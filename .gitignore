@@ -1,0 +1,127 @@
+# ============================================================
+# XR-Apartment-Group8 — Unity 2022.3.62f3
+# 原则：只把「别人 clone 后复现工程所必需的东西」放进仓库。
+# Assets/ 下的 *.meta 必须与它的资源一起提交，永远不要忽略。
+# ============================================================
+
+# ---------- Unity 自动生成的目录（clone 后会重建） ----------
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]serSettings/
+/.unity-logs/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/[Cc]aptures/
+
+# Android Gradle 导出中间产物
+/.utmp/
+/[Aa]ssets/[Pp]lugins/[Aa]ndroid/[Gg]radleAPP/
+
+# ---------- 密钥与签名材料：任何情况下都不许进仓库 ----------
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+*.gpg
+*.secret
+*.credentials
+secrets.json
+credentials.json
+*.env
+.env
+.env.*
+!.env.example
+google-services.json
+GoogleService-Info.plist
+ServiceAccount*.json
+
+# ---------- 崩溃转储 / 日志 / 临时产物（排查用，不共享） ----------
+*.log
+*.tmp
+*.dmp
+*.crash
+*.stackdump
+sysinfo.txt
+sysinfodata/
+hs_err_pid*
+/replay_pid*
+# 编辑器崩溃自动备份
+*.old
+*~
+.#*
+\#*#
+
+# ---------- 构建产物 ----------
+*.apk
+*.aab
+*.xap
+*.app
+*.aab.meta
+*.unitypackage
+
+# ---------- IDE / 工具链生成的工程文件 ----------
+*.csproj
+*.unityproj
+*.sln
+*.sln.DotSettings.user
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+/ExportedObj/
+/.consulo/
+/.gradle/
+
+# ---------- IDE / 编辑器目录 ----------
+/.idea/
+/.vs/
+/.vscode/
+/.cursor/
+/.fleet/
+
+# ---------- Qoder：个人本地配置不共享，共享配置（rules / repowiki 等）照常入库 ----------
+/.qoder/settings.local.json
+/.qoder/*.local.json
+/.qoder/cache/
+/.qoder/logs/
+
+# ---------- OS / Shell 制品 ----------
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+.Trash-*
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+desktop.ini
+*.lnk
+$RECYCLE.BIN/
+@Recently-Snapshot/
+@Recycle/
+
+# ---------- 第三方 / 缓存 ----------
+/[Aa]ssets/AssetStoreTools*
+/AssetStoreThirdPartyNotices*
+/[Aa]ssets/Plugins/Editor/JetBrains*
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# TextMesh Pro：由 UPM 包在首次运行/导入时生成，不入库
+/Assets/TextMesh Pro/
+/Assets/TextMesh Pro.meta

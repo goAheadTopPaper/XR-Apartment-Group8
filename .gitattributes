@@ -1,0 +1,115 @@
+# ============================================================
+# Git 属性：换行归一化 + Git LFS 跟踪规则
+# 需要先执行一次 `git lfs install`（本机 git-lfs 3.7.1 已就绪）。
+# 规则：可读的 YAML/代码走文本（保留 diff 与合并能力），
+#       不可读的二进制美术资源走 LFS。
+# ============================================================
+
+* text=auto
+
+# ---------- 必须保持文本：Unity YAML / C# / 配置 ----------
+# 场景与预制体是 YAML 文本，走 LFS 会让代码审查完全无法看 diff。
+*.cs               text diff=csharp
+*.shader           text
+*.hlsl             text
+*.cginc            text
+*.compute          text
+*.asmdef           text
+*.asmref           text
+*.unity            text
+*.prefab           text
+*.asset            text
+*.mat              text
+*.meta             text
+*.anim             text
+*.controller       text
+*.mask             text
+*.playable         text
+*.physicMaterial   text
+*.physicMaterial2D text
+*.guiskin          text
+*.fontsettings     text
+*.unitypackage.meta text
+*.json             text
+*.xml              text
+*.yaml             text
+*.yml              text
+*.md               text
+*.txt              text
+*.editorconfig     text
+*.gitignore        text
+*.gitattributes    text
+Manifest.json      text
+packages-lock.json text
+
+# ---------- Git LFS：贴图 / 图像 ----------
+*.png    filter=lfs diff=lfs merge=lfs -text
+*.jpg    filter=lfs diff=lfs merge=lfs -text
+*.jpeg   filter=lfs diff=lfs merge=lfs -text
+*.jpe    filter=lfs diff=lfs merge=lfs -text
+*.tga    filter=lfs diff=lfs merge=lfs -text
+*.tif    filter=lfs diff=lfs merge=lfs -text
+*.tiff   filter=lfs diff=lfs merge=lfs -text
+*.bmp    filter=lfs diff=lfs merge=lfs -text
+*.gif    filter=lfs diff=lfs merge=lfs -text
+*.webp   filter=lfs diff=lfs merge=lfs -text
+*.psd    filter=lfs diff=lfs merge=lfs -text
+*.psb    filter=lfs diff=lfs merge=lfs -text
+*.eps    filter=lfs diff=lfs merge=lfs -text
+*.ai     filter=lfs diff=lfs merge=lfs -text
+*.exr    filter=lfs diff=lfs merge=lfs -text
+*.hdr    filter=lfs diff=lfs merge=lfs -text
+*.dds    filter=lfs diff=lfs merge=lfs -text
+*.ktx    filter=lfs diff=lfs merge=lfs -text
+*.ktx2   filter=lfs diff=lfs merge=lfs -text
+*.astc   filter=lfs diff=lfs merge=lfs -text
+*.svg    filter=lfs diff=lfs merge=lfs -text
+
+# ---------- Git LFS：模型 ----------
+*.fbx   filter=lfs diff=lfs merge=lfs -text
+*.FBX   filter=lfs diff=lfs merge=lfs -text
+*.obj   filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.ma    filter=lfs diff=lfs merge=lfs -text
+*.mb    filter=lfs diff=lfs merge=lfs -text
+*.max   filter=lfs diff=lfs merge=lfs -text
+*.3ds   filter=lfs diff=lfs merge=lfs -text
+*.abc   filter=lfs diff=lfs merge=lfs -text
+*.usd   filter=lfs diff=lfs merge=lfs -text
+*.usdc  filter=lfs diff=lfs merge=lfs -text
+*.usdz  filter=lfs diff=lfs merge=lfs -text
+*.glb   filter=lfs diff=lfs merge=lfs -text
+*.gltf  filter=lfs diff=lfs merge=lfs -text
+
+# ---------- Git LFS：音频 ----------
+*.wav  filter=lfs diff=lfs merge=lfs -text
+*.mp3  filter=lfs diff=lfs merge=lfs -text
+*.ogg  filter=lfs diff=lfs merge=lfs -text
+*.oga  filter=lfs diff=lfs merge=lfs -text
+*.aif  filter=lfs diff=lfs merge=lfs -text
+*.aiff filter=lfs diff=lfs merge=lfs -text
+*.flac filter=lfs diff=lfs merge=lfs -text
+*.m4a  filter=lfs diff=lfs merge=lfs -text
+*.aac  filter=lfs diff=lfs merge=lfs -text
+
+# ---------- Git LFS：视频 ----------
+*.mp4  filter=lfs diff=lfs merge=lfs -text
+*.mov  filter=lfs diff=lfs merge=lfs -text
+*.avi  filter=lfs diff=lfs merge=lfs -text
+*.mkv  filter=lfs diff=lfs merge=lfs -text
+*.webm filter=lfs diff=lfs merge=lfs -text
+*.wmv  filter=lfs diff=lfs merge=lfs -text
+
+# ---------- Git LFS：字体与二进制包 ----------
+*.ttf  filter=lfs diff=lfs merge=lfs -text
+*.otf  filter=lfs diff=lfs merge=lfs -text
+*.ttc  filter=lfs diff=lfs merge=lfs -text
+*.dll  filter=lfs diff=lfs merge=lfs -text
+*.so   filter=lfs diff=lfs merge=lfs -text
+*.a    filter=lfs diff=lfs merge=lfs -text
+*.dylib filter=lfs diff=lfs merge=lfs -text
+*.bundle filter=lfs diff=lfs merge=lfs -text
+*.zip  filter=lfs diff=lfs merge=lfs -text
+*.7z   filter=lfs diff=lfs merge=lfs -text
+*.rar  filter=lfs diff=lfs merge=lfs -text
+*.unitypackage filter=lfs diff=lfs merge=lfs -text
