@@ -1,6 +1,6 @@
 # XR-Apartment-Group8
 
-多人协作的 VR 公寓交互项目（课程小组 8）。目标是在 PC VR 上开发调试、最终出 Meta Quest 一体机包。
+COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**（Kitchen Design Review），不是通用 VR 公寓漫游。评审者在单一代表性厨房里比较「冰箱 × 柜体」的三种组合，通过相同的日常任务理解空间取舍，并提交可定位的结构化反馈。产品定义、范围与验收以仓库外的 **Lean PRD v0.1** 为唯一权威（见 §12）。
 
 > **给新组员：先看「clone 后第一次打开」和「版本控制规范」两节，再动 Unity。**
 
@@ -11,10 +11,13 @@
 | 项 | 值 |
 | --- | --- |
 | Unity 版本 | **2022.3.62f3**（`C:\Program Files\Unity\Hub\Editor\2022.3.62f3`），**锁死，不要升级** |
-| 渲染管线 | Built-in RP（URP 迁移见 §9） |
-| 目标平台 | PC VR（OpenXR / SteamVR）开发调试 + Meta Quest 一体机出包 |
+| 渲染管线 | Built-in RP。PRD 没有要求更换管线；迁移 URP 属于团队另行决策（会牵动全部材质与构建验证），不在 MVP 路径上 |
+| 运行环境 | **Meta Quest 3 经 Quest Link 连 Windows PC**（PRD §3.3、TECH-02）→ 构建目标 `StandaloneWindows64`。没头显的组员用 XR Device Simulator 在编辑器里跑 |
+| 会话形态 | 单一参与者、约 20 分钟、自导（不依赖引导员持续讲解）、有限实体 play area + Teleport 覆盖虚拟厨房（PRD §3.3、D09） |
 | 输入系统 | 以 New Input System 为准。实测 `ProjectSettings.asset` 里 `activeInputHandler: 1`，即 **Both（旧 Input Manager 同时启用）**；若要收紧为「仅新系统」需改为 `2`，会重启生效并可能影响用到 `UnityEngine.Input` 的第三方资源 |
-| 脚本后端 | Windows: Mono；Android: IL2CPP / ARM64，Min SDK 29，Graphics API `Vulkan + OpenGLES3` |
+| 数据与记录 | 匿名本地 JSON/CSV（PRD §11.3、D13）。**不建账号、不接云端数据库**，多人协作与云端已明确 Deferred |
+| 模型来源 | Blender → Unity，统一米制 `1 unit = 1 m`（PRD §7.1、TECH-01），由 E 维护几何与参数登记 |
+| 脚本后端 | Windows: Mono（MVP 用这个）。Android 的 IL2CPP / ARM64 / Min SDK 29 / Vulkan+GLES3 工程里已配好，但**一体机出包不在 Phase 2 MVP 范围**，见 §8 |
 | 版本控制 | Git + **Git LFS**（必装，见 §5） |
 
 ### Packages（`Packages/manifest.json`）
@@ -58,7 +61,7 @@ Assets/
     Prefabs/           预制体（优先在预制体里改，不要直接改场景里的实例）
     Scripts/           运行时脚本
     Materials/         材质
-    Settings/          项目自有配置资产（自定义 InputActions、Interaction Layers 等）
+    Settings/          项目自有配置资产（自定义 InputActions、benchmark 组合定义、模型参数登记表）
     XR/                自定义 XR Provider / 交互层配置
   Editor/              编辑器工具脚本（XRProjectBootstrap / VRSceneBootstrap）
   XR/                  ★ XR Plug-in Management 生成的资产（Loader 列表、OpenXR Package Settings）
@@ -122,33 +125,35 @@ git lfs checkout             # 指针文件还原为真实内容
 ## 6. 协作流程
 
 - **分支**：`main` 保持随时可运行，功能开发走 `feature/<名字>`（当前有 `feature/hzc`、`feature/xjx`、`feature/mzh`、`feature/ycy`、`feature/yzk`、`feature/zh`）。合并用 PR，不要直接 push `main`。
-- **Prefab 优先**：可交互物（门、灯、家具、手持物）做成 Prefab 放进 `Assets/_Project/Prefabs/`，场景里只放实例。改 Prefab 一个提交能让全部实例生效，比在场景里逐个改更容易review、也更不容易冲突。
-- **场景拆分**：客厅 / 卧室 / 厨房 / 卫生间 / 阳台各自独立子场景，运行时按 additive 加载。`.unity` 是整体序列化的文本，**两人同时改同一个场景必然冲突且无法手工合并**，这是唯一可靠的解法。
+- **Prefab 优先**：冰箱 archetype（F2/F3/F4）、两类柜体策略（Proud / Flush-oriented）、可抓取物品、反馈面板各自做成 Prefab 放 `Assets/_Project/Prefabs/`，场景里只放实例。benchmark 之间靠切换实例，不靠改场景。
+- **不要扩回完整公寓**：PRD 已把完整公寓、颜色定制、真实重量物理、电线/插座、多人联网列为 Deferred/Rejected（D02/D03、§5）。范围再次膨胀是首要风险 R01。
 - **不要改 `Assets/Samples/**`**：整目录是官方示例，需要改其中的输入配置或预制体时，**复制**到 `Assets/_Project/Settings/` 或 `Prefabs/` 再改（升级 XRI 时 `Samples/` 会整目录替换）。
-- **单位约定**：FBX 导入 `1 unit = 1 m`，人物眼睛高度约 1.6–1.7 m。家具、门洞尺寸按真实米制建模，否则抓取和传送的落点全部会错。
-- **命名**：`前缀_类型_描述`，例如 `PREF_Door_Front`、`MAT_Kitchen_Cabinet`、`TEX_Wall_Paint_01`、`SCN_LivingRoom`。同一概念用同一前缀，方便搜索。
-- 遇到 `ProjectSettings/`（尤其 `TagManager.asset` 的 Interaction Layers、`EditorBuildSettings.asset`）冲突时，优先在群里对齐后由一人重设，不要手工拼接 YAML。
+- **单位与尺寸**：FBX 导入 `1 unit = 1 m`，人物眼高约 1.6–1.7 m。**任何尺寸、clearance、reach 的主张都必须能对上登记的模型参数**（MOD-01、§7.2）；「看起来够宽」不是证据，视觉印象不能作为空间结论的依据。
+- **命名带语义角色，不带 benchmark 编号**：`PREF_Fridge_F2`、`PREF_Cabinet_Proud_Wall`、`MAT_Kitchen_Counter`、`SCN_Kitchen_Review`。可交互物要能通过语义角色被找到（如 `FridgeDoor` / `FridgeDrawer` / `CounterSurface` / `StorageZone`），**不要按 B1/B2/B3 分别命名对象**——FR-03 要求三个 benchmark 执行完全相同的动作链，目标一旦按组合写死，这条就无法满足。
+- 遇到 `ProjectSettings/`（尤其 `TagManager.asset`、`EditorBuildSettings.asset`）冲突时，优先在群里对齐后由一人重设，不要手工拼接 YAML。
 
 ---
 
-## 7. PC VR 调试
+## 7. 运行与调试（Quest Link）
 
-1. 后台启动 SteamVR（或对应头显的运行时）。
-2. 打开 `Assets/_Project/Scenes/Main.unity` → Play。
-3. 验收标准：手柄能抓取示例 Cube（触发键）、能通过 Teleport Area 上的控制器射线传送。
-4. 没头显的组员：`Window → Package Manager → XR Interaction Toolkit → Samples → XR Device Simulator` 按需导入，用键鼠模拟手柄（只用于摆场景，交互手感仍需真机验证）。
+构建目标固定 `StandaloneWindows64`——Quest 3 只当显示器，画面由 PC 渲染（PRD TECH-02 批准的就是这个环境）。
+
+1. 编辑器里 `File → Build Settings` 确认平台是 **Windows, Mac, Linux → Standalone Windows64**，场景 `Assets/_Project/Scenes/Main.unity` 在第 0 位。
+2. Quest 3 上启动 Link（有线优先，无线对带宽敏感），连到本机；Meta Horizon 里允许连接。
+3. Unity 编辑器按 **Play**，头显即显示画面。当前工程的最小验收：控制器能抓取示例 Cube、能沿 Teleport Area 传送。
+4. **没头显的组员**：`Window → Package Manager → XR Interaction Toolkit → Samples → XR Device Simulator`，用键鼠模拟手柄摆场景；但空间尺度、通行和舒适判断必须最后在头显里验，模拟器给不了 1:1 尺度感。
+5. 不要引入 SteamVR / WMR 等其他运行时路径作为测试基线——PRD 只批准了 Quest 3 + Quest Link，多一条链路就多一套 OpenXR Profile 和风险。
 
 ---
 
-## 8. Quest 出包
+## 8. 一体机出包（当前不做）
 
-1. `File → Build Settings → Android → Switch Platform`（需已安装 Android Build Support + SDK/NDK/OpenJDK）。
-2. `Player Settings` 保持：IL2CPP、ARM64、Min SDK 29、Graphics API `Vulkan + OpenGLES3`。
-3. OpenXR 设置里按需启用 `Meta Touch Controller Profile`，需要手势识别再加 `Hand Tracking` feature：`Project Settings → XR Plug-in Management → Android tab → OpenXR`。
-4. 签名：`Project Settings → Player → Android → Publishing Settings` 里指向 keystore。**keystore 文件和口令都不要放进仓库**——放在仓库外的本机路径（例如 `C:\Users\<你>\unity-keystores\`），口令交给组长保管；`.gitignore` 已经拦截 `*.keystore` / `*.jks`。
-5. Build 出 APK 后 `adb install -r <apk>`，在「Unknown Sources / 未知来源应用」中启动。
-6. 需要 OVR 性能工具或上架商店时，另行安装 Meta XR SDK（Asset Store，需登录账号，只能手动装）。
-7. 性能目标：Quest 端稳定 **72 fps**。用 `Window → Analysis → Profiler` 或 Meta OVR Metrics Tool 实测，不要只看编辑器帧率。
+**MVP 不需要 Android/APK**：PRD §14.1 与 TECH-02 只要求 Quest Link 环境。工程里 Android 的 IL2CPP / ARM64 / Min SDK 29 / Vulkan+GLES3 已配好，是给后续可能的一体机版本预留的。
+
+- **不要顺手 Switch Platform**：切到 Android 会触发全量 reimport 并改写 `EditorBuildSettings.asset` / `GraphicsSettings.asset`，属于影响全组状态的动作（见 §12 的「先问人」约定）。
+- 将来真要出一体机包时：keystore 文件与口令**绝不入库**，放在仓库外的本机路径（例如 `C:\Users\<你>\unity-keystores\`），口令交组长保管——`.gitignore` 已拦 `*.keystore` / `*.jks` / `*.pem` / `*.key`。
+- 需要 OVR 性能工具或上架商店时另行安装 Meta XR SDK（Asset Store，需登录 Unity 账号，只能手动装）。
+- PRD 没有设具体 fps 指标；舒适度与性能作为 PRD §9.3（异常与恢复）和 §13（评价计划）的观察项记录，不要用「跑到 72fps」这类文档里没有的目标当验收条件。
 
 ---
 
@@ -203,27 +208,40 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
 
 ## 11. 当前状态
 
-- `Assets/_Project/Scenes/Main.unity` 是 XRI Starter Assets 的初始布局（XR Origin + EventSystem + Ground + Teleport Area/Anchor + 可抓取 Cube），**还没有公寓场景内容**。
-- `Assets/_Project/Scripts/`、`Prefabs/`、`Materials/`、`Settings/`、`XR/` 目前都是空的。
-- 控制台 0 error。
+- `Assets/_Project/Scenes/Main.unity` 是 XRI Starter Assets 的初始布局（XR Origin + EventSystem + Ground + Teleport Area/Anchor + 可抓取 Cube）——只是「能进 VR」的最小外壳。
+- **厨房、冰箱/柜体方案、会话状态机、冲突提示、反馈与本地记录全部还没有**；`Assets/_Project/` 下除 `Scenes/Main.unity` 外都是空目录（靠 `.gitkeep` 占位）。
+- 工程设置与版本控制已冻结入库，控制台 0 error。
+- 对照 PRD §12 的 25 条 Approved 需求，Unity 侧目前 **0 条已实现**。
 
-### 下一步（P0 → P2）
+### 下一步（对齐 PRD §16 里程碑）
 
-**P0**
-- OpenXR Profile 落地：Android 端启用 Meta Touch Controller Profile（要手势识别再加 Hand Tracking），Windows 端按组里实际头显勾选。验收：PC 接手柄 Play 能抓取 + 传送。
-- Quest 出包实测一次：切 Android → Build APK → `adb install -r` → 真机跑到 72 fps（含 Vulkan 兼容性验证）。
+| PRD 周次 | 工作 | Owner | 完成判据 |
+| --- | --- | --- | --- |
+| Week 4 | Quest Link 环境下跑通可执行 build；灰盒厨房比例 | D/E/F | 目标设备能启动并进主旅程（TECH-02）；尺寸抽查与登记一致（TECH-01） |
+| Week 5 | 厨房、两类柜体、F2/F3/F4 与参数登记 | E | B1-B3 几何可切换；Assumption Register 完整（FR-02、MOD-01） |
+| Week 5-6 | 移动、门体/抽屉、抓取、重置、八态状态机 | D | 主动作链可运行且可恢复（FR-01/03/04/05/11） |
+| Week 6 | Explore/Challenge、即时冲突提示、反馈 UI | C/D | 三个 benchmark 能完成并保存记录（FR-06/07/08/09/10、SAFE-01） |
+| Week 7 | 内部试跑、稳定 build、Phase 2 提交 | F/D | 20 分钟主旅程稳定；限制有记录（UX-03） |
 
-**P1**
-- 把 `XRI Default Input Actions` 复制为项目自有 asset 放 `Assets/_Project/Settings/` 再改；建立 Interaction Layers：`Wall / Furniture / Door / Item / Player`。
-- 公寓场景骨架：客厅/卧室/厨房/卫生间/阳台按真实米制白模（可用 ProBuilder），拆成 additive 子场景。
-- 核心可交互 Prefab：门（旋转/推拉）、灯与电器开关、可抓取+投掷物品、传送点与锚点布局。
-- 光照与性能基线：静态 Lightmap 烘焙（Progressive）、Reflection Probe、LOD 与 overdraw 控制，采一次 Profiler 记录瓶颈。
+可并行推进的：把 `XRI Default Input Actions` 复制进 `Assets/_Project/Settings/` 再改（**不要动 Samples**）、ACC-01/02 的姿态切换与远距选择、以及 §12 说的需求 ID 追溯习惯。
 
-**P2**
-- Editor 冒烟测试（`Tests/Editor`）：断言双端 `activeLoaders` 含 `OpenXRLoader`、`activeInputHandler == 1`、`Main` 在 Build Settings 第 0 位——防止队友误改回退。
-- 可选：URP 迁移（Quest 端更省，但要改材质）、Meta XR SDK（需登录 Unity 账号手动装）。
+### 开放实现参数（PRD §22 表 31，不要提前当成已定）
 
-### 未决问题（需要拍板）
+柜体/通道/gap 的具体数值（E，冻结于 gray-box Ready Gate）、门体提示触发阈值（D/E）、反馈面板最终形态（C）、结构化选项措辞（B/C）、物品种类与数量（C/E，每组 3-5 件等价）、稳定 build 版本号（D/F）。
 
-- **是否需要多人同场联网？** 这会决定架构（网络方案 + 交互状态同步），越晚定改动越大。
-- 组里实际有哪些头显？决定 Windows 端 OpenXR Profile 与测试分工。
+---
+
+## 12. 权威文档与需求追溯
+
+- **唯一权威是 Lean PRD v0.1（2026-09-19，状态 Team Decision Baseline）**，配合 Scenario C 作业说明与虚拟客户答复 Q1-Q7。README 与 `AGENTS.md` 只是操作向摘要，**与 PRD 冲突时以 PRD 为准**，并请顺手把摘要改对。
+- 目前这些文档只存在各人本机（微信文件目录）。建议收进仓库 `Docs/` 并走 LFS（`.docx` 是 zip 二进制），否则队友和 agent 会话只能凭二手描述工作，PRD 里那张参数登记表也无从追溯。
+- **状态词不要混用**：`Confirmed`（课程/场景/客户明确事实）｜`Team Decision`（团队冻结的产品选择）｜`Assumption`（须登记 Owner 与验证方法）｜`Open`｜`Deferred`｜`Rejected`。凡空间表述都要标成 prototype assumption，不得冒充 client fact（MOD-01、风险 R02，由 A 做 claims review）。
+- **ID 稳定且唯一**：需求 `FR-01…FR-12`、`UX-01…UX-04`、`ACC-01/02`、`SAFE-01`、`MOD-01`、`TECH-01/02`、`EVAL-01…03`，决策 `D01…D20`，风险 `R01…R11`，评价问题 `EQ1…EQ6`。不要新造并行编号体系。
+- **提交信息引用被满足的需求 ID**，例如：
+
+```
+feat(review): 加入八态会话状态机 [FR-11 FR-12]
+fix(conflict): 门体扫掠检测改为读取登记的开门角参数 [FR-04 MOD-01]
+```
+
+  这是 F 做证据追溯、A 维护 traceability matrix 最省事的做法，也正是 PRD §15.2 所说「用 Git commit / issue / PR 区分个人贡献」的直接来源。
