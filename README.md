@@ -157,7 +157,7 @@ git lfs checkout             # 指针文件还原为真实内容
 - Unity 官方的 `com.unity.ai.assistant` 内置 MCP **要求 Unity 6（6000.0）以上**；本项目走社区方案 **MCP for Unity（CoplayDev，支持 2021.3–6.x）**。这是已定决策，不要再提议升级引擎或安装 `com.unity.ai.assistant*`。
 - 编辑器内：`Window → MCP for Unity → Auto-Setup`；若 Unity Bridge 显示 Stopped，点 `Start Bridge`。
 - 服务端：`uvx --from mcpforunityserver==10.2.0 mcp-for-unity`，需要 [uv](https://docs.astral.sh/uv/)（`uvx --version` 可用即可）。
-- Qoder 侧配置写在各人本地的 `.qoder/settings.local.json`（已 gitignore，不共享），示例：
+- MCP server 要写在**用户级** `~/.qoder/settings.json`（Windows 上是 `C:\Users\<你>\.qoder\settings.json`）的 `mcpServers` 里，示例：
 
 ```json
 {
@@ -170,10 +170,13 @@ git lfs checkout             # 指针文件还原为真实内容
 }
 ```
 
-（`command` + `args` 即 stdio，无需写 `type` 字段。IDE 的 agent 会话可能不读这个文件，用 IDE 的 MCP 设置界面添加。）
+（`command` + `args` 即 stdio，无需写 `type` 字段。）
 
-- 改完后执行 `/mcp reload`，`/mcp` 查看连接状态。Unity 编辑器必须处于打开状态，Bridge（`127.0.0.1:6400`）才能响应工具调用。
-- 给 agent 的硬约束：改设置/场景/预制体优先用 `mcp__unity__*` 工具；工具报错先怀疑编辑器关了 / 域重载中 / 桥停了，而不是包版本问题；提交、推送、切构建目标这类影响共享状态的操作**先问人**。
+**上面这段 JSON 要放进 `~/.qoder/settings.json`（用户级）才会生效。** IDE 的 agent 会话不读仓库内的 `.qoder/settings.local.json`——写在项目里会发现工具列表纹丝不动；那份文件只给终端 `qodercli` 用。不想动全局配置的话，走 IDE 自己的 MCP 设置界面添加也可以，效果相同。改完需要**新开一个会话**才会加载。
+
+- 用 IDE 会话时执行 `/mcp reload` 可能只是被当成普通消息发出去，不一定真重载；`/mcp` 可查看已连上的 server。Unity 编辑器必须处于打开状态，Bridge（`127.0.0.1:6400`）才能响应工具调用。
+- 若工具报 `No Unity Editor instances found`：先确认编辑器还开着（`tasklist | grep -i unity`、`netstat -ano | grep 6400`），这几乎总是编辑器关了或正在域重载，不是配置问题。
+- 给 agent 的硬约束汇总在仓库根的 **`AGENTS.md`**（会随仓库共享，队友的 agent 会话会自动读取）：引擎版本、`Assets/Samples/**` 只读、必须入库/绝不入库清单、当前设置的真实值。改这些约定时同步改它。
 
 ---
 
