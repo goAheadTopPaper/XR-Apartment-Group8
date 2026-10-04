@@ -25,7 +25,8 @@ COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房�
 - PRD §12 的 25 条 Approved 需求（FR/UX/ACC/SAFE/MOD/TECH/EVAL）在 Unity 侧 **0 条已实现**。
 - `Assets/_Project/` 下除 `Scenes/Main.unity` 外全是空目录（`.gitkeep` 占位）：没有脚本、没有 asmdef、没有 Prefab、没有自定义 `.inputactions`、没有测试程序集。
 - `Main.unity` 仍是 Starter Assets 初始布局（XR Origin + EventSystem + Ground + Teleport Area/Anchor + 可抓取 Cube），厨房灰盒还没建。
-- `ProjectSettings/TagManager.asset` 层 3–31 全空，XRI `InteractionLayerSettings` 除 Default 外没有自定义层。
+- `ProjectSettings/TagManager.asset` 层 3–31 仍全空；XRI `InteractionLayerSettings` 目前只有 `Teleport` 一层（Starter Assets 导入时加的）。
+- OpenXR 的 **控制器 interaction profile 已为 StandaloneWindows64 启用**（Oculus Touch / Meta Quest Touch Plus / Touch Pro / KHR Simple），Android 侧有意保持全关。**但本机没装任何 XR 运行时**（无 Meta Horizon/Oculus 桌面端、无 SteamVR），Play 模式实测 `XRSettings.enabled=False`、`isDeviceActive=False`——能进普通模式跑，进不了 XR。这条限制解除前，任何「手柄有没有反应」的结论都不可验证。
 - 编译目标当前是 StandaloneWindows64，双端 OpenXR Loader 均已配置，控制台 0 error。
 
 ## 必须入库 / 绝不入库
