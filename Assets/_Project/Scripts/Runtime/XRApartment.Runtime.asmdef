@@ -3,7 +3,8 @@
   "rootNamespace": "XRApartment.Runtime",
   "references": [
     "XRApartment.Data",
-    "XRApartment.Simulation"
+    "XRApartment.Simulation",
+    "Unity.XR.Interaction.Toolkit"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
