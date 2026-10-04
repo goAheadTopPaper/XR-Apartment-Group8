@@ -1,0 +1,17 @@
+{
+  "name": "XRApartment.Runtime",
+  "rootNamespace": "XRApartment.Runtime",
+  "references": [
+    "XRApartment.Data",
+    "XRApartment.Simulation"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
