@@ -21,11 +21,12 @@ COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房�
 
 ## 当前真实状态（改设置前先看这里，别照旧文档假设）
 
-- `activeInputHandler: 1` = **Both**（旧 Input Manager 与新 Input System 同时启用）。收紧为「仅新系统」是 `2`。**不要因为"看起来应该是 2"就顺手改**。
+- `activeInputHandler: 1` = **仅新 Input System**（Unity 的取值映射是 0=旧 / 1=仅新 / 2=Both，与 `Assets/Editor/XRProjectBootstrap.cs` 的注释一致）。**不要因为"看起来应该是 2"就顺手改**。
 - PRD §12 的 25 条 Approved 需求（FR/UX/ACC/SAFE/MOD/TECH/EVAL）在 Unity 侧 **0 条已实现**。
-- `Assets/_Project/Scripts/` 已建三个程序集边界：`XRApartment.Data`（枚举 / benchmark 定义与注册表 / 模型参数 SO / 会话记录 schema）、`XRApartment.Simulation`（纯 C#，`noEngineReferences`，八态状态机与挑战动作链）、`XRApartment.Runtime`（`ReviewElement` 标注组件，暂不引用 XRI）。`Assets/_Project/Tests/EditMode/` 有 25 条断言，用 `run_tests` 无需头显即可全绿。
-- 仍然没有：厨房灰盒、任何 MonoBehaviour 交互代码、XRI 侧的抓取/门体/冲突检测、反馈 UI、本地记录写盘。`Prefabs/`、`Materials/`、`Settings/`、`XR/` 依旧空。
-- `Main.unity` 仍是 Starter Assets 初始布局（XR Origin + EventSystem + Ground + Teleport Area/Anchor + 可抓取 Cube），厨房灰盒还没建。
+- `Assets/_Project/Scripts/` 三个程序集边界：`XRApartment.Data`（枚举 / benchmark 定义与注册表 / 模型参数 SO / 会话记录 schema）、`XRApartment.Simulation`（纯 C#，`noEngineReferences`，八态状态机、挑战动作链、运动学缓动 `MotionKinematics`）、`XRApartment.Runtime`（`ReviewElement` 标注 + `KinematicSwingDoor` / `KinematicLinearDrawer` 运动学门体抽屉 + `BenchmarkSlotMarker`，已引用 XRI 3.5）。`Assets/_Project/Tests/EditMode/` 在原有 25 条断言之外新增 `MotionKinematicsTests`（7 条），用 `run_tests` 无需头显即可全绿。
+- 厨房灰盒已建：`Assets/_Project/Scenes/SCN_Kitchen_Review.unity`，由 `Assets/Editor/KitchenSceneBootstrap.cs` 的菜单 `XR Apartment/Build Kitchen Review Scene` 生成/重建，几何尺寸一律读 `Settings/ASM_KitchenParameters.asset`（MOD-01）。`Prefabs/` 有 `PREF_Fridge_F2/F3/F4`（按 双门/三门/四门十字 解释，含语义角色门体/抽屉）与可抓取 `PREF_Prop_Pot/Cup`；`Materials/`、`Settings/`（含 `REG_Benchmarks` + `BENCH_B1/B2/B3`）已填充。B1/B2/B3 用菜单 `XR Apartment/Benchmark/Apply …` 切换（编辑器与 Play 模式均可），场景内只换 `SLOT_Fridge` 下的预制体实例和 Flush 围板。
+- 仍然没有：几何冲突检测（SAFE-01 的 warning/fade 与 Red→Amber 两套语义）、反馈 UI、本地记录写盘。`XR/` 目录仍空。
+- `Main.unity` 仍是 Starter Assets 初始布局，未被新场景改动；`SCN_Kitchen_Review` 已加入 Build Settings（第二位）。
 - `ProjectSettings/TagManager.asset` 层 3–31 仍全空；XRI `InteractionLayerSettings` 目前只有 `Teleport` 一层（Starter Assets 导入时加的）。
 - OpenXR 的 **控制器 interaction profile 已为 StandaloneWindows64 启用**（Oculus Touch / Meta Quest Touch Plus / Touch Pro / KHR Simple），Android 侧有意保持全关。
 - 本机 **活动的 OpenXR 运行时是 Virtual Desktop**（`HKLM\SOFTWARE\Khronos\OpenXR\1\ActiveRuntime` 指向 `C:\Program Files\Virtual Desktop Streamer\OpenXR\virtualdesktop-openxr.json`，runtime 名 `VirtualDesktopXR (Bundled)`）。SteamVR 也已安装但不应与 VD 抢运行时。
