@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 839ddfbd3944708448ee11c3e2473f7b, type: 3}
+  m_Name: ASM_KitchenParameters
+  m_EditorClassIdentifier: 
+  modelVersion: 0.1-graybox
+  parameters:
+  - key: room_width
+    valueMetres: 3.6
+    source: "\u7070\u76D2\u623F\u95F4\u5BBD\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: room_depth
+    valueMetres: 3
+    source: "\u7070\u76D2\u623F\u95F4\u8FDB\u6DF1"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: room_height
+    valueMetres: 2.6
+    source: "\u7070\u76D2\u623F\u95F4\u51C0\u9AD8"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: counter_height
+    valueMetres: 0.9
+    source: "\u53F0\u9762\u5B8C\u6210\u9762\u9AD8\uFF08\u53A8\u623F\u4EBA\u4F53\u5DE5\u5B66\u5E38\u7528\u503C\uFF09"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: counter_depth
+    valueMetres: 0.6
+    source: "\u67DC\u4F53\u8FDB\u6DF1"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: counter_run_length
+    valueMetres: 2.22
+    source: "\u51B0\u7BB1\u69FD\u53F3\u4FA7\u7684\u8FDE\u7EED\u53F0\u9762\u957F\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: worktop_thickness
+    valueMetres: 0.04
+    source: "\u53F0\u9762\u677F\u539A\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: toe_kick_height
+    valueMetres: 0.1
+    source: "\u8E22\u811A\u9AD8\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: upper_cabinet_bottom
+    valueMetres: 1.5
+    source: "\u540A\u67DC\u5E95\u9762\u9AD8"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: upper_cabinet_depth
+    valueMetres: 0.35
+    source: "\u540A\u67DC\u8FDB\u6DF1"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: walkway_clearance
+    valueMetres: 1
+    source: "\u53F0\u9762\u524D\u901A\u884C\u51C0\u8DDD\uFF08\u5355\u4EBA\u53A8\u623F\u4E0B\u9650\uFF09"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: fridge_slot_width
+    valueMetres: 0.78
+    source: "\u51B0\u7BB1\u69FD\u5BBD\u5EA6\uFF08\u542B\u4E24\u4FA7\u7559\u7F1D\uFF09"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: fridge_width
+    valueMetres: 0.75
+    source: "\u51B0\u7BB1\u7070\u76D2\u5BBD\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: fridge_depth
+    valueMetres: 0.7
+    source: "\u51B0\u7BB1\u7070\u76D2\u6DF1\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: fridge_height
+    valueMetres: 1.85
+    source: "\u51B0\u7BB1\u7070\u76D2\u9AD8\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: fridge_door_thickness
+    valueMetres: 0.05
+    source: "\u95E8\u677F\u539A\u5EA6"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: fridge_proud_offset
+    valueMetres: 0.1
+    source: "Proud \u72B6\u6001\u51B0\u7BB1\u524D\u7F18\u8D85\u51FA\u53F0\u9762\u524D\u7F18\u7684\u8DDD\u79BB"
+    owner: D
+    status: assumption
+    verification: pending
+  - key: fridge_drawer_travel
+    valueMetres: 0.35
+    source: "\u62BD\u5C49\u6F14\u793A\u884C\u7A0B"
+    owner: D
+    status: assumption
+    verification: pending
