@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
@@ -68,6 +69,7 @@ namespace XRApartment.EditorTools
             BuildKitchenRun();
             BuildBenchmarkRoot();
             PlaceProps();
+            BuildMenuPanel();
             Spawn($"{SampleRoot}/DemoAssets/Prefabs/Teleport/Teleport Anchor.prefab", new Vector3(0f, 0.02f, 0.45f));
 
             ApplyBenchmark("B1");
@@ -490,14 +492,16 @@ namespace XRApartment.EditorTools
                 TagReview(drawer, ReviewRole.FridgeDrawer, ElementStatus.Reviewable, "fridge_depth", name);
             }
 
+            // 双门/三门冰箱的平开门统一同侧铰链（实测玩家视角：异侧会让两扇门向两边张开，
+            // 不符合常见双门形态）；铰链放在靠台面一侧，门扇向房间中央摆出，远离左侧墙。
             switch (archetype)
             {
-                case FridgeArchetype.F2: // 双门：上冷冻小门（左铰）+ 下冷藏大门（右铰）
-                    Swing("DOOR_FridgeDoor_Freezer", 1.30f, 0.55f, w, 0f, true);
+                case FridgeArchetype.F2: // 双门：上冷冻小门 + 下冷藏大门（同侧铰链）
+                    Swing("DOOR_FridgeDoor_Freezer", 1.30f, 0.55f, w, 0f, false);
                     Swing("DOOR_FridgeDoor_Fresh", 0.06f, 1.24f, w, 0f, false);
                     break;
-                case FridgeArchetype.F3: // 三门：上冷藏门 + 中软冻门 + 下冷冻抽屉
-                    Swing("DOOR_FridgeDoor_Upper", 0.85f, 1.00f, w, 0f, true);
+                case FridgeArchetype.F3: // 三门：上冷藏门 + 中软冻门（同侧铰链）+ 下冷冻抽屉
+                    Swing("DOOR_FridgeDoor_Upper", 0.85f, 1.00f, w, 0f, false);
                     Swing("DOOR_FridgeDoor_Middle", 0.50f, 0.35f, w, 0f, false);
                     Slide("DRAWER_FridgeDrawer_Lower", 0.06f, 0.44f, w, 0f);
                     break;
@@ -567,6 +571,83 @@ namespace XRApartment.EditorTools
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             root.AddComponent<XRGrabInteractable>();
             return root;
+        }
+
+        // ------------------------------------------------------------------
+        // World-space menu panel (回到起点 / 暂停 / 平滑移动开关)
+        // ------------------------------------------------------------------
+
+        static void BuildMenuPanel()
+        {
+            var canvasGo = new GameObject("UI_MenuPanel", typeof(Canvas), typeof(TrackedDeviceGraphicRaycaster));
+            var canvas = canvasGo.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+
+            var rect = canvasGo.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(420f, 300f);
+            canvasGo.transform.localScale = Vector3.one * 0.0015f;
+            canvasGo.transform.SetPositionAndRotation(new Vector3(0.45f, 1.35f, 0.05f), Quaternion.identity);
+            canvasGo.transform.LookAt(new Vector3(0f, 1.5f, 0.9f)); // face the player start
+            canvasGo.transform.Rotate(0f, 180f, 0f); // canvas front is local -Z; flip after LookAt
+            canvasGo.AddComponent<KitchenMenuController>();
+
+            var bg = AddUi(canvasGo.transform, "BG", typeof(Image));
+            Stretch(bg.GetComponent<RectTransform>());
+            bg.GetComponent<Image>().color = new Color(0.08f, 0.09f, 0.11f, 0.88f);
+
+            var title = AddUi(canvasGo.transform, "Title", typeof(Text));
+            var titleRect = title.GetComponent<RectTransform>();
+            titleRect.sizeDelta = new Vector2(400f, 48f);
+            titleRect.anchoredPosition = new Vector2(0f, -30f);
+            var titleText = title.GetComponent<Text>();
+            titleText.text = "厨房评审 · 菜单";
+            titleText.font = BuiltinFont();
+            titleText.fontSize = 30;
+            titleText.alignment = TextAnchor.MiddleCenter;
+            titleText.color = new Color(0.90f, 0.92f, 0.95f);
+
+            MakeButton(canvasGo.transform, "BTN_Reset", "回到起点", new Vector2(0f, -88f));
+            MakeButton(canvasGo.transform, "BTN_Pause", "暂停", new Vector2(0f, -150f));
+            MakeButton(canvasGo.transform, "BTN_Locomotion", "平滑移动：关", new Vector2(0f, -212f));
+        }
+
+        static void MakeButton(Transform canvas, string name, string label, Vector2 anchoredPosition)
+        {
+            var button = AddUi(canvas, name, typeof(Image), typeof(Button));
+            var buttonRect = button.GetComponent<RectTransform>();
+            buttonRect.sizeDelta = new Vector2(340f, 52f);
+            buttonRect.anchoredPosition = anchoredPosition;
+            button.GetComponent<Image>().color = new Color(0.20f, 0.33f, 0.50f);
+
+            var labelGo = AddUi(button.transform, "Label", typeof(Text));
+            Stretch(labelGo.GetComponent<RectTransform>());
+            var text = labelGo.GetComponent<Text>();
+            text.text = label;
+            text.font = BuiltinFont();
+            text.fontSize = 26;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+        }
+
+        static GameObject AddUi(Transform parent, string name, params System.Type[] components)
+        {
+            var go = new GameObject(name, components);
+            go.transform.SetParent(parent, false);
+            return go;
+        }
+
+        static void Stretch(RectTransform rt)
+        {
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
+        static Font BuiltinFont()
+        {
+            // 2022 的内置动态字体，正文经 OS 字体回退可显示中文
+            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         }
 
         // ------------------------------------------------------------------
