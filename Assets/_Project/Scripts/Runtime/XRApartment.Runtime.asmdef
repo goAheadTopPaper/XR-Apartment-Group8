@@ -4,7 +4,9 @@
   "references": [
     "XRApartment.Data",
     "XRApartment.Simulation",
-    "Unity.XR.Interaction.Toolkit"
+    "Unity.XR.Interaction.Toolkit",
+    "Unity.XR.CoreUtils",
+    "UnityEngine.UI"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
