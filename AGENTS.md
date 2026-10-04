@@ -23,10 +23,14 @@ COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房�
 
 - `activeInputHandler: 1` = **Both**（旧 Input Manager 与新 Input System 同时启用）。收紧为「仅新系统」是 `2`。**不要因为"看起来应该是 2"就顺手改**。
 - PRD §12 的 25 条 Approved 需求（FR/UX/ACC/SAFE/MOD/TECH/EVAL）在 Unity 侧 **0 条已实现**。
-- `Assets/_Project/` 下除 `Scenes/Main.unity` 外全是空目录（`.gitkeep` 占位）：没有脚本、没有 asmdef、没有 Prefab、没有自定义 `.inputactions`、没有测试程序集。
+- `Assets/_Project/Scripts/` 已建三个程序集边界：`XRApartment.Data`（枚举 / benchmark 定义与注册表 / 模型参数 SO / 会话记录 schema）、`XRApartment.Simulation`（纯 C#，`noEngineReferences`，八态状态机与挑战动作链）、`XRApartment.Runtime`（`ReviewElement` 标注组件，暂不引用 XRI）。`Assets/_Project/Tests/EditMode/` 有 25 条断言，用 `run_tests` 无需头显即可全绿。
+- 仍然没有：厨房灰盒、任何 MonoBehaviour 交互代码、XRI 侧的抓取/门体/冲突检测、反馈 UI、本地记录写盘。`Prefabs/`、`Materials/`、`Settings/`、`XR/` 依旧空。
 - `Main.unity` 仍是 Starter Assets 初始布局（XR Origin + EventSystem + Ground + Teleport Area/Anchor + 可抓取 Cube），厨房灰盒还没建。
 - `ProjectSettings/TagManager.asset` 层 3–31 仍全空；XRI `InteractionLayerSettings` 目前只有 `Teleport` 一层（Starter Assets 导入时加的）。
-- OpenXR 的 **控制器 interaction profile 已为 StandaloneWindows64 启用**（Oculus Touch / Meta Quest Touch Plus / Touch Pro / KHR Simple），Android 侧有意保持全关。**但本机没装任何 XR 运行时**（无 Meta Horizon/Oculus 桌面端、无 SteamVR），Play 模式实测 `XRSettings.enabled=False`、`isDeviceActive=False`——能进普通模式跑，进不了 XR。这条限制解除前，任何「手柄有没有反应」的结论都不可验证。
+- OpenXR 的 **控制器 interaction profile 已为 StandaloneWindows64 启用**（Oculus Touch / Meta Quest Touch Plus / Touch Pro / KHR Simple），Android 侧有意保持全关。
+- 本机 **活动的 OpenXR 运行时是 Virtual Desktop**（`HKLM\SOFTWARE\Khronos\OpenXR\1\ActiveRuntime` 指向 `C:\Program Files\Virtual Desktop Streamer\OpenXR\virtualdesktop-openxr.json`，runtime 名 `VirtualDesktopXR (Bundled)`）。SteamVR 也已安装但不应与 VD 抢运行时。
+- Play 模式实测 `XRSettings.enabled=False`、`isDeviceActive=False` 的原因是 **VDServer 未运行、头显未连接**，不是缺运行时。要验手柄与画面：先启动 PC 端 Virtual Desktop Streamer 并让 Quest 3 连上，再进 Play。
+- **注意与 PRD 的偏差**：§3.3 / §14.1 / TECH-02 写的批准环境是「Quest 3 经 Quest Link」，用 VD 串流属于换链路，需 A/F 确认是改文档还是正式评价仍走官方 Link。别把 VD 的结果当成满足 TECH-02 验收。
 - 编译目标当前是 StandaloneWindows64，双端 OpenXR Loader 均已配置，控制台 0 error。
 
 ## 必须入库 / 绝不入库
