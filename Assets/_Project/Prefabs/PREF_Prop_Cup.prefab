@@ -550,6 +550,7 @@ GameObject:
   - component: {fileID: 7187282919412304588}
   - component: {fileID: 1725520895046840868}
   - component: {fileID: 6875566115503625393}
+  - component: {fileID: 6448890367876573449}
   m_Layer: 0
   m_Name: PREF_Prop_Cup
   m_TagString: Untagged
@@ -574,6 +575,7 @@ Transform:
   - {fileID: 8567952390301573894}
   - {fileID: 4223878758045613638}
   - {fileID: 2411821452415891876}
+  - {fileID: 7164714753148793758}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &7187282919412304588
@@ -602,7 +604,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!114 &1725520895046840868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,7 +618,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 0}
-  m_Colliders: []
+  m_Colliders:
+  - {fileID: 6164763022953839233}
+  - {fileID: 1070785898080462140}
+  - {fileID: 1702909863259405106}
+  - {fileID: 7420157699604346832}
+  - {fileID: 6274057384487600366}
+  - {fileID: 514044870022950287}
+  - {fileID: 2292682699455019695}
+  - {fileID: 8981709495427574599}
+  - {fileID: 2530979389225237513}
+  - {fileID: 3842359960933775192}
+  - {fileID: 579520475963424884}
+  - {fileID: 8256705591759028289}
+  - {fileID: 3096913820460922491}
+  - {fileID: 5963974946594726544}
+  - {fileID: 5610868218906376650}
+  - {fileID: 338828673839607642}
+  - {fileID: 4367337245417864883}
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
@@ -684,7 +703,7 @@ MonoBehaviour:
   m_MatchAttachRotation: 1
   m_SnapToColliderVolume: 1
   m_ReinitializeDynamicAttachEverySingleGrab: 1
-  m_AttachEaseInTime: 0.08
+  m_AttachEaseInTime: 0
   m_MovementType: 2
   m_PredictedVisualsTransform: {fileID: 0}
   m_VelocityDamping: 1
@@ -699,7 +718,7 @@ MonoBehaviour:
   m_SmoothRotation: 0
   m_SmoothRotationAmount: 8
   m_TightenRotation: 0.1
-  m_TrackScale: 1
+  m_TrackScale: 0
   m_SmoothScale: 0
   m_SmoothScaleAmount: 8
   m_TightenScale: 0.1
@@ -725,14 +744,16 @@ MonoBehaviour:
   m_ForceGravityOnDetach: 0
   m_UnparentTransformOnGrab: 1
   m_RetainTransformParent: 1
-  m_StartingSingleGrabTransformers: []
-  m_StartingMultipleGrabTransformers: []
-  m_AddDefaultGrabTransformers: 1
+  m_StartingSingleGrabTransformers:
+  - {fileID: 6448890367876573449}
+  m_StartingMultipleGrabTransformers:
+  - {fileID: 6448890367876573449}
+  m_AddDefaultGrabTransformers: 0
   m_FarAttachMode: 0
-  m_LimitLinearVelocity: 0
-  m_LimitAngularVelocity: 0
-  m_MaxLinearVelocityDelta: 10
-  m_MaxAngularVelocityDelta: 20
+  m_LimitLinearVelocity: 1
+  m_LimitAngularVelocity: 1
+  m_MaxLinearVelocityDelta: 3
+  m_MaxAngularVelocityDelta: 12
 --- !u!114 &6875566115503625393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -751,6 +772,84 @@ MonoBehaviour:
   drain: 0
   surface: {fileID: 8510986483314228729}
   stream: {fileID: 6453180211082840591}
+--- !u!114 &6448890367876573449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4785703392644975205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62f295c04340f45f9b31497a79879f8c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  m_PermittedDisplacementAxes: 7
+  m_ConstrainedAxisDisplacementMode: 1
+  m_TwoHandedRotationMode: 1
+  m_AllowOneHandedScaling: 0
+  m_AllowTwoHandedScaling: 0
+  m_OneHandedScaleSpeed: 0.5
+  m_ThresholdMoveRatioForScale: 0.05
+  m_ClampScaling: 1
+  m_MinimumScaleRatio: 0.25
+  m_MaximumScaleRatio: 2
+  m_ScaleMultiplier: 0.25
+  profile: {fileID: 11400000, guid: 64e6dfe25dd824351a3c33f0dd15618f, type: 2}
+  sweepProbe: {fileID: 3074765708762159474}
+--- !u!1 &5192103166867198522
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7164714753148793758}
+  - component: {fileID: 3074765708762159474}
+  m_Layer: 0
+  m_Name: COL_GrabSweepProbe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7164714753148793758
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5192103166867198522}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 920012488804189037}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &3074765708762159474
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5192103166867198522}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 0.080000006, y: 0.099999994, z: 0.080000006}
+  m_Center: {x: 0, y: 0, z: -0.0000000037252903}
 --- !u!1 &5483044857669046494
 GameObject:
   m_ObjectHideFlags: 0

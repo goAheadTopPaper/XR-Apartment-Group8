@@ -162,6 +162,7 @@ public static class KitchenWaterAuthoring
             body.localScale = Vector3.one;
             foreach (var collider in body.GetComponents<Collider>()) UnityEngine.Object.DestroyImmediate(collider);
             ConfigureVessel(root, body.gameObject, prefix, profile, initialFill, false);
+            KitchenGrabAuthoring.ConfigureProp(root);
             PrefabUtility.SaveAsPrefabAsset(root, path);
         }
         finally { PrefabUtility.UnloadPrefabContents(root); }

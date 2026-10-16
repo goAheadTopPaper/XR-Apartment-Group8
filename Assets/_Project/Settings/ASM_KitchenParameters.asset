@@ -403,3 +403,10 @@ MonoBehaviour:
     status: Prototype assumption
     verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
       pending.
+  - key: grab_contact_skin
+    valueMetres: 0.002
+    source: Conservative held-prop sweep margin; not a kitchen clearance or client
+      dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Automated XRI push/rotation/release checks; Quest Link feel pending.

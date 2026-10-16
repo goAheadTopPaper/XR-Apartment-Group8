@@ -176,6 +176,7 @@ public static class KitchenPropsAuthoring
                 interactable.throwOnDetach = false;
                 interactable.colliders.Clear();
                 interactable.colliders.AddRange(root.GetComponentsInChildren<Collider>());
+                KitchenGrabAuthoring.ConfigureProp(root);
             }
             else
             {

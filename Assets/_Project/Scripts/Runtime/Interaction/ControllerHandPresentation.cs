@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using XRApartment.Data;
 
@@ -33,12 +35,16 @@ namespace XRApartment.Runtime
         float radius, skin, ghostShow, ghostHide, teleportDistance;
         float grip, trigger;
         int feedbackState = -1;
+        CollisionConstrainedGrabTransformer heldProp;
+        HapticImpulsePlayer haptics;
+        float nextBlockedHaptic;
 
         public float Grip => grip;
         public float Trigger => trigger;
         public bool GhostVisible { get; private set; }
         public Vector3 PalmPosition => palmPosition;
         public float TrackingOffset => Vector3.Distance(palmPosition, tracked.position);
+        public float TrackingAngle => Quaternion.Angle(solidRoot.rotation, tracked.rotation);
 
         void Awake()
         {
@@ -58,8 +64,26 @@ namespace XRApartment.Runtime
             palmPosition = tracked.position;
             lastRigPosition = rigRoot.position;
             lastRigRotation = rigRoot.rotation;
+            haptics = interactor.GetComponentInParent<HapticImpulsePlayer>();
+            interactor.selectEntered.AddListener(OnSelected);
+            interactor.selectExited.AddListener(OnReleased);
             SetGhost(false);
         }
+
+        void OnDestroy()
+        {
+            if (interactor == null) return;
+            interactor.selectEntered.RemoveListener(OnSelected);
+            interactor.selectExited.RemoveListener(OnReleased);
+        }
+
+        void OnSelected(SelectEnterEventArgs args)
+        {
+            heldProp = args.interactableObject.transform.GetComponent<CollisionConstrainedGrabTransformer>();
+            nextBlockedHaptic = 0f;
+        }
+
+        void OnReleased(SelectExitEventArgs args) => heldProp = null;
 
         void Update()
         {
@@ -88,12 +112,20 @@ namespace XRApartment.Runtime
                              Quaternion.Angle(rigRoot.rotation, lastRigRotation) > 30f;
             var from = teleported ? tracked.position : palmPosition;
             var held = interactor.hasSelection ? interactor.firstInteractableSelected.transform : null;
-            palmPosition = solver.Resolve(from, tracked.position, radius, skin, held);
-            solidRoot.SetPositionAndRotation(palmPosition, tracked.rotation);
+            var desired = new Pose(tracked.position, tracked.rotation);
+            if (heldProp != null && interactor.selectionRegion.Value != NearFarInteractor.Region.Far)
+                desired = heldProp.ResolveHand(desired);
+            palmPosition = solver.Resolve(from, desired.position, radius, skin, held);
+            solidRoot.SetPositionAndRotation(palmPosition, desired.rotation);
             ghostRoot.SetPositionAndRotation(tracked.position, tracked.rotation);
             var offset = TrackingOffset;
-            if (!GhostVisible && offset > ghostShow) SetGhost(true);
-            else if (GhostVisible && offset < ghostHide) SetGhost(false);
+            if (!GhostVisible && (offset > ghostShow || TrackingAngle > profile.GhostShowAngle)) SetGhost(true);
+            else if (GhostVisible && offset < ghostHide && TrackingAngle < profile.GhostHideAngle) SetGhost(false);
+            if (heldProp != null && heldProp.IsBlocked && haptics != null && Time.unscaledTime >= nextBlockedHaptic)
+            {
+                haptics.SendHapticImpulse(profile.BlockedHapticAmplitude, profile.BlockedHapticDuration);
+                nextBlockedHaptic = Time.unscaledTime + profile.BlockedHapticInterval;
+            }
             lastRigPosition = rigRoot.position;
             lastRigRotation = rigRoot.rotation;
         }

@@ -21,3 +21,12 @@ MonoBehaviour:
     m_Bits: 4294967291
   hoverEmission: {r: 0.04, g: 0.1, b: 0.12, a: 1}
   holdingEmission: {r: 0.06, g: 0.16, b: 0.18, a: 1}
+  grabRotationStepDegrees: 3
+  grabRotationIterations: 32
+  maxReleaseSpeed: 3
+  maxReleaseAngularSpeed: 12
+  blockedHapticAmplitude: 0.18
+  blockedHapticDuration: 0.035
+  blockedHapticInterval: 0.15
+  ghostShowAngle: 25
+  ghostHideAngle: 15

@@ -145,6 +145,32 @@ namespace XRApartment.Tests
         }
 
         [Test]
+        public void AllHeldProps_HaveCollisionConstrainedGrabsAndDisabledQueryProbes()
+        {
+            var grabs = Components<XRGrabInteractable>();
+            Assert.IsNotEmpty(grabs);
+            foreach (var grab in grabs)
+            {
+                var guard = grab.GetComponent<CollisionConstrainedGrabTransformer>();
+                Assert.IsNotNull(guard, grab.name);
+                CollectionAssert.AreEqual(new[] { guard }, grab.startingSingleGrabTransformers, grab.name);
+                CollectionAssert.AreEqual(new[] { guard }, grab.startingMultipleGrabTransformers, grab.name);
+                Assert.IsFalse(grab.addDefaultGrabTransformers, grab.name);
+                Assert.IsFalse(grab.smoothPosition || grab.smoothRotation || grab.trackScale, grab.name);
+                Assert.AreEqual(0f, grab.attachEaseInTime, grab.name);
+                var data = new SerializedObject(guard);
+                var probe = (BoxCollider)data.FindProperty("sweepProbe").objectReferenceValue;
+                Assert.IsNotNull(probe, grab.name);
+                Assert.IsFalse(probe.enabled, grab.name);
+                Assert.IsFalse(grab.colliders.Contains(probe), grab.name);
+                Assert.IsNotEmpty(grab.colliders, grab.name);
+                var profile = (HandInteractionProfile)data.FindProperty("profile").objectReferenceValue;
+                Assert.IsNotNull(profile, grab.name);
+                Assert.That(profile.Length("grab_contact_skin"), Is.GreaterThan(0f));
+            }
+        }
+
+        [Test]
         public void WaterAndSky_AreWiredToTheSelectedAssets()
         {
             Assert.AreEqual(1, Components<KitchenWaterSystem>().Length);

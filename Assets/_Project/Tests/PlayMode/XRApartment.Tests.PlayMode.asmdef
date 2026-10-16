@@ -1,0 +1,8 @@
+{
+  "name": "XRApartment.Tests.PlayMode",
+  "rootNamespace": "XRApartment.Tests",
+  "references": ["XRApartment.Data", "XRApartment.Runtime", "Unity.XR.Interaction.Toolkit"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}
