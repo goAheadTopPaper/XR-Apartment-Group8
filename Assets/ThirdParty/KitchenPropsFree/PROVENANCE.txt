@@ -1,0 +1,45 @@
+Kitchen Props Free 1.0 — Jake Sullivan
+Unity Asset Store product ID: 80208
+Product: https://assetstore.unity.com/packages/slug/80208
+Downloaded through the signed-in Unity Editor Package Manager on 2026-10-16.
+Original unitypackage SHA-256: 3205ebf9277e6a80bc38cd1fd49ae208831903fdae0362c6261e8a389c3e916e
+License: Unity Asset Store Standard EULA, https://unity.com/legal/as-terms
+The user approved acceptance of the Unity Terms of Service and Asset Store EULA
+for these two free packages in this session.
+
+Selected original assets retain their GUIDs. The package root was relocated
+under Assets/ThirdParty. No demo scenes, scripts, project settings, or extra
+furniture were imported. Import settings cap textures at 1024 and generate UV2
+for the selected models; source image and mesh bytes are unchanged.
+Project materials, normalized metre-scale prefabs, simple XRI grab colliders,
+and the shared dressing layout live under Assets/_Project. Vendor materials
+remain the source references. Do not redistribute these source assets outside
+the project under a different license; the Standard EULA governs their use.
+
+Selected files:
+Readme.txt
+materials/drainer.mat
+materials/mug.mat
+materials/plates.mat
+materials/toaster.mat
+models/bowl.fbx
+models/dish-rack.fbx
+models/mug.fbx
+models/plate.fbx
+models/toaster.fbx
+textures/dish-rack_albedo.tga
+textures/dish-rack_ao.tga
+textures/dish-rack_metal.tga
+textures/dish-rack_normal.tga
+textures/mug-ao.tga
+textures/mug-metal.tga
+textures/mug-normal.tga
+textures/mug_albedo.tga
+textures/plates-albedo.tga
+textures/plates-ao.tga
+textures/plates-metal.tga
+textures/plates-normal.tga
+textures/toaster_albedo.tga
+textures/toaster_ao.tga
+textures/toaster_metal.tga
+textures/toaster_normal.tga

@@ -12,113 +12,394 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 839ddfbd3944708448ee11c3e2473f7b, type: 3}
   m_Name: ASM_KitchenParameters
   m_EditorClassIdentifier: 
-  modelVersion: 0.1-graybox
+  modelVersion: mzh-1f501b3-kitchen-adapted
   parameters:
   - key: room_width
-    valueMetres: 3.6
-    source: "\u7070\u76D2\u623F\u95F4\u5BBD\u5EA6"
-    owner: D
+    valueMetres: 3.613
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Kitchen model extent along
+      X; prototype, not a client dimension'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: room_depth
-    valueMetres: 3
-    source: "\u7070\u76D2\u623F\u95F4\u8FDB\u6DF1"
-    owner: D
+    valueMetres: 1.786
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Kitchen model extent along
+      Z; prototype, not a clearance claim'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: room_height
-    valueMetres: 2.6
-    source: "\u7070\u76D2\u623F\u95F4\u51C0\u9AD8"
-    owner: D
+    valueMetres: 2.6801
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Upward collider ray at (-3,
+      1, 1.1) hits source ceiling'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: counter_height
-    valueMetres: 0.9
-    source: "\u53F0\u9762\u5B8C\u6210\u9762\u9AD8\uFF08\u53A8\u623F\u4EBA\u4F53\u5DE5\u5B66\u5E38\u7528\u503C\uFF09"
-    owner: D
-    status: assumption
-    verification: pending
-  - key: counter_depth
-    valueMetres: 0.6
-    source: "\u67DC\u4F53\u8FDB\u6DF1"
-    owner: D
-    status: assumption
-    verification: pending
-  - key: counter_run_length
-    valueMetres: 2.22
-    source: "\u51B0\u7BB1\u69FD\u53F3\u4FA7\u7684\u8FDE\u7EED\u53F0\u9762\u957F\u5EA6"
-    owner: D
-    status: assumption
-    verification: pending
-  - key: worktop_thickness
-    valueMetres: 0.04
-    source: "\u53F0\u9762\u677F\u539A\u5EA6"
-    owner: D
-    status: assumption
-    verification: pending
-  - key: toe_kick_height
-    valueMetres: 0.1
-    source: "\u8E22\u811A\u9AD8\u5EA6"
-    owner: D
-    status: assumption
-    verification: pending
-  - key: upper_cabinet_bottom
-    valueMetres: 1.5
-    source: "\u540A\u67DC\u5E95\u9762\u9AD8"
-    owner: D
-    status: assumption
-    verification: pending
-  - key: upper_cabinet_depth
-    valueMetres: 0.35
-    source: "\u540A\u67DC\u8FDB\u6DF1"
-    owner: D
-    status: assumption
-    verification: pending
-  - key: walkway_clearance
     valueMetres: 1
-    source: "\u53F0\u9762\u524D\u901A\u884C\u51C0\u8DDD\uFF08\u5355\u4EBA\u53A8\u623F\u4E0B\u9650\uFF09"
-    owner: D
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Downward collider ray at
+      (-3, 2, 2) hits source worktop'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
+  - key: counter_depth
+    valueMetres: 0.712
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Source worktop Z extent
+      1.677 to 2.389'
+    owner: D/E
+    status: assumption
+    verification: prototype geometry checked; client validation pending
+  - key: counter_front_z
+    valueMetres: 1.677
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Source worktop front edge'
+    owner: D/E
+    status: assumption
+    verification: prototype geometry checked; client validation pending
+  - key: counter_fridge_cut_x
+    valueMetres: -2.29
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Adaptation: shorten entrance
+      end to make a fridge slot'
+    owner: D/E
+    status: assumption
+    verification: prototype geometry checked; client validation pending
+  - key: fridge_slot_center_x
+    valueMetres: -1.871
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Adaptation: source run end
+      -1.452, cut -2.29'
+    owner: D/E
+    status: assumption
+    verification: prototype geometry checked; client validation pending
   - key: fridge_slot_width
-    valueMetres: 0.78
-    source: "\u51B0\u7BB1\u69FD\u5BBD\u5EA6\uFF08\u542B\u4E24\u4FA7\u7559\u7F1D\uFF09"
-    owner: D
+    valueMetres: 0.838
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Adaptation: reserved entrance-end
+      slot'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: fridge_width
     valueMetres: 0.75
-    source: "\u51B0\u7BB1\u7070\u76D2\u5BBD\u5EA6"
-    owner: D
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Retained Hzc review proxy,
+      not a supplied appliance'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: fridge_depth
     valueMetres: 0.7
-    source: "\u51B0\u7BB1\u7070\u76D2\u6DF1\u5EA6"
-    owner: D
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Retained Hzc review proxy
+      body depth'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: fridge_height
     valueMetres: 1.85
-    source: "\u51B0\u7BB1\u7070\u76D2\u9AD8\u5EA6"
-    owner: D
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Retained Hzc review proxy
+      height'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: fridge_door_thickness
     valueMetres: 0.05
-    source: "\u95E8\u677F\u539A\u5EA6"
-    owner: D
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Retained Hzc proxy panel
+      thickness'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: fridge_proud_offset
     valueMetres: 0.1
-    source: "Proud \u72B6\u6001\u51B0\u7BB1\u524D\u7F18\u8D85\u51FA\u53F0\u9762\u524D\u7F18\u7684\u8DDD\u79BB"
-    owner: D
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Door front relative to source
+      counter front'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
   - key: fridge_drawer_travel
     valueMetres: 0.35
-    source: "\u62BD\u5C49\u6F14\u793A\u884C\u7A0B"
-    owner: D
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Retained deterministic drawer
+      travel'
+    owner: D/E
     status: assumption
-    verification: pending
+    verification: prototype geometry checked; client validation pending
+  - key: flush_panel_depth
+    valueMetres: 0.75
+    source: 'mzh KitchenTest @ 1f501b3 + Hzc adaptation: Adapted trim ends at the
+      proxy door front'
+    owner: D/E
+    status: assumption
+    verification: prototype geometry checked; client validation pending
+  - key: hand_palm_radius
+    valueMetres: 0.045
+    source: Virtual hand presentation tuning; not anatomy or kitchen clearance
+    owner: Prototype
+    status: Prototype assumption
+    verification: Editor sweep tests; headset calibration pending
+  - key: hand_contact_skin
+    valueMetres: 0.002
+    source: Virtual hand presentation tuning; not anatomy or kitchen clearance
+    owner: Prototype
+    status: Prototype assumption
+    verification: Editor sweep tests; headset calibration pending
+  - key: hand_ghost_show_distance
+    valueMetres: 0.08
+    source: Virtual hand presentation tuning; not anatomy or kitchen clearance
+    owner: Prototype
+    status: Prototype assumption
+    verification: Editor sweep tests; headset calibration pending
+  - key: hand_ghost_hide_distance
+    valueMetres: 0.04
+    source: Virtual hand presentation tuning; not anatomy or kitchen clearance
+    owner: Prototype
+    status: Prototype assumption
+    verification: Editor sweep tests; headset calibration pending
+  - key: hand_teleport_reset_distance
+    valueMetres: 0.5
+    source: Virtual hand presentation tuning; not anatomy or kitchen clearance
+    owner: Prototype
+    status: Prototype assumption
+    verification: Editor sweep tests; headset calibration pending
+  - key: water_cup_inner_radius
+    valueMetres: 0.034
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cup_bottom_y
+    valueMetres: -0.044
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cup_height
+    valueMetres: 0.094
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cup_wall_thickness
+    valueMetres: 0.006
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_pot_inner_radius
+    valueMetres: 0.082
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_pot_bottom_y
+    valueMetres: -0.052
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_pot_height
+    valueMetres: 0.112
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_pot_wall_thickness
+    valueMetres: 0.008
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_basin_inner_radius
+    valueMetres: 0.18
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_basin_bottom_y
+    valueMetres: 0.008
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_basin_height
+    valueMetres: 0.075
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_basin_wall_thickness
+    valueMetres: 0.007
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_station_x
+    valueMetres: -4.35
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_station_y
+    valueMetres: 1
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_station_z
+    valueMetres: 2.05
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_tap_height
+    valueMetres: 0.28
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_tap_radius
+    valueMetres: 0.012
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: prop_plate_span
+    valueMetres: 0.27
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_bowl_span
+    valueMetres: 0.19
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_mug_height
+    valueMetres: 0.1
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_dishrack_span
+    valueMetres: 0.505
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_toaster_span
+    valueMetres: 0.27
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_tomato_span
+    valueMetres: 0.08
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_lemon_span
+    valueMetres: 0.085
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_banana_span
+    valueMetres: 0.21
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_onion_span
+    valueMetres: 0.075
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_egg_height
+    valueMetres: 0.06
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_cheese_span
+    valueMetres: 0.12
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_juicepack_height
+    valueMetres: 0.22
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_cerealbox_height
+    valueMetres: 0.28
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_blackpepper_span
+    valueMetres: 0.065
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_oregano_span
+    valueMetres: 0.065
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.
+  - key: prop_smallbowl_span
+    valueMetres: 0.1
+    source: Art dressing scale selected for this prototype; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Normalized renderer bounds in the kitchen editor; Quest Link handling
+      pending.

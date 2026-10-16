@@ -122,6 +122,7 @@ $RECYCLE.BIN/
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-# TextMesh Pro：由 UPM 包在首次运行/导入时生成，不入库
-/Assets/TextMesh Pro/
-/Assets/TextMesh Pro.meta
+# Simulator UI 依赖 TMP Essentials 的字体/设置/Shader，需随项目共享。
+# 导入包附带的旧版 PDF 手册不参与运行。
+/Assets/TextMesh Pro/Documentation/
+/Assets/TextMesh Pro/Documentation.meta

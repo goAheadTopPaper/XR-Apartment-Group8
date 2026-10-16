@@ -14,7 +14,7 @@ COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**�
 | 渲染管线 | Built-in RP。PRD 没有要求更换管线；迁移 URP 属于团队另行决策（会牵动全部材质与构建验证），不在 MVP 路径上 |
 | 运行环境 | **Meta Quest 3 经 Quest Link 连 Windows PC**（PRD §3.3、TECH-02）→ 构建目标 `StandaloneWindows64`。没头显的组员用 XR Device Simulator 在编辑器里跑 |
 | 会话形态 | 单一参与者、约 20 分钟、自导（不依赖引导员持续讲解）、有限实体 play area + Teleport 覆盖虚拟厨房（PRD §3.3、D09） |
-| 输入系统 | 以 New Input System 为准。实测 `ProjectSettings.asset` 里 `activeInputHandler: 1`，即 **Both（旧 Input Manager 同时启用）**；若要收紧为「仅新系统」需改为 `2`，会重启生效并可能影响用到 `UnityEngine.Input` 的第三方资源 |
+| 输入系统 | **仅 New Input System**，`activeInputHandler: 1`（0=旧 / 1=仅新 / 2=Both），不要为迁移场景修改此值 |
 | 数据与记录 | 匿名本地 JSON/CSV（PRD §11.3、D13）。**不建账号、不接云端数据库**，多人协作与云端已明确 Deferred |
 | 模型来源 | Blender → Unity，统一米制 `1 unit = 1 m`（PRD §7.1、TECH-01），由 E 维护几何与参数登记 |
 | 脚本后端 | Windows: Mono（MVP 用这个）。Android 的 IL2CPP / ARM64 / Min SDK 29 / Vulkan+GLES3 工程里已配好，但**一体机出包不在 Phase 2 MVP 范围**，见 §8 |
@@ -28,6 +28,7 @@ COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**�
 | `com.unity.xr.management` | 4.7.0 | XR Plug-in Management |
 | `com.unity.xr.openxr` | 1.17.1 | OpenXR 加载器（Windows 与 Android 均已启用） |
 | `com.unity.xr.interaction.toolkit` | 3.5.0 | XRI，交互框架（Grab / Teleport / Locomotion） |
+| `com.unity.postprocessing` | 3.2.2 | Built-in 后处理：固定 ACES 色调映射与轻度 Bloom |
 | `com.coplaydev.unity-mcp` | 10.2.0 | MCP for Unity，让 AI 编码助手直接操作编辑器（走 OpenUPM scope `com.coplaydev`） |
 | `com.unity.toolchain.win-x86_64-linux-x86_64` | 2.0.11 | Linux 交叉编译工具链（本项目暂未用到，保留） |
 
@@ -47,7 +48,7 @@ git lfs pull                         # 确认二进制资源已下载
 
 1. Unity Hub → **Add project from disk** → 选择仓库根目录 → 用 **2022.3.62f3** 打开（不要用别的版本，否则 `ProjectVersion.txt` 会被改写、`Library/` 需全量重建）。
 2. 首次会联网解析 UPM 依赖（含 OpenUPM 上的 `com.coplaydev.unity-mcp`）并重建 `Library/`，几分钟属正常。
-3. 打开 `Assets/_Project/Scenes/Main.unity`，接好头显（SteamVR 需先在后台运行）按 Play。
+3. 用菜单 `XR Apartment → Open Kitchen Review Scene` 打开 `Assets/_Project/Scenes/SCN_Kitchen_Review.unity`，接好 Quest Link 后按 Play。它是唯一启用的构建场景。
 4. 若报 `The following build scene(s) could not be loaded` 或 XRI 相关 missing script：先 `git lfs pull`，再 `Assets → Reimport All`。
 
 ---
@@ -57,13 +58,14 @@ git lfs pull                         # 确认二进制资源已下载
 ```
 Assets/
   _Project/            ★ 项目自有内容，日常开发都在这里
-    Scenes/            场景（Main.unity 是启动场景，Build Settings 第 0 位）
+    Art/Kitchen/       从 mzh KitchenTest 迁入的模型/贴图，以及 Built-in 材质
+    Scenes/            SCN_Kitchen_Review.unity（唯一启动场景，第 0 位）
     Prefabs/           预制体（优先在预制体里改，不要直接改场景里的实例）
     Scripts/           运行时脚本
     Materials/         材质
     Settings/          项目自有配置资产（自定义 InputActions、benchmark 组合定义、模型参数登记表）
     XR/                自定义 XR Provider / 交互层配置
-  Editor/              编辑器工具脚本（XRProjectBootstrap / VRSceneBootstrap）
+  Editor/              XRProjectBootstrap 工程配置 / KitchenBenchmarkMenu 预设切换
   XR/                  ★ XR Plug-in Management 生成的资产（Loader 列表、OpenXR Package Settings）
   XRI/                 ★ XRI 生成的设置资产（Interaction Layer Mask / Runtime / Simulator Settings）
   Samples/             XRI Starter Assets（只读参考，勿改动，升级时整目录替换）
@@ -138,11 +140,51 @@ git lfs checkout             # 指针文件还原为真实内容
 
 构建目标固定 `StandaloneWindows64`——Quest 3 只当显示器，画面由 PC 渲染（PRD TECH-02 批准的就是这个环境）。
 
-1. 编辑器里 `File → Build Settings` 确认平台是 **Windows, Mac, Linux → Standalone Windows64**，场景 `Assets/_Project/Scenes/Main.unity` 在第 0 位。
+1. 编辑器里 `File → Build Settings` 确认平台是 **Windows, Mac, Linux → Standalone Windows64**，场景 `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` 在第 0 位。
 2. Quest 3 上启动 Link（有线优先，无线对带宽敏感），连到本机；Meta Horizon 里允许连接。
-3. Unity 编辑器按 **Play**，头显即显示画面。当前工程的最小验收：控制器能抓取示例 Cube、能沿 Teleport Area 传送。
-4. **没头显的组员**：`Window → Package Manager → XR Interaction Toolkit → Samples → XR Device Simulator`，用键鼠模拟手柄摆场景；但空间尺度、通行和舒适判断必须最后在头显里验，模拟器给不了 1:1 尺度感。
+3. Unity 编辑器按 **Play**。检查厨房内传送、锅/杯抓取、冰箱门/抽屉，以及回到起点/暂停/平滑移动菜单；B1/B2/B3 从 `XR Apartment → Benchmark → Apply …` 切换。
+4. **没头显的组员（Mac / Windows）**：项目已配置 **XR Interaction Simulator**，进入 Play 后自动创建虚拟头显和两只手柄。先点击 **Game** 画面获得键盘焦点，再按下表操作；不需要再导入一份 Simulator Sample。TMP Essentials 也已随项目提供。
 5. 不要引入 SteamVR / WMR 等其他运行时路径作为测试基线——PRD 只批准了 Quest 3 + Quest Link，多一条链路就多一套 OpenXR Profile 和风险。
+
+### 无头显时的键鼠操作
+
+| 操作 | 默认按键 |
+| --- | --- |
+| 移动 | W / A / S / D |
+| 升高 / 降低当前模拟设备 | E / Q |
+| 转动视角 | 按住鼠标右键移动，或方向键 |
+| 抓取 / 释放锅杯 | 鼠标指向物体，按住 / 松开左键 |
+| 选择门体、点击菜单 | 鼠标指向目标后点击左键 |
+| 全身 / 单设备模式切换 | Tab |
+| 选择左 / 右手柄 | `[` / `]` |
+| 手指握合 / 食指扳机（默认右手） | 按住 G / T；左手组合键见 Y 提示 |
+| 操作提示面板 | Y |
+
+模拟器原样复制自 XRI 3.5.0，位于 `Assets/_Project/XR/InteractionSimulator/`；未改动 `Assets/Samples/`。`Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` 已开启自动创建与 **Instantiate In Editor Only**，正式 Windows 构建不会自动创建模拟器。使用真实头显在编辑器测试时，先在 `Project Settings → XR Plug-in Management → XR Interaction Toolkit` 取消 **Use XR Interaction Simulator in scenes**，避免同时输入。
+
+键鼠可以检查移动、抓取、开合和菜单逻辑；空间尺度、通行与舒适度仍需要 Quest 3 + Quest Link 实测。模拟器的可选裸手模式不在本项目测试路径中，使用默认的虚拟手柄即可。
+
+### 当前手部交互
+
+`PREF_XR_KitchenRig` 使用 mzh 的手模型、贴图及 Idle / Grip / Trigger / Fist 动画，保留原 XRI 输入、菜单、传送与抓取。握把和扳机控制手指，悬停时轻微预握，拿住锅杯时提供握合与淡青色提示；锅杯使用接触位置的动态抓取点。手掌通过球形代理停靠静态台面/墙面，手柄继续越过表面时显示追踪位置的半透明虚影，收回后消失。接触参数来自 `ASM_KitchenParameters`，是虚拟手调参假设。
+
+这版借鉴 Alyx 的握持与接触反馈；目前是**手柄驱动动画**，未接入摄像头裸手识别、逐指碰撞或物体形状自适应握姿。冰箱仍用原有运动学交互，三种 benchmark 的动作链相同。来源与验证见 [迁移说明](Docs/MzhKitchenMigration.md)。
+
+### 天空与日光
+
+厨房使用 `PREF_Lighting_KitchenDaylight`：AllSky Free 的 Cold Sunset 天空、mzh 的低角度暖色阳光、烘焙间接光/接触阴影、室内反射和给动态手部/锅杯使用的 Light Probes。工程颜色空间为 **Linear**，渲染仍是 Built-in。`PP_KitchenDaylight` 保存固定 ACES/Bloom；没有自动曝光，B1/B2/B3 共用同一套光照。
+
+太阳、探针位置在光照 Prefab，天空在 `Art/Lighting/MAT_Sky_KitchenDaylight.mat`，烘焙设置在 `Settings/LGT_KitchenDaylight.lighting`。调整静态环境、太阳或发光材质后，用 Lighting 窗口的 **Generate Lighting** 重烘焙；生成的 `Scenes/SCN_Kitchen_Review/` 及 `.meta` 需要与场景一起共享。薄吊灯使用 Light Probes，冰箱/门体/锅杯/手部不参与静态烘焙，避免切换方案时留下旧方案的阴影。
+
+### 接水与倒水
+
+默认容器水面使用 **NVJOB Water Shaders V2**；水量与重力水流由项目脚本负责。进入 Play 后，选择水站的蓝色龙头拨杆开关水，把杯或锅放到出水口下方接水，再倾斜倒入另一容器。开口锅杯保留 XRI 抓取，水面按重力保持水平并在移动后晃动，落水有水花；接水盆自动排水。
+
+这是有限容器的近似液体交互，没有引入 SPH 流体、浮力、重量变化或地面积水。暂停菜单会停止水的推进；`XR Apartment/Water/Reset Water (Play)` 关闭龙头并恢复初始水量。资源来源、登记参数和维护方法见 [KitchenWaterAndSky.md](Docs/KitchenWaterAndSky.md)。
+
+### 餐具与食品
+
+Kitchen Props Free 和 Food Pack Mixed 的精选资源已布置到公共 `PREF_Kitchen_Dressing`：窗边餐具收纳、备餐盘与调料、烤面包机，以及已有餐桌上的早餐和水果。9 件新增食品/包装和空马克杯支持 XRI 抓取；新马克杯、果汁盒暂不支持倒液体，接水仍使用原有杯和锅。三种 benchmark 共用同一布局。来源清单、登记尺寸和维护方法见 [KitchenDressing.md](Docs/KitchenDressing.md)。
 
 ---
 
@@ -196,22 +238,21 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
   -executeMethod XRApartment.EditorTools.XRProjectBootstrap.Configure \
   -logFile "$PROJ/Logs/bootstrap.log"
 
-# 重建启动场景
-"$UNITY" -batchmode -nographics -quit -projectPath "$PROJ" \
-  -executeMethod XRApartment.EditorTools.VRSceneBootstrap.CreateMainScene \
-  -logFile "$PROJ/Logs/scene.log"
 ```
 
 注意：Unity 会拒绝名字以点开头的 `-logFile` 目录（如 `.unity-logs`），日志请放在 `Logs/` 下。batchmode 前**先关掉编辑器**，否则抢工程锁会失败。
+
+厨房现在由场景和 Prefab 保存设计，**不再通过代码生成房间**。在 `PREF_Kitchen_Environment` 编辑环境，在 `PREF_Kitchen_Benchmark` 编辑槽位/围板，交互物继续编辑各自 Prefab。旧 `VRSceneBootstrap` / `KitchenSceneBootstrap` 已移除，避免覆盖迁入的布局。来源、材质适配和冰箱槽位的改动见 [迁移说明](Docs/MzhKitchenMigration.md)。
 
 ---
 
 ## 11. 当前状态
 
-- `Assets/_Project/Scenes/Main.unity` 是 XRI Starter Assets 的初始布局（XR Origin + EventSystem + Ground + Teleport Area/Anchor + 可抓取 Cube）——只是「能进 VR」的最小外壳。
-- **厨房、冰箱/柜体方案、会话状态机、冲突提示、反馈与本地记录全部还没有**；`Assets/_Project/` 下除 `Scenes/Main.unity` 外都是空目录（靠 `.gitkeep` 占位）。
-- 工程设置与版本控制已冻结入库，控制台 0 error。
-- 对照 PRD §12 的 25 条 Approved 需求，Unity 侧目前 **0 条已实现**。
+- `SCN_Kitchen_Review` 使用 `feature/mzh` 的 `KitchenTest` 厨房设计，保留建筑背景；评审交互和传送区集中在厨房。原灰盒已被替换，旧 `Main.unity` 和无用材质已移除。
+- 保留 Hzc 的数据层、纯逻辑会话状态机/动作链、运动学门体/抽屉、F2/F3/F4 代理、B1/B2/B3 注册表、可抓取锅/杯与世界空间菜单。
+- 迁移保持 Unity 2022.3.62f3、Built-in、XRI 3.5 和 Windows64；手模型/动画适配到项目自己的 XRI Rig，没有引入 mzh 的 Unity 6/URP 工程配置、PD 物理跟随或 FixedJoint 抓取。
+- 天空/光照已按 mzh 的暖日光样式重建，使用 Linear、固定 ACES/Bloom 和本项目重新生成的烘焙数据；不复用 Unity 6 的 LightingData/APV。
+- 几何冲突检测、Safety warning/fade、反馈 UI、本地记录写盘仍未实现。逻辑测试和编辑器场景检查不能替代 Quest 3 + Quest Link 的端到端验收。
 
 ### 下一步（对齐 PRD §16 里程碑）
 

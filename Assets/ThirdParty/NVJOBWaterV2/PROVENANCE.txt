@@ -1,0 +1,16 @@
+NVJOB Water Shaders V2.0
+Author: Nicholas Veselov / #NVJOB
+https://github.com/nvjob/nvjob-water-shaders-v2
+Source commit: 34f30d75568b2a6828f769f20ee007eb6700fc98
+License: MIT. See LICENSE.txt, license_nvjob.txt, and license_unity.txt.
+
+Selected shader sources, the editor inspector and its runtime type dependency,
+and two normal maps preserve their upstream GUIDs.
+Local PC VR patch: NvWaters.cginc declares the camera depth texture through
+UNITY_DECLARE_DEPTH_TEXTURE so instanced stereo can use a texture array.
+Both water shaders target shader model 3.5 for those arrays. Other shader code,
+the C# sources and the textures remain unchanged. Headset validation is pending.
+Demo scenes, environment models, post-processing copies and example prefabs
+are omitted. NVWaterShaders is not attached to any project object. The project
+water system drives the shader movement and preserves camera depth modes;
+no extra planar reflection cameras are used.
