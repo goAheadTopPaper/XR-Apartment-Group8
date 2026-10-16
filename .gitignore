@@ -9,17 +9,25 @@
 /[Mm]emoryCaptures/
 /[Rr]ecordings/
 
-# 保留Assets下所有.meta文件
+# 锟斤拷锟斤拷Assets锟斤拷锟斤拷锟斤拷.meta锟侥硷拷
 !/[Aa]ssets/**/*.meta
 
-# VS/Rider项目文件
+# VS/Rider锟斤拷目锟侥硷拷
 *.sln
 *.csproj
 .vs/
 
-# OS文件
+# OS锟侥硷拷
 .DS_Store
 Thumbs.db
 
-# Blend备份文件
+# Blend锟斤拷锟斤拷锟侥硷拷
 *.blend1
+
+.vsconfig
+Library/
+Logs/
+Temp/
+UserSettings/*
+Assets/Samples/*
+ProjectSettings/
