@@ -1,0 +1,63 @@
+Food Pack Mixed 1.0 — Brain Fail Productions
+Unity Asset Store product ID: 154349
+Product: https://assetstore.unity.com/packages/slug/154349
+Downloaded through the signed-in Unity Editor Package Manager on 2026-10-16.
+Original unitypackage SHA-256: 9535dc42221ec94ad4ad81d6a3e387a70fe0a9b2cf90bc603a40a55750e7b3bf
+License: Unity Asset Store Standard EULA, https://unity.com/legal/as-terms
+The user approved acceptance of the Unity Terms of Service and Asset Store EULA
+for these two free packages in this session.
+
+Selected original assets retain their GUIDs. The package root was relocated
+under Assets/ThirdParty. No demo scenes, scripts, project settings, or extra
+furniture were imported. Import settings cap textures at 1024 and generate UV2
+for the selected models; source image and mesh bytes are unchanged.
+Project materials, normalized metre-scale prefabs, simple XRI grab colliders,
+and the shared dressing layout live under Assets/_Project. Vendor materials
+remain the source references. Do not redistribute these source assets outside
+the project under a different license; the Standard EULA governs their use.
+
+Selected files:
+Materials/Banana.mat
+Materials/BlackPepper.mat
+Materials/CerealBox.mat
+Materials/Cheese.mat
+Materials/Egg.mat
+Materials/JuicePack.mat
+Materials/JuicePack_Cap.mat
+Materials/Lemon.mat
+Materials/Onion.mat
+Materials/OreganoPowder.mat
+Materials/TomatoBody.mat
+Materials/TomatoCrossection.mat
+Materials/TomatoHead.mat
+Meshes/Banana.fbx
+Meshes/CerealBox.fbx
+Meshes/Cheese.fbx
+Meshes/Flour.fbx
+Meshes/JuicePack.fbx
+Meshes/Lemons.fbx
+Meshes/Onion.fbx
+Meshes/Tomato.fbx
+Meshes/egg.fbx
+Prefabs/Banana.prefab
+Prefabs/BlackPepper.prefab
+Prefabs/CerealBox.prefab
+Prefabs/Cheese.prefab
+Prefabs/JuicePack.prefab
+Prefabs/Lemons.prefab
+Prefabs/Onion.prefab
+Prefabs/OreganoPowder.prefab
+Prefabs/Tomato.prefab
+Prefabs/egg.prefab
+Textures/Banana.png
+Textures/BlackPepper.png
+Textures/CerealBox.png
+Textures/Cheese.png
+Textures/Egg shell.png
+Textures/JuicePack_Cap_Surface_Color.png
+Textures/JuicePack_Surface_Color.png
+Textures/Onion.png
+Textures/OreganoPowder.png
+Textures/TomatoBody.png
+Textures/TomatoCrossection.png
+Textures/TomatoHead.png

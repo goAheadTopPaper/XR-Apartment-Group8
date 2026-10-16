@@ -1,0 +1,12 @@
+AllSky Free - 10 Sky / Skybox Set
+Publisher: rpgwhitelock
+Unity Asset Store product: 146014
+https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014
+Package version: 1.2.0 (2024-07-21)
+License: Standard Unity Asset Store EULA, https://unity.com/legal/as-terms
+Obtained through the user's owned Asset Store package using Unity Package Manager.
+
+Only the original Cold Sunset equirectangular PNG and its importer metadata are
+included. Original PNG bytes and GUID are preserved. Other skies, demo scenes,
+scripts, and materials are omitted. The project owns MAT_Sky_KitchenDaylight.
+The unmodified full package remains in the user's local Asset Store cache.
