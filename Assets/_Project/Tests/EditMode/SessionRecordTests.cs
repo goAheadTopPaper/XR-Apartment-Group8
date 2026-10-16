@@ -53,12 +53,21 @@ namespace XRApartment.Tests
             Assert.IsFalse(f.HasAllRequiredFields());
         }
 
-        [Test]
-        public void SkippedTask_RequiresAReason()
+        [TestCase(TaskOutcome.Skipped)]
+        [TestCase(TaskOutcome.Aborted)]
+        public void UnfinishedTask_RequiresTheSameReasonForFieldAndSessionValidation(TaskOutcome outcome)
         {
             var f = Complete("B1");
-            f.taskOutcome = TaskOutcome.Skipped;
+            f.taskOutcome = outcome;
+            var record = SessionWith(f, Complete("B2"), Complete("B3"));
             CollectionAssert.Contains(f.MissingRequiredFields().ToArray(), "outcomeReason");
+            Assert.IsFalse(f.HasAllRequiredFields());
+            Assert.IsFalse(record.IsComplete(3));
+
+            f.outcomeReason = "Reviewer could not finish the action.";
+            Assert.IsEmpty(f.MissingRequiredFields());
+            Assert.IsTrue(f.HasAllRequiredFields());
+            Assert.IsTrue(record.IsComplete(3));
         }
 
         [Test]

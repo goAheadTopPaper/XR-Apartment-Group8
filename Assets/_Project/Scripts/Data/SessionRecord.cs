@@ -31,14 +31,8 @@ namespace XRApartment.Data
         /// FR-07 acceptance: every combination-level judgement field must be present.
         public bool HasAllRequiredFields()
         {
-            return !string.IsNullOrEmpty(combinationId)
-                && decision != CombinationDecision.Unset
-                && category != FeedbackCategory.Unset
-                && experience != ExperienceTag.None
-                && everydayImpact != EverydayImpact.Unset
-                && importance != Importance.Unset
-                && discoveryMode != DiscoveryMode.Unset
-                && taskOutcome != TaskOutcome.Unset;
+            foreach (var _ in MissingRequiredFields()) return false;
+            return true;
         }
 
         public IEnumerable<string> MissingRequiredFields()
