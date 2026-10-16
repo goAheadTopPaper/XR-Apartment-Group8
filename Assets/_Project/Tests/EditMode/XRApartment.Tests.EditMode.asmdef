@@ -4,6 +4,8 @@
   "references": [
     "XRApartment.Data",
     "XRApartment.Simulation",
+    "XRApartment.Runtime",
+    "Unity.XR.Interaction.Toolkit",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner"
   ],
