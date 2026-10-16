@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 461d89e9efc1d4648a2da664b782e95c, type: 3}
+  m_Name: SET_HandInteraction
+  m_EditorClassIdentifier: 
+  assumptions: {fileID: 11400000, guid: ba118600a64afad4b952bec9baf7e63d, type: 2}
+  fingerResponse: 10
+  hoverGrip: 0.12
+  holdingGrip: 0.72
+  contactLayers:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  hoverEmission: {r: 0.04, g: 0.1, b: 0.12, a: 1}
+  holdingEmission: {r: 0.06, g: 0.16, b: 0.18, a: 1}
