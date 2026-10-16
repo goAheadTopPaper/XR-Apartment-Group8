@@ -1,18 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
+using XRApartment.EditorTools;
 using XRApartment.Runtime;
 
 /// Edits only the water station and existing prop prefabs; never rebuilds the authored room.
 public static class KitchenWaterAuthoring
 {
-    const string Root = "Assets/_Project/";
+    const string Root = KitchenAuthoring.Root;
     const string WaterArt = Root + "Art/Water/";
     const string ProfilePath = Root + "Settings/SET_WaterInteraction.asset";
     const string StationPath = Root + "Prefabs/PREF_Water_KitchenStation.prefab";
@@ -25,37 +23,12 @@ public static class KitchenWaterAuthoring
         if (KitchenWaterSystem.Instance != null) KitchenWaterSystem.Instance.ResetWater();
     }
 
-    [MenuItem("XR Apartment/Lighting/Apply AllSky Free Daylight")]
-    public static void ApplyAllSky()
-    {
-        if (EditorApplication.isPlaying) throw new InvalidOperationException("Apply sky in Edit mode.");
-        const string path = "Assets/ThirdParty/AllSkyFree/ColdSunset/Cold Sunset Equirect.png";
-        var cube = AssetDatabase.LoadAssetAtPath<Cubemap>(path);
-        if (cube == null) throw new InvalidOperationException("Import the selected AllSky Free cubemap first.");
-        var sky = AssetDatabase.LoadAssetAtPath<Material>(Root + "Art/Lighting/MAT_Sky_KitchenDaylight.mat");
-        sky.shader = Shader.Find("Skybox/Cubemap");
-        sky.SetTexture("_Tex", cube);
-        sky.SetColor("_Tint", new Color(0.5f, 0.5f, 0.5f));
-        sky.SetFloat("_Exposure", 1f);
-        sky.SetFloat("_Rotation", 0f);
-        RenderSettings.skybox = sky;
-        DynamicGI.UpdateEnvironment();
-        EditorUtility.SetDirty(sky);
-        AssetDatabase.SaveAssets();
-        EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
-        EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
-        Debug.Log("AllSky Free Cold Sunset applied; rebake lighting and reflection probes before final verification.");
-    }
-
     [MenuItem("XR Apartment/Water/Configure Kitchen Water")]
     public static void Configure()
     {
-        if (EditorApplication.isPlaying) throw new InvalidOperationException("Configure water in Edit mode.");
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().path != Root + "Scenes/SCN_Kitchen_Review.unity")
-            throw new InvalidOperationException("Open the authored kitchen scene first.");
-        Directory.CreateDirectory(WaterArt);
-        AssetDatabase.Refresh();
-        var assumptions = AssetDatabase.LoadAssetAtPath<ModelAssumptions>(Root + "Settings/ASM_KitchenParameters.asset");
+        var scene = KitchenAuthoring.RequireKitchenScene();
+        KitchenAuthoring.EnsureFolder(WaterArt.TrimEnd('/'));
+        var assumptions = KitchenAuthoring.Assumptions;
         Register(assumptions, "water_cup", 0.034f, -0.044f, 0.094f, 0.006f);
         Register(assumptions, "water_pot", 0.082f, -0.052f, 0.112f, 0.008f);
         Register(assumptions, "water_basin", 0.18f, 0.008f, 0.075f, 0.007f);
@@ -115,9 +88,7 @@ public static class KitchenWaterAuthoring
         EditorUtility.SetDirty(surface);
         EditorUtility.SetDirty(stream);
         EditorUtility.SetDirty(splash);
-        AssetDatabase.SaveAssets();
-        EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
-        EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+        KitchenAuthoring.SaveScene(scene);
         Debug.Log("Kitchen water configured: open vessels, NVJOB surfaces, conserved volume parcels, tap and drain.");
     }
 
@@ -155,17 +126,14 @@ public static class KitchenWaterAuthoring
     static void ConfigureProp(string type, string prefix, WaterInteractionProfile profile, float initialFill)
     {
         string path = Root + "Prefabs/PREF_Prop_" + type + ".prefab";
-        var root = PrefabUtility.LoadPrefabContents(path);
-        try
+        KitchenAuthoring.EditPrefab(path, root =>
         {
             var body = root.transform.Find("BODY_" + type);
             body.localScale = Vector3.one;
             foreach (var collider in body.GetComponents<Collider>()) UnityEngine.Object.DestroyImmediate(collider);
             ConfigureVessel(root, body.gameObject, prefix, profile, initialFill, false);
             KitchenGrabAuthoring.ConfigureProp(root);
-            PrefabUtility.SaveAsPrefabAsset(root, path);
-        }
-        finally { PrefabUtility.UnloadPrefabContents(root); }
+        });
     }
 
     static void ConfigureVessel(GameObject root, GameObject body, string prefix, WaterInteractionProfile profile, float fill, bool drain)
@@ -174,7 +142,7 @@ public static class KitchenWaterAuthoring
         float bottom = profile.Length(prefix + "_bottom_y");
         float height = profile.Length(prefix + "_height");
         float wall = profile.Length(prefix + "_wall_thickness");
-        body.GetComponent<MeshFilter>().sharedMesh = SaveMesh("MESH_" + prefix + "_Open", VesselMesh(radius, bottom, height, wall));
+        body.GetComponent<MeshFilter>().sharedMesh = SaveMesh("MESH_" + prefix + "_Open", WaterVesselMeshBuilder.OpenVessel(radius, bottom, height, wall));
         var old = root.transform.Find("COL_WaterVessel");
         if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
         var colliders = Child(root.transform, "COL_WaterVessel");
@@ -201,7 +169,7 @@ public static class KitchenWaterAuthoring
         renderer.shadowCastingMode = ShadowCastingMode.Off;
         var surface = surfaceTransform.GetComponent<LiquidSurface>();
         if (surface == null) surface = surfaceTransform.gameObject.AddComponent<LiquidSurface>();
-        filter.sharedMesh = SaveMesh("MESH_" + prefix + "_WaterPreview", Disk(radius, height * fill));
+        filter.sharedMesh = SaveMesh("MESH_" + prefix + "_WaterPreview", WaterVesselMeshBuilder.PreviewDisk(radius, height * fill));
         var stream = CreateStream(root.transform, profile);
         var container = root.GetComponent<LiquidContainer>();
         if (container == null) container = root.AddComponent<LiquidContainer>();
@@ -268,7 +236,6 @@ public static class KitchenWaterAuthoring
             fx.GetComponent<ParticleSystemRenderer>().sharedMaterial = profile.SplashMaterial;
             var system = root.AddComponent<KitchenWaterSystem>();
             var systemData = new SerializedObject(system);
-            systemData.FindProperty("profile").objectReferenceValue = profile;
             systemData.FindProperty("splashes").objectReferenceValue = fx;
             systemData.ApplyModifiedPropertiesWithoutUndo();
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, StationPath);
@@ -318,59 +285,4 @@ public static class KitchenWaterAuthoring
         UnityEngine.Object.DestroyImmediate(mesh); return existing;
     }
 
-    static Mesh VesselMesh(float radius, float bottom, float height, float wall)
-    {
-        var vertices = new List<Vector3>(); var triangles = new List<int>();
-        const int segments = 40;
-        for (int i = 0; i < segments; i++)
-        {
-            float a = i * 2f * Mathf.PI / segments, b = (i + 1) * 2f * Mathf.PI / segments;
-            var ra = new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a));
-            var rb = new Vector3(Mathf.Cos(b), 0, Mathf.Sin(b));
-            var low = Vector3.up * bottom; var high = Vector3.up * (bottom + height);
-            Quad(vertices, triangles, ra * radius + low, rb * radius + low, rb * radius + high, ra * radius + high);
-            Quad(vertices, triangles, rb * (radius + wall) + low - Vector3.up * wall, ra * (radius + wall) + low - Vector3.up * wall, ra * (radius + wall) + high, rb * (radius + wall) + high);
-            Quad(vertices, triangles, ra * radius + high, rb * radius + high, rb * (radius + wall) + high, ra * (radius + wall) + high);
-            Quad(vertices, triangles, low, rb * radius + low, ra * radius + low, low);
-            Quad(vertices, triangles, low - Vector3.up * wall, ra * (radius + wall) + low - Vector3.up * wall, rb * (radius + wall) + low - Vector3.up * wall, low - Vector3.up * wall);
-        }
-        var mesh = new Mesh(); mesh.SetVertices(vertices); mesh.SetTriangles(triangles, 0);
-        mesh.RecalculateNormals();
-        var normals = mesh.normals;
-        for (int i = 0; i < segments; i++)
-        {
-            float a = i * 2f * Mathf.PI / segments, b = (i + 1) * 2f * Mathf.PI / segments;
-            var ra = new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a));
-            var rb = new Vector3(Mathf.Cos(b), 0, Mathf.Sin(b));
-            int n = i * 20;
-            normals[n] = normals[n + 3] = -ra;
-            normals[n + 1] = normals[n + 2] = -rb;
-            normals[n + 4] = normals[n + 7] = rb;
-            normals[n + 5] = normals[n + 6] = ra;
-        }
-        mesh.normals = normals;
-        mesh.RecalculateBounds(); return mesh;
-    }
-
-    static void Quad(List<Vector3> vertices, List<int> triangles, Vector3 a, Vector3 b, Vector3 c, Vector3 d)
-    {
-        int n = vertices.Count; vertices.Add(a); vertices.Add(b); vertices.Add(c); vertices.Add(d);
-        triangles.Add(n); triangles.Add(n + 1); triangles.Add(n + 2);
-        triangles.Add(n); triangles.Add(n + 2); triangles.Add(n + 3);
-    }
-
-    static Mesh Disk(float radius, float y)
-    {
-        var vertices = new Vector3[41]; var uv = new Vector2[41]; var triangles = new int[40 * 3];
-        vertices[0] = Vector3.up * y;
-        for (int i = 0; i < 40; i++)
-        {
-            float angle = -i * 2f * Mathf.PI / 40;
-            vertices[i + 1] = new Vector3(Mathf.Cos(angle) * radius, y, Mathf.Sin(angle) * radius);
-            uv[i + 1] = new Vector2(vertices[i + 1].x, vertices[i + 1].z) * 5f;
-            triangles[i * 3] = 0; triangles[i * 3 + 1] = i + 1; triangles[i * 3 + 2] = (i + 1) % 40 + 1;
-        }
-        var mesh = new Mesh { vertices = vertices, uv = uv, triangles = triangles };
-        mesh.RecalculateNormals(); return mesh;
-    }
 }

@@ -1,17 +1,16 @@
 using System;
-using System.IO;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
+using XRApartment.EditorTools;
 
 /// Builds project-owned props from selected vendor meshes; edits only the dressing prefab.
 public static class KitchenPropsAuthoring
 {
-    const string Root = "Assets/_Project/";
+    const string Root = KitchenAuthoring.Root;
     const string Art = Root + "Art/Props/";
     const string Prefabs = Root + "Prefabs/Props/";
     const string Dressing = Root + "Prefabs/PREF_Kitchen_Dressing.prefab";
@@ -21,15 +20,12 @@ public static class KitchenPropsAuthoring
     [MenuItem("XR Apartment/Props/Configure Kitchen Dressing")]
     public static void Configure()
     {
-        var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-        if (EditorApplication.isPlaying || scene.path != Root + "Scenes/SCN_Kitchen_Review.unity")
-            throw new InvalidOperationException("Open the kitchen in Edit mode before configuring props.");
-        Directory.CreateDirectory(Art);
-        Directory.CreateDirectory(Prefabs);
-        AssetDatabase.Refresh();
+        var scene = KitchenAuthoring.RequireKitchenScene();
+        KitchenAuthoring.EnsureFolder(Art.TrimEnd('/'));
+        KitchenAuthoring.EnsureFolder(Prefabs.TrimEnd('/'));
         ConfigureImporters();
 
-        var assumptions = AssetDatabase.LoadAssetAtPath<ModelAssumptions>(Root + "Settings/ASM_KitchenParameters.asset");
+        var assumptions = KitchenAuthoring.Assumptions;
         BuildProp("Plate", Kitchen + "models/plate.fbx", null, .27f, false, false, assumptions);
         BuildProp("Bowl", Kitchen + "models/bowl.fbx", null, .19f, false, false, assumptions);
         BuildProp("SmallBowl", Kitchen + "models/bowl.fbx", null, .10f, false, false, assumptions);
@@ -88,9 +84,7 @@ public static class KitchenPropsAuthoring
             UnityEngine.Object.DestroyImmediate(previous);
         PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Dressing), scene);
         EditorUtility.SetDirty(assumptions);
-        AssetDatabase.SaveAssets();
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
+        KitchenAuthoring.SaveScene(scene);
         Debug.Log("Kitchen dressing configured. Bake lighting and reflections after changing fixed props.");
     }
 
@@ -123,8 +117,7 @@ public static class KitchenPropsAuthoring
                 status = "Prototype assumption", source = "Art dressing scale selected for this prototype; not a client dimension.",
                 verification = "Normalized renderer bounds in the kitchen editor; Quest Link handling pending." });
         }
-        var model = AssetDatabase.LoadAssetAtPath<GameObject>(source);
-        if (model == null) throw new InvalidOperationException("Missing prop source " + source);
+        var model = KitchenAuthoring.LoadRequired<GameObject>(source);
         Transform selected = selection == null ? model.transform : model.GetComponentsInChildren<Transform>(true)
             .First(t => t.name.StartsWith(selection, StringComparison.Ordinal));
         var root = new GameObject("PREF_Prop_" + name);
@@ -153,7 +146,6 @@ public static class KitchenPropsAuthoring
             bounds = Bounds(root);
             // Bottom-centred project pivot removes the source pack's display offsets and unit mismatch.
             visual.transform.localPosition -= new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
-            bounds = Bounds(root);
             if (grab)
             {
                 // A single convex hull is sufficient for food and empty decorative mugs.
@@ -166,16 +158,7 @@ public static class KitchenPropsAuthoring
                 }
                 var body = root.AddComponent<Rigidbody>();
                 body.mass = .15f; // Generic handling mass, not a simulated food weight.
-                body.interpolation = RigidbodyInterpolation.Interpolate;
-                body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-                var interactable = root.AddComponent<XRGrabInteractable>();
-                interactable.movementType = XRBaseInteractable.MovementType.Kinematic;
-                interactable.useDynamicAttach = true;
-                interactable.matchAttachPosition = true;
-                interactable.matchAttachRotation = true;
-                interactable.throwOnDetach = false;
-                interactable.colliders.Clear();
-                interactable.colliders.AddRange(root.GetComponentsInChildren<Collider>());
+                root.AddComponent<XRGrabInteractable>().throwOnDetach = false;
                 KitchenGrabAuthoring.ConfigureProp(root);
             }
             else

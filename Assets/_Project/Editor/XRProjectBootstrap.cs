@@ -8,7 +8,7 @@ using UnityEngine.XR.Management;
 namespace XRApartment.EditorTools
 {
     /// <summary>
-    /// One-shot project configuration for the dual-target (PC VR + Quest) XR setup.
+    /// Configures the approved Standalone PC XR setup without switching build target.
     /// Run with: Unity.exe -batchmode -executeMethod XRApartment.EditorTools.XRProjectBootstrap.Configure
     /// </summary>
     public static class XRProjectBootstrap
@@ -21,12 +21,12 @@ namespace XRApartment.EditorTools
 
         static readonly string[] ProjectFolders =
         {
-            "Assets/_Project/Scenes",
-            "Assets/_Project/Prefabs",
-            "Assets/_Project/Materials",
-            "Assets/_Project/Scripts",
-            "Assets/_Project/Settings",
-            "Assets/_Project/XR",
+            KitchenAuthoring.Root + "Scenes",
+            KitchenAuthoring.Root + "Prefabs",
+            KitchenAuthoring.Root + "Materials",
+            KitchenAuthoring.Root + "Scripts",
+            KitchenAuthoring.Root + "Settings",
+            KitchenAuthoring.Root + "XR",
         };
 
         public static void Configure()
@@ -34,10 +34,7 @@ namespace XRApartment.EditorTools
             SetActiveInputHandler(NewInputSystemOnly);
 
             var container = EnsureSettingsContainer();
-            foreach (var group in new[] { BuildTargetGroup.Standalone, BuildTargetGroup.Android })
-                EnableOpenXr(container, group);
-
-            ConfigureAndroid();
+            EnableOpenXr(container, BuildTargetGroup.Standalone);
             CreateFolders();
 
             AssetDatabase.SaveAssets();
@@ -109,41 +106,18 @@ namespace XRApartment.EditorTools
                 return;
             }
 
-            foreach (var loader in new List<XRLoader>(manager.activeLoaders))
-                if (loader != null)
-                    XRPackageMetadataStore.RemoveLoader(manager, loader.GetType().FullName, group);
+            foreach (var loader in manager.activeLoaders)
+                if (loader != null && loader.GetType().FullName == OpenXrLoaderTypeName) return;
 
             var assigned = XRPackageMetadataStore.AssignLoader(manager, OpenXrLoaderTypeName, group);
             Debug.Log($"{Marker} {group}: assign OpenXR loader = {assigned}; " +
                       $"active = [{Describe(manager)}]");
         }
 
-        static void ConfigureAndroid()
-        {
-            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
-            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
-            PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
-            PlayerSettings.SetGraphicsAPIs(
-                BuildTarget.Android,
-                new[]
-                {
-                    UnityEngine.Rendering.GraphicsDeviceType.Vulkan,
-                    UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3
-                });
-        }
-
         static void CreateFolders()
         {
             foreach (var folder in ProjectFolders)
-            {
-                var parts = folder.Split('/');
-                for (var i = 1; i < parts.Length; i++)
-                {
-                    var path = string.Join("/", parts, 0, i + 1);
-                    if (!AssetDatabase.IsValidFolder(path))
-                        AssetDatabase.CreateFolder(string.Join("/", parts, 0, i), parts[i]);
-                }
-            }
+                KitchenAuthoring.EnsureFolder(folder);
         }
 
         static string Describe(XRManagerSettings manager)
@@ -158,16 +132,9 @@ namespace XRApartment.EditorTools
         static void Report()
         {
             var container = EnsureSettingsContainer();
-            foreach (var group in new[] { BuildTargetGroup.Standalone, BuildTargetGroup.Android })
-            {
-                var manager = container.ManagerSettingsForBuildTarget(group);
-                Debug.Log($"{Marker} VERIFY {group}: [{(manager == null ? "null" : Describe(manager))}]");
-            }
-
-            Debug.Log($"{Marker} VERIFY activeInputHandler={GetActiveInputHandler()} " +
-                      $"androidBackend={PlayerSettings.GetScriptingBackend(BuildTargetGroup.Android)} " +
-                      $"androidMinSdk={PlayerSettings.Android.minSdkVersion} " +
-                      $"androidArch={PlayerSettings.Android.targetArchitectures}");
+            var manager = container.ManagerSettingsForBuildTarget(BuildTargetGroup.Standalone);
+            Debug.Log($"{Marker} VERIFY Standalone: [{(manager == null ? "null" : Describe(manager))}]");
+            Debug.Log($"{Marker} VERIFY activeInputHandler={GetActiveInputHandler()}");
             Debug.Log($"{Marker} VERIFY activeBuildTarget={EditorUserBuildSettings.activeBuildTarget}");
         }
     }

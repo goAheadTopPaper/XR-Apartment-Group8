@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Simulation;
 
@@ -35,13 +36,15 @@ namespace XRApartment.Runtime
 
         private void OnEnable()
         {
-            interactable.selectEntered.AddListener(_ => Toggle());
+            interactable.selectEntered.AddListener(OnSelected);
         }
 
         private void OnDisable()
         {
-            interactable.selectEntered.RemoveAllListeners();
+            interactable.selectEntered.RemoveListener(OnSelected);
         }
+
+        private void OnSelected(SelectEnterEventArgs _) => Toggle();
 
         public void Toggle() => SetOpen(!openTarget);
 

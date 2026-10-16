@@ -1,5 +1,4 @@
 using UnityEngine;
-using XRApartment.Data;
 
 namespace XRApartment.Runtime
 {
@@ -8,7 +7,6 @@ namespace XRApartment.Runtime
     public sealed class KitchenWaterSystem : MonoBehaviour
     {
         const int ParcelCapacity = 256;
-        [SerializeField] WaterInteractionProfile profile;
         [SerializeField] ParticleSystem splashes;
         struct Parcel
         {

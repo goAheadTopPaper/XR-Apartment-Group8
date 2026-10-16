@@ -668,7 +668,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1d510da5a97e47f6b3620c0a069c4ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: 65ad5483f5f2945618c51517de4487d1, type: 2}
   splashes: {fileID: 2263644988950013355}
 --- !u!1 &2618441038995624266
 GameObject:

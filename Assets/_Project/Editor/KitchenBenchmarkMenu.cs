@@ -11,16 +11,12 @@ namespace XRApartment.EditorTools
     /// these commands only exchange the fridge and toggle its flush surround (D03).
     public static class KitchenBenchmarkMenu
     {
-        const string ScenePath = "Assets/_Project/Scenes/SCN_Kitchen_Review.unity";
-        const string SettingsRoot = "Assets/_Project/Settings";
-        const string PrefabRoot = "Assets/_Project/Prefabs";
-
         [MenuItem("XR Apartment/Open Kitchen Review Scene")]
         public static void OpenKitchenScene()
         {
             if (Application.isPlaying) return;
             if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-                EditorSceneManager.OpenScene(ScenePath);
+                EditorSceneManager.OpenScene(KitchenAuthoring.ScenePath);
         }
 
         [MenuItem("XR Apartment/Benchmark/Apply B1 - Proud + F2")]
@@ -41,15 +37,15 @@ namespace XRApartment.EditorTools
                 marker = root.GetComponentInChildren<BenchmarkSlotMarker>();
                 if (marker != null) break;
             }
-            var registry = AssetDatabase.LoadAssetAtPath<BenchmarkRegistry>($"{SettingsRoot}/REG_Benchmarks.asset");
+            var registry = AssetDatabase.LoadAssetAtPath<BenchmarkRegistry>(KitchenAuthoring.Settings + "REG_Benchmarks.asset");
             var definition = registry != null ? registry.Find(benchmarkId) : null;
             var slot = marker != null ? marker.transform.Find("SLOT_Fridge") : null;
             var prefab = definition != null
-                ? AssetDatabase.LoadAssetAtPath<GameObject>($"{PrefabRoot}/PREF_Fridge_{definition.Fridge}.prefab")
+                ? AssetDatabase.LoadAssetAtPath<GameObject>($"{KitchenAuthoring.Prefabs}PREF_Fridge_{definition.Fridge}.prefab")
                 : null;
             if (slot == null || prefab == null)
             {
-                Debug.LogError($"[KITCHEN] Cannot apply {benchmarkId}. Open {ScenePath} and check the registry and fridge prefab.");
+                Debug.LogError($"[KITCHEN] Cannot apply {benchmarkId}. Open {KitchenAuthoring.ScenePath} and check the registry and fridge prefab.");
                 return;
             }
 

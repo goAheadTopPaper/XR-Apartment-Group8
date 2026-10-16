@@ -2,7 +2,6 @@ using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace XRApartment.Runtime
 {
