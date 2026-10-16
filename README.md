@@ -61,11 +61,18 @@ Assets/
     Art/Kitchen/       从 mzh KitchenTest 迁入的模型/贴图，以及 Built-in 材质
     Scenes/            SCN_Kitchen_Review.unity（唯一启动场景，第 0 位）
     Prefabs/           预制体（优先在预制体里改，不要直接改场景里的实例）
-    Scripts/           运行时脚本
+    Scripts/
+      Data/            benchmark / 参数登记 / 反馈记录定义
+      Simulation/      无引擎引用的状态机、动作链、运动学与水量算法
+      Runtime/
+        Review/        评审标记、方案槽位、世界空间菜单
+        Interaction/   门/抽屉、手部呈现、持物防穿透
+        Water/         接水、容器、水流、水面与水花
+    Editor/            项目作者工具：方案、道具、抓取、水体、天空、XR 初始化
+    Tests/             EditMode / PlayMode 回归测试
     Materials/         材质
     Settings/          项目自有配置资产（自定义 InputActions、benchmark 组合定义、模型参数登记表）
     XR/                自定义 XR Provider / 交互层配置
-  Editor/              XRProjectBootstrap 工程配置 / KitchenBenchmarkMenu 预设切换
   XR/                  ★ XR Plug-in Management 生成的资产（Loader 列表、OpenXR Package Settings）
   XRI/                 ★ XRI 生成的设置资产（Interaction Layer Mask / Runtime / Simulator Settings）
   Samples/             XRI Starter Assets（只读参考，勿改动，升级时整目录替换）
@@ -75,6 +82,8 @@ UserSettings/ Logs/ Temp/ Library/   ← 本机私有，已 gitignore，不要�
 ```
 
 ★ 标记的三个 `Assets/` 子目录**必须入库**：`Assets/XR/` 与 `Assets/XRI/` 下的 `.asset` 是 `ProjectSettings/EditorBuildSettings.asset` 和 XRI 运行时引用的实际对象，删掉或漏提交会让队友打开工程后加载器列表为空、交互层丢失。
+
+各模块职责、修改入口和依赖方向见 [代码结构与维护入口](Docs/CodeStructure.md)。编辑器工具与运行时代码分开，现有三个运行时程序集保持不变。
 
 ---
 
@@ -138,13 +147,16 @@ git lfs checkout             # 指针文件还原为真实内容
 
 ## 7. 运行与调试（Quest Link）
 
-构建目标固定 `StandaloneWindows64`——Quest 3 只当显示器，画面由 PC 渲染（PRD TECH-02 批准的就是这个环境）。
+构建目标固定 `StandaloneWindows64`：Windows PC 渲染画面，Quest 3 提供头部与手柄追踪（PRD TECH-02）。直接 Play 联动头显时，Unity 编辑器也需要在 Windows PC 上运行。
+
+**Mac 的平台限制**：Virtual Desktop 的 Mac 连接提供桌面串流；PCVR 串流需要 Windows，不能将 Quest 追踪接入 Mac 上的 Unity Play（[VD 官方说明](https://www.vrdesktop.net/)）。Mac 上继续使用下方的键鼠模拟器；把构建目标设为 Windows 不会改变编辑器所在的平台。
 
 1. 编辑器里 `File → Build Settings` 确认平台是 **Windows, Mac, Linux → Standalone Windows64**，场景 `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` 在第 0 位。
 2. Quest 3 上启动 Link（有线优先，无线对带宽敏感），连到本机；Meta Horizon 里允许连接。
-3. Unity 编辑器按 **Play**。检查厨房内传送、锅/杯抓取、冰箱门/抽屉，以及回到起点/暂停/平滑移动菜单；B1/B2/B3 从 `XR Apartment → Benchmark → Apply …` 切换。
-4. **没头显的组员（Mac / Windows）**：项目已配置 **XR Interaction Simulator**，进入 Play 后自动创建虚拟头显和两只手柄。先点击 **Game** 画面获得键盘焦点，再按下表操作；不需要再导入一份 Simulator Sample。TMP Essentials 也已随项目提供。
-5. 不要引入 SteamVR / WMR 等其他运行时路径作为测试基线——PRD 只批准了 Quest 3 + Quest Link，多一条链路就多一套 OpenXR Profile 和风险。
+3. 确认当前 OpenXR 运行时与连接方式一致：Quest Link 使用 Meta 的运行时；Windows VD 调试使用其对应的运行时，并先启动 Streamer、让头显连接该 PC。
+4. 真机 Play 前，在 `Project Settings → XR Plug-in Management → XR Interaction Toolkit` 取消 **Use XR Interaction Simulator in scenes**，避免模拟输入同时进入。然后按 **Play**，检查传送、锅/杯抓取、冰箱门/抽屉，以及回到起点/暂停/平滑移动菜单；B1/B2/B3 从 `XR Apartment → Benchmark → Apply …` 切换。
+5. **没头显的组员（Mac / Windows）**：项目已配置 **XR Interaction Simulator**，进入 Play 后自动创建虚拟头显和两只手柄。先点击 **Game** 画面获得键盘焦点，再按下表操作；不需要再导入一份 Simulator Sample。TMP Essentials 也已随项目提供。
+6. 正式验收仍使用 Quest 3 + Quest Link；Windows VD 可用于开发调试，其结果不等于通过 TECH-02。不要引入其他运行时路径作为测试基线。
 
 ### 无头显时的键鼠操作
 
@@ -233,7 +245,7 @@ Kitchen Props Free 和 Food Pack Mixed 的精选资源已布置到公共 `PREF_K
 UNITY="/c/Program Files/Unity/Hub/Editor/2022.3.62f3/Editor/Unity.exe"
 PROJ="D:/codeWork/XR-Apartment-Group8"
 
-# 写入 XR 加载器 / Input System / Android 编译设置
+# 确保 Standalone OpenXR / New Input System 和项目目录
 "$UNITY" -batchmode -nographics -quit -projectPath "$PROJ" \
   -executeMethod XRApartment.EditorTools.XRProjectBootstrap.Configure \
   -logFile "$PROJ/Logs/bootstrap.log"
@@ -241,6 +253,8 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
 ```
 
 注意：Unity 会拒绝名字以点开头的 `-logFile` 目录（如 `.unity-logs`），日志请放在 `Logs/` 下。batchmode 前**先关掉编辑器**，否则抢工程锁会失败。
+
+初始化会保留已有 Loader，仅在缺少 OpenXR 时补上；不切换当前构建目标，也不改写 Android 设置。
 
 厨房现在由场景和 Prefab 保存设计，**不再通过代码生成房间**。在 `PREF_Kitchen_Environment` 编辑环境，在 `PREF_Kitchen_Benchmark` 编辑槽位/围板，交互物继续编辑各自 Prefab。旧 `VRSceneBootstrap` / `KitchenSceneBootstrap` 已移除，避免覆盖迁入的布局。来源、材质适配和冰箱槽位的改动见 [迁移说明](Docs/MzhKitchenMigration.md)。
 

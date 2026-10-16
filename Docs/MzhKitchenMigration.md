@@ -44,6 +44,8 @@
 
 借鉴 [Alyx 官方说明](https://www.half-life.com/en/alyx/) 中对手指追踪/扳机式控制器的兼容，以及 [Valve 交互设计访谈](https://www.uploadvr.com/valve-interview-half-life-alyx/) 对可触碰物体的讨论。当前仅实现手势、握持提示和球形手掌接触；没有逐指碰撞、贴合不同物体的握姿、完整物理手或裸手识别。没有引入远距吸取，以免改变三种方案的触达比较。
 
+后续针对用户发现的锅穿桌问题，所有活动道具增加整体扫掠，持物实手跟随受阻姿态并显示透过遮挡的追踪虚影；实现、验证与保守包围盒的限制见 [HeldPropCollision.md](HeldPropCollision.md)。
+
 ## 天空与光照适配
 
 来源 `KitchenTest` 使用 Unity 默认程序天空，太阳旋转 `(15°,60°,0°)`、暖白色 `(1,0.95686,0.83922)`、强度 5、间接光倍率 4；`StandardLightingSettings` 启用两次反弹、0.5m 烘焙 AO。两个室内反射探针分别在 `(-3.5,1.75,1.75)` 与 `(-3,1.75,-0.75)`。`GeneralSceneProfile` 开启 ACES 与 Bloom（强度 2、阈值 1），Motion Blur/Vignette 关闭。来源项目为 Linear。这些是从该提交的场景/设置中读出的值，不代表另一场演示一定采用了同一版本。

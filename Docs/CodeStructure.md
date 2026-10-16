@@ -1,0 +1,66 @@
+# 代码结构与维护入口
+
+项目代码集中在 `Assets/_Project/`。当前保留 Data、Simulation、Runtime 三个运行时程序集，Editor 使用 Unity 的编辑器程序集；运行时按厨房业务职责分目录，类名和序列化 GUID 保持稳定。
+
+## 职责与依赖
+
+| 位置 | 职责 | 主要入口 |
+| --- | --- | --- |
+| `Scripts/Data/` | benchmark、语义角色、参数登记、手部/水体配置、匿名反馈 schema | `BenchmarkRegistry`、`ModelAssumptions`、`SessionRecord` |
+| `Scripts/Simulation/` | 不引用 UnityEngine 的状态机、动作链和数学算法 | `SessionStateMachine`、`ChallengeTaskTracker`、`MotionKinematics`、`WaterVolume`、`CylindricalLiquid` |
+| `Scripts/Runtime/Review/` | 场景语义标记、冰箱方案槽位、世界空间菜单 | `ReviewElement`、`BenchmarkSlotMarker`、`KitchenMenuController` |
+| `Scripts/Runtime/Interaction/` | 门/抽屉开合、手部呈现、手掌接触与持物防穿透 | `KinematicSwingDoor`、`KinematicLinearDrawer`、`ControllerHandPresentation`、`CollisionConstrainedGrabTransformer` |
+| `Scripts/Runtime/Water/` | 龙头、液体容器、水量流转及视觉表现 | `WaterTap`、`LiquidContainer`、`KitchenWaterSystem`、`LiquidStream`、`LiquidSurface` |
+| `Editor/` | 创建/适配项目资产，检查编辑状态，保存场景或 Prefab | 下表中的作者工具 |
+| `Tests/EditMode/`、`Tests/PlayMode/` | 纯逻辑、资源完整性、物理查询和真实 XRI 流程验证 | 各模块同名测试 |
+
+箭头表示代码引用：
+
+```mermaid
+flowchart LR
+    Editor --> Runtime
+    Editor --> Data
+    Runtime --> Simulation
+    Runtime --> Data
+    Simulation --> Data
+```
+
+Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject 或其他 Unity 对象。Editor 创建资产，Runtime 消费已经保存的配置和 Prefab。
+
+## 需要修改时从哪里开始
+
+| 任务 | 入口 | 作用范围 |
+| --- | --- | --- |
+| 切换 B1/B2/B3 | `KitchenBenchmarkMenu`，`XR Apartment/Benchmark/Apply …` | 替换冰箱实例和围板；三方案共用环境 |
+| 调整抓取、防穿透、释放速度 | `KitchenGrabAuthoring.ConfigureProp` 与 `SET_HandInteraction` | 一处维护动态接触点、碰撞体列表、扫掠、平滑及释放配置；食品和水容器都调用它 |
+| 调整食品和餐具 | `KitchenPropsAuthoring`，`XR Apartment/Props/Configure Kitchen Dressing` | 精选模型、材质、归一化尺寸与公共布置；重建会恢复默认摆放 |
+| 调整容器/水站 | `KitchenWaterAuthoring`，`XR Apartment/Water/Configure Kitchen Water` | 水材质、锅杯、龙头和接水盆；重建会恢复登记的水体默认配置 |
+| 修改容器网格算法 | `WaterVesselMeshBuilder` | 只构造 Mesh，资产保存仍由水体工具负责 |
+| 应用固定天空 | `KitchenLightingAuthoring`，`XR Apartment/Lighting/Apply AllSky Free Daylight` | 天空材质与场景天光；修改后按光照文档重烘焙 |
+| 初始化 XR | `XRApartment.EditorTools.XRProjectBootstrap.Configure` | Standalone OpenXR、New Input System 与项目目录；保留已有 Loader，不切平台、不重设 Android |
+| 调整反馈必填规则 | `BenchmarkFeedback.MissingRequiredFields` | `HasAllRequiredFields` 和会话完整性复用同一规则；Skipped/Aborted 需要原因 |
+
+`KitchenAuthoring` 集中公共资产路径、必需资源加载、编辑状态/场景检查和 Prefab 的加载—修改—保存—释放流程。不要在单个作者工具里重复这些规则。Prefab 修改失败也必须释放其编辑内容；保持 `.meta` 与资源一起移动。
+
+## 保留的具体模块
+
+- 门体和抽屉共享 `MotionKinematics`，各自保留小型运动适配；禁用时只移除自己的监听，不清除其他模块的监听。
+- `KinematicPalmSolver` 处理静态表面的手掌球，`HeldPropSweep` 处理整个持物的平移与旋转。两者碰撞规则不同，分别维护。
+- `ReviewElement`、`BenchmarkSlotMarker` 是场景语义入口；状态机和反馈 schema 仍有 PRD 职责，不能按“当前未接 UI”删除。
+- 手部/水体参数来自登记表；不把几何尺寸分散回运行时脚本。三种 benchmark 使用同一动作链和交互规则。
+
+## 验证与范围
+
+保持 Unity 2022.3.62f3 / Built-in / Linear / XRI 3.5 / StandaloneWindows64；不修改 Samples、来源美术、场景摆放或烘焙。
+
+本次整理验证（2026-10-16）：
+
+- EditMode 77/77、PlayMode 8/8 通过，包含原防穿透回归、未完成任务的原因校验，以及门/抽屉反复禁用启用后的监听保留。
+- 35 个原项目脚本的 GUID 全部保留，其中 19 个移动目录。场景、其他 Prefab、烘焙及工程/包设置与整理前一致；水站 Prefab 只删除未读取的 `profile` 字段。
+- 作者工具：重复配置抓取保持一个扫掠代理，编辑失败后释放 Prefab 内容，三个场景作者入口拦截错误场景；锅、杯、接水盆生成的顶点/三角形/法线与原网格一致。
+- 场景组件检查：B1/B2 的两扇门、B3 的两扇门和两个抽屉均能开合到底，共用环境/道具/水体/天空引用保持一致。
+- XRI 抓取下接水约 204.827mL → 341.378mL；临时容器检查中，杯内约 204.827mL 倒入锅，未计入溢出，体积误差小于 0.001mL。
+
+诊断文件位于忽略入库的 `Logs/CodeCleanup/`。这些编辑器与组件 API 检查不代表完整需求验收；Quest Link 手感与头显性能仍按 PRD 单独验证。
+
+抓取、水体、美术迁移的详细限制分别见 [HeldPropCollision.md](HeldPropCollision.md)、[KitchenWaterAndSky.md](KitchenWaterAndSky.md)、[MzhKitchenMigration.md](MzhKitchenMigration.md) 和 [KitchenDressing.md](KitchenDressing.md)。
