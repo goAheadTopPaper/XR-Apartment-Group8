@@ -1,10 +1,10 @@
 # AGENTS.md — 给 AI 编码助手的项目指令
 
-面向在本仓库工作的 agent 会话。人类向说明看 `README.md`，**产品与需求的唯一权威是 Lean PRD v0.1（见 README §12）**。本文件只收必须遵守的约束和已验证的工具入口。
+面向在本仓库工作的 agent 会话。人类向说明看 `README.md`。**Phase 2 产品范围与验收以 Lean PRD v0.3 Final（2026-10-03，Post-submission Phase 2 Implementation Baseline）为准**；Final Proposal 是该 PRD 的实施来源，冰箱 archetype 定义以 PRD Final §6.2 为准。本文是操作摘要，冲突时核对 PRD Final；本机文件位置和需求追溯见 README §12。
 
 ## 这个项目是什么
 
-COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房里，让 future-resident proxy 比较「冰箱 archetype（F2/F3/F4）× 柜体策略（Proud / Flush-oriented）」的三种 benchmark 组合（B1=Proud+F2、B2=Flush+F2、B3=Flush+F4），执行相同的日常动作链，接受即时非阻塞的几何冲突提示，最后提交可定位的结构化反馈。
+COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房里，让 future-resident proxy 通过相同的日常动作链比较 P0 的 B1=Proud+F2 与 B2=Flush+F2。B3=Flush+F4、F3 Explore-only 预览和位置 marker 为 P1，待主旅程稳定后再纳入；F3 不产生正式比较证据。P0 包括即时非阻塞的客观几何冲突提示、逐组合反馈与匿名本地记录。
 
 **不是**通用 VR 公寓漫游、不是装修器、不是营销展示、不是合规认证工具。产品关系是 `建筑师提出方案 → 评审者体验 → 系统捕获反馈 → 建筑师修订`。
 
@@ -12,7 +12,7 @@ COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房�
 
 - **引擎锁死 Unity 2022.3.62f3**。不要升级、不要提议升级到 Unity 6、不要安装 `com.unity.ai.assistant*`。官方内置 MCP 要求 Unity 6，本项目改用社区方案 MCP for Unity 10.2.0（支持 2021.3–6.x），这是已定决策。
 - **构建目标是 `StandaloneWindows64`**。PRD 批准的环境是 Meta Quest 3 **经 Quest Link 连 PC**（TECH-02），一体机 APK 不在 MVP 内。**不要 Switch Platform 到 Android**：会触发全量 reimport 并改写 `EditorBuildSettings.asset` / `GraphicsSettings.asset`，影响全组。
-- **不要扩张范围**。完整公寓、颜色/材质定制、真实重量与复杂物理、电线插座、多人同场、云端后台均已在 PRD §5 标为 Deferred/Rejected（D02/D03/D13）。范围膨胀是首要风险 R01。
+- **不要扩张 P0 范围**。B3/F4、F3 Explore-only 和位置 marker 为 P1；预设颜色方案及代表性线缆/插座为 P2（FR-13/14）；完整公寓、真实重量与复杂物理、多人同场和云端后台不进入 P0。范围膨胀是风险 R01。
 - **不要把自由编辑当成方案**。方案切换是预设 configuration switching（D03），不是任意搬动家具。
 - **不要修改 `Assets/Samples/**`**。整目录是 XRI 官方示例，升级时整目录替换。需要改输入配置或预制体时**复制**到 `Assets/_Project/Settings/` 或 `Prefabs/` 再改。
 - **空间主张必须有登记参数支撑**（MOD-01）。尺寸 / clearance / reach 结论只能对 `Assumption Register` 里的 prototype assumption 成立，不得写成 client fact。
@@ -22,11 +22,11 @@ COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房�
 ## 当前真实状态（改设置前先看这里，别照旧文档假设）
 
 - `activeInputHandler: 1` = **仅新 Input System**（Unity 的取值映射是 0=旧 / 1=仅新 / 2=Both，与 `Assets/Editor/XRProjectBootstrap.cs` 的注释一致）。**不要因为"看起来应该是 2"就顺手改**。
-- PRD §12 的 25 条 Approved 需求（FR/UX/ACC/SAFE/MOD/TECH/EVAL）尚未完成端到端验收；已有模块与完整需求验收需区分。
-- `Assets/_Project/Scripts/` 三个程序集边界：`XRApartment.Data`（枚举 / benchmark 定义与注册表 / 模型参数 SO / 会话记录 schema）、`XRApartment.Simulation`（纯 C#，`noEngineReferences`，八态状态机、挑战动作链、运动学缓动 `MotionKinematics`）、`XRApartment.Runtime`（`ReviewElement` 标注 + `KinematicSwingDoor` / `KinematicLinearDrawer` 运动学门体抽屉 + `BenchmarkSlotMarker` + `KitchenMenuController` 世界空间菜单，已引用 XRI 3.5 / XR CoreUtils / uGUI）。冰箱平开门统一**同侧铰链**（靠台面一侧），门扇向房间中央摆出——异侧会让两扇门向玩家两侧张开，不符合双门形态（玩家实测反馈）。`Assets/_Project/Tests/EditMode/` 在原有 25 条断言之外新增 `MotionKinematicsTests`（7 条），用 `run_tests` 无需头显即可全绿。
+- PRD Final §12 的需求包含 P0/P1/P2；P0 主旅程尚未完成端到端验收，现有模块不能视作需求已验收。按 Final 的优先级、状态和验收条件追踪各 ID。
+- `Assets/_Project/Scripts/` 三个程序集边界：`XRApartment.Data`（枚举 / benchmark 定义与注册表 / 模型参数 SO / 会话记录 schema）、`XRApartment.Simulation`（纯 C#，`noEngineReferences`，八态状态机、挑战动作链、运动学缓动 `MotionKinematics`）、`XRApartment.Runtime`（`ReviewElement` 标注 + `KinematicSwingDoor` / `KinematicLinearDrawer` 运动学门体抽屉 + `BenchmarkSlotMarker` + `KitchenMenuController` 世界空间菜单，已引用 XRI 3.5 / XR CoreUtils / uGUI）。现有门体的同侧铰链安排属于旧代理实现；修正 F2/F3/F4 时须逐件按 PRD Final §6.2 和登记参数核对门数、铰链、开启方向及碰撞。`Assets/_Project/Tests/EditMode/` 在原有 25 条断言之外新增 `MotionKinematicsTests`（7 条），用 `run_tests` 无需头显即可全绿。
 - 厨房已迁移为 `feature/mzh@1f501b3` 的 `KitchenTest` 设计：`Assets/_Project/Scenes/SCN_Kitchen_Review.unity`。用 `XR Apartment/Open Kitchen Review Scene` 打开；环境由 `PREF_Kitchen_Environment` 保存，来源模型/贴图和适配后的 Standard 材质在 `Assets/_Project/Art/Kitchen/`。**旧 `KitchenSceneBootstrap` / `VRSceneBootstrap` 已删除，不要恢复代码生成的灰盒**。原始 FBX 不变，台面入口端用派生网格留出 0.838m 冰箱槽位；此改动和实测台面高度等已更新到 `Settings/ASM_KitchenParameters.asset`（全为 prototype assumption，MOD-01）。详见 `Docs/MzhKitchenMigration.md`。
-- `Prefabs/` 保留 `PREF_Fridge_F2/F3/F4`（双门/三门/四门十字代理）与 `PREF_Prop_Pot/Cup`；新增厨房环境、benchmark 槽位、菜单和传送区 Prefab。B1/B2/B3 继续由 `KitchenBenchmarkMenu` 的 `XR Apartment/Benchmark/Apply …` 切换（编辑器与 Play 均可），只换 `SLOT_Fridge` 的实例和 Flush 围板。mzh 场景未提供可用冰箱方案，因此这些交互代理仍为 Hzc 原有版本，不能声称来自 mzh。
-- 仍然没有：几何冲突检测（SAFE-01 的 warning/fade 与 Red→Amber 两套语义）、反馈 UI、本地记录写盘。
+- `Prefabs/` 保留 `PREF_Fridge_F2/F3/F4` 现有交互代理与 `PREF_Prop_Pot/Cup`；新增厨房环境、benchmark 槽位、菜单和传送区 Prefab。**现有代理与 PRD Final §6.2 的形态不符**：F2 现为上下两扇门，Final 要求大型单开门；F3 现有两扇门加抽屉，Final 要求左右双开门；F4 现有两扇门加两个抽屉，Final 要求上部双门加一个下部抽屉。P0 先修 F2，F3/F4 随 P1 修。当前 `KitchenBenchmarkMenu` 的 `XR Apartment/Benchmark/Apply …` 是编辑器制作/调试入口，不满足构建后的运行时方案切换；现有切换主要替换 `SLOT_Fridge` 实例和 Flush 围板。mzh 场景未提供可用冰箱方案，这些交互代理仍为 Hzc 原有版本，不能声称来自 mzh。
+- 仍然没有：客观几何冲突检测与 Yellow→Amber 设计提示（FR-06）、独立的 Red 安全提示（SAFE-01）、反馈 UI、本地记录写盘。
 - 旧 `Main.unity` 已删除；Build Settings 只启用 `SCN_Kitchen_Review`（第 0 位）。保留 Unity 2022.3.62f3 / Built-in / XRI 3.5，不引入 mzh 的 Unity 6 / URP / XRI 3.6.1 / 物理手控制器、烘焙数据和测试场。
 - `ProjectSettings/TagManager.asset` 层 3–31 仍全空；XRI `InteractionLayerSettings` 目前只有 `Teleport` 一层（Starter Assets 导入时加的）。
 - 无头显键鼠测试已配置：`Assets/_Project/XR/InteractionSimulator/` 是 XRI 3.5.0 的 XR Interaction Simulator 项目副本，TMP Essentials 在 `Assets/TextMesh Pro/`。`Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` 自动创建已开启且仅限 Editor，进入 Play 后点击 Game 即可用 WASD / 鼠标操作，Y 显示提示。真实头显在编辑器测试前关闭自动模拟器；构建仍保持 Windows64。不要为测试再次导入同 GUID 的 Simulator Sample，也不要升级 Unity。
@@ -37,7 +37,7 @@ COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房�
 - OpenXR 的 **控制器 interaction profile 已为 StandaloneWindows64 启用**（Oculus Touch / Meta Quest Touch Plus / Touch Pro / KHR Simple），Android 侧有意保持全关。
 - 本机 **活动的 OpenXR 运行时是 Virtual Desktop**（`HKLM\SOFTWARE\Khronos\OpenXR\1\ActiveRuntime` 指向 `C:\Program Files\Virtual Desktop Streamer\OpenXR\virtualdesktop-openxr.json`，runtime 名 `VirtualDesktopXR (Bundled)`）。SteamVR 也已安装但不应与 VD 抢运行时。
 - Play 模式实测 `XRSettings.enabled=False`、`isDeviceActive=False` 的原因是 **VDServer 未运行、头显未连接**，不是缺运行时。要验手柄与画面：先启动 PC 端 Virtual Desktop Streamer 并让 Quest 3 连上，再进 Play。
-- **注意与 PRD 的偏差**：§3.3 / §14.1 / TECH-02 写的批准环境是「Quest 3 经 Quest Link」，用 VD 串流属于换链路，需 A/F 确认是改文档还是正式评价仍走官方 Link。别把 VD 的结果当成满足 TECH-02 验收。
+- **注意与 PRD Final 的偏差**：TECH-02 的批准环境是「Quest 3 经 Quest Link」，VD 串流可作调试，但其结果不满足 TECH-02 验收；正式验收仍须走 Quest Link。
 - 编译目标当前是 StandaloneWindows64，双端 OpenXR Loader 均已配置，控制台 0 error。
 
 ## 必须入库 / 绝不入库
@@ -61,19 +61,18 @@ Unity 会丢弃无资源的空文件夹，需要在仓库里保留的空目录�
 
 ## 修改约定
 
+- 开发或修改会话流程、方案切换、任务事件、UI、冲突提示、反馈或本地记录时，先读 `Docs/Module_Interface_Contract.md`；它定义模块交接字段、状态推进和联合测试，变更共享接口须先更新该契约。
 - 提交信息用中文 + Conventional Commits 前缀，正文写清「为什么」而不是「改了什么」，并**引用被满足的 PRD 需求 ID**，例如 `feat(review): 加入八态会话状态机 [FR-11 FR-12]`。这是 F 做证据追溯、A 维护 traceability 的依据。
 - **不要新造需求/决策编号**。沿用 PRD 稳定 ID：`FR-*`、`UX-*`、`ACC-*`、`SAFE-01`、`MOD-01`、`TECH-*`、`EVAL-*`、`D01…D20`、`R01…R11`、`EQ1…EQ6`。
 - 一次提交只含一个关注点，按依赖顺序排：VCS 配置 → 引擎/厂商设置资产 → vendored 资源 → 项目内容 → 文档。
 - 可交互物一律做成 Prefab 放 `Assets/_Project/Prefabs/`，场景里只放实例。benchmark 之间切换预制体实例，不改场景。
-- **三个 benchmark 必须跑同一条动作链**（FR-03 / D07）。可交互目标按**语义角色**解析（`FridgeDoor` / `FridgeDrawer` / `CounterSurface` / `StorageZone`），不要按 B1/B2/B3 写死对象名或任务分支，否则比较失去可解释性。
+- **所有已实现的 Challenge benchmark 必须跑同一条动作链**（FR-03 / D07）；P0 是 B1/B2，B3 仅在 P1 纳入后适用。可交互目标按**语义角色**解析（`FridgeDoor` / `FridgeDrawer` / `CounterSurface` / `StorageZone`），不要按组合名写死任务分支。
 - 门体与抽屉用运动学旋转 + 扫掠体检测，参数从登记表读取（FR-04）；**不要用 HingeJoint 物理驱动**，那会引入不可复现的结果并撞上 R04。
-- Safety collision（边界 warning/fade）与 Design conflict（Red→Amber 几何标红）是两套语义，不得复用同一套视觉（SAFE-01、§10.1）。
+- Safety collision（边界 warning/fade，Red）与 Design conflict（客观几何冲突 Yellow→提交反馈后 Amber）是两套语义，均附文字/图标，不得复用同一套视觉（SAFE-01、FR-06）。
 - 命名 `前缀_类型_描述`：`PREF_Fridge_F2`、`PREF_Cabinet_Proud_Wall`、`MAT_Kitchen_Counter`、`SCN_Kitchen_Review`。
 - 新增需要走 LFS 的后缀时改 `.gitattributes`；已经提交过的文件需要 `git lfs migrate`，属于影响全组的动作，先问。
 
 ## 待确认（尚未冻结，别当成既定事实）
 
-- Unity 侧模块划分与程序集（asmdef）方案：状态机 / 配置注册 / 参数登记 / 冲突检测 / 反馈捕获 / 本地记录六块，以及是否单列一个不依赖 XR 的纯逻辑层。等 D 确认后再建目录。
-- 厨房灰盒由谁先搭（D 用 ProBuilder 按登记参数占位，还是等 E 的 Blender 模型）。
-- 模型参数登记用 ScriptableObject 还是 CSV 表（涉及 E 手填与 F 取数）。
-- PRD 与作业文档是否收进仓库 `Docs/`（目前只在各人本机，队友和 agent 读不到）。
+- PRD Final 与作业文档是否收进仓库 `Docs/`（当前 PRD Final 位于本机仓库外，队友和 agent 会话可能读不到）。
+- F2 代表性几何参数、冲突阈值和 Ready for Evaluation 联合检查结果，以 Assumption Register、模型版本和实际证据冻结；不得凭现有 Prefab 反推 PRD 定义。

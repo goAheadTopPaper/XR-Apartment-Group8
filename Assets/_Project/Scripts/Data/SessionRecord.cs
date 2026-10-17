@@ -26,6 +26,7 @@ namespace XRApartment.Data
         public Importance importance = Importance.Unset;
         public DiscoveryMode discoveryMode = DiscoveryMode.Unset;
         public TaskOutcome taskOutcome = TaskOutcome.Unset;
+        public string shortExplanation;
         public string outcomeReason;
 
         /// FR-07 acceptance: every combination-level judgement field must be present.
@@ -54,6 +55,21 @@ namespace XRApartment.Data
             if (taskOutcome != TaskOutcome.Completed && string.IsNullOrEmpty(outcomeReason))
                 yield return "outcomeReason";
         }
+    }
+
+    [Serializable]
+    public class ConflictRecord
+    {
+        public string issueId;
+        public string combinationId;
+        public string modelVersion;
+        public string objectId;
+        public ReviewRole role;
+        public string assumptionKey;
+        public float measurement;
+        public float sessionSeconds;
+        public string message;
+        public bool feedbackRecorded;
     }
 
     [Serializable]
@@ -90,8 +106,10 @@ namespace XRApartment.Data
         public List<TimedEvent> promptEvents = new List<TimedEvent>();
         public List<TimedEvent> assistanceEvents = new List<TimedEvent>();
         public List<TimedEvent> comfortOrAbort = new List<TimedEvent>();
+        public List<ConflictRecord> conflicts = new List<ConflictRecord>();
         public string finalPreferenceCombinationId;
         public string finalTradeOffSummary;
+        public SessionOutcome sessionOutcome = SessionOutcome.None;
         public float totalSeconds;
 
         public BenchmarkFeedback FindFeedback(string combinationId)

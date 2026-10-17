@@ -1,6 +1,6 @@
 # XR-Apartment-Group8
 
-COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**（Kitchen Design Review），不是通用 VR 公寓漫游。评审者在单一代表性厨房里比较「冰箱 × 柜体」的三种组合，通过相同的日常任务理解空间取舍，并提交可定位的结构化反馈。产品定义、范围与验收以仓库外的 **Lean PRD v0.1** 为唯一权威（见 §12）。
+COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**（Kitchen Design Review），不是通用 VR 公寓漫游。评审者在单一代表性厨房里以相同的日常任务比较 P0 的 **B1（Proud+F2）与 B2（Flush-oriented+F2）**，提交逐组合结构化反馈；B3、F3 预览及位置 marker 为 P1。Phase 2 产品范围与验收以仓库外的 **Lean PRD v0.3 Final** 为基线（见 §12）。
 
 > **给新组员：先看「clone 后第一次打开」和「版本控制规范」两节，再动 Unity。**
 
@@ -15,7 +15,7 @@ COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**�
 | 运行环境 | **Meta Quest 3 经 Quest Link 连 Windows PC**（PRD §3.3、TECH-02）→ 构建目标 `StandaloneWindows64`。没头显的组员用 XR Device Simulator 在编辑器里跑 |
 | 会话形态 | 单一参与者、约 20 分钟、自导（不依赖引导员持续讲解）、有限实体 play area + Teleport 覆盖虚拟厨房（PRD §3.3、D09） |
 | 输入系统 | **仅 New Input System**，`activeInputHandler: 1`（0=旧 / 1=仅新 / 2=Both），不要为迁移场景修改此值 |
-| 数据与记录 | 匿名本地 JSON/CSV（PRD §11.3、D13）。**不建账号、不接云端数据库**，多人协作与云端已明确 Deferred |
+| 数据与记录 | 匿名本地记录并验证保存结果（FR-10）；JSON/CSV 是可选内部格式，不是 P0 阻塞条件。**不建账号、不接云端数据库** |
 | 模型来源 | Blender → Unity，统一米制 `1 unit = 1 m`（PRD §7.1、TECH-01），由 E 维护几何与参数登记 |
 | 脚本后端 | Windows: Mono（MVP 用这个）。Android 的 IL2CPP / ARM64 / Min SDK 29 / Vulkan+GLES3 工程里已配好，但**一体机出包不在 Phase 2 MVP 范围**，见 §8 |
 | 版本控制 | Git + **Git LFS**（必装，见 §5） |
@@ -128,10 +128,10 @@ git lfs checkout             # 指针文件还原为真实内容
 
 - **分支**：`main` 保持随时可运行，功能开发走 `feature/<名字>`（当前有 `feature/hzc`、`feature/xjx`、`feature/mzh`、`feature/ycy`、`feature/yzk`、`feature/zh`）。合并用 PR，不要直接 push `main`。
 - **Prefab 优先**：冰箱 archetype（F2/F3/F4）、两类柜体策略（Proud / Flush-oriented）、可抓取物品、反馈面板各自做成 Prefab 放 `Assets/_Project/Prefabs/`，场景里只放实例。benchmark 之间靠切换实例，不靠改场景。
-- **不要扩回完整公寓**：PRD 已把完整公寓、颜色定制、真实重量物理、电线/插座、多人联网列为 Deferred/Rejected（D02/D03、§5）。范围再次膨胀是首要风险 R01。
+- **不要扩张 P0**：B3/F4、F3 Explore-only、位置 marker 为 P1；预设颜色与代表性线缆/插座为 P2（FR-13/14）。完整公寓、真实重量物理、多人联网不进入 P0。范围再次膨胀是风险 R01。
 - **不要改 `Assets/Samples/**`**：整目录是官方示例，需要改其中的输入配置或预制体时，**复制**到 `Assets/_Project/Settings/` 或 `Prefabs/` 再改（升级 XRI 时 `Samples/` 会整目录替换）。
 - **单位与尺寸**：FBX 导入 `1 unit = 1 m`，人物眼高约 1.6–1.7 m。**任何尺寸、clearance、reach 的主张都必须能对上登记的模型参数**（MOD-01、§7.2）；「看起来够宽」不是证据，视觉印象不能作为空间结论的依据。
-- **命名带语义角色，不带 benchmark 编号**：`PREF_Fridge_F2`、`PREF_Cabinet_Proud_Wall`、`MAT_Kitchen_Counter`、`SCN_Kitchen_Review`。可交互物要能通过语义角色被找到（如 `FridgeDoor` / `FridgeDrawer` / `CounterSurface` / `StorageZone`），**不要按 B1/B2/B3 分别命名对象**——FR-03 要求三个 benchmark 执行完全相同的动作链，目标一旦按组合写死，这条就无法满足。
+- **命名带语义角色，不带 benchmark 编号**：`PREF_Fridge_F2`、`PREF_Cabinet_Proud_Wall`、`MAT_Kitchen_Counter`、`SCN_Kitchen_Review`。可交互物要能通过语义角色被找到（如 `FridgeDoor` / `FridgeDrawer` / `CounterSurface` / `StorageZone`），**不要按组合写死任务对象**——FR-03 要求所有已实现 Challenge 使用同一条动作链；P0 先验收 B1/B2，B3 仅在 P1 纳入后适用。
 - 遇到 `ProjectSettings/`（尤其 `TagManager.asset`、`EditorBuildSettings.asset`）冲突时，优先在群里对齐后由一人重设，不要手工拼接 YAML。
 
 ---
@@ -140,9 +140,11 @@ git lfs checkout             # 指针文件还原为真实内容
 
 构建目标固定 `StandaloneWindows64`——Quest 3 只当显示器，画面由 PC 渲染（PRD TECH-02 批准的就是这个环境）。
 
+Core 临时 Play 验收的完整按钮顺序、八步物品操作、回退/跳过/安全退出和开发交接见 [Core_Review_Playbook.md](Docs/Core_Review_Playbook.md)。左上角 `CORE PLAY TEST` 是临时 Debug UI，正式 UI/Feedback/Storage 尚未接入。
+
 1. 编辑器里 `File → Build Settings` 确认平台是 **Windows, Mac, Linux → Standalone Windows64**，场景 `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` 在第 0 位。
 2. Quest 3 上启动 Link（有线优先，无线对带宽敏感），连到本机；Meta Horizon 里允许连接。
-3. Unity 编辑器按 **Play**。检查厨房内传送、锅/杯抓取、冰箱门/抽屉，以及回到起点/暂停/平滑移动菜单；B1/B2/B3 从 `XR Apartment → Benchmark → Apply …` 切换。
+3. Unity 编辑器按 **Play**。检查厨房内传送、锅/杯抓取、冰箱门/抽屉，以及回到起点/暂停菜单；`XR Apartment → Benchmark → Apply …` 是编辑器制作/调试入口。P0 正式体验须在构建后的程序内切换 B1/B2，不以该菜单代替运行时切换。
 4. **没头显的组员（Mac / Windows）**：项目已配置 **XR Interaction Simulator**，进入 Play 后自动创建虚拟头显和两只手柄。先点击 **Game** 画面获得键盘焦点，再按下表操作；不需要再导入一份 Simulator Sample。TMP Essentials 也已随项目提供。
 5. 不要引入 SteamVR / WMR 等其他运行时路径作为测试基线——PRD 只批准了 Quest 3 + Quest Link，多一条链路就多一套 OpenXR Profile 和风险。
 
@@ -168,7 +170,7 @@ git lfs checkout             # 指针文件还原为真实内容
 
 `PREF_XR_KitchenRig` 使用 mzh 的手模型、贴图及 Idle / Grip / Trigger / Fist 动画，保留原 XRI 输入、菜单、传送与抓取。握把和扳机控制手指，悬停时轻微预握，拿住锅杯时提供握合与淡青色提示；锅杯使用接触位置的动态抓取点。手掌通过球形代理停靠静态台面/墙面，手柄继续越过表面时显示追踪位置的半透明虚影，收回后消失。接触参数来自 `ASM_KitchenParameters`，是虚拟手调参假设。
 
-这版借鉴 Alyx 的握持与接触反馈；目前是**手柄驱动动画**，未接入摄像头裸手识别、逐指碰撞或物体形状自适应握姿。冰箱仍用原有运动学交互，三种 benchmark 的动作链相同。来源与验证见 [迁移说明](Docs/MzhKitchenMigration.md)。
+这版借鉴 Alyx 的握持与接触反馈；目前是**手柄驱动动画**，未接入摄像头裸手识别、逐指碰撞或物体形状自适应握姿。冰箱仍用原有运动学交互；P0 的 B1/B2 必须采用同一动作链，B3 在 P1 纳入时复用。来源与验证见 [迁移说明](Docs/MzhKitchenMigration.md)。
 
 ### 天空与日光
 
@@ -249,24 +251,24 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
 ## 11. 当前状态
 
 - `SCN_Kitchen_Review` 使用 `feature/mzh` 的 `KitchenTest` 厨房设计，保留建筑背景；评审交互和传送区集中在厨房。原灰盒已被替换，旧 `Main.unity` 和无用材质已移除。
-- 保留 Hzc 的数据层、纯逻辑会话状态机/动作链、运动学门体/抽屉、F2/F3/F4 代理、B1/B2/B3 注册表、可抓取锅/杯与世界空间菜单。
+- 保留 Hzc 的数据层、纯逻辑会话状态机/动作链、运动学门体/抽屉、F2/F3/F4 代理、B1/B2/B3 注册表、可抓取锅/杯与世界空间菜单。**现有冰箱代理尚未符合 PRD Final §6.2**：F2 应为大型单开门（现为上下两扇门），F3 应为左右双开门（现带下抽屉），F4 应为上部双门加一个下抽屉（现有两个下抽屉）。P0 优先修 F2，F3/F4 属 P1。
 - 迁移保持 Unity 2022.3.62f3、Built-in、XRI 3.5 和 Windows64；手模型/动画适配到项目自己的 XRI Rig，没有引入 mzh 的 Unity 6/URP 工程配置、PD 物理跟随或 FixedJoint 抓取。
 - 天空/光照已按 mzh 的暖日光样式重建，使用 Linear、固定 ACES/Bloom 和本项目重新生成的烘焙数据；不复用 Unity 6 的 LightingData/APV。
-- 几何冲突检测、Safety warning/fade、反馈 UI、本地记录写盘仍未实现。逻辑测试和编辑器场景检查不能替代 Quest 3 + Quest Link 的端到端验收。
+- 几何冲突检测、Yellow→Amber 设计提示、独立 Red 安全提示、反馈 UI、本地记录写盘仍未实现。逻辑测试和编辑器场景检查不能替代 Quest 3 + Quest Link 的端到端验收。
 
-### 下一步（对齐 PRD §16 里程碑）
+### 下一步（对齐 PRD Final §16 里程碑）
 
 | PRD 周次 | 工作 | Owner | 完成判据 |
 | --- | --- | --- | --- |
-| Week 4 | Quest Link 环境下跑通可执行 build；灰盒厨房比例 | D/E/F | 目标设备能启动并进主旅程（TECH-02）；尺寸抽查与登记一致（TECH-01） |
-| Week 5 | 厨房、两类柜体、F2/F3/F4 与参数登记 | E | B1-B3 几何可切换；Assumption Register 完整（FR-02、MOD-01） |
+| Week 4 | Quest Link 环境下跑通可执行 build；灰盒厨房比例与 B1/B2 骨架 | D/E/F | 目标设备能启动并进主旅程（TECH-02）；尺寸抽查与登记一致（TECH-01） |
+| Week 5 | 厨房、两类柜体、F2 与参数登记；F3/F4 留待 P1 | E | B1/B2 几何可切换；Assumption Register 完整（FR-02、MOD-01） |
 | Week 5-6 | 移动、门体/抽屉、抓取、重置、八态状态机 | D | 主动作链可运行且可恢复（FR-01/03/04/05/11） |
-| Week 6 | Explore/Challenge、即时冲突提示、反馈 UI | C/D | 三个 benchmark 能完成并保存记录（FR-06/07/08/09/10、SAFE-01） |
-| Week 7 | 内部试跑、稳定 build、Phase 2 提交 | F/D | 20 分钟主旅程稳定；限制有记录（UX-03） |
+| Week 6 | Explore/Challenge、Yellow→Amber 设计提示、反馈 UI | C/D | B1/B2 主旅程、四项逐组合必填反馈及匿名本地记录可完成（FR-06/07/09/10、SAFE-01）；marker FR-08 为 P1 |
+| Week 7 | 内部试跑、稳定 build、Phase 2 提交 | F/D | 约 20 分钟 B1/B2 主旅程稳定；限制与 P1 延后项有记录（UX-03） |
 
 可并行推进的：把 `XRI Default Input Actions` 复制进 `Assets/_Project/Settings/` 再改（**不要动 Samples**）、ACC-01/02 的姿态切换与远距选择、以及 §12 说的需求 ID 追溯习惯。
 
-### 开放实现参数（PRD §22 表 31，不要提前当成已定）
+### 开放实现参数（以 PRD Final 的 Assumption Register 与参数表为准，不要提前当成已定）
 
 柜体/通道/gap 的具体数值（E，冻结于 gray-box Ready Gate）、门体提示触发阈值（D/E）、反馈面板最终形态（C）、结构化选项措辞（B/C）、物品种类与数量（C/E，每组 3-5 件等价）、稳定 build 版本号（D/F）。
 
@@ -274,10 +276,10 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
 
 ## 12. 权威文档与需求追溯
 
-- **唯一权威是 Lean PRD v0.1（2026-09-19，状态 Team Decision Baseline）**，配合 Scenario C 作业说明与虚拟客户答复 Q1-Q7。README 与 `AGENTS.md` 只是操作向摘要，**与 PRD 冲突时以 PRD 为准**，并请顺手把摘要改对。
-- 目前这些文档只存在各人本机（微信文件目录）。建议收进仓库 `Docs/` 并走 LFS（`.docx` 是 zip 二进制），否则队友和 agent 会话只能凭二手描述工作，PRD 里那张参数登记表也无从追溯。
+- **Phase 2 实施和验收基线是 Lean PRD v0.3 Final（2026-10-03，Post-submission Phase 2 Implementation Baseline）**，本机文件为 `C:\Users\86188\Documents\ChatGPT\XR\Phase 1\COMP5424_Scenario_C_Lean_PRD_CN_Final.docx`。Final Proposal 是 PRD 所列来源；冰箱 archetype 以 PRD Final §6.2 为准。README 与 `AGENTS.md` 仅为操作摘要，若冲突以 PRD Final 的明确决定为准。
+- PRD Final 目前在仓库外的本机路径，其他组员不一定能访问。若团队决定把它收进仓库 `Docs/`，先确认共享和 LFS 规则；在共享前不要把本机路径当作队友可访问的链接。
 - **状态词不要混用**：`Confirmed`（课程/场景/客户明确事实）｜`Team Decision`（团队冻结的产品选择）｜`Assumption`（须登记 Owner 与验证方法）｜`Open`｜`Deferred`｜`Rejected`。凡空间表述都要标成 prototype assumption，不得冒充 client fact（MOD-01、风险 R02，由 A 做 claims review）。
-- **ID 稳定且唯一**：需求 `FR-01…FR-12`、`UX-01…UX-04`、`ACC-01/02`、`SAFE-01`、`MOD-01`、`TECH-01/02`、`EVAL-01…03`，决策 `D01…D20`，风险 `R01…R11`，评价问题 `EQ1…EQ6`。不要新造并行编号体系。
+- **ID 稳定且唯一**：需求 `FR-01…FR-15`、`UX-01…UX-04`、`ACC-01/02`、`SAFE-01`、`MOD-01`、`TECH-01/02/03`、`EVAL-01…03`，决策 `D01…D20`，风险 `R01…R11`，评价问题以 PRD Final 为准。追溯时同时记录优先级；不要新造并行编号体系。
 - **提交信息引用被满足的需求 ID**，例如：
 
 ```
@@ -285,4 +287,4 @@ feat(review): 加入八态会话状态机 [FR-11 FR-12]
 fix(conflict): 门体扫掠检测改为读取登记的开门角参数 [FR-04 MOD-01]
 ```
 
-  这是 F 做证据追溯、A 维护 traceability matrix 最省事的做法，也正是 PRD §15.2 所说「用 Git commit / issue / PR 区分个人贡献」的直接来源。
+  这是 F 做证据追溯、A 维护 traceability matrix 的直接依据，也支持 PRD Final 要求的个人贡献追溯。

@@ -11,7 +11,8 @@ namespace XRApartment.Simulation
         FeedbackPending,
         ComparisonSummary,
         Paused,
-        Finished
+        Finished,
+        Exited
     }
 
     public enum SessionTrigger

@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
 using XRApartment.Runtime;
+using XRApartment.Runtime.Core;
 
 namespace XRApartment.Tests
 {
@@ -40,7 +41,11 @@ namespace XRApartment.Tests
             var enabledScenes = EditorBuildSettings.scenes.Where(item => item.enabled).ToArray();
             Assert.AreEqual(1, enabledScenes.Length);
             Assert.AreEqual(ScenePath, enabledScenes[0].path);
-            Assert.AreEqual(1, Components<BenchmarkSlotMarker>().Length);
+            Assert.AreEqual(0, Components<BenchmarkSlotMarker>().Length,
+                "Benchmarks are now instantiated into the runtime slot in Play.");
+            Assert.AreEqual(1, Components<JourneyRuntimeHost>().Length);
+            Assert.AreEqual(1, Components<RuntimeBenchmarkAdapter>().Length);
+            Assert.AreEqual(1, Components<TaskEvidenceBridge>().Length);
             Assert.AreEqual(1, Components<KitchenMenuController>().Length);
             Assert.AreEqual(1, Components<Camera>().Count(camera => camera.CompareTag("MainCamera")));
         }
