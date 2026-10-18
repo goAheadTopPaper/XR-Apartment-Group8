@@ -4,10 +4,12 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using XRApartment.Runtime.Core;
 using XRApartment.Runtime;
 using XRApartment.Runtime.Debugging;
+using XRApartment.Runtime.UI;
 using XRApartment.Simulation;
 
 public class CorePlayWiringSmokeTests
@@ -203,32 +205,42 @@ public class CorePlayWiringSmokeTests
     }
 
     [UnityTest]
-    public IEnumerator CompactTaskCardTracksTheJourneyWithoutChangingIt()
+    public IEnumerator WorldSpaceSetupButtonAndTaskCardTrackTheJourney()
     {
         SceneManager.LoadScene("SCN_Kitchen_Review");
         yield return null;
         var host = Object.FindObjectOfType<JourneyRuntimeHost>();
-        var ui = Object.FindObjectOfType<JourneyDebugUI>();
-        Assert.IsTrue(ui.IsMenuExpanded);
-        Assert.That(ui.CurrentTaskSummary, Does.Contain("Setup"));
-        ui.ToggleMenu();
-        Assert.IsFalse(ui.IsMenuExpanded);
-        Assert.IsTrue(host.Submit(new JourneyCommand
-        { Type = JourneyCommandType.CompleteSetup, PrerequisitesMet = true }).Accepted);
+        var ui = Object.FindObjectOfType<JourneyWorldSpaceView>();
+        Assert.IsNotNull(ui);
+        Assert.IsFalse(Object.FindObjectOfType<JourneyDebugUI>().enabled);
+        var panel = ui.transform.Find("Panel");
+        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("Setup"));
+        var setup = panel.Find("SetupControls");
+        var button = setup.Find("CompleteSetup").GetComponent<Button>();
+        button.onClick.Invoke();
+        Assert.AreEqual(SessionState.Setup, host.Core.Snapshot.State);
+        Assert.That(panel.Find("Error").GetComponent<Text>().text,
+            Does.Contain("Required setup"));
+        setup.Find("CalibrationConfirmed").GetComponent<Toggle>().isOn = true;
+        setup.Find("PracticeConfirmed").GetComponent<Toggle>().isOn = true;
+        button.onClick.Invoke();
+        Assert.AreEqual(SessionState.Orientation, host.Core.Snapshot.State);
+        Assert.IsFalse(setup.gameObject.activeSelf);
+        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("Orientation"));
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.StartChallenge, BenchmarkId = "B1" }).Accepted);
         yield return null;
         Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
-        Assert.That(ui.CurrentTaskSummary, Does.Contain("B1 | Step 1/8"));
-        Assert.That(ui.CurrentTaskSummary, Does.Contain("GREEN zone"));
+        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("ChallengeActive"));
+        Assert.That(panel.Find("Design").GetComponent<Text>().text, Does.Contain("B1"));
+        Assert.That(panel.Find("Progress").GetComponent<Text>().text, Does.Contain("1/8"));
         Assert.IsTrue(host.Submit(new JourneyCommand { Type = JourneyCommandType.Pause }).Accepted);
         yield return null;
         Assert.IsEmpty(Object.FindObjectOfType<TaskTargetGuide>().VisibleTargets);
         Assert.IsTrue(host.Submit(new JourneyCommand { Type = JourneyCommandType.Resume }).Accepted);
-        ui.ToggleMenu();
-        Assert.IsTrue(ui.IsMenuExpanded);
+        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("ChallengeActive"));
         Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
     }
 
@@ -247,7 +259,9 @@ public class CorePlayWiringSmokeTests
         for (var frame = 0; frame < 60 && host.Core.Snapshot.Save == SaveStatus.Pending; frame++)
             yield return null;
         Assert.AreEqual(SaveStatus.Verified, host.Core.Snapshot.Save);
-        Object.FindObjectOfType<JourneyDebugUI>().StartNewTestSession();
+        // The legacy Debug UI is disabled in the integrated scene. A fresh scene load
+        // still starts a new session after the exited session has been saved.
+        SceneManager.LoadScene("SCN_Kitchen_Review");
         yield return null;
         host = Object.FindObjectOfType<JourneyRuntimeHost>();
         Assert.AreEqual(SessionState.Setup, host.Core.Snapshot.State);
