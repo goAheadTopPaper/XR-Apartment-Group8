@@ -169,7 +169,7 @@ public static class KitchenPropsAuthoring
                 body.interpolation = RigidbodyInterpolation.Interpolate;
                 body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 var interactable = root.AddComponent<XRGrabInteractable>();
-                interactable.movementType = XRBaseInteractable.MovementType.Kinematic;
+                interactable.movementType = XRBaseInteractable.MovementType.VelocityTracking;
                 interactable.useDynamicAttach = true;
                 interactable.matchAttachPosition = true;
                 interactable.matchAttachRotation = true;
