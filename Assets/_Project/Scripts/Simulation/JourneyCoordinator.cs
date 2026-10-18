@@ -39,6 +39,9 @@ namespace XRApartment.Simulation
         private string displayedBenchmarkId;
         private string activeBenchmarkId;
         private string skippedReason;
+        public string PendingSkipReason => states.Current == SessionState.FeedbackPending &&
+            outcomes.TryGetValue(activeBenchmarkId, out var outcome) && outcome == TaskOutcome.Skipped
+                ? skippedReason : null;
         private long activeRunId;
         private long nextRequestId;
         private long nextRunId;

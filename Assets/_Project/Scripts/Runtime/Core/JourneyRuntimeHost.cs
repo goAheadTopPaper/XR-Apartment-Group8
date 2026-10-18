@@ -172,7 +172,7 @@ namespace XRApartment.Runtime.Core
             {
                 SessionId = snapshot.SessionId, BenchmarkId = snapshot.ActiveBenchmarkId,
                 TaskOutcome = snapshot.BenchmarkOutcomes[snapshot.ActiveBenchmarkId],
-                OutcomeReason = draft.SkipReason
+                OutcomeReason = (Core as JourneyCoordinator)?.PendingSkipReason
             };
             FeedbackValidationResult validation;
             try { validation = feedback.Validate(request, draft); }

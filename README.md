@@ -1,6 +1,6 @@
 # XR-Apartment-Group8
 
-COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**（Kitchen Design Review），不是通用 VR 公寓漫游。评审者在单一代表性厨房里以相同的日常任务比较 P0 的 **B1（Proud+F2）与 B2（Flush-oriented+F2）**，提交逐组合结构化反馈；B3、F3 预览及位置 marker 为 P1。Phase 2 产品范围与验收以仓库外的 **Lean PRD v0.3 Final** 为基线（见 §12）。
+COMP5424 Scenario C 的课程小组项目：一个**厨房设计评审原型**（Kitchen Design Review），不是通用 VR 公寓漫游。评审者在单一代表性厨房里以相同的日常任务比较 P0 的 **B1（Proud+F2）与 B2（Flush-oriented+F2）**，提交逐组合结构化反馈；B3、F3 预览及位置 marker 为 P1。Phase 2 产品范围与验收以 `Docs/` 中的 **Lean PRD v0.3 Final** 为基线（见 §12）。
 
 > **给新组员：先看「clone 后第一次打开」和「版本控制规范」两节，再动 Unity。**
 
@@ -276,8 +276,7 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
 
 ## 12. 权威文档与需求追溯
 
-- **Phase 2 实施和验收基线是 Lean PRD v0.3 Final（2026-10-03，Post-submission Phase 2 Implementation Baseline）**，本机文件为 `C:\Users\86188\Documents\ChatGPT\XR\Phase 1\COMP5424_Scenario_C_Lean_PRD_CN_Final.docx`。Final Proposal 是 PRD 所列来源；冰箱 archetype 以 PRD Final §6.2 为准。README 与 `AGENTS.md` 仅为操作摘要，若冲突以 PRD Final 的明确决定为准。
-- PRD Final 目前在仓库外的本机路径，其他组员不一定能访问。若团队决定把它收进仓库 `Docs/`，先确认共享和 LFS 规则；在共享前不要把本机路径当作队友可访问的链接。
+- **Phase 2 实施和验收基线是 [Lean PRD v0.3 Final](Docs/COMP5424_Scenario_C_Lean_PRD_CN_Final.docx)（2026-10-03，Post-submission Phase 2 Implementation Baseline）**。Final Proposal 是 PRD 所列来源；冰箱 archetype 以 PRD Final §6.2 为准。README 与 `AGENTS.md` 仅为操作摘要，若冲突以 PRD Final 的明确决定为准。
 - **状态词不要混用**：`Confirmed`（课程/场景/客户明确事实）｜`Team Decision`（团队冻结的产品选择）｜`Assumption`（须登记 Owner 与验证方法）｜`Open`｜`Deferred`｜`Rejected`。凡空间表述都要标成 prototype assumption，不得冒充 client fact（MOD-01、风险 R02，由 A 做 claims review）。
 - **ID 稳定且唯一**：需求 `FR-01…FR-15`、`UX-01…UX-04`、`ACC-01/02`、`SAFE-01`、`MOD-01`、`TECH-01/02/03`、`EVAL-01…03`，决策 `D01…D20`，风险 `R01…R11`，评价问题以 PRD Final 为准。追溯时同时记录优先级；不要新造并行编号体系。
 - **提交信息引用被满足的需求 ID**，例如：
