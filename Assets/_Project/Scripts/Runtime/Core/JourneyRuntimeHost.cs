@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using XRApartment.Data;
+using XRApartment.Runtime.Feedback;
+using XRApartment.Runtime.UI;
 using XRApartment.Simulation;
 
 namespace XRApartment.Runtime.Core
@@ -99,6 +101,13 @@ namespace XRApartment.Runtime.Core
             feedback = feedbackAdapter as IFeedbackPort;
             storage = storageAdapter as ISessionStore;
             view = viewAdapter as IJourneyView;
+            if (feedback is FeedbackPortAdapter && view is JourneyWorldSpaceView)
+            {
+                var form = GetComponent<FeedbackFormView>();
+                if (form == null) form = gameObject.AddComponent<FeedbackFormView>();
+                form.Configure(this, view);
+                view = form;
+            }
             conflicts = conflictSource as IConflictSource;
             safety = safetySource as ISafetySource;
             plan = BuildPlan();

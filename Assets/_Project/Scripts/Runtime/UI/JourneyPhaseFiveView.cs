@@ -50,6 +50,8 @@ namespace XRApartment.Runtime.UI
         private string activeDraftKey;
         private bool feedbackOpenNow;
 
+        public bool UseExternalFeedbackView { get; set; }
+
         private IFeedbackInputView FeedbackInput => feedbackInput as IFeedbackInputView;
         private IComparisonInputView ComparisonInput => comparisonInput as IComparisonInputView;
 
@@ -66,9 +68,7 @@ namespace XRApartment.Runtime.UI
             if (feedbackInput == null && feedbackInputSlot != null)
                 foreach (var component in feedbackInputSlot.GetComponentsInChildren<MonoBehaviour>(true))
                     if (component is IFeedbackInputView) { feedbackInput = component; break; }
-            if (comparisonInput == null && comparisonInputSlot != null)
-                foreach (var component in comparisonInputSlot.GetComponentsInChildren<MonoBehaviour>(true))
-                    if (component is IComparisonInputView) { comparisonInput = component; break; }
+            EnsureComparisonInput();
             if (FeedbackInput != null && feedbackInputSlot != null &&
                 feedbackInputSlot.Find("Dependency") != null)
                 feedbackInputSlot.Find("Dependency").gameObject.SetActive(false);
@@ -105,6 +105,7 @@ namespace XRApartment.Runtime.UI
 
         public void Render(JourneySnapshot current, JourneyErrorCode code, string message)
         {
+            EnsureComparisonInput();
             var previousState = snapshot == null ? SessionState.Setup : snapshot.State;
             if (snapshot != null && current != null &&
                 snapshot.State == SessionState.FeedbackPending && current.State != SessionState.FeedbackPending)
@@ -124,7 +125,7 @@ namespace XRApartment.Runtime.UI
             var comparing = current.State == SessionState.ComparisonSummary;
             var finished = current.State == SessionState.Finished && current.Save == SaveStatus.Verified;
             if (!pending) feedbackOpenNow = false;
-            SetActive(feedbackPanel, pending);
+            SetActive(feedbackPanel, pending && !UseExternalFeedbackView);
             SetActive(comparisonPanel, comparing);
             SetActive(finishedPanel, finished);
             RenderFeedback(current, pending);
@@ -133,6 +134,17 @@ namespace XRApartment.Runtime.UI
                 ? "<size=38><b>Review complete</b></size>\n\nThank you for reviewing both kitchen designs.\nYour feedback has been saved locally and verified."
                 : "<size=38><b>Session complete</b></size>\n\nYour session record has been saved locally and verified.");
             RenderNotices(current);
+        }
+
+        private void EnsureComparisonInput()
+        {
+            if (comparisonInput != null || comparisonInputSlot == null) return;
+            foreach (var component in comparisonInputSlot.GetComponentsInChildren<MonoBehaviour>(true))
+                if (component is IComparisonInputView) { comparisonInput = component; break; }
+            if (comparisonInput == null)
+                comparisonInput = comparisonInputSlot.gameObject.AddComponent<JourneyComparisonInputView>();
+            var dependency = comparisonInputSlot.Find("Dependency");
+            if (dependency != null) dependency.gameObject.SetActive(false);
         }
 
         private void RenderFeedback(JourneySnapshot current, bool pending)
@@ -183,7 +195,9 @@ namespace XRApartment.Runtime.UI
                     ? "Final save failed; use Retry. The comparison remains in memory. " + lastError
                     : current.Save == SaveStatus.Pending
                         ? "Saving final comparison; Finished is locked until read back verification."
-                        : lastError);
+                        : string.IsNullOrEmpty(lastError)
+                            ? "Enter the main trade-off, then confirm. If one task was skipped, you can use its context."
+                            : lastError);
             if (comparisonInputSlot != null) comparisonInputSlot.gameObject.SetActive(ComparisonInput != null);
             if (comparisonConfirm != null) comparisonConfirm.interactable = ComparisonInput != null &&
                 !current.IsBusy && current.Save != SaveStatus.Failed;
@@ -338,17 +352,25 @@ namespace XRApartment.Runtime.UI
                 outcome != TaskOutcome.Completed ||
                 string.IsNullOrWhiteSpace(comparisonDraft.TradeOffSummary)))
             {
-                ComparisonInput.ShowError("Choose a completed design and describe its main trade-off.");
+                const string error = "Choose a completed design and enter the main trade-off before confirming.";
+                ComparisonInput.ShowError(error);
+                Label(comparisonStatus, error);
                 return;
             }
             if (!hasCompleted && !string.IsNullOrWhiteSpace(preference))
             {
-                ComparisonInput.ShowError("Both tasks were skipped; leave preference empty.");
+                const string error = "Both tasks were skipped; leave preference empty.";
+                ComparisonInput.ShowError(error);
+                Label(comparisonStatus, error);
                 return;
             }
             var result = host.Submit(new JourneyCommand
             { Type = JourneyCommandType.ConfirmComparison, Comparison = comparisonDraft });
-            if (!result.Accepted) ComparisonInput.ShowError(result.Message);
+            if (!result.Accepted)
+            {
+                ComparisonInput.ShowError(result.Message);
+                Label(comparisonStatus, result.Message);
+            }
         }
 
         private void RetrySave()

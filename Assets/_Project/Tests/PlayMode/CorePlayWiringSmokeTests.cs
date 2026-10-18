@@ -1,21 +1,118 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using XRApartment.Runtime.Core;
+using XRApartment.Runtime.Feedback;
 using XRApartment.Runtime;
 using XRApartment.Runtime.Debugging;
 using XRApartment.Runtime.UI;
+using XRApartment.Data;
 using XRApartment.Simulation;
 
 public class CorePlayWiringSmokeTests
 {
+    [UnityTest]
+    public IEnumerator ComparisonSkipShortcutHasAUsableXRRaycastTarget()
+    {
+        SceneManager.LoadScene("SCN_Kitchen_Review");
+        yield return null;
+        var shell = Object.FindObjectOfType<JourneyPhaseFiveView>();
+        shell.Render(new JourneySnapshot
+        {
+            State = SessionState.ComparisonSummary,
+            BenchmarkOutcomes = new Dictionary<string, TaskOutcome>
+            {
+                ["B1"] = TaskOutcome.Skipped,
+                ["B2"] = TaskOutcome.Completed
+            }
+        }, JourneyErrorCode.None, "");
+        yield return null;
+        var shortcut = shell.GetComponentInChildren<JourneyComparisonInputView>(true)
+            .transform.Find("Use skip context");
+        var start = Camera.main.transform.position;
+        var aim = shortcut.position - Vector3.up * .035f;
+        var data = new TrackedDeviceEventData(EventSystem.current)
+        {
+            rayPoints = new List<Vector3> { start, start + (aim - start).normalized * 3f },
+            layerMask = -1
+        };
+        var hits = new List<RaycastResult>();
+        shell.GetComponent<TrackedDeviceGraphicRaycaster>().Raycast(data, hits);
+        Assert.IsNotEmpty(hits, "A slightly low hand ray must still hit the skip shortcut.");
+        Assert.AreEqual(shortcut.gameObject, hits[0].gameObject);
+        data.button = PointerEventData.InputButton.Left;
+        ExecuteEvents.Execute<IPointerClickHandler>(hits[0].gameObject, data,
+            ExecuteEvents.pointerClickHandler);
+        Assert.That(shell.GetComponentInChildren<JourneyComparisonInputView>(true)
+            .GetComponentInChildren<TMP_InputField>().text, Does.Contain("B1 was skipped"));
+
+        var confirm = shell.transform.Find("ComparisonPanel/ConfirmComparison");
+        aim = confirm.position - Vector3.up * .035f;
+        data.rayPoints = new List<Vector3> { start, start + (aim - start).normalized * 3f };
+        hits.Clear();
+        shell.GetComponent<TrackedDeviceGraphicRaycaster>().Raycast(data, hits);
+        Assert.IsNotEmpty(hits, "A slightly low hand ray must still hit Confirm.");
+        Assert.AreEqual(confirm.gameObject, hits[0].gameObject);
+
+        var mouse = new PointerEventData(EventSystem.current);
+        foreach (var target in new[] { shortcut, confirm })
+        {
+            mouse.position = Camera.main.WorldToScreenPoint(target.position);
+            hits.Clear();
+            EventSystem.current.RaycastAll(mouse, hits);
+            Assert.IsTrue(hits.Any(hit => hit.gameObject == target.gameObject),
+                "Mouse input must reach " + target.name + " in Editor Play Mode.");
+        }
+        var field = shell.GetComponentInChildren<JourneyComparisonInputView>(true)
+            .GetComponentInChildren<TMP_InputField>();
+        mouse.position = Camera.main.WorldToScreenPoint(field.transform.position);
+        hits.Clear();
+        EventSystem.current.RaycastAll(mouse, hits);
+        Assert.IsTrue(hits.Any(hit => hit.gameObject.GetComponentInParent<TMP_InputField>() == field),
+            "Mouse input must reach the trade-off field in Editor Play Mode.");
+    }
+
+    [UnityTest]
+    public IEnumerator EachTaskItemRestingOnEitherFreshShelfIsDetectable()
+    {
+        SceneManager.LoadScene("SCN_Kitchen_Review");
+        yield return null;
+        var host = Object.FindObjectOfType<JourneyRuntimeHost>();
+        Assert.IsTrue(host.Submit(new JourneyCommand
+        { Type = JourneyCommandType.CompleteSetup, PrerequisitesMet = true }).Accepted);
+        Assert.IsTrue(host.Submit(new JourneyCommand
+        { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
+        foreach (var benchmark in new[] { "B1", "B2" })
+        {
+            Assert.IsTrue(host.Submit(new JourneyCommand
+            { Type = JourneyCommandType.ShowBenchmark, BenchmarkId = benchmark }).Accepted);
+            yield return null;
+            var destination = Identity("ZONE_FreshDestination");
+            foreach (var shelf in new[] { "SHELF_Fresh_Lower", "SHELF_Fresh_Task" })
+                foreach (var itemId in new[] { "ITEM_Tomato", "ITEM_Onion", "ITEM_CerealBox" })
+                {
+                    var item = Identity(itemId);
+                    PlaceRestingOnShelf(item, shelf);
+                    var center = item.GetComponentInChildren<Collider>().bounds.center;
+                    Assert.IsTrue(destination.ContainsPoint(center),
+                        benchmark + " " + shelf + " " + itemId + " resting center is outside Fresh destination: " + center +
+                        "; shelf=" + GameObject.Find(shelf).GetComponent<Collider>().bounds +
+                        "; sensors=" + string.Join(", ", destination.GetComponents<Collider>()
+                            .Select(sensor => sensor.bounds.ToString()).ToArray()));
+                }
+        }
+    }
+
     [UnityTest]
     public IEnumerator SeparatelyHeldMugAndJuicePackCollide()
     {
@@ -618,6 +715,12 @@ public class CorePlayWiringSmokeTests
             MoveHead(-3.0f, 1.08f);
             yield return null;
             Assert.AreEqual(SessionState.FeedbackPending, host.Core.Snapshot.State);
+            Assert.NotNull(host.GetComponent<FeedbackFormView>(),
+                "A completed challenge must open the formal feedback form.");
+            Assert.IsTrue(GameObject.Find("FeedbackFormCanvas") != null,
+                "The formal feedback form must be visible while feedback is pending.");
+            Assert.IsTrue(Object.FindObjectOfType<JourneyPhaseFiveView>().UseExternalFeedbackView,
+                "The phase-five placeholder must yield to the formal feedback form.");
             yield return null;
             AssertZoneHighlights();
             Assert.IsTrue(host.SubmitFeedback(new FeedbackDraft
@@ -632,12 +735,19 @@ public class CorePlayWiringSmokeTests
             Assert.AreEqual(id == "B1" ? SessionState.Explore : SessionState.ComparisonSummary,
                 host.Core.Snapshot.State);
         }
-        Assert.IsTrue(host.Submit(new JourneyCommand
-        {
-            Type = JourneyCommandType.ConfirmComparison,
-            Comparison = new FinalComparison
-            { PreferredBenchmarkId = "B1", TradeOffSummary = "B1 versus B2 sensor run" }
-        }).Accepted);
+        var shell = Object.FindObjectOfType<JourneyPhaseFiveView>();
+        var comparison = Object.FindObjectOfType<JourneyComparisonInputView>(true);
+        Assert.NotNull(comparison);
+        var confirm = shell.transform.Find("ComparisonPanel/ConfirmComparison").GetComponent<Button>();
+        Assert.IsTrue(confirm.interactable);
+        confirm.onClick.Invoke();
+        Assert.AreEqual(SessionState.ComparisonSummary, host.Core.Snapshot.State,
+            "An empty trade-off must keep the comparison open.");
+        Assert.That(shell.transform.Find("ComparisonPanel/Status").GetComponent<TMP_Text>().text,
+            Does.Contain("trade-off"));
+        comparison.transform.Find("Prefer B1").GetComponent<Button>().onClick.Invoke();
+        comparison.GetComponentInChildren<TMP_InputField>(true).text = "B1 versus B2 sensor run";
+        confirm.onClick.Invoke();
         yield return new WaitForSeconds(.1f);
         Assert.AreEqual(SessionState.Finished, host.Core.Snapshot.State);
         Assert.AreEqual(SaveStatus.Verified, host.Core.Snapshot.Save);
