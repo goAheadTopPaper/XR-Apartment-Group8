@@ -206,6 +206,30 @@ namespace XRApartment.Tests
         }
 
         [Test]
+        public void CompletedB1AndSkippedB2_CanCompareUsingB1()
+        {
+            var core = ReadyCore();
+            CompleteBenchmark(core, "B1");
+            SaveFeedback(core, "B1", true);
+            SkipAndSave(core, "B2");
+            Assert.AreEqual(SessionState.ComparisonSummary, core.Snapshot.State);
+
+            var invalid = core.Submit(Command(JourneyCommandType.ConfirmComparison,
+                comparison: new FinalComparison
+                { PreferredBenchmarkId = "B2", TradeOffSummary = "Skipped design" }));
+            Assert.IsFalse(invalid.Accepted);
+
+            var comparison = core.Submit(Command(JourneyCommandType.ConfirmComparison,
+                comparison: new FinalComparison
+                { PreferredBenchmarkId = "B1", TradeOffSummary = "B1 circulation is workable." }));
+            Assert.IsTrue(comparison.Accepted, comparison.Message);
+            Assert.AreEqual(SessionOutcome.Incomplete, comparison.Action.Record.sessionOutcome);
+            Assert.AreEqual("B1", comparison.Action.Record.finalPreferenceCombinationId);
+            Assert.AreEqual(SessionState.Finished,
+                CompleteSave(core, comparison.Action, true).Snapshot.State);
+        }
+
+        [Test]
         public void PendingSkipReason_IsAvailableOnlyWhileSkippedFeedbackIsPending()
         {
             var core = ReadyCore();

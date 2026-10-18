@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 using XRApartment.Data;
 using XRApartment.Runtime.Core;
+using XRApartment.Runtime.UI;
 using XRApartment.Simulation;
 
 namespace XRApartment.Runtime.Feedback
@@ -40,11 +41,25 @@ namespace XRApartment.Runtime.Feedback
         private JourneySnapshot snapshot;
         private bool handsHidden;
 
+        public void Configure(JourneyRuntimeHost runtimeHost, IJourneyView fallbackView)
+        {
+            host = runtimeHost;
+            fallback = fallbackView;
+            var shell = FindObjectOfType<JourneyPhaseFiveView>(true);
+            if (shell != null) shell.UseExternalFeedbackView = true;
+        }
+
         private void Awake()
         {
             fallback = fallbackView as IJourneyView;
             BuildCanvas();
             SetVisible(false);
+        }
+
+        private void OnDestroy()
+        {
+            SetHandRenderersHidden(false);
+            if (canvas != null) Destroy(canvas.gameObject);
         }
 
         public void Render(JourneySnapshot current, JourneyErrorCode errorCode, string message)
@@ -104,6 +119,7 @@ namespace XRApartment.Runtime.Feedback
             canvasObject.transform.SetParent(viewer, false);
             canvas = canvasObject.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
+            canvas.sortingOrder = 200;
             // The legacy InputField still uses a dynamic Unity font. Keep its raster
             // resolution high enough for the enlarged world-space XR canvas; other labels use SDF.
             canvasObject.GetComponent<CanvasScaler>().dynamicPixelsPerUnit = 96f;

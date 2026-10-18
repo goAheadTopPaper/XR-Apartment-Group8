@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,51 @@ namespace XRApartment.Tests
 {
     public class JourneyWorldSpaceViewTests
     {
+        [Test]
+        public void ComparisonInput_EnablesCompletedB1AndDisablesSkippedB2()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Prefabs/UI/PREF_UI_JourneyPhaseFive.prefab");
+            Assert.NotNull(prefab);
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var shell = instance.GetComponent<JourneyPhaseFiveView>();
+                shell.Render(new JourneySnapshot
+                {
+                    State = XRApartment.Simulation.SessionState.ComparisonSummary,
+                    BenchmarkOutcomes = new Dictionary<string, TaskOutcome>
+                    { { "B1", TaskOutcome.Completed }, { "B2", TaskOutcome.Skipped } }
+                }, JourneyErrorCode.None, string.Empty);
+                var input = instance.GetComponentInChildren<JourneyComparisonInputView>(true);
+                Assert.NotNull(input, "The final comparison needs an input view.");
+                var buttons = input.GetComponentsInChildren<Button>(true);
+                Assert.IsTrue(System.Array.Find(buttons, button => button.name == "Prefer B1").interactable);
+                Assert.IsFalse(System.Array.Find(buttons, button => button.name == "Prefer B2").interactable);
+                Assert.AreEqual("B1", input.Capture().PreferredBenchmarkId);
+                var shortcut = System.Array.Find(buttons, button => button.name == "Use skip context");
+                Assert.IsTrue(shortcut.gameObject.activeSelf);
+                Assert.That(shortcut.GetComponent<Image>().color.grayscale, Is.LessThan(.5f),
+                    "The shortcut must have a dark background so its white label is visible.");
+                Assert.AreEqual("Use skip context", shortcut.GetComponentInChildren<TMP_Text>().text);
+                shortcut.onClick.Invoke();
+                Assert.That(input.Capture().TradeOffSummary, Does.Contain("B2 was skipped"));
+                input.GetComponentInChildren<TMP_InputField>(true).text = "B1 has easier circulation.";
+                Assert.AreEqual("B1 has easier circulation.", input.Capture().TradeOffSummary);
+                input.Open(new JourneySnapshot
+                {
+                    BenchmarkOutcomes = new Dictionary<string, TaskOutcome>
+                    { { "B1", TaskOutcome.Skipped }, { "B2", TaskOutcome.Completed } }
+                }, new FinalComparison());
+                Assert.AreEqual("B2", input.Capture().PreferredBenchmarkId);
+                shortcut.onClick.Invoke();
+                Assert.That(input.Capture().TradeOffSummary, Does.Contain("B1 was skipped"));
+                Assert.IsTrue(instance.transform.Find("ComparisonPanel/ConfirmComparison")
+                    .GetComponent<Button>().interactable);
+            }
+            finally { Object.DestroyImmediate(instance); }
+        }
+
         private const string PrefabPath =
             "Assets/_Project/Prefabs/UI/PREF_UI_JourneyStageOne.prefab";
 
