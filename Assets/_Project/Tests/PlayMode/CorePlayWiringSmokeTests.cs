@@ -64,6 +64,12 @@ public class CorePlayWiringSmokeTests
                 Object.FindObjectOfType<JourneyDebugUI>().LastMessage);
             Assert.AreEqual(run, host.Core.Snapshot.ActiveRunId);
             AssertFreezerSourceItems("after restore");
+            for (var frame = 0; frame < 3; frame++)
+            {
+                yield return null;
+                Assert.AreEqual(0, host.Core.Snapshot.CompletedItemCount,
+                    "restoring the source must not emit TakeOut evidence");
+            }
             Place(tomato, -3.65f, 1.06f, 1.50f);
             Place(onion, -3.55f, 1.06f, 1.50f);
             yield return null;
@@ -143,7 +149,7 @@ public class CorePlayWiringSmokeTests
         foreach (var id in new[] { "ITEM_Tomato", "ITEM_Onion" })
         {
             var identity = Identity(id);
-            var position = identity.transform.position;
+            var position = identity.Body != null ? identity.Body.position : identity.transform.position;
             Assert.IsTrue(freezer.ContainsPoint(position),
                 context + " " + id + " at " + position + "; freezer " + freezer.Sensor.bounds);
         }
@@ -604,6 +610,30 @@ public class CorePlayWiringSmokeTests
         var head = rig.GetComponentInChildren<Camera>().transform;
         rig.position += new Vector3(x - head.position.x, 0f, z - head.position.z);
         Physics.SyncTransforms();
+    }
+
+    [UnityTest]
+    public IEnumerator SkipReasonUsesRecordedCauseWithEmptyChangedAndMatchingDrafts()
+    {
+        foreach (var draftReason in new[] { null, "changed later", "comfort stop" })
+        {
+            SceneManager.LoadScene("SCN_Kitchen_Review");
+            yield return null;
+            var host = Object.FindObjectOfType<JourneyRuntimeHost>();
+            Assert.IsNull(host.StartupError);
+            Assert.IsTrue(host.Submit(new JourneyCommand
+            { Type = JourneyCommandType.CompleteSetup, PrerequisitesMet = true }).Accepted);
+            Assert.IsTrue(host.Submit(new JourneyCommand
+            { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
+            Assert.IsTrue(host.Submit(new JourneyCommand
+            { Type = JourneyCommandType.StartChallenge, BenchmarkId = "B1" }).Accepted);
+            yield return null;
+            Assert.IsTrue(host.Submit(new JourneyCommand
+            { Type = JourneyCommandType.SkipChallenge, Reason = "comfort stop" }).Accepted);
+            var result = host.SubmitFeedback(new FeedbackDraft { SkipReason = draftReason });
+            Assert.IsTrue(result.Accepted, "draft reason=" + (draftReason ?? "<null>") + ": " + result.Message);
+            Assert.AreEqual("comfort stop", result.Action.Record.FindFeedback("B1").outcomeReason);
+        }
     }
 
     [UnityTest]

@@ -90,7 +90,7 @@ namespace XRApartment.Runtime.Core
                     return false;
                 }
                 if (item.IsExistingItem)
-                    sourceWasInside[item.ItemId] = Inside(item.SourceZoneId, identity.transform.position);
+                    sourceWasInside[item.ItemId] = Inside(item.SourceZoneId, SourcePosition(identity));
             }
             task = plan.Task;
             core = journey;
@@ -155,14 +155,7 @@ namespace XRApartment.Runtime.Core
             if (step == ChallengeStep.TemporaryPlacement) placed.Clear();
             foreach (var item in task.Items)
                 if (item.IsExistingItem && identities.TryGetValue(item.ItemId, out var identity))
-                    sourceWasInside[item.ItemId] = Inside(item.SourceZoneId, identity.transform.position);
-            if (step == ChallengeStep.TakeOut)
-                foreach (var item in task.Items)
-                    if (item.IsExistingItem)
-                        Debug.Log("[DEBUG-b01] reset " + item.ItemId + " inside=" + sourceWasInside[item.ItemId] +
-                            " position=" + identities[item.ItemId].transform.position +
-                            " bodyPosition=" + identities[item.ItemId].Body.position +
-                            " zone=" + identities[item.SourceZoneId].Sensor.bounds);
+                    sourceWasInside[item.ItemId] = Inside(item.SourceZoneId, SourcePosition(identity));
             foreach (var access in task.AccessTargets)
                 if (identities.TryGetValue(access.ObjectId, out var identity) &&
                     identity.TryGetAccessProgress(out var progress))
@@ -187,6 +180,11 @@ namespace XRApartment.Runtime.Core
         {
             TaskEvidenceIdentity zone;
             return identities.TryGetValue(zoneId, out zone) && zone.ContainsPoint(point);
+        }
+
+        private static Vector3 SourcePosition(TaskEvidenceIdentity identity)
+        {
+            return identity.Body != null ? identity.Body.position : identity.transform.position;
         }
 
         private void Update()
@@ -220,14 +218,8 @@ namespace XRApartment.Runtime.Core
             {
                 if (!item.IsExistingItem) continue;
                 var identity = identities[item.ItemId];
-                var inside = Inside(item.SourceZoneId, identity.transform.position);
+                var inside = Inside(item.SourceZoneId, SourcePosition(identity));
                 bool wasInside;
-                if (active && snapshot.CurrentStep == ChallengeStep.TakeOut &&
-                    sourceWasInside.TryGetValue(item.ItemId, out wasInside) && wasInside != inside)
-                    Debug.Log("[DEBUG-b01] edge " + item.ItemId + " was=" + wasInside + " now=" + inside +
-                        " position=" + identity.transform.position + " zone=" + identities[item.SourceZoneId].Sensor.bounds +
-                        " bodyPosition=" + identity.Body.position + " kinetic=" + identity.Body.isKinematic + " selected=" + identity.Grab.isSelected +
-                        " parent=" + identity.transform.parent.name + " run=" + runId);
                 if (active && snapshot.CurrentStep == ChallengeStep.TakeOut &&
                     sourceWasInside.TryGetValue(item.ItemId, out wasInside) && wasInside && !inside)
                 {
