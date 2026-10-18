@@ -10,6 +10,7 @@ namespace XRApartment.Runtime.Debugging
     public sealed class JourneyDebugUI : MonoBehaviour, IJourneyView
     {
         [SerializeField] private JourneyRuntimeHost host;
+        [SerializeField] private bool feedbackSubmittedByDedicatedView;
         private JourneySnapshot snapshot;
         private JourneyErrorCode lastErrorCode;
         private string message;
@@ -110,6 +111,12 @@ namespace XRApartment.Runtime.Debugging
             }
             if (snapshot.State == SessionState.FeedbackPending)
             {
+                if (feedbackSubmittedByDedicatedView)
+                {
+                    GUILayout.Label("Use the dedicated XR feedback panel to review and submit this benchmark.");
+                }
+                else
+                {
                 var skipped = snapshot.ActiveBenchmarkId != null &&
                     snapshot.BenchmarkOutcomes.TryGetValue(snapshot.ActiveBenchmarkId, out var outcome) &&
                     outcome == TaskOutcome.Skipped;
@@ -133,6 +140,7 @@ namespace XRApartment.Runtime.Debugging
                         ShortExplanation = explanation,
                         SkipReason = skipReason
                     });
+                }
             }
             if (snapshot.State == SessionState.ComparisonSummary)
             {
