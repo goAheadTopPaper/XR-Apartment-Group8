@@ -139,7 +139,12 @@ namespace XRApartment.Tests
                     }
                     var grab = prop.GetComponent<XRGrabInteractable>();
                     if (grab == null) continue;
-                    Assert.IsNotNull(prop.GetComponent<Rigidbody>(), path);
+                    var body = prop.GetComponent<Rigidbody>();
+                    Assert.IsNotNull(body, path);
+                    Assert.IsFalse(body.isKinematic, path);
+                    Assert.AreEqual(XRBaseInteractable.MovementType.VelocityTracking,
+                        grab.movementType, path + " must remain dynamic while held so held props collide");
+                    Assert.AreNotEqual(CollisionDetectionMode.Discrete, body.collisionDetectionMode, path);
                     Assert.IsTrue(grab.useDynamicAttach, path);
                     Assert.IsNotEmpty(grab.colliders, path);
                     Assert.IsTrue(grab.colliders.All(collider => collider != null && collider.enabled

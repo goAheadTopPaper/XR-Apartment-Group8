@@ -7,6 +7,7 @@ using UnityEngine.TestTools;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.Filtering;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using XRApartment.Runtime.Core;
 using XRApartment.Runtime;
 using XRApartment.Runtime.Debugging;
@@ -15,6 +16,66 @@ using XRApartment.Simulation;
 
 public class CorePlayWiringSmokeTests
 {
+    [UnityTest]
+    public IEnumerator SeparatelyHeldMugAndJuicePackCollide()
+    {
+        SceneManager.LoadScene("SCN_Kitchen_Review");
+        yield return null;
+
+        var manager = Object.FindObjectOfType<UnityEngine.XR.Interaction.Toolkit.XRInteractionManager>();
+        var mug = GameObject.Find("PREF_Prop_Mug");
+        var juicePack = GameObject.Find("PREF_Prop_JuicePack");
+        Assert.NotNull(manager);
+        Assert.NotNull(mug);
+        Assert.NotNull(juicePack);
+
+        var mugGrab = mug.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        var juiceGrab = juicePack.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        var mugBody = mug.GetComponent<Rigidbody>();
+        var juiceBody = juicePack.GetComponent<Rigidbody>();
+        Assert.NotNull(mugGrab);
+        Assert.NotNull(juiceGrab);
+        Assert.NotNull(mugBody);
+        Assert.NotNull(juiceBody);
+
+        var start = new Vector3(100f, 10f, 100f);
+        mugBody.useGravity = false;
+        juiceBody.useGravity = false;
+        mugBody.velocity = Vector3.zero;
+        juiceBody.velocity = Vector3.zero;
+        mugBody.position = start + Vector3.left * .35f;
+        juiceBody.position = start + Vector3.right * .35f;
+        var mugCollider = mug.AddComponent<BoxCollider>();
+        var juiceCollider = juicePack.AddComponent<BoxCollider>();
+        mugCollider.size = Vector3.one * .22f;
+        juiceCollider.size = Vector3.one * .22f;
+        var probe = mug.AddComponent<HeldObjectCollisionProbe>();
+
+        var leftHand = CreateTestInteractor(manager, mugBody.position);
+        var rightHand = CreateTestInteractor(manager, juiceBody.position);
+        yield return new WaitForFixedUpdate();
+        leftHand.StartManualInteraction((UnityEngine.XR.Interaction.Toolkit.Interactables.IXRSelectInteractable)mugGrab);
+        rightHand.StartManualInteraction((UnityEngine.XR.Interaction.Toolkit.Interactables.IXRSelectInteractable)juiceGrab);
+        yield return new WaitForFixedUpdate();
+
+        Assert.IsTrue(leftHand.hasSelection);
+        Assert.IsTrue(rightHand.hasSelection);
+        Assert.IsFalse(mugBody.isKinematic);
+        Assert.IsFalse(juiceBody.isKinematic);
+
+        leftHand.transform.position = start + Vector3.left * .05f;
+        rightHand.transform.position = start + Vector3.right * .05f;
+        for (var frame = 0; frame < 30 && !probe.HasCollided; frame++)
+            yield return new WaitForFixedUpdate();
+
+        Assert.IsTrue(probe.HasCollided,
+            "Two separately held dynamic props should produce a collision when their colliders meet.");
+        leftHand.EndManualInteraction();
+        rightHand.EndManualInteraction();
+        Object.Destroy(leftHand.gameObject);
+        Object.Destroy(rightHand.gameObject);
+    }
+
     [UnityTest]
     public IEnumerator OpenStageRejectsEarlyGrabsAndTakeOutRestoreRearmsBothItems()
     {
@@ -627,6 +688,21 @@ public class CorePlayWiringSmokeTests
         Physics.SyncTransforms();
     }
 
+    private static XRDirectInteractor CreateTestInteractor(
+        UnityEngine.XR.Interaction.Toolkit.XRInteractionManager manager, Vector3 position)
+    {
+        var hand = new GameObject("TestDirectInteractor");
+        hand.transform.position = position;
+        var trigger = hand.AddComponent<SphereCollider>();
+        trigger.isTrigger = true;
+        trigger.radius = .02f;
+        var interactor = hand.AddComponent<XRDirectInteractor>();
+        interactor.interactionManager = manager;
+        interactor.attachTransform = hand.transform;
+        interactor.keepSelectedTargetValid = true;
+        return interactor;
+    }
+
     [UnityTest]
     public IEnumerator SkipReasonUsesRecordedCauseWithEmptyChangedAndMatchingDrafts()
     {
@@ -685,5 +761,15 @@ public class CorePlayWiringSmokeTests
         { Type = JourneyCommandType.ShowBenchmark, BenchmarkId = "B2" }).Accepted);
         yield return null;
         Assert.AreEqual("B2", host.GetComponent<RuntimeBenchmarkAdapter>().CurrentBenchmarkId);
+    }
+}
+
+public class HeldObjectCollisionProbe : MonoBehaviour
+{
+    public bool HasCollided { get; private set; }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        HasCollided = true;
     }
 }
