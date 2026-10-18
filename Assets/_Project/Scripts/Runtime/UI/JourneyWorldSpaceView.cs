@@ -14,6 +14,8 @@ namespace XRApartment.Runtime.UI
     public sealed class JourneyWorldSpaceView : MonoBehaviour, IJourneyView
     {
         [SerializeField] private JourneyRuntimeHost host;
+        [SerializeField] private RecoveryMenuView recoveryMenu;
+        [SerializeField] private JourneyPhaseFiveView phaseFiveView;
         [SerializeField] private XROrigin xrOrigin;
         [SerializeField] private UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation.TeleportationProvider teleportationProvider;
         [SerializeField] private UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation.TeleportationArea teleportPracticeArea;
@@ -48,12 +50,13 @@ namespace XRApartment.Runtime.UI
         [SerializeField] private Button resetTaskButton, restartSessionButton;
         [SerializeField] private GameObject exitedPanel;
         [SerializeField] private TMP_Text exitedStatus;
+        [SerializeField] private Button continueSkippedButton;
         [Header("Session controls")]
         [SerializeField] private Button setupPauseButton, setupRetryButton;
         [SerializeField] private Button exploreIntroPauseButton, explorePauseButton;
         [SerializeField] private Button challengePauseButton, pendingPauseButton;
-        [SerializeField] private GameObject pausedPanel, finishedPanel, noticePanel, skipPanel;
-        [SerializeField] private TMP_Text pausedStatus, finishedStatus, noticeText, skipError;
+        [SerializeField] private GameObject pausedPanel, finishedPanel, skipPanel;
+        [SerializeField] private TMP_Text pausedStatus, finishedStatus, skipError;
         [SerializeField] private Button resumeButton, pausedExitButton, retryButton, finishedRestartButton;
         [SerializeField] private Button openSkipButton, confirmSkipButton, cancelSkipButton;
         [SerializeField] private Button skipDiscomfortButton, skipBlockedButton;
@@ -102,10 +105,15 @@ namespace XRApartment.Runtime.UI
             Wire(toolbarB1Button, PreviewB1); Wire(toolbarB2Button, PreviewB2);
             Wire(toolbarChallengeButton, StartChallenge);
             Wire(resetTaskButton, ResetCurrentTask); Wire(restartSessionButton, StartNewSession);
+            Wire(continueSkippedButton, ContinueSkippedChallenge);
             Wire(setupPauseButton, PauseJourney); Wire(explorePauseButton, PauseJourney);
             Wire(exploreIntroPauseButton, PauseJourney);
             Wire(setupRetryButton, RetryFailedOperation);
             Wire(challengePauseButton, PauseJourney); Wire(pendingPauseButton, PauseJourney);
+            foreach (var menuButton in new[] { setupPauseButton, explorePauseButton,
+                exploreIntroPauseButton, challengePauseButton, pendingPauseButton })
+                if (menuButton != null)
+                    Label(menuButton.GetComponentInChildren<TMP_Text>(true), "Menu");
             Wire(resumeButton, ResumeJourney); Wire(pausedExitButton, SafeExit);
             Wire(retryButton, RetryFailedOperation); Wire(finishedRestartButton, StartNewSession);
             Wire(openSkipButton, OpenSkip); Wire(confirmSkipButton, ConfirmSkip);
@@ -151,7 +159,29 @@ namespace XRApartment.Runtime.UI
                 var stageThreeRoot = explorePanel.transform.root;
                 stageThreeRoot.position = cameraTransform.position + flatForward * 1.25f;
                 stageThreeRoot.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
+                if (snapshot.State == SessionState.Explore && exploreStarted && exploreToolbar != null)
+                    PositionAtViewportTop(exploreToolbar, xrOrigin.Camera, stageThreeRoot,
+                        0.5f, 0.95f);
+                if (snapshot.State == SessionState.ChallengeActive)
+                    PositionAtViewportTop(challengeCompact ? challengeCompactPanel : challengePanel,
+                        xrOrigin.Camera, stageThreeRoot, 0.025f, 0.94f);
             }
+        }
+
+        private static void PositionAtViewportTop(GameObject panel, Camera camera,
+            Transform canvasRoot, float viewportX, float viewportY)
+        {
+            if (panel == null || camera == null) return;
+            var rect = panel.GetComponent<RectTransform>();
+            if (rect == null) return;
+            var ray = camera.ViewportPointToRay(new Vector3(viewportX, viewportY));
+            var plane = new Plane(canvasRoot.forward, canvasRoot.position);
+            if (!plane.Raycast(ray, out var distance)) return;
+            var top = ray.GetPoint(distance);
+            var halfWidth = rect.rect.width * rect.lossyScale.x * 0.5f;
+            var halfHeight = rect.rect.height * rect.lossyScale.y * 0.5f;
+            rect.position = top + (viewportX < 0.5f ? canvasRoot.right * halfWidth : Vector3.zero)
+                - canvasRoot.up * halfHeight;
         }
 
         private void OnDestroy()
@@ -175,6 +205,7 @@ namespace XRApartment.Runtime.UI
             Unwire(toolbarB1Button, PreviewB1); Unwire(toolbarB2Button, PreviewB2);
             Unwire(toolbarChallengeButton, StartChallenge);
             Unwire(resetTaskButton, ResetCurrentTask); Unwire(restartSessionButton, StartNewSession);
+            Unwire(continueSkippedButton, ContinueSkippedChallenge);
             Unwire(setupPauseButton, PauseJourney); Unwire(explorePauseButton, PauseJourney);
             Unwire(exploreIntroPauseButton, PauseJourney);
             Unwire(setupRetryButton, RetryFailedOperation);
@@ -198,9 +229,10 @@ namespace XRApartment.Runtime.UI
 
         public void Render(JourneySnapshot current, JourneyErrorCode code, string message)
         {
+            if (recoveryMenu != null) recoveryMenu.Render(current, code, message);
+            if (phaseFiveView != null) phaseFiveView.Render(current, code, message);
             var previousState = snapshot == null ? SessionState.Setup : snapshot.State;
             snapshot = current;
-            UpdateMenuHandVisibility();
             if (current == null)
             {
                 Label(stateText, "Journey unavailable");
@@ -220,10 +252,12 @@ namespace XRApartment.Runtime.UI
                 if (code == JourneyErrorCode.None && current.Save != SaveStatus.Failed)
                     retryAvailable = false;
             }
-            if (previousState != current.State && current.State == SessionState.Explore)
-                exploreStarted = false;
+            if (previousState != current.State && current.State == SessionState.Explore &&
+                previousState != SessionState.Paused)
+                exploreStarted = previousState == SessionState.FeedbackPending;
             if (previousState != current.State && current.State == SessionState.ChallengeActive &&
                 previousState != SessionState.Paused) challengeCompact = false;
+            UpdateMenuHandVisibility();
             if (resetPending && current.State == SessionState.Orientation && !current.IsBusy)
             {
                 resetPending = false;
@@ -252,6 +286,9 @@ namespace XRApartment.Runtime.UI
                 setupAlert = "Save failed. Retry the operation.  " + setupAlert;
             if (current.Conflicts != null && current.Conflicts.Count > 0)
                 setupAlert += " Design notices: " + current.Conflicts.Count + ".";
+            if (phaseFiveView != null && (current.State == SessionState.FeedbackPending ||
+                current.State == SessionState.ComparisonSummary || current.State == SessionState.Finished))
+                setupAlert = string.Empty;
             Error(setupAlert);
             Visible(Setup, Orientation);
             RenderExploreChallenge(current, code, message);
@@ -344,15 +381,22 @@ namespace XRApartment.Runtime.UI
                     !string.IsNullOrEmpty(current.ActiveBenchmarkId) &&
                     current.BenchmarkOutcomes.TryGetValue(current.ActiveBenchmarkId, out var outcome) &&
                     outcome == TaskOutcome.Skipped;
-                Label(pendingStatus, current.ActiveBenchmarkId +
-                    (skipped ? " Challenge skipped. The reason was recorded. " : " task complete. ") +
-                    "Feedback is pending for this design.");
+                Label(pendingStatus, skipped
+                    ? current.ActiveBenchmarkId + " Challenge skipped. Save the recorded reason to continue."
+                    : current.ActiveBenchmarkId + " task complete. Feedback is pending for this design.");
+                if (continueSkippedButton != null)
+                {
+                    continueSkippedButton.gameObject.SetActive(skipped);
+                    continueSkippedButton.interactable = !current.IsBusy;
+                }
             }
             if (current.State == SessionState.Exited)
             {
                 Label(exitedStatus, current.Save == SaveStatus.Pending
-                    ? "Session exited. Waiting for the final save."
-                    : "Session exited. Start a new session to return to Setup.");
+                    ? "Session exited. Final save is still pending."
+                    : current.Save == SaveStatus.Verified
+                        ? "Session exited. Final save verified. Start a new session to return to Setup."
+                        : "Session exited. Final save was not verified. Start a new session only if you accept that risk.");
                 if (restartSessionButton != null)
                     restartSessionButton.interactable = current.Save != SaveStatus.Pending;
             }
@@ -366,25 +410,18 @@ namespace XRApartment.Runtime.UI
             if (exploreToolbar != null) exploreToolbar.SetActive(explore && exploreStarted);
             if (challengePanel != null) challengePanel.SetActive(challenge && !challengeCompact);
             if (challengeCompactPanel != null) challengeCompactPanel.SetActive(challenge && challengeCompact);
-            if (pendingPanel != null) pendingPanel.SetActive(pending);
+            if (pendingPanel != null) pendingPanel.SetActive(pending && phaseFiveView == null);
             if (exitedPanel != null) exitedPanel.SetActive(snapshot != null && snapshot.State == SessionState.Exited);
-            if (pausedPanel != null) pausedPanel.SetActive(snapshot != null && snapshot.State == SessionState.Paused);
-            if (finishedPanel != null) finishedPanel.SetActive(snapshot != null && snapshot.State == SessionState.Finished);
+            if (pausedPanel != null) pausedPanel.SetActive(recoveryMenu == null &&
+                snapshot != null && snapshot.State == SessionState.Paused);
+            if (finishedPanel != null) finishedPanel.SetActive(phaseFiveView == null &&
+                snapshot != null && snapshot.State == SessionState.Finished);
             if (skipPanel != null) skipPanel.SetActive(challenge && skipOpen);
         }
 
         private void RenderSessionControls(JourneySnapshot current, JourneyErrorCode code, string message)
         {
             bool stageThree = current.State != SessionState.Setup && current.State != SessionState.Orientation;
-            if (noticePanel != null) noticePanel.SetActive(stageThree);
-            var notice = "Save: " + current.Save + "  |  Outcome: " + current.Outcome;
-            if (current.CurrentSafety != null) notice += "\nSAFETY: " + current.CurrentSafety.Message;
-            if (current.Conflicts != null && current.Conflicts.Count > 0)
-                notice += "\nDesign notices: " + current.Conflicts.Count +
-                    "  " + current.Conflicts[0].Message;
-            if (code != JourneyErrorCode.None && !string.IsNullOrEmpty(message))
-                notice += "\n" + code + ": " + message;
-            Label(noticeText, notice);
             Label(pausedStatus, retryAvailable && current.Save != SaveStatus.Failed
                 ? "Session paused. Resume before retrying the failed operation."
                 : "Session paused. Resume to continue the previous stage.");
@@ -436,8 +473,8 @@ namespace XRApartment.Runtime.UI
             if (menuHandRenderers == null || snapshot == null) return;
             var showHands = snapshot.State != SessionState.Setup &&
                             snapshot.State != SessionState.Orientation &&
-                            snapshot.State != SessionState.Explore &&
-                            snapshot.State != SessionState.FeedbackPending;
+                            (snapshot.State != SessionState.Explore || exploreStarted) &&
+                            (phaseFiveView != null || snapshot.State != SessionState.FeedbackPending);
             for (var i = 0; i < menuHandRenderers.Length; i++)
                 if (menuHandRenderers[i] != null)
                     menuHandRenderers[i].enabled = showHands && originalHandVisibility[i];
@@ -553,9 +590,7 @@ namespace XRApartment.Runtime.UI
         }
         private void PauseJourney()
         {
-            if (snapshot == null || snapshot.State == SessionState.Paused ||
-                snapshot.State == SessionState.Finished || snapshot.State == SessionState.Exited || host == null) return;
-            host.Submit(new JourneyCommand { Type = JourneyCommandType.Pause });
+            if (recoveryMenu != null) { recoveryMenu.Open(); return; }
         }
         private void ResumeJourney()
         {
@@ -571,6 +606,7 @@ namespace XRApartment.Runtime.UI
         }
         private void OpenSkip()
         {
+            if (recoveryMenu != null) { recoveryMenu.Open(); return; }
             if (snapshot == null || snapshot.State != SessionState.ChallengeActive || snapshot.IsBusy) return;
             skipOpen = true;
             ShowStage(false, true, false);
@@ -617,7 +653,15 @@ namespace XRApartment.Runtime.UI
             { Type = JourneyCommandType.SkipChallenge, Reason = reason });
             if (result.Accepted) skipOpen = false;
             else Label(skipError, result.ErrorCode + ": " + result.Message);
-            ShowStage(false, snapshot.State == SessionState.ChallengeActive, false);
+        }
+        private void ContinueSkippedChallenge()
+        {
+            if (snapshot == null || snapshot.State != SessionState.FeedbackPending ||
+                snapshot.IsBusy || host == null || snapshot.BenchmarkOutcomes == null ||
+                string.IsNullOrEmpty(snapshot.ActiveBenchmarkId) ||
+                !snapshot.BenchmarkOutcomes.TryGetValue(snapshot.ActiveBenchmarkId, out var outcome) ||
+                outcome != TaskOutcome.Skipped) return;
+            host.SubmitFeedback(new FeedbackDraft());
         }
         private void StartNewSession()
         {
@@ -758,7 +802,13 @@ namespace XRApartment.Runtime.UI
         { if (Orientation) { selected = true; Refresh(); } }
         private void MinimisePanel() { compact = true; ShowStage(false, false, false); }
         private void ExpandPanel() { compact = false; ShowStage(false, false, false); }
-        private void BeginExplore() { if (Orientation || snapshot == null || snapshot.State != SessionState.Explore) return; exploreStarted = true; ShowStage(true, false, false); }
+        private void BeginExplore()
+        {
+            if (Orientation || snapshot == null || snapshot.State != SessionState.Explore) return;
+            exploreStarted = true;
+            ShowStage(true, false, false);
+            UpdateMenuHandVisibility();
+        }
         private void OnGrab(SelectEnterEventArgs args)
         {
             if (Orientation && args.interactableObject is UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable item)
@@ -791,7 +841,7 @@ namespace XRApartment.Runtime.UI
             { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true });
         }
         private void SafeExit()
-        { if (host != null && snapshot != null) host.Submit(new JourneyCommand { Type = JourneyCommandType.RequestExit }); }
+        { if (recoveryMenu != null) recoveryMenu.RequestExitConfirmation(); }
         private void Visible(bool setup, bool orientation)
         {
             if (setupControls != null) setupControls.SetActive(setup);

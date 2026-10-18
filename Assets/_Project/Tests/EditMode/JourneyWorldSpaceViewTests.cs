@@ -2,6 +2,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 using XRApartment.Data;
 using XRApartment.Runtime.UI;
@@ -33,13 +34,13 @@ namespace XRApartment.Tests
                     DisplayedBenchmarkId = "B1", CurrentStep = ChallengeStep.Open,
                     CompletedItemCount = 1, TotalItemCount = 3 },
                     JourneyErrorCode.InvalidState, "Required setup is incomplete.");
-                Assert.That(instance.transform.Find("Panel/State").GetComponent<Text>().text,
+                Assert.That(instance.transform.Find("Panel/State").GetComponent<TMP_Text>().text,
                     Does.Contain("Setup"));
-                Assert.That(instance.transform.Find("Panel/Design").GetComponent<Text>().text,
+                Assert.That(instance.transform.Find("Panel/Design").GetComponent<TMP_Text>().text,
                     Does.Contain("B1"));
-                Assert.That(instance.transform.Find("Panel/Progress").GetComponent<Text>().text,
+                Assert.That(instance.transform.Find("Panel/Progress").GetComponent<TMP_Text>().text,
                     Does.Contain("2/8"));
-                Assert.That(instance.transform.Find("Panel/Error").GetComponent<Text>().text,
+                Assert.That(instance.transform.Find("Panel/Error").GetComponent<TMP_Text>().text,
                     Does.Contain("Required setup"));
             }
             finally

@@ -30,19 +30,22 @@ namespace XRApartment.EditorTools
                     Button("Pause", intro, -390, 223, 150, 54, "Pause", font);
                 var toolbar = root.Find("ExploreToolbar");
                 if (toolbar.Find("Pause") == null)
-                    Button("Pause", toolbar, -205, 72, 90, 54, "Pause", font);
+                    Button("Pause", toolbar, -440, 65, 100, 58, "Pause", font);
                 var challenge = root.Find("ChallengePanel");
                 if (challenge.Find("Pause") == null)
-                    Button("Pause", challenge, -160, 335, 130, 48, "Pause", font);
+                    Button("Pause", challenge, -160, 320, 130, 48, "Pause", font);
                 if (challenge.Find("Compact") == null)
-                    Button("Compact", challenge, 0, 335, 130, 48, "Compact", font);
+                    Button("Compact", challenge, 0, 320, 130, 48, "Compact", font);
+                challenge.Find("Pause").GetComponent<RectTransform>().anchoredPosition = new Vector2(-160, 320);
+                challenge.Find("Compact").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 320);
                 challenge.Find("SafeExitChallenge").GetComponent<RectTransform>().anchoredPosition =
-                    new Vector2(160, 335);
+                    new Vector2(160, 320);
                 var reset = challenge.Find("ResetTask") as RectTransform;
-                reset.anchoredPosition = new Vector2(-105, -270);
+                reset.anchoredPosition = new Vector2(-105, -285);
                 reset.sizeDelta = new Vector2(215, 58);
                 if (challenge.Find("OpenSkip") == null)
-                    Button("OpenSkip", challenge, 115, -270, 190, 58, "Skip task", font);
+                    Button("OpenSkip", challenge, 115, -285, 190, 58, "Skip task", font);
+                challenge.Find("OpenSkip").GetComponent<RectTransform>().anchoredPosition = new Vector2(115, -285);
                 var challengeCompact = root.Find("ChallengeCompactPanel") as RectTransform;
                 if (challengeCompact == null)
                 {
@@ -56,11 +59,14 @@ namespace XRApartment.EditorTools
                     Button("Expand", challengeCompact, 0, -91, 190, 48, "Expand", font);
                     challengeCompact.gameObject.SetActive(false);
                 }
+                challengeCompact.anchoredPosition = new Vector2(-345, 240);
                 var pending = root.Find("PendingPanel");
                 if (pending.Find("Pause") == null)
-                    Button("Pause", pending, -105, -80, 180, 55, "Pause", font);
+                    Button("Pause", pending, -105, -120, 180, 55, "Pause", font);
+                pending.Find("Pause").GetComponent<RectTransform>().anchoredPosition =
+                    new Vector2(-105, -120);
                 var pendingExit = pending.Find("SafeExitPending") as RectTransform;
-                pendingExit.anchoredPosition = new Vector2(105, -80);
+                pendingExit.anchoredPosition = new Vector2(105, -120);
                 pendingExit.sizeDelta = new Vector2(180, 55);
 
                 var paused = root.Find("PausedPanel") as RectTransform;
@@ -85,16 +91,10 @@ namespace XRApartment.EditorTools
                     finished.gameObject.SetActive(false);
                 }
                 var notice = root.Find("NoticePanel") as RectTransform;
-                if (notice == null)
-                {
-                    notice = Panel("NoticePanel", root, 350, -245, 390, 190,
-                        new Color(0.06f, 0.11f, 0.17f, 0.90f));
-                    var noticeLabel = Label("Notice", notice, 0, 30, 355, 115, 18,
-                        "Save: None  |  Outcome: Unset", font);
-                    noticeLabel.alignment = TextAlignmentOptions.MidlineLeft;
-                    Button("Retry", notice, 0, -70, 180, 48, "Retry", font);
-                    notice.gameObject.SetActive(false);
-                }
+                if (notice != null) Object.DestroyImmediate(notice.gameObject);
+                if (root.Find("RetryFailed") == null)
+                    Button("RetryFailed", root, 350, 255, 180, 52, "Retry", font);
+                root.Find("RetryFailed").gameObject.SetActive(false);
                 var skip = root.Find("SkipPanel") as RectTransform;
                 if (skip == null)
                 {
@@ -144,9 +144,7 @@ namespace XRApartment.EditorTools
             Assign(fields, "finishedPanel", panel.transform.Find("FinishedPanel").gameObject);
             Assign(fields, "finishedStatus", panel.transform.Find("FinishedPanel/Status").GetComponent<TMP_Text>());
             Assign(fields, "finishedRestartButton", panel.transform.Find("FinishedPanel/RestartSession").GetComponent<Button>());
-            Assign(fields, "noticePanel", panel.transform.Find("NoticePanel").gameObject);
-            Assign(fields, "noticeText", panel.transform.Find("NoticePanel/Notice").GetComponent<TMP_Text>());
-            Assign(fields, "retryButton", panel.transform.Find("NoticePanel/Retry").GetComponent<Button>());
+            Assign(fields, "retryButton", panel.transform.Find("RetryFailed").GetComponent<Button>());
             Assign(fields, "skipPanel", panel.transform.Find("SkipPanel").gameObject);
             Assign(fields, "skipError", panel.transform.Find("SkipPanel/Error").GetComponent<TMP_Text>());
             Assign(fields, "openSkipButton", panel.transform.Find("ChallengePanel/OpenSkip").GetComponent<Button>());
@@ -193,22 +191,22 @@ namespace XRApartment.EditorTools
                 var root = (RectTransform)prefab.transform;
                 var font = TMP_Settings.defaultFontAsset;
                 var challenge = root.Find("ChallengePanel") as RectTransform;
-                challenge.anchoredPosition = new Vector2(-440, 185);
+                challenge.anchoredPosition = new Vector2(-345, 45);
                 challenge.sizeDelta = new Vector2(465, 700);
                 challenge.localScale = Vector3.one * 0.86f;
                 var reset = challenge.Find("ResetTask") != null
                     ? challenge.Find("ResetTask").GetComponent<Button>()
                     : Button("ResetTask", challenge, 0, -270, 280, 58, "Reset task", font);
-                challenge.Find("Benchmark").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 285);
-                challenge.Find("Step").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 225);
-                challenge.Find("Instruction").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 115);
-                challenge.Find("Items").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 25);
-                challenge.Find("Status").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -38);
-                challenge.Find("Error").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -108);
-                challenge.Find("ConfirmReorganisation").GetComponent<RectTransform>().anchoredPosition = new Vector2(-105, -190);
-                challenge.Find("RestoreStep").GetComponent<RectTransform>().anchoredPosition = new Vector2(115, -190);
-                challenge.Find("SafeExitChallenge").GetComponent<RectTransform>().anchoredPosition = new Vector2(160, 285);
-                reset.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -270);
+                challenge.Find("Benchmark").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 245);
+                challenge.Find("Step").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 185);
+                challenge.Find("Instruction").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 75);
+                challenge.Find("Items").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -20);
+                challenge.Find("Status").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -78);
+                challenge.Find("Error").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -150);
+                challenge.Find("ConfirmReorganisation").GetComponent<RectTransform>().anchoredPosition = new Vector2(-105, -215);
+                challenge.Find("RestoreStep").GetComponent<RectTransform>().anchoredPosition = new Vector2(115, -215);
+                challenge.Find("SafeExitChallenge").GetComponent<RectTransform>().anchoredPosition = new Vector2(160, 320);
+                reset.GetComponent<RectTransform>().anchoredPosition = new Vector2(-105, -285);
                 var exited = root.Find("ExitedPanel") as RectTransform;
                 if (exited == null)
                 {
@@ -272,28 +270,48 @@ namespace XRApartment.EditorTools
                     Button("Challenge", toolbar, 330, 35, 200, 58, "Challenge", font);
                     toolbar.gameObject.SetActive(false);
                 }
-                toolbar.anchoredPosition = new Vector2(0, 460);
-                toolbar.sizeDelta = new Vector2(1050, 260);
+                toolbar.anchoredPosition = new Vector2(0, 190);
+                toolbar.sizeDelta = new Vector2(1050, 420);
                 var design = toolbar.Find("Design") as RectTransform;
-                design.anchoredPosition = new Vector2(-365, 72);
-                design.sizeDelta = new Vector2(270, 68);
+                design.anchoredPosition = new Vector2(-290, 105);
+                design.sizeDelta = new Vector2(170, 68);
                 design.GetComponent<TMP_Text>().text = "Explore";
                 var status = toolbar.Find("Status") as RectTransform;
                 status.anchoredPosition = new Vector2(0, -35);
-                status.sizeDelta = new Vector2(980, 58);
+                status.sizeDelta = new Vector2(980, 115);
                 var errorRect = toolbar.Find("Error") as RectTransform;
-                errorRect.anchoredPosition = new Vector2(0, -88);
-                errorRect.sizeDelta = new Vector2(980, 38);
-                toolbar.Find("PreviewB1").GetComponent<RectTransform>().anchoredPosition = new Vector2(-70, 72);
-                toolbar.Find("PreviewB2").GetComponent<RectTransform>().anchoredPosition = new Vector2(110, 72);
-                toolbar.Find("Challenge").GetComponent<RectTransform>().anchoredPosition = new Vector2(330, 72);
+                errorRect.anchoredPosition = new Vector2(0, -140);
+                errorRect.sizeDelta = new Vector2(980, 75);
+                var b1 = toolbar.Find("PreviewB1") as RectTransform;
+                b1.anchoredPosition = new Vector2(-95, 105);
+                b1.sizeDelta = new Vector2(135, 58);
+                var b2 = toolbar.Find("PreviewB2") as RectTransform;
+                b2.anchoredPosition = new Vector2(55, 105);
+                b2.sizeDelta = new Vector2(135, 58);
+                var challengeButton = toolbar.Find("Challenge") as RectTransform;
+                challengeButton.anchoredPosition = new Vector2(250, 105);
+                challengeButton.sizeDelta = new Vector2(210, 58);
                 if (toolbar.Find("SafeExitToolbar") == null)
-                    Button("SafeExitToolbar", toolbar, 460, 72, 120, 54, "Exit", font);
+                    Button("SafeExitToolbar", toolbar, 455, 105, 100, 58, "Exit", font);
+                var exitButton = toolbar.Find("SafeExitToolbar") as RectTransform;
+                exitButton.anchoredPosition = new Vector2(455, 105);
+                exitButton.sizeDelta = new Vector2(100, 58);
+                var pauseButton = toolbar.Find("Pause") as RectTransform;
+                if (pauseButton != null)
+                {
+                    pauseButton.anchoredPosition = new Vector2(-440, 105);
+                    pauseButton.sizeDelta = new Vector2(100, 58);
+                }
                 var pending = root.Find("PendingPanel") as RectTransform;
-                pending.sizeDelta = new Vector2(465, 250);
-                pending.Find("Status").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 45);
+                pending.sizeDelta = new Vector2(465, 340);
+                var pendingMessage = pending.Find("Status") as RectTransform;
+                pendingMessage.anchoredPosition = new Vector2(0, 80);
+                pendingMessage.sizeDelta = new Vector2(430, 115);
+                if (pending.Find("ContinueSkipped") == null)
+                    Button("ContinueSkipped", pending, 0, -25, 350, 60, "Continue to Explore", font);
+                pending.Find("ContinueSkipped").gameObject.SetActive(false);
                 if (pending.Find("SafeExitPending") == null)
-                    Button("SafeExitPending", pending, 0, -75, 200, 55, "Safe exit", font);
+                    Button("SafeExitPending", pending, 105, -120, 180, 55, "Safe exit", font);
                 PrefabUtility.SaveAsPrefabAsset(prefab, PrefabPath);
                 AssetDatabase.SaveAssets();
             }
@@ -315,6 +333,7 @@ namespace XRApartment.EditorTools
             Assign(serialized, "toolbarChallengeButton", panel.transform.Find("ExploreToolbar/Challenge").GetComponent<Button>());
             Assign(serialized, "toolbarExitButton", panel.transform.Find("ExploreToolbar/SafeExitToolbar").GetComponent<Button>());
             Assign(serialized, "pendingExitButton", panel.transform.Find("PendingPanel/SafeExitPending").GetComponent<Button>());
+            Assign(serialized, "continueSkippedButton", panel.transform.Find("PendingPanel/ContinueSkipped").GetComponent<Button>());
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);

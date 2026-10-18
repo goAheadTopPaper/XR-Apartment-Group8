@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using XRApartment.Runtime.Core;
 using XRApartment.Runtime;
@@ -220,33 +221,33 @@ public class CorePlayWiringSmokeTests
         Assert.IsNotNull(ui);
         Assert.IsFalse(Object.FindObjectOfType<JourneyDebugUI>().enabled);
         var panel = ui.transform.Find("Panel");
-        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("Setup"));
+        Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("Setup"));
         var setup = panel.Find("SetupControls");
         var button = setup.Find("CompleteSetup").GetComponent<Button>();
         button.onClick.Invoke();
         Assert.AreEqual(SessionState.Setup, host.Core.Snapshot.State);
-        Assert.That(panel.Find("Error").GetComponent<Text>().text,
-            Does.Contain("Required setup"));
-        setup.Find("CalibrationConfirmed").GetComponent<Toggle>().isOn = true;
-        setup.Find("PracticeConfirmed").GetComponent<Toggle>().isOn = true;
+        Assert.That(panel.Find("Error").GetComponent<TMP_Text>().text,
+            Does.Contain("Choose a posture"));
+        setup.Find("Standing").GetComponent<Button>().onClick.Invoke();
+        setup.Find("Calibrate").GetComponent<Button>().onClick.Invoke();
         button.onClick.Invoke();
         Assert.AreEqual(SessionState.Orientation, host.Core.Snapshot.State);
         Assert.IsFalse(setup.gameObject.activeSelf);
-        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("Orientation"));
+        Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("Orientation"));
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.StartChallenge, BenchmarkId = "B1" }).Accepted);
         yield return null;
         Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
-        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("ChallengeActive"));
-        Assert.That(panel.Find("Design").GetComponent<Text>().text, Does.Contain("B1"));
-        Assert.That(panel.Find("Progress").GetComponent<Text>().text, Does.Contain("1/8"));
+        Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("ChallengeActive"));
+        Assert.That(panel.Find("Design").GetComponent<TMP_Text>().text, Does.Contain("B1"));
+        Assert.That(panel.Find("Progress").GetComponent<TMP_Text>().text, Does.Contain("1/8"));
         Assert.IsTrue(host.Submit(new JourneyCommand { Type = JourneyCommandType.Pause }).Accepted);
         yield return null;
         Assert.IsEmpty(Object.FindObjectOfType<TaskTargetGuide>().VisibleTargets);
         Assert.IsTrue(host.Submit(new JourneyCommand { Type = JourneyCommandType.Resume }).Accepted);
-        Assert.That(panel.Find("State").GetComponent<Text>().text, Does.Contain("ChallengeActive"));
+        Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("ChallengeActive"));
         Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
     }
 

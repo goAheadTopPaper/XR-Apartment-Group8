@@ -1,6 +1,6 @@
 {
   "name": "XRApartment.Tests.PlayMode",
-  "references": ["XRApartment.Data", "XRApartment.Simulation", "XRApartment.Runtime", "Unity.XR.Interaction.Toolkit"],
+  "references": ["XRApartment.Data", "XRApartment.Simulation", "XRApartment.Runtime", "Unity.XR.Interaction.Toolkit", "Unity.TextMeshPro"],
   "optionalUnityReferences": ["TestAssemblies"],
   "includePlatforms": [],
   "autoReferenced": false,

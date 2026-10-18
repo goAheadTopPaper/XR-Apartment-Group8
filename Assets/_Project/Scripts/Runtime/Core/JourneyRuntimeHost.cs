@@ -64,6 +64,34 @@ namespace XRApartment.Runtime.Core
 
         public IJourneyCore Core { get; private set; }
         public string StartupError { get; private set; }
+        public FeedbackValidationResult LastFeedbackValidation { get; private set; }
+        public FeedbackRequest CurrentFeedbackRequest
+        {
+            get
+            {
+                var snapshot = Core?.Snapshot;
+                if (snapshot == null || snapshot.State != SessionState.FeedbackPending ||
+                    string.IsNullOrEmpty(snapshot.ActiveBenchmarkId) || snapshot.BenchmarkOutcomes == null ||
+                    !snapshot.BenchmarkOutcomes.TryGetValue(snapshot.ActiveBenchmarkId, out var outcome))
+                    return null;
+                return new FeedbackRequest
+                {
+                    SessionId = snapshot.SessionId, BenchmarkId = snapshot.ActiveBenchmarkId,
+                    TaskOutcome = outcome,
+                    OutcomeReason = (Core as JourneyCoordinator)?.PendingSkipReason
+                };
+            }
+        }
+        public IReadOnlyList<string> TaskItemIds
+        {
+            get
+            {
+                var ids = new List<string>();
+                if (plan?.Task?.Items != null)
+                    foreach (var item in plan.Task.Items) ids.Add(item.ItemId);
+                return ids.AsReadOnly();
+            }
+        }
 
         private void Awake()
         {
@@ -156,6 +184,7 @@ namespace XRApartment.Runtime.Core
 
         public JourneyResult SubmitFeedback(FeedbackDraft draft)
         {
+            LastFeedbackValidation = null;
             if (Core == null || feedback == null) return new JourneyResult
             {
                 Accepted = false, ErrorCode = JourneyErrorCode.InvalidPlan,
@@ -168,12 +197,7 @@ namespace XRApartment.Runtime.Core
             if (draft == null) draft = new FeedbackDraft();
             draft.SessionId = snapshot.SessionId;
             draft.BenchmarkId = snapshot.ActiveBenchmarkId;
-            var request = new FeedbackRequest
-            {
-                SessionId = snapshot.SessionId, BenchmarkId = snapshot.ActiveBenchmarkId,
-                TaskOutcome = snapshot.BenchmarkOutcomes[snapshot.ActiveBenchmarkId],
-                OutcomeReason = (Core as JourneyCoordinator)?.PendingSkipReason
-            };
+            var request = CurrentFeedbackRequest;
             FeedbackValidationResult validation;
             try { validation = feedback.Validate(request, draft); }
             catch (Exception exception)
@@ -190,6 +214,7 @@ namespace XRApartment.Runtime.Core
                     }
                 });
             }
+            LastFeedbackValidation = validation;
             return Submit(new JourneyCommand
             { Type = JourneyCommandType.SubmitFeedback, Feedback = validation });
         }
