@@ -1,6 +1,6 @@
 # AGENTS.md — 给 AI 编码助手的项目指令
 
-面向在本仓库工作的 agent 会话。人类向说明看 `README.md`。**Phase 2 产品范围与验收以 Lean PRD v0.3 Final（2026-10-03，Post-submission Phase 2 Implementation Baseline）为准**；Final Proposal 是该 PRD 的实施来源，冰箱 archetype 定义以 PRD Final §6.2 为准。本文是操作摘要，冲突时核对 PRD Final；本机文件位置和需求追溯见 README §12。
+面向在本仓库工作的 agent 会话。人类向说明看 `README.md`。**Phase 2 产品范围与验收以 `Docs/COMP5424_Scenario_C_Lean_PRD_CN_Final.docx`（Lean PRD v0.3 Final，2026-10-03）为准**；Final Proposal 是该 PRD 的实施来源，冰箱 archetype 定义以 PRD Final §6.2 为准。本文是操作摘要，冲突时核对 PRD Final；需求追溯见 README §12。
 
 ## 这个项目是什么
 
@@ -74,5 +74,5 @@ Unity 会丢弃无资源的空文件夹，需要在仓库里保留的空目录�
 
 ## 待确认（尚未冻结，别当成既定事实）
 
-- PRD Final 与作业文档是否收进仓库 `Docs/`（当前 PRD Final 位于本机仓库外，队友和 agent 会话可能读不到）。
+- 作业文档是否收进仓库 `Docs/`（PRD Final 已入库）。
 - F2 代表性几何参数、冲突阈值和 Ready for Evaluation 联合检查结果，以 Assumption Register、模型版本和实际证据冻结；不得凭现有 Prefab 反推 PRD 定义。
