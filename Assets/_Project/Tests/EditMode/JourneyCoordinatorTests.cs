@@ -2,12 +2,99 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using XRApartment.Data;
 using XRApartment.Simulation;
+using XRApartment.Runtime.Feedback;
+using XRApartment.Runtime.Storage;
 
 namespace XRApartment.Tests
 {
     public class JourneyCoordinatorTests
     {
         private const string SessionId = "anonymous-test-session";
+
+        [Test]
+        public void NormalB1B2_ValidatedFeedbackIsWrittenToCsvBeforeProgressing()
+        {
+            var directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(),
+                "XRApartment-FeedbackCsvTests", System.Guid.NewGuid().ToString("N"));
+            try
+            {
+                var store = new CsvSessionStore(directory);
+                var validator = new FeedbackValidator();
+                var core = ReadyCore();
+                foreach (var id in new[] { "B1", "B2" })
+                {
+                    CompleteBenchmark(core, id);
+                    var validation = validator.Validate(new FeedbackRequest
+                    {
+                        SessionId = SessionId, BenchmarkId = id, TaskOutcome = TaskOutcome.Completed
+                    }, new FeedbackDraft
+                    {
+                        SessionId = SessionId, BenchmarkId = id,
+                        Decision = CombinationDecision.NeedsRevision, Category = FeedbackCategory.DoorClearance,
+                        Importance = Importance.High,
+                        Experience = ExperienceTag.DoorBlocked | ExperienceTag.NeedsToStepBack,
+                        EverydayImpact = EverydayImpact.ProlongsTask
+                    });
+                    Assert.IsTrue(validation.IsValid);
+                    var submission = core.Submit(Command(JourneyCommandType.SubmitFeedback, feedback: validation));
+                    Assert.IsTrue(submission.Accepted, submission.Message);
+                    Assert.AreEqual(SessionState.FeedbackPending, core.Snapshot.State);
+                    if (id == "B1")
+                    {
+                        System.IO.Directory.CreateDirectory(directory);
+                        using (System.IO.File.Open(store.FilePath + ".lock", System.IO.FileMode.OpenOrCreate,
+                            System.IO.FileAccess.ReadWrite, System.IO.FileShare.None))
+                        {
+                            SaveResult blocked = null;
+                            store.Save(submission.Action.RequestId, submission.Action.Record, result => blocked = result);
+                            Assert.IsFalse(blocked.Succeeded);
+                            var failed = core.Submit(new JourneyCommand
+                            { Type = JourneyCommandType.SaveCompleted, SaveResult = blocked });
+                            Assert.AreEqual(SessionState.FeedbackPending, failed.Snapshot.State);
+                            Assert.AreEqual(SaveStatus.Failed, failed.Snapshot.Save);
+                        }
+                        submission = core.Submit(Command(JourneyCommandType.Retry));
+                        Assert.IsTrue(submission.Accepted, submission.Message);
+                    }
+                    var saved = SaveToCsv(core, store, submission.Action);
+                    Assert.AreEqual(SaveStatus.Verified, saved.Snapshot.Save);
+                    ReadResult loaded = null;
+                    new CsvSessionStore(directory).TryRead(SessionId, result => loaded = result);
+                    Assert.IsTrue(loaded.Succeeded, loaded.Message);
+                    Assert.AreEqual(ExperienceTag.DoorBlocked | ExperienceTag.NeedsToStepBack,
+                        loaded.Record.FindFeedback(id).experience);
+                    Assert.IsTrue(string.IsNullOrEmpty(loaded.Record.FindFeedback(id).shortExplanation));
+                    Assert.AreEqual(CombinationDecision.NeedsRevision, loaded.Record.FindFeedback(id).decision);
+                    Assert.AreEqual(FeedbackCategory.DoorClearance, loaded.Record.FindFeedback(id).category);
+                    Assert.AreEqual(Importance.High, loaded.Record.FindFeedback(id).importance);
+                }
+                var comparison = core.Submit(Command(JourneyCommandType.ConfirmComparison,
+                    comparison: new FinalComparison
+                    { PreferredBenchmarkId = "B2", TradeOffSummary = "B2 通道更方便。" }));
+                Assert.AreEqual(SessionState.Finished, SaveToCsv(core, store, comparison.Action).Snapshot.State);
+                ReadResult final = null;
+                new CsvSessionStore(directory).TryRead(SessionId, result => final = result);
+                Assert.IsTrue(final.Succeeded, final.Message);
+                Assert.AreEqual(2, final.Record.benchmarkFeedback.Count);
+                Assert.AreEqual(SessionOutcome.Completed, final.Record.sessionOutcome);
+                Assert.AreEqual("B2", final.Record.finalPreferenceCombinationId);
+                Assert.AreEqual("B2 通道更方便。", final.Record.finalTradeOffSummary);
+            }
+            finally
+            {
+                if (System.IO.Directory.Exists(directory)) System.IO.Directory.Delete(directory, true);
+            }
+        }
+
+        private static JourneyResult SaveToCsv(JourneyCoordinator core, CsvSessionStore store, JourneyAction action)
+        {
+            Assert.AreEqual(JourneyActionType.SaveRecord, action.Type);
+            SaveResult saved = null;
+            store.Save(action.RequestId, action.Record, result => saved = result);
+            Assert.IsTrue(saved.Succeeded, saved.Message);
+            Assert.IsTrue(saved.ReadBackVerified);
+            return core.Submit(new JourneyCommand { Type = JourneyCommandType.SaveCompleted, SaveResult = saved });
+        }
 
         [TestCase(2)]
         [TestCase(6)]

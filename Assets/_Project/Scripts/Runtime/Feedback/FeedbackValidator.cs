@@ -26,8 +26,6 @@ namespace XRApartment.Runtime.Feedback
                     errors["category"] = "Select a category.";
                 if (draft == null || draft.Importance == Importance.Unset)
                     errors["importance"] = "Select importance.";
-                if (draft == null || string.IsNullOrWhiteSpace(draft.ShortExplanation))
-                    errors["shortExplanation"] = "Describe the reason briefly.";
             }
             else if (request != null && request.TaskOutcome == TaskOutcome.Skipped)
             {

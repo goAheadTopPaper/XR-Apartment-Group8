@@ -83,11 +83,16 @@ namespace XRApartment.Runtime.Feedback
                         ? "Task skipped. The stored reason is unavailable; submission is blocked."
                         : "Task skipped · Reason recorded: " + pendingSkipReason
                     : "Task outcome is not available.";
-            submitButton.interactable = outcome == TaskOutcome.Completed ||
-                (outcome == TaskOutcome.Skipped && !string.IsNullOrWhiteSpace(pendingSkipReason));
+            submitButton.interactable = !current.IsBusy && (outcome == TaskOutcome.Completed ||
+                (outcome == TaskOutcome.Skipped && !string.IsNullOrWhiteSpace(pendingSkipReason)));
+            submitButton.GetComponentInChildren<TMP_Text>().text = current.Save == SaveStatus.Failed
+                ? "Retry save" : "Submit feedback";
             RestoreControls();
             UpdatePageVisibility();
-            if (errorCode == JourneyErrorCode.InvalidFeedback) ShowContractErrors(message);
+            if (current.Save == SaveStatus.Failed)
+                validationLabel.text = "CSV save failed. Close the CSV if it is open in Excel, then retry saving your submitted answers. " + message;
+            else if (current.Save == SaveStatus.Pending) validationLabel.text = "Saving feedback...";
+            else if (errorCode == JourneyErrorCode.InvalidFeedback) ShowContractErrors(message);
             else validationLabel.text = string.Empty;
         }
 
@@ -232,6 +237,12 @@ namespace XRApartment.Runtime.Feedback
         private void Submit()
         {
             if (host == null || snapshot == null || draft == null) return;
+            if (snapshot.Save == SaveStatus.Failed)
+            {
+                var retry = host.Submit(new JourneyCommand { Type = JourneyCommandType.Retry });
+                if (!retry.Accepted) validationLabel.text = retry.Message;
+                return;
+            }
             if (draftOutcome != TaskOutcome.Completed && draftOutcome != TaskOutcome.Skipped)
             {
                 validationLabel.text = "Feedback is unavailable because the task outcome is not Completed or Skipped.";
@@ -268,17 +279,14 @@ namespace XRApartment.Runtime.Feedback
                 return;
             }
             var fields = new List<string>();
-            foreach (var key in new[] { "decision", "category", "importance", "shortExplanation", "experience", "everydayImpact", "identity", "taskOutcome", "outcomeReason" })
+            foreach (var key in new[] { "decision", "category", "importance", "experience", "everydayImpact", "identity", "taskOutcome", "outcomeReason" })
                 if (message.IndexOf(key + "=", StringComparison.OrdinalIgnoreCase) >= 0)
-                    fields.Add(key == "shortExplanation" ? "Short explanation" : Friendly(key));
+                    fields.Add(Friendly(key));
             SetChoiceError("decision", fields.Contains("Decision"));
             SetChoiceError("category", fields.Contains("Category"));
             SetChoiceError("importance", fields.Contains("Importance"));
-            if (fields.Contains("Short explanation")) page = 1;
             UpdatePageVisibility();
-            validationLabel.text = fields.Contains("Short explanation")
-                ? "The current feedback contract still requires a written explanation. Verbal comments are not recorded; submission is blocked until the requirement is updated."
-                : fields.Count == 0 ? message : "Please review: " + string.Join(", ", fields) + ".";
+            validationLabel.text = fields.Count == 0 ? message : "Please review: " + string.Join(", ", fields) + ".";
         }
 
         private void Continue()

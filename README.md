@@ -140,7 +140,7 @@ git lfs checkout             # 指针文件还原为真实内容
 
 构建目标固定 `StandaloneWindows64`——Quest 3 只当显示器，画面由 PC 渲染（PRD TECH-02 批准的就是这个环境）。
 
-Core 临时 Play 验收的完整按钮顺序、八步物品操作、回退/跳过/安全退出和开发交接见 [Core_Review_Playbook.md](Docs/Core_Review_Playbook.md)。左上角 `CORE PLAY TEST` 是临时 Debug UI，正式 UI/Feedback/Storage 尚未接入。
+Core 临时 Play 验收的完整按钮顺序、八步物品操作、回退/跳过/安全退出和开发交接见 [Core_Review_Playbook.md](Docs/Core_Review_Playbook.md)。左上角 `CORE PLAY TEST` 是临时 Debug UI；Feedback 面板及本地 CSV 已在流程 Prefab 中接入，正式引导/整体 UI 与完整端到端验收仍待完成，见 [LocalCsvStorage](Docs/LocalCsvStorage.md)。
 
 1. 编辑器里 `File → Build Settings` 确认平台是 **Windows, Mac, Linux → Standalone Windows64**，场景 `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` 在第 0 位。
 2. Quest 3 上启动 Link（有线优先，无线对带宽敏感），连到本机；Meta Horizon 里允许连接。
@@ -254,7 +254,7 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
 - 保留 Hzc 的数据层、纯逻辑会话状态机/动作链、运动学门体/抽屉、F2/F3/F4 代理、B1/B2/B3 注册表、可抓取锅/杯与世界空间菜单。**现有冰箱代理尚未符合 PRD Final §6.2**：F2 应为大型单开门（现为上下两扇门），F3 应为左右双开门（现带下抽屉），F4 应为上部双门加一个下抽屉（现有两个下抽屉）。P0 优先修 F2，F3/F4 属 P1。
 - 迁移保持 Unity 2022.3.62f3、Built-in、XRI 3.5 和 Windows64；手模型/动画适配到项目自己的 XRI Rig，没有引入 mzh 的 Unity 6/URP 工程配置、PD 物理跟随或 FixedJoint 抓取。
 - 天空/光照已按 mzh 的暖日光样式重建，使用 Linear、固定 ACES/Bloom 和本项目重新生成的烘焙数据；不复用 Unity 6 的 LightingData/APV。
-- 几何冲突检测、Yellow→Amber 设计提示、独立 Red 安全提示仍未实现。本地 CSV 存储已提供 `ISessionStore` 实现，支持逐用户记录、检查点替换与读回验证；正式流程接线与反馈 UI 联调待完成，见 [LocalCsvStorage](Docs/LocalCsvStorage.md)。逻辑测试和编辑器场景检查不能替代 Quest 3 + Quest Link 的端到端验收。
+- 几何冲突检测、Yellow→Amber 设计提示、独立 Red 安全提示仍未实现。Feedback 表单已通过流程 Prefab 接入本地 CSV，支持逐用户记录、检查点替换、读回验证和失败重试；当前按用户确认仅必填三个选择项，文字说明可空，相对 PRD Final FR-07 的偏差见模块契约 §6。存储路径与操作见 [LocalCsvStorage](Docs/LocalCsvStorage.md)。逻辑测试和编辑器场景检查不能替代 Quest 3 + Quest Link 的端到端验收。
 
 ### 下一步（对齐 PRD Final §16 里程碑）
 

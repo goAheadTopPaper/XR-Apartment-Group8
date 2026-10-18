@@ -43,13 +43,24 @@ namespace XRApartment.Tests
             Assert.Contains("decision", new System.Collections.Generic.List<string>(result.FieldErrors.Keys));
             Assert.Contains("category", new System.Collections.Generic.List<string>(result.FieldErrors.Keys));
             Assert.Contains("importance", new System.Collections.Generic.List<string>(result.FieldErrors.Keys));
-            Assert.Contains("shortExplanation", new System.Collections.Generic.List<string>(result.FieldErrors.Keys));
+            Assert.IsFalse(result.FieldErrors.ContainsKey("shortExplanation"));
+        }
+
+        [Test]
+        public void CompletedFeedback_ChoicesOnlyDoesNotRequireWrittenExplanation()
+        {
+            var draft = CompleteDraft("session-a", "B1");
+            draft.ShortExplanation = null;
+            var result = validator.Validate(Request("session-a", "B1", TaskOutcome.Completed), draft);
+            Assert.IsTrue(result.IsValid);
+            Assert.IsNull(result.Feedback.shortExplanation);
         }
 
         [Test]
         public void SkippedFeedback_RequiresOutcomeReasonButNotRatings()
         {
             var request = Request("session-a", "B2", TaskOutcome.Skipped);
+            request.OutcomeReason = null;
             var draft = new FeedbackDraft { SessionId = "session-a", BenchmarkId = "B2" };
             Assert.IsFalse(validator.Validate(request, draft).IsValid);
 

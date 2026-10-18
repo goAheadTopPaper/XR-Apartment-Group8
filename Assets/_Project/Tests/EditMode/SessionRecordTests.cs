@@ -44,7 +44,7 @@ namespace XRApartment.Tests
         }
 
         [Test]
-        public void CompletedFeedback_RequiresOnlyTheFourJudgementFields()
+        public void CompletedFeedback_RequiresChoicesButAllowsEmptyExplanation()
         {
             var f = Complete("B1");
             f.importance = Importance.Unset;
@@ -54,8 +54,10 @@ namespace XRApartment.Tests
             f.discoveryMode = DiscoveryMode.Unset;
 
             var missing = f.MissingRequiredFields().ToArray();
-            CollectionAssert.AreEquivalent(new[] { "importance", "shortExplanation" }, missing);
+            CollectionAssert.AreEquivalent(new[] { "importance" }, missing);
             Assert.IsFalse(f.HasAllRequiredFields());
+            f.importance = Importance.High;
+            Assert.IsTrue(f.HasAllRequiredFields());
         }
 
         [Test]

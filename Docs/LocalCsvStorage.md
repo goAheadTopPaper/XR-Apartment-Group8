@@ -1,6 +1,6 @@
 # 本地 CSV 存储（FR-10）
 
-适用：Unity 2022.3.62f3 / StandaloneWindows64，Windows 电脑连接 VR 头显。数据保存在运行程序的电脑上，不需要服务器或网络。本次交付存储能力，表单通过现有流程接口对接。
+适用：Unity 2022.3.62f3 / StandaloneWindows64，Windows 电脑连接 VR 头显。数据保存在运行程序的电脑上，不需要服务器或网络。现有 Feedback 表单已通过 Host 接入 CSV；每次有效提交即保存，不需要等整场评审结束。
 
 ## 文件位置
 
@@ -12,14 +12,19 @@
 %USERPROFILE%\AppData\LocalLow\DefaultCompany\XR-Apartment-Group8\ReviewRecords\sessions.csv
 ```
 
+当前机器经 Unity API 确认的实际路径：`XR-Apartment-Group8\ReviewRecords\sessions.csv`。首次有效提交前文件可能尚未创建；本次测试使用独立临时目录，不向正式 CSV 填入演示用户。
+
 首次成功保存时创建目录和文件；退出程序、重新启动后保留。Editor 和 Windows Player 在 Company/Product 设置相同时共用该目录。`LocalCsvStorageAdapter.CsvPath` 返回实际完整路径；组件右键菜单 `Log CSV Storage Path` 可将路径写到 Console。修改 Company/Product 会改变默认目录，旧数据需要自行保留。
 
 ## 接入现有流程
 
-1. 场景集成人在流程对象上添加 `LocalCsvStorageAdapter`（Add Component → XR Apartment → Storage → Local CSV Storage Adapter）。
-2. 把组件拖到 `JourneyRuntimeHost` 的 **Storage Adapter** 字段，替换 `MockStorageAdapter` 的引用。当前 `PREF_Core_PlayValidation` 的 Mock 引用保留，未改动共享 Scene/核心 Prefab。
-3. 后续表单使用 `JourneyRuntimeHost.SubmitFeedback(FeedbackDraft)`。Core 已在逐方案提交、暂停、退出和最终确认等保存节点调用 `ISessionStore.Save`，表单不需要再直接保存一遍。
-4. 完成状态继续依据 `SaveResult.Succeeded && SaveResult.ReadBackVerified`；失败由 Host/Core 保留数据并提供重试，不显示保存成功。
+`PREF_Core_PlayValidation` 已添加 `LocalCsvStorageAdapter`，并把 `JourneyRuntimeHost.Storage Adapter` 从 Mock 改为该组件；厨房场景中的实例继承该绑定。使用 Unity Prefab API 修改，无需对场景 YAML 增加覆盖。
+
+现有 `FeedbackFormView` 的 Submit → `JourneyRuntimeHost.SubmitFeedback` → Feedback 校验 → Core 保存请求 → CSV 写入/读回 → Core 推进。每个新会话新增一行；同一会话第二方案和最终比较更新原行。保存失败时表单保留答案并显示 `Retry save`，关闭 Excel 等占用文件的程序后点击重试；读回确认前不推进。
+
+按 2026-10-18 用户确认，完成任务后的表单只要求 Decision、Category、Importance 三个选择，Experience/Everyday impact 为可选；不再要求文字说明。兼容字段 `shortExplanation` 保留为空，不把口述写成已采集文字。此规则相对 PRD Final FR-07 四项必填有明确偏差，见模块契约 §6。
+
+如在其他流程 Prefab 中复用，在对象上添加 `LocalCsvStorageAdapter`（Add Component → XR Apartment → Storage → Local CSV Storage Adapter），并拖到 Host 的 Storage Adapter 字段即可；不需要在表单中重复保存一次。若在 Play 中更新了 Prefab，退出并重新进入 Play，使 Host 使用新的适配器。
 
 也可以在尚未接入流程的独立表单脚本中调用组件：
 
@@ -64,7 +69,7 @@ storage.Save(1, record, result =>
 | `model_version` | 本次模型/参数版本 |
 | `session_outcome` / `total_seconds` | 会话结果与会话累计秒数 |
 | `benchmark_order` | 实际方案顺序，如 `B1 > B2` |
-| `feedback_summary` | 各方案的任务结果、Decision/Category/Importance、说明和跳过原因，可读枚举名称 |
+| `feedback_summary` | 各方案的任务结果、Decision/Category/Importance、Experience/Everyday impact/Discovery mode、兼容说明和跳过原因，可读枚举名称；同时兼容旧版不含可选项的摘要 |
 | `final_preference_combination_id` / `final_trade_off_summary` | 最终偏好和取舍说明 |
 | `record_json` | 完整 `SessionRecord`，包括全部反馈字段、markers、冲突、提示/帮助/舒适事件；用于无损读回 |
 
@@ -80,4 +85,4 @@ Excel 占用文件、目录不可写、磁盘满、CSV 损坏或校验不一致�
 
 自动化检查：`Assets/_Project/Tests/EditMode/CsvSessionStoreTests.cs`，在 Unity Test Runner 的 EditMode 中运行；使用临时测试目录，不把测试数据混入真实用户文件。测试覆盖多用户、检查点、重启读回、全字段/中文/换行、文件锁/重试、损坏文件、无效输入、旧回执、模型版本保护及回调异常。
 
-2026-10-18：上述 15 个用例已在 Unity 2022.3.62f3 编辑器主线程执行（含每例 SetUp/TearDown 和 NUnit 断言），15 通过、0 失败。当前未做正式表单/共享场景接线、Windows Player 或 Quest Link 端到端验证。
+2026-10-18 首轮存储测试：15 通过、0 失败。此次接入共执行 58 项检查，58 通过、0 失败，包含 Prefab 绑定、选择项无文字说明的校验、完整 B1/B2 动作链后的真实 CSV 写入/读回、文件占用失败后 Core 重试、最终比较更新和旧 CSV 摘要兼容；测试在 Unity 2022.3.62f3 编辑器主线程执行（含每例 SetUp/TearDown 和 NUnit 断言）。Windows Player 与 Quest Link 端到端验收仍待实际设备完成。

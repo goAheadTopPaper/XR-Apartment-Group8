@@ -1,6 +1,6 @@
 # Module Interface Contract — 厨房评审核心流程
 
-**状态**：Frozen v0.4（2026-10-18）；公共接口基线，变更须先修订本文并审查  
+**状态**：Frozen v0.5（2026-10-18）；公共接口基线，变更须先修订本文并审查
 **适用范围**：P0 B1=Proud+F2、B2=Flush-oriented+F2 的运行时评审旅程及 Core、Feedback、UI、Conflict Detection、Storage 的交接  
 **需求依据**：Lean PRD v0.3 Final §§8–12、FR-01/02/03/05/06/07/09/10/11/12、SAFE-01。本文约定模块交接，不代替 PRD 验收。现有模型与 PRD 的差异单独记录，由模型模块修复。
 
@@ -48,7 +48,7 @@
 | `JourneySnapshot` | `sessionId`, 状态、`SessionOutcome`、`SaveStatus`、展示中与挑战中的方案 ID、顺序、逐方案结果、当前步骤、任务物品进度、反馈摘要和冲突摘要 | Core → UI/Feedback/测试；返回防御性副本，UI 不持有 Core 内部集合 |
 | `TaskEvidence` | `sessionId`, `benchmarkId`, `runId`, 步骤、`ReviewRole`, 对象/物品/区域稳定 ID、会话内时间、实际测量、已释放抓取标志 | 场景适配 → Core；`runId` 仅区分当前 Challenge 与旧实例/重试；同一步骤/物品只计一次。Open/Close 对照 `TaskConfig.AccessTargets` 验证全部指定门体/抽屉 |
 | `FeedbackRequest` | session/benchmark ID、该方案 Completed/Skipped | Core → Feedback；草稿由 Feedback UI 自行保留 |
-| `FeedbackDraft` | session/benchmark ID、Decision/Category/Importance/Short explanation、可选额外字段或跳过原因 | 正式表单或 Debug UI → Feedback 校验；不得直接变更 Core 状态 |
+| `FeedbackDraft` | session/benchmark ID、Decision/Category/Importance、可选 Short explanation/额外字段或跳过原因（见 §6 用户确认变更） | 正式表单或 Debug UI → Feedback 校验；不得直接变更 Core 状态 |
 | `FeedbackValidationResult` | session/benchmark ID、`isValid`、字段级错误、校验后的 `BenchmarkFeedback` 或跳过原因 | Feedback → Core；正式校验由 Feedback 所有 |
 | `FinalComparison` | `preferredBenchmarkId`, `tradeOffSummary` | UI/Feedback → Core；Core 复核资格并推导 `SessionOutcome` |
 | `SessionRecord`（复用） | session/model ID、实际方案顺序、逐方案结果/反馈、帮助/重置/舒适事件、冲突关联、最终比较和 outcome | Core 交给 Storage 的独立副本；Storage 不持有 Core 内部对象，正式序列化字段由 Feedback/Storage 共同核对 |
@@ -395,11 +395,13 @@ Core 在 Unity 主线程按序处理命令。可预期拒绝不抛异常、不�
 
 ## 6. UI、反馈与冲突接口
 
+2026-10-18 用户明确确认：当前 Feedback **只保存选择项，取消文字说明必填要求**。完成方案必填 Decision、Category、Importance；Experience、Everyday impact 等仍为可选。`ShortExplanation` / `shortExplanation` 字段为兼容既有记录而保留，但可空，不自动生成文字、不把口述伪装成文字或录音。本次按用户确认覆盖原 Short explanation 必填规则；这属于相对 PRD Final FR-07 四项必填的明确偏差，不代表原 FR-07 已完整验收。最终比较的 trade-off 与跳过原因规则保持原契约。
+
 UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反馈、比较、暂停及错误；只通过命令提交意图。按钮是否可用由快照决定，但 Core 仍验证每条命令。UI 不直接设置 `SessionState`、方案 ID 或保存成功标志。临时 Debug UI 只用于 Play 测试，采用同一命令和反馈接口，正式 UI 可替换它。
 
 | 输入/输出 | 合同 |
 | --- | --- |
-| `FeedbackRequest` → `FeedbackValidationResult`（Feedback 工作包） | 完成方案必须有 Combination ID、Decision、Category、Importance、非空 Short explanation；Experience、Everyday impact、Discovery mode、Task outcome 不阻塞。跳过要求原因，四项评价可空。失败返回 `fieldId → errorCode/message`，取消/无效不改 Core 状态。Core Mock 使用同一输入输出，不绕过 session/方案匹配。 |
+| `FeedbackRequest` → `FeedbackValidationResult`（Feedback 工作包） | 完成方案必须有 Combination ID、Decision、Category、Importance；Short explanation、Experience、Everyday impact、Discovery mode 不阻塞。Task outcome 仍由 Core 的 Completed/Skipped 决定。跳过要求原因，评价可空。失败返回 `fieldId → errorCode/message`，取消/无效不改 Core 状态。Core Mock 使用同一输入输出，不绕过 session/方案匹配。 |
 | `FinalComparison`（UI/Feedback → Core） | 至少一个 Completed 时偏好必须指向已完成方案，主要 trade-off 非空；存在跳过仍为 Incomplete。全跳过时偏好可空，不写成完成比较。 |
 | `ConflictNotice`（Conflict Detection → Core/UI） | `issueId`, benchmark/model ID、对象 ID、登记参数 key、客观测量及说明。Core 按 issue+方案去重并关联反馈；UI 在客观触发时立即显示 Yellow＋文字/图标，不阻塞任务。参与者**提交该方案的有效反馈后**转 Amber，仅表示反馈已记录在本次会话内；不表示已保存、已解决或模型已修正。 |
 | `SafetyNotice`（安全来源 → Core/UI） | `safetyEventId`, session ID、风险类型、时间及建议动作；真实世界边界/play-area 风险独立以 Red＋文字/图标显示，可触发 Pause/RequestExit，不进入设计冲突状态。 |
@@ -410,7 +412,7 @@ UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反�
 
 ## 7. 本地保存接口与终态
 
-本地 CSV 实现约定（2026-10-18，FR-10，不改变公共签名）：`Runtime/Storage/CsvSessionStore` 实现现有 `ISessionStore`，`LocalCsvStorageAdapter` 提供 Unity 组件接入。默认文件为 `Application.persistentDataPath/ReviewRecords/sessions.csv`。每位评审者每次新会话生成新的匿名 `sessionId`，增加一行；同一会话的逐方案反馈、暂停、最终确认及重试更新同一行，避免把检查点重复计为用户提交。CSV 包含可读摘要和完整 `SessionRecord` 的 JSON 单元格，后者用于无损恢复；没有独立 JSON 文件。UTF-8 BOM、标准 CSV 引号转义保留中文和多行文字。实现同步串行保存，在 Unity 主线程调用/回调；同目录临时文件落盘验证后原子替换，最终文件再次读回匹配才返回成功。文件锁定、格式损坏、写入或验证失败返回 `OperationFailed`，不覆盖坏文件、不自动另存绕过错误。共享 Scene/核心 Prefab 的正式接线仍由场景集成人完成，Mock 不会自动替换。
+本地 CSV 实现约定（2026-10-18，FR-10，不改变公共签名）：`Runtime/Storage/CsvSessionStore` 实现现有 `ISessionStore`，`LocalCsvStorageAdapter` 提供 Unity 组件接入。默认文件为 `Application.persistentDataPath/ReviewRecords/sessions.csv`。每位评审者每次新会话生成新的匿名 `sessionId`，增加一行；同一会话的逐方案反馈、暂停、最终确认及重试更新同一行，避免把检查点重复计为用户提交。CSV 包含可读摘要和完整 `SessionRecord` 的 JSON 单元格，后者用于无损恢复；没有独立 JSON 文件。UTF-8 BOM、标准 CSV 引号转义保留中文和多行文字。实现同步串行保存，在 Unity 主线程调用/回调；同目录临时文件落盘验证后原子替换，最终文件再次读回匹配才返回成功。文件锁定、格式损坏、写入或验证失败返回 `OperationFailed`，不覆盖坏文件、不自动另存绕过错误。按本次用户接线授权，`PREF_Core_PlayValidation` 的 Storage Adapter 改为 Local CSV，场景实例继承该配置；保留 Mock 脚本供测试使用。Feedback 表单使用同一 Host 保存流程；保存失败展示错误及 Retry save，已提交的选择保留，重试成功前不推进方案。
 
 `ISessionStore.Save(requestId, record, completed)` 接收 Core 制作的独立 `SessionRecord` 副本，回调 `SaveResult` 包含相同 `RequestId`、写入是否成功、读回是否验证、存储位置和错误码。`TryRead(sessionId, completed)` 由 Storage 工作包正式实现，返回 `ReadResult`。格式为内部选择；不得要求账号或云端，不保存音视频或身份。Core 维护现有 `SessionRecord` 的公共字段：新增 `BenchmarkFeedback.shortExplanation`、`SessionRecord.sessionOutcome` 与 `SessionRecord.conflicts`，逐方案结果/原因复用现有 `BenchmarkFeedback.taskOutcome`/`outcomeReason`。Feedback/Storage 审查字段含义，在独立文件实现正式校验与序列化。现有 `HasAllRequiredFields()` 不能替代 Feedback 模块的正式字段校验。
 

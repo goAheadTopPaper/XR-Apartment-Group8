@@ -122,14 +122,14 @@ namespace XRApartment.Runtime.Debugging
                     outcome == TaskOutcome.Skipped;
                 GUILayout.Label(skipped
                     ? "Task skipped. Its skip reason was recorded when you clicked Skip; submit this feedback to continue. Ratings are optional."
-                    : "Task completed. Select decision, category and importance; enter a short explanation; then submit to save and continue.");
+                    : "Task completed. Select decision, category and importance; then submit to save and continue.");
                 chosenDecision = GUILayout.SelectionGrid(chosenDecision,
                     new[] { "Unset", "Accept", "Revise", "Reject" }, 4);
                 chosenCategory = GUILayout.SelectionGrid(chosenCategory,
                     new[] { "Unset", "Door", "Circulation", "Storage", "Space", "Other" }, 3);
                 chosenImportance = GUILayout.SelectionGrid(chosenImportance,
                     new[] { "Unset", "Low", "Medium", "High" }, 4);
-                GUILayout.Label("Short explanation:");
+                GUILayout.Label("Short explanation (optional):");
                 explanation = GUILayout.TextField(explanation);
                 if (GUILayout.Button("Validate and submit feedback"))
                     host.SubmitFeedback(new FeedbackDraft

@@ -307,9 +307,9 @@ namespace XRApartment.Simulation
             feedback.outcomeReason = feedback.taskOutcome == TaskOutcome.Skipped ? skippedReason : null;
             if (feedback.taskOutcome == TaskOutcome.Completed &&
                 (feedback.decision == CombinationDecision.Unset || feedback.category == FeedbackCategory.Unset ||
-                 feedback.importance == Importance.Unset || string.IsNullOrWhiteSpace(feedback.shortExplanation)))
+                 feedback.importance == Importance.Unset))
                 return Reject(JourneyErrorCode.InvalidFeedback,
-                    "Decision, category, importance and short explanation are required.");
+                    "Decision, category and importance are required.");
             record.benchmarkFeedback.Add(feedback);
             feedbackRecorded = true;
             foreach (var pair in conflicts)

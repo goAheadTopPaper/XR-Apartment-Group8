@@ -29,7 +29,7 @@ namespace XRApartment.Data
         public string shortExplanation;
         public string outcomeReason;
 
-        /// FR-07 acceptance: completed tasks require the four judgement fields; skipped tasks require a reason.
+        /// Current user-approved contract: three required choices; explanation is optional.
         public bool HasAllRequiredFields()
         {
             using (var missing = MissingRequiredFields().GetEnumerator())
@@ -44,7 +44,6 @@ namespace XRApartment.Data
                 if (decision == CombinationDecision.Unset) yield return "decision";
                 if (category == FeedbackCategory.Unset) yield return "category";
                 if (importance == Importance.Unset) yield return "importance";
-                if (string.IsNullOrWhiteSpace(shortExplanation)) yield return "shortExplanation";
             }
             if (taskOutcome != TaskOutcome.Completed && taskOutcome != TaskOutcome.Skipped)
                 yield return "taskOutcome";

@@ -15,6 +15,20 @@ namespace XRApartment.Tests
         private string directory;
         private CsvSessionStore store;
 
+        [Test]
+        public void ReviewPrefab_UsesLocalCsvForTheFeedbackHost()
+        {
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Prefabs/Core/PREF_Core_PlayValidation.prefab");
+            Assert.That(prefab, Is.Not.Null);
+            var host = prefab.GetComponent<XRApartment.Runtime.Core.JourneyRuntimeHost>();
+            Assert.That(host, Is.Not.Null);
+            var serialized = new UnityEditor.SerializedObject(host);
+            Assert.That(serialized.FindProperty("storageAdapter").objectReferenceValue,
+                Is.TypeOf<LocalCsvStorageAdapter>());
+            Assert.That(prefab.GetComponent<XRApartment.Runtime.Debugging.MockStorageAdapter>(), Is.Null);
+        }
+
         [SetUp]
         public void SetUp()
         {
@@ -92,6 +106,8 @@ namespace XRApartment.Tests
             var bytes = File.ReadAllBytes(store.FilePath);
             CollectionAssert.AreEqual(new byte[] { 0xef, 0xbb, 0xbf }, bytes.Take(3).ToArray());
             StringAssert.Contains("decision=NeedsRevision", File.ReadAllText(store.FilePath));
+            StringAssert.Contains("experience=DoorBlocked, NeedsToStepBack", File.ReadAllText(store.FilePath));
+            StringAssert.Contains("everydayImpact=ProlongsTask", File.ReadAllText(store.FilePath));
         }
 
         [Test]
@@ -109,6 +125,19 @@ namespace XRApartment.Tests
             Assert.That(Read(store, "anonymous-1").Record.finalTradeOffSummary, Is.EqualTo("更新结果"));
             Assert.That(Read(store, "anonymous-2").Succeeded, Is.True);
             Assert.That(Directory.GetFiles(directory, "*.tmp"), Is.Empty);
+        }
+
+        [Test]
+        public void EarlierCsvSummary_RemainsReadableAfterAddingChoiceDetails()
+        {
+            Assert.That(Save(store, 1, Record()).Succeeded, Is.True);
+            var csv = File.ReadAllText(store.FilePath)
+                .Replace("; experience=DoorBlocked, NeedsToStepBack; everydayImpact=ProlongsTask; discoveryMode=HumanObserved", "")
+                .Replace("; experience=None; everydayImpact=Unset; discoveryMode=Unset", "");
+            File.WriteAllText(store.FilePath, csv, new UTF8Encoding(true));
+            Assert.That(Read(new CsvSessionStore(directory), "anonymous-1").Succeeded, Is.True);
+            Assert.That(Save(store, 2, Record("anonymous-2")).Succeeded, Is.True);
+            Assert.That(Read(store, "anonymous-1").Succeeded, Is.True);
         }
 
         [Test]

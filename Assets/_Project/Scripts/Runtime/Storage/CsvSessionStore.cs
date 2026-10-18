@@ -155,7 +155,7 @@ namespace XRApartment.Runtime.Storage
             ValidateIdentity(record);
             if (!DateTime.TryParseExact(row[2], "O", CultureInfo.InvariantCulture,
                     DateTimeStyles.RoundtripKind, out var savedAt) || savedAt.Kind != DateTimeKind.Utc ||
-                !Equal(row, MakeRow(record, row[2])))
+                (!Equal(row, MakeRow(record, row[2])) && !Equal(row, MakeRow(record, row[2], false))))
                 throw new InvalidDataException("CSV summary does not match the stored record.");
             return record;
         }
@@ -167,7 +167,7 @@ namespace XRApartment.Runtime.Storage
                 throw new ArgumentException("Record, anonymous session ID and model version are required.");
         }
 
-        private static string[] MakeRow(SessionRecord record, string savedAt)
+        private static string[] MakeRow(SessionRecord record, string savedAt, bool includeOptionalChoices = true)
         {
             var summary = new StringBuilder();
             if (record.benchmarkFeedback != null)
@@ -181,6 +181,10 @@ namespace XRApartment.Runtime.Storage
                         .Append("; importance=").Append(feedback.importance)
                         .Append("; explanation=").Append(feedback.shortExplanation)
                         .Append("; reason=").Append(feedback.outcomeReason);
+                    if (includeOptionalChoices)
+                        summary.Append("; experience=").Append(feedback.experience)
+                            .Append("; everydayImpact=").Append(feedback.everydayImpact)
+                            .Append("; discoveryMode=").Append(feedback.discoveryMode);
                 }
             return new[]
             {
