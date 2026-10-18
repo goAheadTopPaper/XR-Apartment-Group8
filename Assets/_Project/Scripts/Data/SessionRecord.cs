@@ -26,34 +26,45 @@ namespace XRApartment.Data
         public Importance importance = Importance.Unset;
         public DiscoveryMode discoveryMode = DiscoveryMode.Unset;
         public TaskOutcome taskOutcome = TaskOutcome.Unset;
+        public string shortExplanation;
         public string outcomeReason;
 
-        /// FR-07 acceptance: every combination-level judgement field must be present.
+        /// Current user-approved contract: three required choices; explanation is optional.
         public bool HasAllRequiredFields()
         {
-            return !string.IsNullOrEmpty(combinationId)
-                && decision != CombinationDecision.Unset
-                && category != FeedbackCategory.Unset
-                && experience != ExperienceTag.None
-                && everydayImpact != EverydayImpact.Unset
-                && importance != Importance.Unset
-                && discoveryMode != DiscoveryMode.Unset
-                && taskOutcome != TaskOutcome.Unset;
+            using (var missing = MissingRequiredFields().GetEnumerator())
+                return !missing.MoveNext();
         }
 
         public IEnumerable<string> MissingRequiredFields()
         {
-            if (string.IsNullOrEmpty(combinationId)) yield return "combinationId";
-            if (decision == CombinationDecision.Unset) yield return "decision";
-            if (category == FeedbackCategory.Unset) yield return "category";
-            if (experience == ExperienceTag.None) yield return "experience";
-            if (everydayImpact == EverydayImpact.Unset) yield return "everydayImpact";
-            if (importance == Importance.Unset) yield return "importance";
-            if (discoveryMode == DiscoveryMode.Unset) yield return "discoveryMode";
-            if (taskOutcome == TaskOutcome.Unset) yield return "taskOutcome";
-            if (taskOutcome != TaskOutcome.Completed && string.IsNullOrEmpty(outcomeReason))
+            if (string.IsNullOrWhiteSpace(combinationId)) yield return "combinationId";
+            if (taskOutcome == TaskOutcome.Completed)
+            {
+                if (decision == CombinationDecision.Unset) yield return "decision";
+                if (category == FeedbackCategory.Unset) yield return "category";
+                if (importance == Importance.Unset) yield return "importance";
+            }
+            if (taskOutcome != TaskOutcome.Completed && taskOutcome != TaskOutcome.Skipped)
+                yield return "taskOutcome";
+            if (taskOutcome == TaskOutcome.Skipped && string.IsNullOrWhiteSpace(outcomeReason))
                 yield return "outcomeReason";
         }
+    }
+
+    [Serializable]
+    public class ConflictRecord
+    {
+        public string issueId;
+        public string combinationId;
+        public string modelVersion;
+        public string objectId;
+        public ReviewRole role;
+        public string assumptionKey;
+        public float measurement;
+        public float sessionSeconds;
+        public string message;
+        public bool feedbackRecorded;
     }
 
     [Serializable]
@@ -90,8 +101,10 @@ namespace XRApartment.Data
         public List<TimedEvent> promptEvents = new List<TimedEvent>();
         public List<TimedEvent> assistanceEvents = new List<TimedEvent>();
         public List<TimedEvent> comfortOrAbort = new List<TimedEvent>();
+        public List<ConflictRecord> conflicts = new List<ConflictRecord>();
         public string finalPreferenceCombinationId;
         public string finalTradeOffSummary;
+        public SessionOutcome sessionOutcome = SessionOutcome.None;
         public float totalSeconds;
 
         public BenchmarkFeedback FindFeedback(string combinationId)
@@ -104,18 +117,28 @@ namespace XRApartment.Data
             return null;
         }
 
-        /// Session Definition of Done (PRD 8.5): all benchmarks judged, preference chosen,
-        /// and the record stamped with the model version it was collected against.
+        /// All planned benchmarks must be resolved; all-skipped sessions have no preference.
         public bool IsComplete(int expectedBenchmarkCount)
         {
-            if (string.IsNullOrEmpty(sessionId) || string.IsNullOrEmpty(modelVersion)) return false;
-            if (string.IsNullOrEmpty(finalPreferenceCombinationId)) return false;
-            if (benchmarkFeedback.Count < expectedBenchmarkCount) return false;
+            if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(modelVersion)) return false;
+            if (expectedBenchmarkCount <= 0 || benchmarkFeedback == null ||
+                benchmarkFeedback.Count != expectedBenchmarkCount) return false;
+            var completedCount = 0;
+            var preferenceIsCompleted = false;
             for (int i = 0; i < benchmarkFeedback.Count; i++)
             {
                 if (benchmarkFeedback[i] == null || !benchmarkFeedback[i].HasAllRequiredFields()) return false;
+                if (benchmarkFeedback[i].taskOutcome == TaskOutcome.Completed)
+                {
+                    completedCount++;
+                    if (benchmarkFeedback[i].combinationId == finalPreferenceCombinationId)
+                        preferenceIsCompleted = true;
+                }
             }
-            return true;
+            if (completedCount == 0) return sessionOutcome == SessionOutcome.Incomplete;
+            return preferenceIsCompleted && !string.IsNullOrWhiteSpace(finalTradeOffSummary) &&
+                sessionOutcome == (completedCount == expectedBenchmarkCount
+                    ? SessionOutcome.Completed : SessionOutcome.Incomplete);
         }
     }
 }

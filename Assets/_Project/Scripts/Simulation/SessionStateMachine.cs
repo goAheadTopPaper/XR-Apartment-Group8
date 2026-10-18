@@ -44,17 +44,17 @@ namespace XRApartment.Simulation
 
             if (trigger == SessionTrigger.ExitRequested)
             {
-                if (Current == SessionState.Finished)
+                if (Current == SessionState.Finished || Current == SessionState.Exited)
                 {
                     LastRejection = "session already finished";
                     return false;
                 }
-                return Move(SessionState.Finished, trigger);
+                return Move(SessionState.Exited, trigger);
             }
 
             if (trigger == SessionTrigger.PauseRequested)
             {
-                if (Current == SessionState.Paused || Current == SessionState.Finished)
+                if (Current == SessionState.Paused || Current == SessionState.Finished || Current == SessionState.Exited)
                 {
                     LastRejection = "cannot pause from " + Current;
                     return false;
@@ -73,7 +73,7 @@ namespace XRApartment.Simulation
                 return Move(StateBeforePause, trigger);
             }
 
-            if (Current == SessionState.Paused || Current == SessionState.Finished)
+            if (Current == SessionState.Paused || Current == SessionState.Finished || Current == SessionState.Exited)
             {
                 LastRejection = "session is " + Current;
                 return false;
