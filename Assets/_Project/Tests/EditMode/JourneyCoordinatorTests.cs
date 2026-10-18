@@ -119,6 +119,20 @@ namespace XRApartment.Tests
         }
 
         [Test]
+        public void PendingSkipReason_IsAvailableOnlyWhileSkippedFeedbackIsPending()
+        {
+            var core = ReadyCore();
+            Start(core, "B1");
+            var skipped = core.Submit(Command(JourneyCommandType.SkipChallenge, reason: "  comfort stop  "));
+
+            Assert.IsTrue(skipped.Accepted, skipped.Message);
+            Assert.AreEqual("comfort stop", core.PendingSkipReason);
+
+            core.Submit(Command(JourneyCommandType.RequestExit, reason: "participant ended session"));
+            Assert.IsNull(core.PendingSkipReason);
+        }
+
+        [Test]
         public void ValidFeedbackTurnsConflictAmberBeforeFailedSave_AndSafetyStaysSeparate()
         {
             var core = ReadyCore();

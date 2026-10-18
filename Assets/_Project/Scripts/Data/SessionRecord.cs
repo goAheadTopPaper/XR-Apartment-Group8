@@ -29,7 +29,7 @@ namespace XRApartment.Data
         public string shortExplanation;
         public string outcomeReason;
 
-        /// FR-07 acceptance: every combination-level judgement field must be present.
+        /// FR-07 acceptance: completed tasks require the four judgement fields; skipped tasks require a reason.
         public bool HasAllRequiredFields()
         {
             using (var missing = MissingRequiredFields().GetEnumerator())

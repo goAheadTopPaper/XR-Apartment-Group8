@@ -254,7 +254,7 @@ PROJ="D:/codeWork/XR-Apartment-Group8"
 - 保留 Hzc 的数据层、纯逻辑会话状态机/动作链、运动学门体/抽屉、F2/F3/F4 代理、B1/B2/B3 注册表、可抓取锅/杯与世界空间菜单。**现有冰箱代理尚未符合 PRD Final §6.2**：F2 应为大型单开门（现为上下两扇门），F3 应为左右双开门（现带下抽屉），F4 应为上部双门加一个下抽屉（现有两个下抽屉）。P0 优先修 F2，F3/F4 属 P1。
 - 迁移保持 Unity 2022.3.62f3、Built-in、XRI 3.5 和 Windows64；手模型/动画适配到项目自己的 XRI Rig，没有引入 mzh 的 Unity 6/URP 工程配置、PD 物理跟随或 FixedJoint 抓取。
 - 天空/光照已按 mzh 的暖日光样式重建，使用 Linear、固定 ACES/Bloom 和本项目重新生成的烘焙数据；不复用 Unity 6 的 LightingData/APV。
-- 几何冲突检测、Yellow→Amber 设计提示、独立 Red 安全提示、反馈 UI、本地记录写盘仍未实现。逻辑测试和编辑器场景检查不能替代 Quest 3 + Quest Link 的端到端验收。
+- 几何冲突检测、Yellow→Amber 设计提示、独立 Red 安全提示仍未实现。本地 CSV 存储已提供 `ISessionStore` 实现，支持逐用户记录、检查点替换与读回验证；正式流程接线与反馈 UI 联调待完成，见 [LocalCsvStorage](Docs/LocalCsvStorage.md)。逻辑测试和编辑器场景检查不能替代 Quest 3 + Quest Link 的端到端验收。
 
 ### 下一步（对齐 PRD Final §16 里程碑）
 

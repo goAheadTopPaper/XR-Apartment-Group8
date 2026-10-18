@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7044460626083115062}
   - component: {fileID: 3553455207414407263}
   - component: {fileID: 7449685045090408781}
+  - component: {fileID: 9110384260132700001}
   m_Layer: 0
   m_Name: PREF_Core_PlayValidation
   m_TagString: Untagged
@@ -91,7 +92,7 @@ MonoBehaviour:
   sceneAdapter: {fileID: 959318340797206689}
   feedbackAdapter: {fileID: 3430540248147533412}
   storageAdapter: {fileID: 7044460626083115062}
-  viewAdapter: {fileID: 3553455207414407263}
+  viewAdapter: {fileID: 9110384260132700001}
   conflictSource: {fileID: 0}
   safetySource: {fileID: 0}
   operationTimeoutSeconds: 10
@@ -140,7 +141,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 753053518246743316}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6031c0c4a34d4b748e4c891e6336f5aa, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b56ce125b3c4c8caae38108dbeb9116, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7044460626083115062
@@ -168,9 +169,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 683c05aaa36041c193ab5a25ed334422, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  feedbackSubmittedByDedicatedView: 1
+  m_Name:
+  m_EditorClassIdentifier:
   host: {fileID: 335612631384319044}
+--- !u!114 &9110384260132700001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753053518246743316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c2f3d9d2f84440ba7d695a594f386c1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  host: {fileID: 335612631384319044}
+  fallbackView: {fileID: 3553455207414407263}
+  distanceFromOrigin: 1.6
+  canvasSize: {x: 1000, y: 950}
 --- !u!114 &7449685045090408781
 MonoBehaviour:
   m_ObjectHideFlags: 0

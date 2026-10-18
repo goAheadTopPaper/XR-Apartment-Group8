@@ -6,7 +6,8 @@
     "XRApartment.Simulation",
     "Unity.XR.Interaction.Toolkit",
     "Unity.XR.CoreUtils",
-    "UnityEngine.UI"
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

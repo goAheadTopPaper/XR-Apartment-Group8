@@ -410,6 +410,8 @@ UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反�
 
 ## 7. 本地保存接口与终态
 
+本地 CSV 实现约定（2026-10-18，FR-10，不改变公共签名）：`Runtime/Storage/CsvSessionStore` 实现现有 `ISessionStore`，`LocalCsvStorageAdapter` 提供 Unity 组件接入。默认文件为 `Application.persistentDataPath/ReviewRecords/sessions.csv`。每位评审者每次新会话生成新的匿名 `sessionId`，增加一行；同一会话的逐方案反馈、暂停、最终确认及重试更新同一行，避免把检查点重复计为用户提交。CSV 包含可读摘要和完整 `SessionRecord` 的 JSON 单元格，后者用于无损恢复；没有独立 JSON 文件。UTF-8 BOM、标准 CSV 引号转义保留中文和多行文字。实现同步串行保存，在 Unity 主线程调用/回调；同目录临时文件落盘验证后原子替换，最终文件再次读回匹配才返回成功。文件锁定、格式损坏、写入或验证失败返回 `OperationFailed`，不覆盖坏文件、不自动另存绕过错误。共享 Scene/核心 Prefab 的正式接线仍由场景集成人完成，Mock 不会自动替换。
+
 `ISessionStore.Save(requestId, record, completed)` 接收 Core 制作的独立 `SessionRecord` 副本，回调 `SaveResult` 包含相同 `RequestId`、写入是否成功、读回是否验证、存储位置和错误码。`TryRead(sessionId, completed)` 由 Storage 工作包正式实现，返回 `ReadResult`。格式为内部选择；不得要求账号或云端，不保存音视频或身份。Core 维护现有 `SessionRecord` 的公共字段：新增 `BenchmarkFeedback.shortExplanation`、`SessionRecord.sessionOutcome` 与 `SessionRecord.conflicts`，逐方案结果/原因复用现有 `BenchmarkFeedback.taskOutcome`/`outcomeReason`。Feedback/Storage 审查字段含义，在独立文件实现正式校验与序列化。现有 `HasAllRequiredFields()` 不能替代 Feedback 模块的正式字段校验。
 
 - 每次逐方案反馈、暂停/安全退出及最终确认后请求保存。对同一 session ID 临时写入、完成替换并读回验证，避免半写入冒充成功。同一时刻只有一个当前有效保存请求，旧 `RequestId` 回调无效。安全退出可使尚未返回的旧请求失效；Storage 必须按 `RequestId` 串行提交同一 session 的替换，保证较新的退出快照最终生效，不建立通用多版本框架。
