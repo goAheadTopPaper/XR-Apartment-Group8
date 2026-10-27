@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
 using XRApartment.Runtime;
+using XRApartment.Runtime.Core;
 
 namespace XRApartment.Tests
 {
@@ -40,7 +41,11 @@ namespace XRApartment.Tests
             var enabledScenes = EditorBuildSettings.scenes.Where(item => item.enabled).ToArray();
             Assert.AreEqual(1, enabledScenes.Length);
             Assert.AreEqual(ScenePath, enabledScenes[0].path);
-            Assert.AreEqual(1, Components<BenchmarkSlotMarker>().Length);
+            Assert.AreEqual(0, Components<BenchmarkSlotMarker>().Length,
+                "Benchmarks are now instantiated into the runtime slot in Play.");
+            Assert.AreEqual(1, Components<JourneyRuntimeHost>().Length);
+            Assert.AreEqual(1, Components<RuntimeBenchmarkAdapter>().Length);
+            Assert.AreEqual(1, Components<TaskEvidenceBridge>().Length);
             Assert.AreEqual(1, Components<KitchenMenuController>().Length);
             Assert.AreEqual(1, Components<Camera>().Count(camera => camera.CompareTag("MainCamera")));
         }
@@ -134,7 +139,14 @@ namespace XRApartment.Tests
                     }
                     var grab = prop.GetComponent<XRGrabInteractable>();
                     if (grab == null) continue;
-                    Assert.IsNotNull(prop.GetComponent<Rigidbody>(), path);
+                    var body = prop.GetComponent<Rigidbody>();
+                    Assert.IsNotNull(body, path);
+                    Assert.IsFalse(body.isKinematic, path);
+                    Assert.AreEqual(XRBaseInteractable.MovementType.Instantaneous, grab.movementType,
+                        path + " uses the final pose checked by the collision-constrained transformer");
+                    Assert.IsNotNull(grab.GetComponent<CollisionConstrainedGrabTransformer>(),
+                        path + " must constrain held movement rather than follow through obstacles");
+                    Assert.AreNotEqual(CollisionDetectionMode.Discrete, body.collisionDetectionMode, path);
                     Assert.IsTrue(grab.useDynamicAttach, path);
                     Assert.IsNotEmpty(grab.colliders, path);
                     Assert.IsTrue(grab.colliders.All(collider => collider != null && collider.enabled

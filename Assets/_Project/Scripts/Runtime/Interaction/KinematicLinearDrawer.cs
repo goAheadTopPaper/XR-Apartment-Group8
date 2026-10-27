@@ -52,6 +52,13 @@ namespace XRApartment.Runtime
             openTarget = open;
         }
 
+        public void SetOpenImmediate(bool open)
+        {
+            openTarget = open;
+            progress = open ? 1.0 : 0.0;
+            Apply();
+        }
+
         private void Update()
         {
             var target = openTarget ? 1.0 : 0.0;

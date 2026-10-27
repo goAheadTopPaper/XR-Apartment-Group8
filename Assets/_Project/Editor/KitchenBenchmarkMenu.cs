@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using XRApartment.Data;
 using XRApartment.Runtime;
+using XRApartment.Runtime.Core;
+using XRApartment.Simulation;
 
 namespace XRApartment.EditorTools
 {
@@ -31,6 +33,22 @@ namespace XRApartment.EditorTools
         public static void ApplyBenchmark(string benchmarkId)
         {
             var scene = SceneManager.GetActiveScene();
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                var host = root.GetComponentInChildren<JourneyRuntimeHost>(true);
+                if (host == null) continue;
+                if (!Application.isPlaying)
+                {
+                    Debug.Log("[KITCHEN] This scene uses the runtime review journey. Enter Play, complete setup and orientation, then choose B1/B2 in Explore. Other fridge prefabs remain available for authoring.");
+                    return;
+                }
+                var result = host.Submit(new JourneyCommand
+                {
+                    Type = JourneyCommandType.ShowBenchmark, BenchmarkId = benchmarkId
+                });
+                if (!result.Accepted) Debug.LogWarning($"[KITCHEN] Cannot preview {benchmarkId}: {result.Message}");
+                return;
+            }
             BenchmarkSlotMarker marker = null;
             foreach (var root in scene.GetRootGameObjects())
             {

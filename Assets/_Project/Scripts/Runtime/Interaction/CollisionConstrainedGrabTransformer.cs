@@ -53,8 +53,13 @@ namespace XRApartment.Runtime
                 updatePhase != XRInteractionUpdateOrder.UpdatePhase.OnBeforeRender)) return;
             RequestedPose = targetPose;
             using (SweepMarker.Auto())
+            {
+                // XRI applies instantaneous poses through Transform. A second held prop
+                // must query the first prop's accepted pose, not its previous physics pose.
+                Physics.SyncTransforms();
                 accepted = sweep.Resolve(accepted, targetPose, rig, skin,
                     profile.GrabRotationStepDegrees, profile.GrabRotationIterations);
+            }
             IsBlocked = sweep.QuerySaturated || Vector3.SqrMagnitude(accepted.position - targetPose.position) > .000001f ||
                         Quaternion.Angle(accepted.rotation, targetPose.rotation) > .5f;
             targetPose = accepted;

@@ -8,6 +8,9 @@
 | --- | --- | --- |
 | `Scripts/Data/` | benchmark、语义角色、参数登记、手部/水体配置、匿名反馈 schema | `BenchmarkRegistry`、`ModelAssumptions`、`SessionRecord` |
 | `Scripts/Simulation/` | 不引用 UnityEngine 的状态机、动作链和数学算法 | `SessionStateMachine`、`ChallengeTaskTracker`、`MotionKinematics`、`WaterVolume`、`CylindricalLiquid` |
+| `Scripts/Runtime/Core/` | 主旅程接线、运行时方案切换与实际任务证据 | `JourneyRuntimeHost`、`RuntimeBenchmarkAdapter`、`TaskEvidenceBridge` |
+| `Scripts/Runtime/Feedback/`、`Storage/`、`UI/` | 正式反馈、匿名 CSV 写盘与世界空间引导/比较/恢复界面 | `FeedbackPortAdapter`、`LocalCsvStorageAdapter`、`JourneyWorldSpaceView` |
+| `Scripts/Runtime/Debug/` | 联调用替身和调试视图，保留测试用途 | `MockFeedbackAdapter`、`MockStorageAdapter`、`JourneyDebugUI` |
 | `Scripts/Runtime/Review/` | 场景语义标记、冰箱方案槽位、世界空间菜单 | `ReviewElement`、`BenchmarkSlotMarker`、`KitchenMenuController` |
 | `Scripts/Runtime/Interaction/` | 门/抽屉开合、手部呈现、手掌接触与持物防穿透 | `KinematicSwingDoor`、`KinematicLinearDrawer`、`ControllerHandPresentation`、`CollisionConstrainedGrabTransformer` |
 | `Scripts/Runtime/Water/` | 龙头、液体容器、水量流转及视觉表现 | `WaterTap`、`LiquidContainer`、`KitchenWaterSystem`、`LiquidStream`、`LiquidSurface` |
@@ -31,7 +34,8 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 
 | 任务 | 入口 | 作用范围 |
 | --- | --- | --- |
-| 切换 B1/B2/B3 | `KitchenBenchmarkMenu`，`XR Apartment/Benchmark/Apply …` | 替换冰箱实例和围板；三方案共用环境 |
+| 正式切换 B1/B2 | `JourneyRuntimeHost` 的 Show/Start 命令与 `RuntimeBenchmarkAdapter` | 复用主线的任务计划、稳定 ID 和反馈/保存状态；只替换方案实例 |
+| 原有制作菜单 | `KitchenBenchmarkMenu`，`XR Apartment/Benchmark/Apply …` | 静态预览入口；含 Core 的评审场景须遵守旅程状态，不直接替换任务冰箱 |
 | 调整抓取、防穿透、释放速度 | `KitchenGrabAuthoring.ConfigureProp` 与 `SET_HandInteraction` | 一处维护动态接触点、碰撞体列表、扫掠、平滑及释放配置；食品和水容器都调用它 |
 | 调整食品和餐具 | `KitchenPropsAuthoring`，`XR Apartment/Props/Configure Kitchen Dressing` | 精选模型、材质、归一化尺寸与公共布置；重建会恢复默认摆放 |
 | 调整容器/水站 | `KitchenWaterAuthoring`，`XR Apartment/Water/Configure Kitchen Water` | 水材质、锅杯、龙头和接水盆；重建会恢复登记的水体默认配置 |
@@ -47,7 +51,7 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 - 门体和抽屉共享 `MotionKinematics`，各自保留小型运动适配；禁用时只移除自己的监听，不清除其他模块的监听。
 - `KinematicPalmSolver` 处理静态表面的手掌球，`HeldPropSweep` 处理整个持物的平移与旋转。两者碰撞规则不同，分别维护。
 - `ReviewElement`、`BenchmarkSlotMarker` 是场景语义入口；状态机和反馈 schema 仍有 PRD 职责，不能按“当前未接 UI”删除。
-- 手部/水体参数来自登记表；不把几何尺寸分散回运行时脚本。三种 benchmark 使用同一动作链和交互规则。
+- 手部/水体参数来自登记表；不把几何尺寸分散回运行时脚本。当前正式旅程为 B1/B2，共用动作链、交互约束与环境；B3 的代理资源保留，不自动进入主线的 P0 会话计划。
 
 ## 验证与范围
 
@@ -64,3 +68,13 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 诊断文件位于忽略入库的 `Logs/CodeCleanup/`。这些编辑器与组件 API 检查不代表完整需求验收；Quest Link 手感与头显性能仍按 PRD 单独验证。
 
 抓取、水体、美术迁移的详细限制分别见 [HeldPropCollision.md](HeldPropCollision.md)、[KitchenWaterAndSky.md](KitchenWaterAndSky.md)、[MzhKitchenMigration.md](MzhKitchenMigration.md) 和 [KitchenDressing.md](KitchenDressing.md)。
+
+## 与最新 main 的整合
+
+2026-10-27 从 `origin/main@3a5c009` 整合到 `feature/hzc@069aa86` 的工作区。保留主线评审场景、Core/Feedback/UI/Storage 接线与新会话字段；新增四个 UI 作者脚本移入 `_Project/Editor`，保留原 GUID。已有手部、天空、水体、美术和 11 件持物约束继续使用。
+
+主线曾通过 VelocityTracking 改善持物碰撞；本分支继续由 `CollisionConstrainedGrabTransformer` 检查最终抓取姿态。测试验证实际不可穿透与释放后的刚体恢复，不把持物时的刚体模式当作需求。反馈记录采用主线现行契约：跳过须有原因，安全退出是会话 Aborted，不把中止任务算成已完成反馈。
+
+整合验证：EditMode 133/133、PlayMode 28/28 通过，包含主线完整流程、反馈/CSV、已有防穿透回归，以及新增双持物交叉、XRI 取物/重置和编辑器预览状态保护。双持物测试使用实际道具碰撞体，不以刚体模式或碰撞回调次数代替不可穿透结果；取物测试固定非目标物品以单独验证目标的真实 XRI 路径，仍不代表完整人工操作验收。
+
+双手持物时，扫掠前同步 Transform 到物理查询，避免同帧后处理的物体看到先处理物体的旧位置。作者菜单在含 Core 的场景中经 Host 提交 ShowBenchmark；Challenge 内拒绝预览，不销毁当前任务目标。主线场景、Rig、冰箱资产及所有美术保持原引用，未重新烘焙。当前 Mac 只安装 Mac Build Support，Windows Player 与本次整合的 Quest Link 体验仍需在 Windows 侧验证。

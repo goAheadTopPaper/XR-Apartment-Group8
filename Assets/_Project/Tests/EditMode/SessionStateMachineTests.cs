@@ -77,7 +77,7 @@ namespace XRApartment.Tests
         {
             var sm = new SessionStateMachine(3);
             Assert.IsTrue(sm.TryAdvance(SessionTrigger.ExitRequested));
-            Assert.AreEqual(SessionState.Finished, sm.Current);
+            Assert.AreEqual(SessionState.Exited, sm.Current);
             Assert.IsFalse(sm.TryAdvance(SessionTrigger.ExitRequested));
         }
 
