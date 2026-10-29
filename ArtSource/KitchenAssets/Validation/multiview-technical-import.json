@@ -1,0 +1,18 @@
+{
+  "job_id": "cfe4c1e5-af07-4954-80fa-c30853880588",
+  "source_sha256": "1c08c9b69e1b3b62048f80690738173e6231520248bacc3a1740b88a8d4e923e",
+  "unity_import": "passed",
+  "visual_review": "rejected_wrinkled_facade_not_placed_in_kitchen",
+  "triangles": 8000,
+  "renderers": 1,
+  "colliders": 1,
+  "size_unity_xyz": {
+    "x": 0.6099853515625,
+    "y": 1.0003339052200317,
+    "z": 0.6468756198883057
+  },
+  "cloud_generated": true,
+  "diagnostic_fixture": false,
+  "temporary_import_removed": true,
+  "provenance_enriched_from": "ArtSource/KitchenAssets/cabinet_multiview/v001/inspection/unity_asset.json"
+}

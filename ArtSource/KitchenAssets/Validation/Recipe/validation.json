@@ -1,0 +1,114 @@
+{
+  "date_local": "2026-10-28",
+  "unity": "2022.3.62f3",
+  "platform": "OSXEditor",
+  "build_target": "StandaloneWindows64",
+  "git_baseline": "2975cd61969c72242bbd7b0c2b7c3a1c8bd0c793",
+  "branch": "feature/hzc",
+  "committed": false,
+  "pushed": false,
+  "tests": {
+    "editmode": {
+      "passed": 145,
+      "failed": 0,
+      "skipped": 0,
+      "result": "Passed",
+      "duration_seconds": 0.285693,
+      "completed_utc": "2026-10-28 14:58:51Z",
+      "source": "Logs/TomatoEggRecipe/editmode-regression.xml",
+      "xml_sha256": "29e9b68bc0b72364e48decfdf234b85b020b019b3294c71e5c35bd17f9360de6"
+    },
+    "playmode": {
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0,
+      "result": "Passed",
+      "duration_seconds": 143.496251,
+      "completed_utc": "2026-10-28 15:09:31Z",
+      "source": "Logs/TomatoEggRecipe/playmode-regression.xml",
+      "xml_sha256": "f0c674ead7c8c4c77f92ed993f27ef7f6061d9fc1a7e801498cafcd445e674c9"
+    }
+  },
+  "recipe_play_tests": {
+    "passed": 5,
+    "failed": 0,
+    "fixture": "Assets/_Project/Tests/PlayMode/TomatoEggRecipePlayTests.cs"
+  },
+  "scenario": {
+    "actions": "OpenFridge, TakeTomato, SliceTomato, DiceTomato, TakeEgg, TakeBowl, CrackEgg, BeatEgg, TurnOnStove, PlacePan, PourEgg, ScrambleEgg, AddTomato, StirFry",
+    "completed": true,
+    "eggMl": 50.000003814697266,
+    "tomatoGrams": 110.22830963134766,
+    "scrambledMetres": 3.466312885284424,
+    "stirFryMetres": 2.4586691856384277,
+    "capturedPieces": 14,
+    "presentationMeanMs": 0.011047657142857142,
+    "presentationMaxMs": 0.012541,
+    "presentationSamples": 70
+  },
+  "tomato_geometry": {
+    "source": "ArtSource/KitchenAssets/tomato/v002/prepared_recipe/unity_asset.json",
+    "closed_slices": 4,
+    "closed_diced_pieces": 16,
+    "max_parent_volume_relative_error": 5.504775760399804e-09,
+    "source_game_glb_sha256": "42d30b6054b5175c1641c961e36386c2acd1773b4db0abeacd6b8260e31b2c10",
+    "prepared_game_triangles": 4000
+  },
+  "model_provenance": "ArtSource/KitchenAssets/Recipe/v001/model_provenance.json",
+  "protected_review_assets": {
+    "checked": 19,
+    "unchanged": true,
+    "sha256": {
+      "Assets/_Project/Scenes/SCN_Kitchen_Review.unity": "a8790858d5bd7ba808cc3c244295a31a6916899dfc06d34e55d8abf96a1d2dc0",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review.unity.meta": "966fc50d46cda29896b570b5a92e15a9c8c569244c5d189b075022a04ee267da",
+      "Assets/_Project/Prefabs/PREF_Lighting_KitchenDaylight.prefab": "429952a23be574c8da0ca33cd24b654622c978880e32e1cb626d5ea0d5649fba",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/LightingData.asset.meta": "2f30f8ef50f4bb66c032bbdc8581003749aa75d568501afe9710cb842fe0bf59",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/Lightmap-0_comp_light.exr": "3c2877647ba2515c957851b1ceb2aa28ce4bfe7c4e7db3c0f8568f263153fcc7",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/Lightmap-0_comp_dir.png.meta": "2fca52de599484bf8eeb893d4f5cf22025c5833c6481dd272241f5f129949905",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/Lightmap-0_comp_shadowmask.png.meta": "dc0ee8253dae1287de91b6743253a2bc60bd970864fe0ce121181e16fb8d05dc",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/ReflectionProbe-2.exr.meta": "a6b593f9441722705f879d0c9ba9be4a8c5c92c086f42469eee19915a751ce66",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/Lightmap-0_comp_light.exr.meta": "47cfb6e47e7ba78ea82163cf2816311e9abb79f8f79286a547e5956c1a180a26",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/Lightmap-0_comp_dir.png": "1658415d68cc6daa300af5bd6a67f9d59ee79626974dcb839a5d0292798d8b93",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/ReflectionProbe-0.exr": "a28c4e1551622fc1103c57f70024f268a00096f5049e2a8c06b9180cdb63fe06",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/ReflectionProbe-1.exr": "62701c2c886bd6acf9121280bdee07ae7960f18c86bec6ab7f1f8541ed9a10b5",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/LightingData.asset": "59c45bdb55062ad3840de5f4ab75a442b93b0df7cdcf875642049fa1ae7fd4eb",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/ReflectionProbe-2.exr": "f627d80d9fef5ffd35f252710a53aa99912af6cb91c23545b340080cd2ba4e5c",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/Lightmap-0_comp_shadowmask.png": "ebb3b2b7048b03b880b6b18d1e491cc304a9e8fa6b76ad13212bac2f64f76342",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/ReflectionProbe-0.exr.meta": "ea4fd472eaaf2eee4fe402dbab121913e141fac1292c1693c9360581eb39b2bc",
+      "Assets/_Project/Scenes/SCN_Kitchen_Review/ReflectionProbe-1.exr.meta": "76999b1ee4454f18a8503a331cba366b0bade637328f588d3ad9fc1bd6a03fdd",
+      "Assets/_Project/Art/Lighting/MAT_Sky_KitchenDaylight.mat": "8c1cd61354c634673f5194b904f73f7c786e338c1d9ac8e760fe24c5a7e2031f",
+      "Assets/_Project/Art/Lighting/MAT_Sky_KitchenDaylight.mat.meta": "8c6e275360315cf122cd720ae9095cf3a47dcd7192de7de28e303cce7bc3f016"
+    }
+  },
+  "previews": {
+    "fridge-open.png": {
+      "sha256": "42ec49de5fb7cf282265bb75c77e6273c4775a015e248fa1844f3fc2dd0879de",
+      "source": "Logs/TomatoEggRecipe/fridge-open.png",
+      "edited": false
+    },
+    "tomato-diced.png": {
+      "sha256": "0e5bc90da2c4a95b61413d3a2c0ab9e353a24785891a427267592bc47fe87aa0",
+      "source": "Logs/TomatoEggRecipe/tomato-diced.png",
+      "edited": false
+    },
+    "tomato-egg-finished.png": {
+      "sha256": "d116a4f0dddc1697ade0b4879670b7cc6a53c74c4f3b2e39dd0fc1d6533545e1",
+      "source": "Logs/TomatoEggRecipe/tomato-egg-finished.png",
+      "edited": false
+    },
+    "kitchen-recipe-complete.png": {
+      "sha256": "746a0b685daf67aafbad01b6f2d33691eb25d3fdd69dc29f521bc0f7016d77f6",
+      "source": "Logs/TomatoEggRecipe/kitchen-recipe-complete.png",
+      "edited": false
+    }
+  },
+  "profiling_scope": "70 rendered Editor frames, KitchenPanContents presentation marker only; excludes whole-frame CPU/GPU/XR cost",
+  "limits": [
+    "Prepared two-stage cuts, not arbitrary runtime mesh cutting",
+    "Finite-volume egg and pooled cooked-food presentation, not multiphase fluid or thermal simulation",
+    "14 of 16 diced pieces entered the pan in this run; only 110.22831g was counted",
+    "Windows Player build and Quest Link controller feel / frame rate not tested",
+    "No new Comfy Cloud jobs for this recipe; mechanical models are locally authored"
+  ],
+  "diagnostics": "Mac has no active OpenXR runtime. Additive test fixtures can report duplicate EventSystem / AudioListener messages; the authored scene has one EventSystem and one rig. Tests passed; this report does not claim a clean native XR console."
+}

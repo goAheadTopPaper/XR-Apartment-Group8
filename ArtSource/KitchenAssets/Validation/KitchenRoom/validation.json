@@ -1,0 +1,86 @@
+{
+  "date_local": "2026-10-29",
+  "unity": "2022.3.62f3",
+  "platform": "OSXEditor",
+  "build_target": "StandaloneWindows64",
+  "additional_actual_cloud_jobs": 8,
+  "actual_cloud_jobs_total": 20,
+  "credits_consumed": null,
+  "editmode": {
+    "passed": 145,
+    "failed": 0,
+    "skipped": 0
+  },
+  "playmode": {
+    "passed": 49,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scenario": {
+    "actions": "OpenFridge, TakeTomato, SliceTomato, DiceTomato, TakeEgg, TakeBowl, CrackEgg, BeatEgg, TurnOnStove, PlacePan, PourEgg, ScrambleEgg, AddTomato, StirFry",
+    "completed": true,
+    "eggMl": 50.0,
+    "tomatoGrams": 120.0,
+    "scrambledMetres": 3.3119139671325684,
+    "stirFryMetres": 2.3639235496520996,
+    "capturedPieces": 16,
+    "presentationMeanMs": 0.03834944285714287,
+    "presentationMaxMs": 0.078708,
+    "presentationSamples": 70
+  },
+  "water": {
+    "beforeMl": 204.82684326171875,
+    "afterMl": 341.3780517578125,
+    "filledWhileHeld": true,
+    "cupPosition": {
+      "x": -4.710000038146973,
+      "y": 1.2649999856948853,
+      "z": 1.1799999475479126
+    },
+    "outletPosition": {
+      "x": -4.710000038146973,
+      "y": 1.3650000095367432,
+      "z": 1.1799999475479126
+    }
+  },
+  "flame_validation": [
+    "actual XRI stove selection lights empty burner",
+    "particles active with no pan/food",
+    "switch off clears particles immediately",
+    "disabled heat source extinguishes flame",
+    "station reset extinguishes flame"
+  ],
+  "layout_validation": "All active grabbables in cooking scene inside the kitchen room, supported, with constrained grab transformer. Real XRI knife, eggs, whisk, pan, bowl and spatula used through full recipe.",
+  "protected_review_files_checked": 19,
+  "protected_review_files_changed": [],
+  "scope": "Cooking scene only. Shared original water prefabs, review scene/lighting, Packages, XR, Build Settings unchanged.",
+  "timing_regression": {
+    "reproduction": "Time.captureDeltaTime=0.5, maximumDeltaTime=0.5; original tests waited only FixedUpdate while XRI consumes Dynamic/OnBeforeRender",
+    "before": {
+      "passed": 0,
+      "failed": 2
+    },
+    "after": {
+      "passed": 2,
+      "failed": 0
+    },
+    "fix": "Yield a rendered input update before each physics sample in two existing tests. Assertions and runtime constraints unchanged. Temporary reproduction fixture archived in ignored logs."
+  },
+  "fridge_quality": "Generated warped casing rejected; locally rebuilt hard-surface casing and liner. Generated door retained with cleanup.",
+  "windows_player": "not_tested",
+  "quest_link": "not_tested",
+  "performance_note": "Local cooking presentation CPU sample only; not a full-frame or VR frame-rate benchmark.",
+  "evidence_sha256": {
+    "kitchen-room-ready.png": "2578e8cc22396eab321307257ab7f18c48c23a6e57093beaaf0a8f9807bcf018",
+    "editmode-results.xml": "bd85abf7bb1bf8b3971012138f7611fa413e7aaf9e3adf881fc8b515df2cfbbe",
+    "playmode-results.xml": "581a97192b3f5dab1ea523982a1fe8037a6beed3e1d2ae1f52d354d3ebc1d1c5",
+    "recipe-scenario.json": "21044a65877fbb5744049ae888dfb2c412c06eac179dc1326e3ce584200b5d21",
+    "cloud-cookware-complete.png": "c13a865b573d000ca40093d8907bdccad172f1635356939ea32ab2aa9a803d1d",
+    "tomato-egg-finished.png": "e2775aed1c6dd16aab7eacc357c396a51bb875a7f0d745a68e2a1c79414830fb",
+    "kitchen-washing.png": "d95aded673cd22061a2ccfedeaf952e3058ce1cec438798f121c49fa52da27f6",
+    "gas-flame.png": "d04295da9bca2a5f754c0bae138babaec34399361341dbf90161c737d09b19ed",
+    "kitchen-recipe-complete.png": "0c4321ff4a7d04323b9d56514b4fc2aabcce8d2581f6a4d953bacde5fb994acd",
+    "fridge-open.png": "3a855ce947bd127c8648dce1428a5391066ea59798fd9bf08bbde8503c246c12",
+    "water-scenario.json": "8d49afb7586f0b5038c3e6a785a2a873599ed7abcf428a4cafebcbb8eccf00ff"
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "actions": "OpenFridge, TakeTomato, SliceTomato, DiceTomato, TakeEgg, TakeBowl, CrackEgg, BeatEgg, TurnOnStove, PlacePan, PourEgg, ScrambleEgg, AddTomato, StirFry",
+    "completed": true,
+    "eggMl": 50.0,
+    "tomatoGrams": 120.0,
+    "scrambledMetres": 3.3119139671325685,
+    "stirFryMetres": 2.3639235496520998,
+    "capturedPieces": 16,
+    "presentationMeanMs": 0.03834944285714287,
+    "presentationMaxMs": 0.078708,
+    "presentationSamples": 70
+}

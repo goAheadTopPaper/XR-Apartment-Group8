@@ -128,7 +128,7 @@ namespace XRApartment.Tests
             yield return null;
             manager.SelectEnter((IXRSelectInteractor)hand, grab);
             hand.transform.position = origin + Vector3.down * .4f;
-            for (var frame = 0; frame < 10; frame++) yield return new WaitForFixedUpdate();
+            for (var frame = 0; frame < 10; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
             var guard = grab.GetComponent<CollisionConstrainedGrabTransformer>();
             Assert.IsTrue(guard.IsBlocked);
             var presented = guard.ResolveHand(new Pose(hand.transform.position, hand.transform.rotation));
@@ -136,15 +136,15 @@ namespace XRApartment.Tests
             Assert.That(Vector3.Distance(presented.position, hand.transform.position), Is.GreaterThan(.1f));
 
             hand.transform.position = origin + Vector3.up * .4f;
-            for (var frame = 0; frame < 10; frame++) yield return new WaitForFixedUpdate();
+            for (var frame = 0; frame < 10; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
             Assert.IsFalse(guard.IsBlocked);
             Assert.That(grab.transform.position.y, Is.EqualTo(guard.RequestedPose.position.y).Within(.003f));
 
             hand.transform.position = origin + new Vector3(1.5f, -.4f, 0f);
-            for (var frame = 0; frame < 20; frame++) yield return new WaitForFixedUpdate();
+            for (var frame = 0; frame < 20; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
             Assert.That(grab.transform.position.y, Is.LessThan(table.bounds.min.y - .1f));
             hand.transform.position = origin + Vector3.down * .4f;
-            for (var frame = 0; frame < 10; frame++) yield return new WaitForFixedUpdate();
+            for (var frame = 0; frame < 10; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
             Assert.IsFalse(guard.IsBlocked);
             Assert.That(grab.transform.position.y, Is.EqualTo(guard.RequestedPose.position.y).Within(.003f));
         }

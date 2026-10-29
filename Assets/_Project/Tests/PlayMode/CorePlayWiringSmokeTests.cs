@@ -232,6 +232,9 @@ public class CorePlayWiringSmokeTests
                 {
                     // Both runtime fridges face the room towards negative world Z.
                     hand.transform.position = sourcePosition + Vector3.back * (.07f * frame);
+                    // XRI reads tracked poses in Dynamic/OnBeforeRender. A
+                    // fixed-step catch-up can otherwise skip every input sample.
+                    yield return null;
                     yield return new WaitForFixedUpdate();
                 }
                 hand.EndManualInteraction();
