@@ -410,3 +410,291 @@ MonoBehaviour:
     owner: Hzc
     status: Prototype assumption
     verification: Automated XRI push/rotation/release checks; Quest Link feel pending.
+  - key: cooking_mixingbowl_radius
+    valueMetres: 0.075
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_mixingbowl_bottom
+    valueMetres: 0.008
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_mixingbowl_height
+    valueMetres: 0.05
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fryingpan_radius
+    valueMetres: 0.105
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fryingpan_bottom
+    valueMetres: 0.008
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fryingpan_height
+    valueMetres: 0.025
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_tabletop_height
+    valueMetres: 0.957544
+    source: Optional cooking sandbox vessel geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_plate_span
+    valueMetres: 0.27006033
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_tomato_span
+    valueMetres: 0.07993697
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_carrot_span
+    valueMetres: 0.22008435
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_apple_span
+    valueMetres: 0.08504801
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_lemon_span
+    valueMetres: 0.085051276
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_egg_span
+    valueMetres: 0.06001903
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_knife_span
+    valueMetres: 0.30002713
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_character_height
+    valueMetres: 1.75
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_cabinet_width
+    valueMetres: 0.6
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_cabinet_depth
+    valueMetres: 0.6
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_cabinet_height
+    valueMetres: 1
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_width
+    valueMetres: 0.72
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_depth
+    valueMetres: 0.66
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_height
+    valueMetres: 1.81
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_shelf_lower
+    valueMetres: 1.009
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_shelf_upper
+    valueMetres: 1.329
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_spatula_length
+    valueMetres: 0.324
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_recipe_board_width
+    valueMetres: 0.42
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_recipe_board_depth
+    valueMetres: 0.34
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_center_x
+    valueMetres: -1.87
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_center_z
+    valueMetres: 1.98
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_tomatobowl_radius
+    valueMetres: 0.09
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_tomatobowl_bottom
+    valueMetres: 0.008
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_tomatobowl_height
+    valueMetres: 0.065
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_table_width
+    valueMetres: 2
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_table_depth
+    valueMetres: 1
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_counter_height
+    valueMetres: 1
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_counter_depth
+    valueMetres: 0.65
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_side_counter_height
+    valueMetres: 1.11
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_board_x
+    valueMetres: -3.68
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_board_z
+    valueMetres: 1.92
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_burner_x
+    valueMetres: -2.66
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_burner_z
+    valueMetres: 1.95
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_burner_support_height
+    valueMetres: 0.055
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_gas_flame_radius
+    valueMetres: 0.073
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_gas_flame_height
+    valueMetres: 0.035
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_water_station_x
+    valueMetres: -4.73
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_water_station_y
+    valueMetres: 1.115
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_water_station_z
+    valueMetres: 1.18
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_sink_outer_radius
+    valueMetres: 0.192
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_fridge_body_outer_depth
+    valueMetres: 0.673
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
