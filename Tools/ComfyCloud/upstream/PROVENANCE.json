@@ -1,0 +1,14 @@
+{
+  "upstream_repository": "Comfy-Org/workflow_templates",
+  "upstream_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62",
+  "templates": {
+    "3d_pixal3d_trellis2_image_to_model": {
+      "url": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/3c2199b9362457b12b9c60c6cc303501526ebd62/templates/3d_pixal3d_trellis2_image_to_model.json",
+      "sha256": "df8a1dc4dacac39ba036758f7b4bb7e57e556a607e5391b500e29effd95b2e5d"
+    },
+    "3d_pixal3d_multi_views": {
+      "url": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/3c2199b9362457b12b9c60c6cc303501526ebd62/templates/3d_pixal3d_multi_views.json",
+      "sha256": "6a6a42b5d6e40e758ded2cd6aa541281b5bf082a179816daf76466a370d9d252"
+    }
+  }
+}

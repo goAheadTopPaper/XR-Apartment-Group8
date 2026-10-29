@@ -1,0 +1,48 @@
+{
+  "job_id": "250c7fd4-3027-45cf-82a9-36e127847ec3",
+  "archive_sha256": "61d355b9841c1ca8b7075062383ffbe4645fa8d29bffb4cf3c128b983b12aa82",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_frying_pan/v001/master_glb_00001.glb",
+      "bytes": 11564156,
+      "sha256": "f2f34089eae907a1892cb6240a3bb9f4a5ef35847d89848e926303552475ba52",
+      "file": "kitchen_frying_pan/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_frying_pan/v001/basecolor_00001.png",
+      "bytes": 3119567,
+      "sha256": "cf437d4e15e5a599d3a27a79c30e127b158a7e2e6ff1b4a2a0ceab07ca423b13",
+      "file": "kitchen_frying_pan/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_frying_pan/v001/metallic_00001.png",
+      "bytes": 1045551,
+      "sha256": "608308c21e02d0a978b49d25adb6ba065a75b9641b4ea265deb1e76ba5e7b71e",
+      "file": "kitchen_frying_pan/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_frying_pan/v001/roughness_00001.png",
+      "bytes": 1452404,
+      "sha256": "2d03acb1d62c6216edaa86abe72551f71310b7e01bae1e80650073e75221f733",
+      "file": "kitchen_frying_pan/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_frying_pan/v001/normal_00001.png",
+      "bytes": 1685122,
+      "sha256": "c1e63864ca117bcf6223894d65d9ee3ac02ada6adc27b9b220006ccf70ca0352",
+      "file": "kitchen_frying_pan/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_frying_pan/v001/ao_00001.png",
+      "bytes": 498960,
+      "sha256": "f01ed30d8971c5e982e2bd6921b8b8191a91c6c4253800d67afe9baaee056a22",
+      "file": "kitchen_frying_pan/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_frying_pan/v001/render_preview_00001.png",
+      "bytes": 368641,
+      "sha256": "9c1d24adedd11d85efeb3378907e3b8bb754077182b6cdf64adfdc485f0af239",
+      "file": "kitchen_frying_pan/v001/download/cloud_render_preview.png"
+    }
+  }
+}

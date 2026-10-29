@@ -1,0 +1,48 @@
+{
+  "job_id": "710d788b-8850-4efb-bffe-5c3e78738b1a",
+  "archive_sha256": "3740a425e988a6cb1a9e1ee76a864e6f5462d798161ad2235caf6743678c755d",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_character/v001/master_glb_00001.glb",
+      "bytes": 13704576,
+      "sha256": "752dd41e9a81cd073caf509c6dee8bc39cca589338056646db4baff3b3841a49",
+      "file": "kitchen_character/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_character/v001/basecolor_00001.png",
+      "bytes": 3150686,
+      "sha256": "c7bbaa6d4b896c8c0a17f87e3ed729bbe93d96d8743119723b22442731261810",
+      "file": "kitchen_character/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_character/v001/metallic_00001.png",
+      "bytes": 1310742,
+      "sha256": "28f6e8ebe4b4a1c57b6c669597ffda7a70c9623e03bbea7d4846c95bd4ef3232",
+      "file": "kitchen_character/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_character/v001/roughness_00001.png",
+      "bytes": 1490224,
+      "sha256": "da9031d71c4f549f907572668573ccf4103262a02ce4b62adbaf0b6b1cb492ec",
+      "file": "kitchen_character/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_character/v001/normal_00001.png",
+      "bytes": 2710585,
+      "sha256": "ebe8ee17ea6d79d3930bd4bf20801ca701025fdca908bab31f5f5b1d8a214da5",
+      "file": "kitchen_character/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_character/v001/ao_00001.png",
+      "bytes": 669350,
+      "sha256": "0f9fb5a318755152c57d80c8094d325a4323d3814a410897ebd8005d758a7f9c",
+      "file": "kitchen_character/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_character/v001/render_preview_00001.png",
+      "bytes": 370493,
+      "sha256": "31ca989692300e00b3609d26b605c2f4b504197afdcf1f159a5236cdff8c8f4f",
+      "file": "kitchen_character/v001/download/cloud_render_preview.png"
+    }
+  }
+}

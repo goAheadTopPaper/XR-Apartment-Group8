@@ -1,0 +1,24 @@
+{
+  "source": "locally authored Blender meshes; not cloud output",
+  "units": "metres",
+  "front": "Blender -Y / Unity +Z",
+  "fridge_size": [
+    0.72,
+    0.66,
+    1.81
+  ],
+  "fridge_hinge_unity_fbx": [
+    0.345,
+    0.04,
+    0.37
+  ],
+  "fbx_axis_note": "FBX mirrors Blender X; Unity uses the right hinge and +105 degree outward swing",
+  "models": {
+    "fridge_door.fbx": "47a056f46122bd14099ba8b328c89278d38374a0986c05fb78fd1c461b54d0d2",
+    "spatula.fbx": "0c616f5ec6d765fb6355904b8c7a767f3b0103b914bcfc94d7aa2a44811d9ff8",
+    "chopping_board.fbx": "6abd448cb1717605c18e0d032291dc787c3e32c50cbf18ce7f7432ab45504071",
+    "fridge_body.fbx": "0086a3bb423a5e78f789f6504fd70ef5cac46cbcefc3c2f4058f9e1af099dde8",
+    "egg_curds.fbx": "012914f15844a50120506be1dcc0f0d058795c92ce14d762a7a40260460188a3"
+  },
+  "tomato_derivation": "approved Pixal3D tomato v001 -> four slices -> four diced pieces per slice"
+}

@@ -1,0 +1,48 @@
+{
+  "job_id": "fd89d542-5b59-476b-9864-dbbcbfed09ef",
+  "archive_sha256": "e1a649d6c7bcf01397f32da5e75d2f14b0b344c72c7897289474f97a2a71cdbd",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/carrot/v001/master_glb_00001.glb",
+      "bytes": 12004840,
+      "sha256": "1f58c5934f5143ea4b4b361c466685cf19066b95573817dea4dc8f26353f9954",
+      "file": "carrot/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/carrot/v001/basecolor_00001.png",
+      "bytes": 3737487,
+      "sha256": "77c2db9a0ae12746f5bb08b5a775874f1a3dfb833464f282fcbd675bbb246ad6",
+      "file": "carrot/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/carrot/v001/metallic_00001.png",
+      "bytes": 133894,
+      "sha256": "045e68d734dc93f8c5eb60c2bd074d2e44806e15a0de16b73c270bc157e74435",
+      "file": "carrot/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/carrot/v001/roughness_00001.png",
+      "bytes": 1981230,
+      "sha256": "9f269e5a830884fcabc4c34fafa8d6fff8f3871f3436e79208bbdff8b5c99074",
+      "file": "carrot/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/carrot/v001/normal_00001.png",
+      "bytes": 1955827,
+      "sha256": "aaa229523cd619325aa78a2418ac8dea75731ab96b1a9e4a3ec7a6c4fda781f3",
+      "file": "carrot/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/carrot/v001/ao_00001.png",
+      "bytes": 341859,
+      "sha256": "f58d86a4ca3721ab15a2d38430f82852ca8eab3bc5f43fa5f3b9e258ce595669",
+      "file": "carrot/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/carrot/v001/render_preview_00001.png",
+      "bytes": 379692,
+      "sha256": "63a4336d2193b5a3fbba1a5bad83890ce7a00c3630cfe7d58c4c2480d348c81a",
+      "file": "carrot/v001/download/cloud_render_preview.png"
+    }
+  }
+}

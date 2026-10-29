@@ -1,0 +1,48 @@
+{
+  "job_id": "cfe4c1e5-af07-4954-80fa-c30853880588",
+  "archive_sha256": "b0b97f58a51fb4fa242b7f4092dc6f42112d7089b321ca2de6420c6944ef40d9",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/cabinet_multiview/v001/master_glb_00001.glb",
+      "bytes": 8308400,
+      "sha256": "1c08c9b69e1b3b62048f80690738173e6231520248bacc3a1740b88a8d4e923e",
+      "file": "cabinet_multiview/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/cabinet_multiview/v001/basecolor_00001.png",
+      "bytes": 2213048,
+      "sha256": "3ff26e6fafe9cea3d8f55f72f1ea615bf7fe3e7d4395a7b772b2ca58d6e98e41",
+      "file": "cabinet_multiview/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/cabinet_multiview/v001/metallic_00001.png",
+      "bytes": 145572,
+      "sha256": "68553c0f18f1ed48353d732e7706463b23939b033c7a10f4e35795f4fbfb0f0c",
+      "file": "cabinet_multiview/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/cabinet_multiview/v001/roughness_00001.png",
+      "bytes": 420592,
+      "sha256": "ebb8130fc83c469950b9cf3de01b8873195b04fa1107f385358fd98914050538",
+      "file": "cabinet_multiview/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/cabinet_multiview/v001/normal_00001.png",
+      "bytes": 1508815,
+      "sha256": "0cd093c34e68069cd15640085bc91ab14a0be623feef5e0dd291dbdf26865635",
+      "file": "cabinet_multiview/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/cabinet_multiview/v001/ao_00001.png",
+      "bytes": 282365,
+      "sha256": "de3ea1e6e6f340e0dc0d03cdf33d37c79766bf5416d8e9e55b475441f38223ef",
+      "file": "cabinet_multiview/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/cabinet_multiview/v001/render_preview_00001.png",
+      "bytes": 372765,
+      "sha256": "fc97ba97ad195a4253edca42152850707d2786b05678b71a7e1f9a43b966f05e",
+      "file": "cabinet_multiview/v001/download/cloud_render_preview.png"
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "asset_name": "cabinet_multiview",
+  "asset_class": "building",
+  "version": 1,
+  "seed": 271929,
+  "quality": "standard",
+  "input_mode": "multiview",
+  "reference_images": {
+    "front": "../cabinet_module/v001/calibrated_final/front.png",
+    "left": "../cabinet_module/v001/calibrated_final/left.png",
+    "back": "../cabinet_module/v001/calibrated_final/back.png",
+    "right": "../cabinet_module/v001/calibrated_final/right.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 9,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 1.0,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "module",
+    "dimensions_metres": [
+      0.6,
+      0.6,
+      1.0
+    ],
+    "door": "separate mesh and hinge",
+    "enterable_building": false
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_technical_import_passed_visual_rejected",
+    "job_id": "cfe4c1e5-af07-4954-80fa-c30853880588",
+    "elapsed_seconds": 181.92,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "workflow_sha256": "01b2f9c1a250f4dd0d6418edd41818e9a8f9efdaf3d197bb9c2a269c8e1f6deb"
+  },
+  "outputs": {
+    "master_glb": "../cabinet_multiview/v001/download/master.glb",
+    "game_glb": "../cabinet_multiview/v001/inspection/cabinet_multiview_game.glb",
+    "unity_fbx": "../cabinet_multiview/v001/inspection/cabinet_multiview_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../cabinet_multiview/v001/TexturesSource/basecolor.png",
+      "metallic": "../cabinet_multiview/v001/TexturesSource/metallic.png",
+      "roughness": "../cabinet_multiview/v001/TexturesSource/roughness.png",
+      "normal": "../cabinet_multiview/v001/TexturesSource/normal.png",
+      "ao": "../cabinet_multiview/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../cabinet_multiview/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../cabinet_multiview/v001/inspection/cabinet_multiview_master.glb",
+    "prepared_manifest": "../cabinet_multiview/v001/inspection/unity_asset.json",
+    "game_pbr_folder": "../cabinet_multiview/v001/inspection/Textures",
+    "unity_prefab": null,
+    "rejected_preview_png": "../cabinet_multiview/v001/inspection/cabinet_multiview_preview.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_temporary_actual_FBX_import_then_removed",
+    "interaction": "not_applicable_rejected_candidate",
+    "visual_quality": "rejected_wrinkled_facade_not_used_in_kitchen",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "ready_for_editor_prototype": false
+  },
+  "reference_sha256": {
+    "front": "a583a744c77777b78482f221e2cfcb5ec55ba37d9b7e2a2c709442cd4f8d5504",
+    "left": "92913f32a7b21cf5de951485339a651c8e74651c54631ec4b92000bcff563f77",
+    "back": "58ddbfb9e09e452cfec7111725eb9c52eb41502aa8bd821de7d9b97632938177",
+    "right": "ca15b7a378f1af6ece10c57640a8cc1bf9636c9b410b391e9cf3ccdc8dc5fb1a"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true,
+    "orientation": "longest_axis_z_box"
+  },
+  "multiview": {
+    "shared_crop": [
+      0,
+      0,
+      1024,
+      1024
+    ],
+    "source": "Four controlled renders of the same locally dimensioned module derived from Comfy single-image output, not four independent photographs",
+    "fov_degrees": 20
+  },
+  "intact_review": {
+    "status": "rejected_visual_quality",
+    "reviewer": "Codex visual review of actual generated mesh",
+    "preview": "../cabinet_multiview/v001/inspection/cabinet_multiview_preview.png",
+    "notes": "Four calibrated views executed successfully, but the output has folded / wrinkled rigid panels and does not improve the production cabinet. Retained as a workflow contrast, excluded from the kitchen."
+  },
+  "processing": {
+    "source_sha256": "1c08c9b69e1b3b62048f80690738173e6231520248bacc3a1740b88a8d4e923e",
+    "game_triangles": 8000,
+    "triangle_budget": 8000,
+    "piece_count": 0,
+    "size_blender_xyz": [
+      0.6099854707717896,
+      0.6468756198883057,
+      1.0003339052200317
+    ],
+    "game_basecolor_size": [
+      2048,
+      2048
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 33.598,
+    "local_authoring_seconds": null,
+    "fragment_volume_relative_error": null
+  }
+}

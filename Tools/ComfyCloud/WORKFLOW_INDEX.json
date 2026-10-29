@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "workflow_version": "KitchenAssets_v1",
+  "checked_date_local": "2026-10-29",
+  "source_template_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62",
+  "cloud_generation_status": "20_actual_pixal_jobs_completed_19_single_1_multiview_contrast",
+  "actual_cloud_pilot_assets": 20,
+  "cloud_backend_version": null,
+  "workflows": [
+    {
+      "file": "workflows/KitchenAssets_v1_Multiview_Pixal.json",
+      "sha256": "ed4e45cbf2e2827cde96534f56edd1ddb3f96c64995dd861bca4e134f62b84b9",
+      "nodes": 96,
+      "links": 140,
+      "status": "actual_generation_and_Unity_FBX_import_tested",
+      "required_images": 4,
+      "generation_jobs_run": 1,
+      "credits_consumed": null,
+      "model_files": [
+        "birefnet.safetensors",
+        "dino_v3_L_naf_fp32.safetensors",
+        "pixal3d_multiview_int8_convrot.safetensors",
+        "trellis_2_shape_vae_bf16.safetensors",
+        "trellis_2_texture_vae_bf16.safetensors"
+      ],
+      "trellis2_actual_run": false
+    },
+    {
+      "file": "workflows/KitchenAssets_v1_Single_Pixal_Trellis.json",
+      "sha256": "44e5ad1f504b4b9ba223e26b499c85a203329c114ad3a72e5438eba3fd1be444",
+      "nodes": 86,
+      "links": 124,
+      "status": "actual_generation_and_Unity_FBX_import_tested",
+      "required_images": 1,
+      "generation_jobs_run": 19,
+      "credits_consumed": null,
+      "model_files": [
+        "birefnet.safetensors",
+        "dino_v3_L_naf_fp32.safetensors",
+        "moge_2_vitl_normal_fp16.safetensors",
+        "pixal3d_int8_convrot.safetensors",
+        "trellis_2_int8_convrot.safetensors",
+        "trellis_2_shape_vae_bf16.safetensors",
+        "trellis_2_texture_vae_bf16.safetensors"
+      ],
+      "trellis2_actual_run": false
+    }
+  ],
+  "local_normalisation": [
+    "Single LoadImage requires a reference instead of the original sample axe; both positional and named widgets cleared."
+  ],
+  "validation": {
+    "python_tests": 12,
+    "blender_tests": 7,
+    "unity_editmode_tests": 145,
+    "unity_playmode_tests": 49,
+    "fbx_import_samples": "15 actual generated kitchen props, local casing/plumbing derivatives and vendor ceramics; previous character/cabinet samples retained",
+    "quest_link": "not_tested"
+  },
+  "local_normalisation_verified_in_cloud_ui": true,
+  "quality_notes": [
+    "Character body motion/seam tests passed; shoulder and cloth art need manual retopology; facial rig not implemented.",
+    "Calibrated four-view Pixal3D ran successfully; visual output rejected and not placed in the kitchen.",
+    "Credit charges not confirmed; visible balance before/after nine jobs was 6631.",
+    "Fridge body image-to-3D casing had warped broad planes; local hard-surface casing/liner used. Generated door retained after debris removal and rear liner repair."
+  ],
+  "post_bake_scene_check": {
+    "passed": 1,
+    "failed": 0,
+    "preview": "../../ArtSource/KitchenAssets/Validation/kitchen-play.png"
+  },
+  "recipe_validation": "../../ArtSource/KitchenAssets/Validation/FoodVisuals/validation.json",
+  "recipe_preview": "../../ArtSource/KitchenAssets/Validation/FoodVisuals/tomato-egg-finished.png",
+  "cookware_validation": "../../ArtSource/KitchenAssets/Validation/KitchenRoom/validation.json",
+  "cookware_preview": "../../ArtSource/KitchenAssets/Validation/KitchenRoom/kitchen-room-ready.png"
+}

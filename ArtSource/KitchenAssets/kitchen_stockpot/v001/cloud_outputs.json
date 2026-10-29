@@ -1,0 +1,48 @@
+{
+  "job_id": "27e42d88-e8a4-46ee-b243-2b1c80031274",
+  "archive_sha256": "494c61c2501820a80bdbcca111593cebbad3da161e7483ff6da2cde39ab0a1d8",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_stockpot/v001/master_glb_00001.glb",
+      "bytes": 10785964,
+      "sha256": "beba7e03505e4d9c71235d182c3dff4439e0495231b336a1c4947ef729a46289",
+      "file": "kitchen_stockpot/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_stockpot/v001/basecolor_00001.png",
+      "bytes": 3081555,
+      "sha256": "9c1c9e0c8d59734f5ce40b003f0e1e6327a272f8eada156207c58b1ce6ad681d",
+      "file": "kitchen_stockpot/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_stockpot/v001/metallic_00001.png",
+      "bytes": 952324,
+      "sha256": "f3e600df8b103845e7e79fef3a79e56333a60a4bd498d9bf161f4e65e1eae128",
+      "file": "kitchen_stockpot/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_stockpot/v001/roughness_00001.png",
+      "bytes": 822925,
+      "sha256": "3caacf7075a2a50ad242b90bdb696c45eb05fd42ef72ba42461fc61317aa39a1",
+      "file": "kitchen_stockpot/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_stockpot/v001/normal_00001.png",
+      "bytes": 1496471,
+      "sha256": "f7b115ca1b887058aeb3d18291927e7f2deb2f54c143a35eba9c2002c2f2b8cb",
+      "file": "kitchen_stockpot/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_stockpot/v001/ao_00001.png",
+      "bytes": 496246,
+      "sha256": "c24e048fb50dd545a8d4bf92255072d1e461865d6367e1733f6ea130906fe0bf",
+      "file": "kitchen_stockpot/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_stockpot/v001/render_preview_00001.png",
+      "bytes": 780981,
+      "sha256": "fd2949861f7817c3dacea588728ef9277b7961ec449dca046cea0d2c160e3899",
+      "file": "kitchen_stockpot/v001/download/cloud_render_preview.png"
+    }
+  }
+}

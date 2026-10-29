@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "asset_name": "kitchen_character",
+  "asset_class": "character",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "752dd41e9a81cd073caf509c6dee8bc39cca589338056646db4baff3b3841a49",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 1.9753177852639783,
+  "stage": "intact_inspection",
+  "master_stats": [
+    {
+      "vertices": 49977,
+      "triangles": 99998,
+      "closed": true,
+      "volume_m3": 0.09459543161879137
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 66870,
+      "triangles": 99998,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 8.859333992004393e-08,
+      "vertices_before": 66870,
+      "vertices_after": 49977,
+      "boundaries_before": 32540,
+      "boundaries_after": 0
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.8536722660064697,
+    0.3286006450653076,
+    1.7501490116119385
+  ],
+  "intact_fbx": "kitchen_character_rig.fbx",
+  "pieces_fbx": "",
+  "recipe": "rig",
+  "piece_count": 0,
+  "pieces": [],
+  "triangle_budget": 30000,
+  "game_triangles": 30000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": null,
+  "elapsed_seconds": 37.593,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "pending",
+    "facial_lipsync": "pending_separate",
+    "movable_part_pivots": "manual_check_required"
+  },
+  "special_authoring_completed": true,
+  "character_actions": [
+    "Stand",
+    "Walk",
+    "RaiseArm",
+    "BendKnee"
+  ],
+  "body_rig": {
+    "type": "Generic",
+    "bones": 20,
+    "unweighted_vertices": 0,
+    "maximum_influences": 3,
+    "mesh_validation_applied": [
+      false
+    ],
+    "rig_mesh_cleanup": [
+      {
+        "mesh": "VIS_Intact_00",
+        "operation": "weld_coincident_vertices_preserve_loop_uv",
+        "tolerance_source_units": 1.7501490116119383e-07,
+        "vertices_before": 24837,
+        "vertices_after": 14978,
+        "boundaries_before": 18450,
+        "boundaries_after": 0
+      }
+    ],
+    "weight_smoothing_iterations": 6,
+    "apron_weighted_vertices": 2429,
+    "weighting_method": "Authored anatomical nearest-segment weights with an apron/pelvis mask; not automatic production skinning",
+    "topology": "Generated triangle topology with welded UV seams; production joint retopology and cloth cleanup remain manual",
+    "facial_lipsync": "not_implemented_separate_acceptance"
+  },
+  "local_authoring_seconds": 70.132
+}

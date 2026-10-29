@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "asset_name": "lemon",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271428,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/lemon_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 5,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 0.085,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "slice",
+    "pieces": 4,
+    "interior": "lemon flesh"
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "4925f12c-ace2-45c4-b9a6-22309e7ce6ba",
+    "elapsed_seconds": 40.62,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "compute_hours_displayed": 0.011,
+    "workflow_sha256": "2daa3372f0e41525d26e4c98db835752a583999b88c54aa0f72d96e4c1259f78"
+  },
+  "outputs": {
+    "master_glb": "../lemon/v001/download/master.glb",
+    "game_glb": "../lemon/v001/prepared/lemon_game.glb",
+    "unity_fbx": "../lemon/v001/prepared/lemon_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../lemon/v001/TexturesSource/basecolor.png",
+      "metallic": "../lemon/v001/TexturesSource/metallic.png",
+      "roughness": "../lemon/v001/TexturesSource/roughness.png",
+      "normal": "../lemon/v001/TexturesSource/normal.png",
+      "ao": "../lemon/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../lemon/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../lemon/v001/prepared/lemon_master.glb",
+    "prepared_manifest": "../lemon/v001/prepared/unity_asset.json",
+    "game_pbr_folder": "../lemon/v001/prepared/Textures",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/lemon_v001/PREF_Prop_lemon.prefab",
+    "game_preview_png": "../lemon/v001/prepared/lemon_preview.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed.",
+      "Prepared cut planes and simple independent interior material; seeds/core/segments not authored."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "passed_real_XRI_physics_and_cooking_scenarios",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "visual_quality": "approved_for_kitchen_prototype",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "d3c68c702c80fc5baf7e663c88f151718039dbdb8398df5d9835a1a1b307b431"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true
+  },
+  "intact_review": {
+    "status": "approved_for_prefracture",
+    "reviewer": "Codex mesh and visual review",
+    "source_sha256": "acfab3f78c66bd2f037f3a207e64cb22040b23dfe58552ad2888743438a1e4d0",
+    "preview": "../lemon/v001/qa/intact-reviewed.png",
+    "notes": "Welded closed solid, 8.5cm horizontal span and citrus silhouette inspected."
+  },
+  "processing": {
+    "source_sha256": "acfab3f78c66bd2f037f3a207e64cb22040b23dfe58552ad2888743438a1e4d0",
+    "game_triangles": 4000,
+    "triangle_budget": 4000,
+    "piece_count": 4,
+    "size_blender_xyz": [
+      0.0850512757897377,
+      0.06106309965252876,
+      0.06023288145661354
+    ],
+    "game_basecolor_size": [
+      1024,
+      1024
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 18.304,
+    "local_authoring_seconds": null,
+    "fragment_volume_relative_error": 2.1503366657708254e-10
+  }
+}

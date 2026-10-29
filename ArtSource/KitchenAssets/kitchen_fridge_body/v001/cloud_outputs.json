@@ -1,0 +1,48 @@
+{
+  "job_id": "1c97cc8d-8fa6-4bea-8cbc-ace58f965264",
+  "archive_sha256": "b738dfe367f79c9a1085b37d5bed6571557e27cf7d6e5ac770767814a70a55b2",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_body/v001/master_glb_00001.glb",
+      "bytes": 11841152,
+      "sha256": "4db376d874b55c1257bc483a02131f8ae7e200f0f668b22888500e4f03c45575",
+      "file": "kitchen_fridge_body/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_body/v001/basecolor_00001.png",
+      "bytes": 1557466,
+      "sha256": "a6fa62b9e15b3735e411d5935e288371bb23df10d1f1ac1f1aaed42f21ef0ffe",
+      "file": "kitchen_fridge_body/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_body/v001/metallic_00001.png",
+      "bytes": 643625,
+      "sha256": "38b356352b2709871ca0fd545ed0bf1ac165426bc231ffd3611f60fd939dd139",
+      "file": "kitchen_fridge_body/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_body/v001/roughness_00001.png",
+      "bytes": 938890,
+      "sha256": "21f8f1405361a757a8392380208228f1caffe8f0d4306b2128535422275a969c",
+      "file": "kitchen_fridge_body/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_body/v001/normal_00001.png",
+      "bytes": 2823885,
+      "sha256": "f61ea931a93f22c1758194dd1d42a1f21827eecb0e46c91748b231c8f89b61f3",
+      "file": "kitchen_fridge_body/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_body/v001/ao_00001.png",
+      "bytes": 703356,
+      "sha256": "2403dd274841d788a45441053d4ee2ef19871cf4f51c2a51a16f439dc20a5a5f",
+      "file": "kitchen_fridge_body/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_body/v001/render_preview_00001.png",
+      "bytes": 280548,
+      "sha256": "dcb95ba2ad21e334966db80122ee4a3883cdf78028995aea7387371785c4fd55",
+      "file": "kitchen_fridge_body/v001/download/cloud_render_preview.png"
+    }
+  }
+}

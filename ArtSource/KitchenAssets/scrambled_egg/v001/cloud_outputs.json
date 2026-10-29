@@ -1,0 +1,48 @@
+{
+  "job_id": "691f27f7-8e38-47e1-88d7-65d5fe2b828f",
+  "archive_sha256": "40f1d4c01a35fe0c42f0a20768c32880c1aaea43bcca9c6ae9c11cc861f459bd",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/scrambled_egg/v001/master_glb_00001.glb",
+      "bytes": 18051572,
+      "sha256": "e6402f8131cbb69464dc0a67157afff770c6d19ac8f6d997ac017e1d1d697192",
+      "file": "scrambled_egg/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/scrambled_egg/v001/basecolor_00001.png",
+      "bytes": 4967069,
+      "sha256": "d8e63fe8094d43c900fe042218c6ce3a5a4090c0e5bc1dfea0898b826248ce14",
+      "file": "scrambled_egg/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/scrambled_egg/v001/metallic_00001.png",
+      "bytes": 134521,
+      "sha256": "dd060b17b80aeb8ed8e5a1c7fdd08cc96d3125ccf1e5309a5aadb3d93ee5dc8e",
+      "file": "scrambled_egg/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/scrambled_egg/v001/roughness_00001.png",
+      "bytes": 168064,
+      "sha256": "22174f287adfb135e463ba9fde3efb7bb21145ca833fd8958f8a14b9086df368",
+      "file": "scrambled_egg/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/scrambled_egg/v001/normal_00001.png",
+      "bytes": 5727887,
+      "sha256": "bb266bf0ef73a893567311722e719075dfb70bab8d328eeff615c2897f43117a",
+      "file": "scrambled_egg/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/scrambled_egg/v001/ao_00001.png",
+      "bytes": 867182,
+      "sha256": "be49214f2bb4566d652bae1f3dc6751d7088a2c4b9c8756a007694e75a7055c0",
+      "file": "scrambled_egg/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/scrambled_egg/v001/render_preview_00001.png",
+      "bytes": 725877,
+      "sha256": "5f16e8863825f865679522f3f1fa0a973fe8a6c9e17c1caf9e11d1ef59847cb0",
+      "file": "scrambled_egg/v001/download/cloud_render_preview.png"
+    }
+  }
+}

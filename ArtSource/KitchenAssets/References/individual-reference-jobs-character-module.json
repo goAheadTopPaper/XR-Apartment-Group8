@@ -1,0 +1,16 @@
+{
+  "method": "built-in ImageGen",
+  "style_board": "Kitchen_StyleBoard_v001.png",
+  "entries": [
+    {
+      "name": "kitchen_character",
+      "prompt": "Create one single full-body character reference matching the fictional adult kitchen character in cell 8 of the approved style board. Same face, short brown hair, clean white rolled-sleeve shirt, charcoal apron ending above the knees, dark trousers and simple dark shoes. Clean realistic game-asset style, medium detail. For rigging: neutral symmetrical relaxed A-pose with arms about 35 degrees away from the torso, elbows straight, hands open with visible separated fingers and no contact with body or apron, legs straight and feet hip-width apart. Frontal full-body view with restrained perspective and no camera elevation, entire head, shoes and both hands clearly visible with generous margins. Soft uniform diffuse lighting, plain off-white background. One fictional person only, no props, no text, no numbers, no grid, no weapon, no motion, no cropped body parts. This is an unrigged character reference, not an animated or face-rigged deliverable.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-0cc700c1-b342-4cf9-9d09-3496bb690bae.png"
+    },
+    {
+      "name": "cabinet_module",
+      "prompt": "Create one isolated kitchen cabinet module reference matching cell 9 of the approved style board: one warm-white base cabinet, pale natural wood countertop, a single closed front door, modest horizontal brushed-metal pull near the top, small recessed plinth/toe kick. Clean restrained realistic kitchen game-asset style, medium detail. A clearly rectangular base cabinet approximately 0.6m wide, 0.6m deep and 1m high in design proportions. Useful three-quarter front view with slight camera elevation showing front door, one side and wood top; whole cabinet visible in a square frame with generous margins. Soft even diffuse light and plain off-white background. No labels, dimensions, text, grid, logos, food, sink, stove or surrounding room. Keep the door/pull boundaries clear for later Blender part separation; this image does not claim working hinges or a hollow interior.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-fa9bd727-43d0-4df3-b405-7569169bff29.png"
+    }
+  ]
+}

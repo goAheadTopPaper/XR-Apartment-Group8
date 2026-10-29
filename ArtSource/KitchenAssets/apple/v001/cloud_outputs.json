@@ -1,0 +1,48 @@
+{
+  "job_id": "f47c156b-7995-47ca-b585-1c9f673074a1",
+  "archive_sha256": "3a38af56f2335669529c3069c70cdc054b71e5fc74c486139f8eb36b3e08d07d",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/apple/v001/master_glb_00001.glb",
+      "bytes": 11880676,
+      "sha256": "a714d9a2a8e935071b48b7e7242d9d876c6a182e3e739d4eada736c2a17ebdd6",
+      "file": "apple/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/apple/v001/basecolor_00001.png",
+      "bytes": 3793794,
+      "sha256": "e4e5901522980518e2284bae65971e02730c3e98d079eb6c70e4cb4becef6abf",
+      "file": "apple/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/apple/v001/metallic_00001.png",
+      "bytes": 133667,
+      "sha256": "168346d7d28f6e993dbcbdbf970660ce1e96aaacb16ea58f5ae027243dbb9898",
+      "file": "apple/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/apple/v001/roughness_00001.png",
+      "bytes": 2322128,
+      "sha256": "7730a949d2aa7aa1fff5419cd510894ea806ed38167665fbae951cdee41f10ba",
+      "file": "apple/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/apple/v001/normal_00001.png",
+      "bytes": 1978265,
+      "sha256": "669a4aa3349d898f8672b853657c877ee8a17b06df5f0ffbdc11ff771a064c92",
+      "file": "apple/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/apple/v001/ao_00001.png",
+      "bytes": 208532,
+      "sha256": "6ab8d1b75173f95488c3f583281de0a1c38243f71b58b2b2d60f23648761a3c9",
+      "file": "apple/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/apple/v001/render_preview_00001.png",
+      "bytes": 1000012,
+      "sha256": "7b0eff62f319e1bd95a7093fe876b286cc07f14fcf0df8d8907e6b6a34b40041",
+      "file": "apple/v001/download/cloud_render_preview.png"
+    }
+  }
+}

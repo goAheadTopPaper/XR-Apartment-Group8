@@ -1,0 +1,48 @@
+{
+  "job_id": "53cef90d-5321-4038-9c0b-2e367514f4d1",
+  "archive_sha256": "a0493a35c51828dd19228ed294bb0fb084a12de7c7c9b6c091e59dda82a3d583",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_spatula/v001/master_glb_00001.glb",
+      "bytes": 10832752,
+      "sha256": "da343c86205cbcc798b3e1de1095bbeccc4546b15fa6f65d47d1f8501f4752ba",
+      "file": "kitchen_spatula/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_spatula/v001/basecolor_00001.png",
+      "bytes": 2182204,
+      "sha256": "dd6a49aaf2b6cb7b7a6dc727a41b42bb26435a7cf9a741be809148bdb50f6ba7",
+      "file": "kitchen_spatula/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_spatula/v001/metallic_00001.png",
+      "bytes": 1544097,
+      "sha256": "15e607d88839fb6f5ce5406ba52ecc4647ba64695a21241803206b0b9403806e",
+      "file": "kitchen_spatula/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_spatula/v001/roughness_00001.png",
+      "bytes": 1117088,
+      "sha256": "f37f66be93207169637dedfcc039bda1384f63611ecf69ef696cc637a5d0c1e7",
+      "file": "kitchen_spatula/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_spatula/v001/normal_00001.png",
+      "bytes": 1932841,
+      "sha256": "fca6d37593400fe9941ef78c08b662103f16401e627eb950fb7ac224700fc796",
+      "file": "kitchen_spatula/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_spatula/v001/ao_00001.png",
+      "bytes": 406831,
+      "sha256": "5a3c1a9dde50b9e1eb7f713a04fd42cd9843540dc1716dbd1639ad41caba67df",
+      "file": "kitchen_spatula/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_spatula/v001/render_preview_00001.png",
+      "bytes": 213530,
+      "sha256": "86d0e723c16f2c729ed164cba3591a628dbca32bc2320172203361c3694702c9",
+      "file": "kitchen_spatula/v001/download/cloud_render_preview.png"
+    }
+  }
+}

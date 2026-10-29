@@ -1,0 +1,48 @@
+{
+  "job_id": "9158c97f-7deb-4e5b-b096-c001ea973c01",
+  "archive_sha256": "447ff9b1b51bcc6f7d1d7152b3bda780d4b9f01b7f8b392520db1551ba401a22",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/knife/v001/master_glb_00001.glb",
+      "bytes": 8076860,
+      "sha256": "f1e1c4e1d806f81fad5542011658be4af3b748c7443e436caf02adc31d9242a5",
+      "file": "knife/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/knife/v001/basecolor_00001.png",
+      "bytes": 2255022,
+      "sha256": "1c6a7fff8db8aad0308264de78ddcbffcd851cb734f60a9345cfc2b65d5a4dd2",
+      "file": "knife/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/knife/v001/metallic_00001.png",
+      "bytes": 467432,
+      "sha256": "64d43a9c8698ff1dfbfc2e42218e7dadd72380ef0f6c1c00b112754967fe38e5",
+      "file": "knife/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/knife/v001/roughness_00001.png",
+      "bytes": 377009,
+      "sha256": "a269937c10cc13310eb523da120e708ce58b2e841780d106a2a0dbfccd6b8f7c",
+      "file": "knife/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/knife/v001/normal_00001.png",
+      "bytes": 1123756,
+      "sha256": "e3cca80c503201a9ea5b1989c4cf72bd49412b66f0777ae658d5318cf88ad02b",
+      "file": "knife/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/knife/v001/ao_00001.png",
+      "bytes": 230865,
+      "sha256": "99f61f0d9a82f2ddb7177030e06910c9c48585bc75cc97ef78672f9bd8965c66",
+      "file": "knife/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/knife/v001/render_preview_00001.png",
+      "bytes": 264833,
+      "sha256": "b67dbe6e32edb33b804c6f685ca66eaefbee148a127d367ffb88cb173b6dff88",
+      "file": "knife/v001/download/cloud_render_preview.png"
+    }
+  }
+}

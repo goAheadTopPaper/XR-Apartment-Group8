@@ -1,0 +1,48 @@
+{
+  "job_id": "22e7cd35-8a20-454f-9272-a3226beefec4",
+  "archive_sha256": "aeaa05ce9f5e97f870adff2fcf30c668e5f18ac3203b3bbc5ab214a82fa3b4e7",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/cabinet_module/v001/master_glb_00001.glb",
+      "bytes": 10965556,
+      "sha256": "a727ddddafa4bb1714616f6e50e1f6085b3c1278d0bcafab202d14268efbb8d0",
+      "file": "cabinet_module/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/cabinet_module/v001/basecolor_00001.png",
+      "bytes": 2877086,
+      "sha256": "997dcd11719c3f97d7d12e6cb54961c45bfe5417d976035685ce68dfd5042af0",
+      "file": "cabinet_module/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/cabinet_module/v001/metallic_00001.png",
+      "bytes": 200140,
+      "sha256": "8681545fba397fe2177821a47251fd6dbc1a8a052e08dcf16d47d0df50b6ca3e",
+      "file": "cabinet_module/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/cabinet_module/v001/roughness_00001.png",
+      "bytes": 1516846,
+      "sha256": "838f0557fa5a6a0537ad3efac7ec7970eb8542f9fe238d316df094f33653315b",
+      "file": "cabinet_module/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/cabinet_module/v001/normal_00001.png",
+      "bytes": 1976218,
+      "sha256": "041698ae549a54bec037d5524421f241949459eb93b082f51525ba39a72de4bf",
+      "file": "cabinet_module/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/cabinet_module/v001/ao_00001.png",
+      "bytes": 355372,
+      "sha256": "f361329a2b0b1612a3ff2edbe91384bb2da73b313b5a28e5d4a77b12a30800cb",
+      "file": "cabinet_module/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/cabinet_module/v001/render_preview_00001.png",
+      "bytes": 482638,
+      "sha256": "fe11aa4a4316199dfdae604167d9f94236199f2878279b57f2843fa2436a20ea",
+      "file": "cabinet_module/v001/download/cloud_render_preview.png"
+    }
+  }
+}

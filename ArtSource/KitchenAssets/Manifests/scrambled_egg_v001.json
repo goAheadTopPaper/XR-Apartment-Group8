@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "asset_name": "scrambled_egg",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271041,
+  "quality": "high",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/scrambled_egg_single_v001.png"
+  },
+  "reference_sha256": {
+    "single": "f69d2b15107d068d9099ca2c5a319a51446873358fb0ef73ffed6e99fa58da7c"
+  },
+  "design_review": {
+    "approved": true,
+    "approval_evidence": "User 2026-10-28: use model generation directly to replace simplistic tomato and cooked egg; agent selects matching realistic food design within authorized scope",
+    "style_board": "../References/Kitchen_StyleBoard_v001.png"
+  },
+  "scale": {
+    "reference_span_metres": 0.04,
+    "status": "prototype asset-production assumption, not client fact",
+    "orientation": "Blender Z-up / Unity Y-up",
+    "pivot": "bottom centre"
+  },
+  "parameters": {
+    "master_faces": 100000,
+    "master_texture": 2048,
+    "master_normal": 2048,
+    "master_ao": 1024,
+    "game_triangles": 8000,
+    "game_texture": 2048
+  },
+  "postprocess_recipe": {
+    "kind": "static",
+    "pieces": 0
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "reference_provider": "built-in Image Gen",
+    "reference_specification": "One naturally folded cooked egg curd with golden edges, moist pores and ruffled torn edges; pure white background."
+  },
+  "generation": {
+    "status": "generated_processed_imported_recipe_verified",
+    "job_id": "691f27f7-8e38-47e1-88d7-65d5fe2b828f",
+    "elapsed_seconds": 56.07,
+    "credits_consumed": null
+  },
+  "outputs": {
+    "master_glb": "../scrambled_egg/v001/download/master.glb",
+    "preview_png": "../scrambled_egg/v001/download/cloud_render_preview.png",
+    "pbr_textures": {
+      "basecolor": "../scrambled_egg/v001/TexturesSource/basecolor.png",
+      "metallic": "../scrambled_egg/v001/TexturesSource/metallic.png",
+      "roughness": "../scrambled_egg/v001/TexturesSource/roughness.png",
+      "normal": "../scrambled_egg/v001/TexturesSource/normal.png",
+      "ao": "../scrambled_egg/v001/TexturesSource/ao.png"
+    },
+    "game_glb": "../scrambled_egg/v001/prepared/scrambled_egg_game.glb",
+    "unity_fbx": "../scrambled_egg/v001/prepared/scrambled_egg_game.fbx",
+    "prepared_manifest": "../scrambled_egg/v001/prepared/unity_asset.json",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/scrambled_egg_v001/PREF_Prop_scrambled_egg.prefab",
+    "normalized_master_glb": "../scrambled_egg/v001/prepared/scrambled_egg_master.glb"
+  },
+  "acceptance": {
+    "cloud_generation": "passed_output_downloaded",
+    "unity_import": "passed_saved_FBX_Standard_PBR_reference_checks",
+    "visual_quality": "agent_reviewed_in_Unity_recipe_prototype",
+    "interaction": "passed_existing_XRI_cut_pour_scramble_recipe_regression",
+    "quest_link": "not_tested",
+    "ready_for_editor_prototype": true
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true,
+    "orientation": "best_fit_plane_z"
+  },
+  "processing": {
+    "source_sha256": "e6402f8131cbb69464dc0a67157afff770c6d19ac8f6d997ac017e1d1d697192",
+    "game_triangles": 8000,
+    "game_texture": 2048,
+    "size_blender_xyz": [
+      0.03971691429615021,
+      0.039929941296577454,
+      0.01812751032412052
+    ],
+    "cleanup": [
+      {
+        "mesh": "Mesh_0",
+        "operation": "weld_coincident_vertices_preserve_loop_uv",
+        "tolerance_source_units": 8.559896945953368e-08,
+        "vertices_before": 79035,
+        "vertices_after": 49830,
+        "boundaries_before": 54394,
+        "boundaries_after": 0
+      },
+      {
+        "operation": "best_fit_plane_z",
+        "source_axis": [
+          -0.007842634804546833,
+          -0.5499894022941589,
+          0.8351348042488098
+        ]
+      }
+    ],
+    "postprocess_seconds": 4.522
+  },
+  "human_cleanup": {
+    "human_manual_minutes": 0,
+    "agent_authoring_minutes": null,
+    "notes": [
+      "Agent-authored mesh derivatives, LODs, collider-bound visual fitting and Unity material setup. Original cloud master retained."
+    ]
+  }
+}

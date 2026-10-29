@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "status": "approved",
+  "image": "Kitchen_StyleBoard_v001.png",
+  "method": "ImageGen",
+  "style": "clean realistic kitchen, warm white ceramic, restrained metal, natural produce",
+  "cells": [
+    "plate",
+    "tomato",
+    "carrot",
+    "apple",
+    "lemon",
+    "egg",
+    "knife",
+    "character",
+    "cabinet_module"
+  ],
+  "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后",
+  "production_order": "kitchen props first, then character and cabinet module"
+}

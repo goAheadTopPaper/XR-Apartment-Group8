@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "asset_name": "kitchen_spatula",
+  "asset_class": "prop",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "da343c86205cbcc798b3e1de1095bbeccc4546b15fa6f65d47d1f8501f4752ba",
+  "source_input_relative": "../download/master.glb",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 0.3062489258393057,
+  "stage": "prepared",
+  "master_stats": [
+    {
+      "vertices": 49971,
+      "triangles": 99986,
+      "closed": true,
+      "volume_m3": 5.511406500616495e-05
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 59426,
+      "triangles": 99986,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 9.942127466201782e-08,
+      "vertices_before": 59426,
+      "vertices_after": 49971,
+      "boundaries_before": 18354,
+      "boundaries_after": 0
+    },
+    {
+      "operation": "longest_axis_x_flat_z",
+      "source_axis": [
+        0.8946062922477722,
+        0.02783166989684105,
+        0.44598764181137085
+      ]
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.3240182101726532,
+    0.08984790742397308,
+    0.04732362553477287
+  ],
+  "intact_fbx": "kitchen_spatula_game.fbx",
+  "pieces_fbx": "",
+  "recipe": "static",
+  "piece_count": 0,
+  "pieces": [],
+  "triangle_budget": 8000,
+  "game_triangles": 8000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": null,
+  "elapsed_seconds": 5.938,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  }
+}
