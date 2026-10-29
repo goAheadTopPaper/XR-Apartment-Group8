@@ -20,7 +20,8 @@ public static class KitchenGrabAuthoring
         var paths = AssetDatabase.FindAssets("t:Prefab", new[] { Root + "Prefabs" })
             .Select(AssetDatabase.GUIDToAssetPath)
             .Where(path => path.EndsWith("/PREF_Prop_Pot.prefab") || path.EndsWith("/PREF_Prop_Cup.prefab") ||
-                path.StartsWith(Root + "Prefabs/Props/", StringComparison.Ordinal));
+                path.StartsWith(Root + "Prefabs/Props/", StringComparison.Ordinal) ||
+                path.StartsWith(Root + "Prefabs/Generated/", StringComparison.Ordinal));
         foreach (var path in paths)
         {
             if (KitchenAuthoring.LoadRequired<GameObject>(path).GetComponent<XRGrabInteractable>() == null) continue;
@@ -46,8 +47,10 @@ public static class KitchenGrabAuthoring
             });
             EditorUtility.SetDirty(profile.Assumptions);
         }
+        var body = root.GetComponent<Rigidbody>();
         var physical = root.GetComponentsInChildren<Collider>(true)
-            .Where(c => c.enabled && !c.isTrigger && c.name != "COL_GrabSweepProbe").ToArray();
+            .Where(c => c.enabled && !c.isTrigger && c.name != "COL_GrabSweepProbe" &&
+                c.GetComponentInParent<Rigidbody>(true) == body).ToArray();
         if (physical.Length == 0) throw new InvalidOperationException("No physical colliders on " + root.name);
         var bounds = LocalBounds(root.transform, physical);
         var query = root.transform.Find("COL_GrabSweepProbe");
@@ -94,7 +97,9 @@ public static class KitchenGrabAuthoring
         grab.maxLinearVelocityDelta = profile.MaxReleaseSpeed;
         grab.limitAngularVelocity = true;
         grab.maxAngularVelocityDelta = profile.MaxReleaseAngularSpeed;
-        var body = root.GetComponent<Rigidbody>();
+        // A deterministic prototype balance point from this body's authored
+        // shapes. Disabled query probes and nested food bodies must not shift it.
+        body.centerOfMass = bounds.center;
         body.interpolation = RigidbodyInterpolation.Interpolate;
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         EditorUtility.SetDirty(grab);

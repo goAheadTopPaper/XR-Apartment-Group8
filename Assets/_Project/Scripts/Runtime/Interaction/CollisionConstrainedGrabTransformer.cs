@@ -80,8 +80,11 @@ namespace XRApartment.Runtime
             restoreThrow = true;
             grabInteractable.throwOnDetach = false;
             var body = grabInteractable.GetComponent<Rigidbody>();
-            body.velocity = Vector3.zero;
-            body.angularVelocity = Vector3.zero;
+            if (!body.isKinematic)
+            {
+                body.velocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+            }
         }
 
         public override void OnUnlink(XRGrabInteractable grabInteractable)
