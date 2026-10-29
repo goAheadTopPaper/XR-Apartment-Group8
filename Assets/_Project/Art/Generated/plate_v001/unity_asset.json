@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "asset_name": "plate",
+  "asset_class": "prop",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "32cd196bc872a079696cb8cd5980e6c6a79e6740340ca8faaffcd23d49eead84",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 0.28947913993315044,
+  "stage": "prepared",
+  "master_stats": [
+    {
+      "vertices": 50001,
+      "triangles": 99998,
+      "closed": true,
+      "volume_m3": 0.0004160933806554877
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 54796,
+      "triangles": 99998,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 8.893401622772216e-08,
+      "vertices_before": 54796,
+      "vertices_after": 50001,
+      "boundaries_before": 9524,
+      "boundaries_after": 0
+    },
+    {
+      "operation": "best_fit_plane_z",
+      "source_axis": [
+        -0.0007546886918134987,
+        -0.44505688548088074,
+        0.895501971244812
+      ]
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.25746577978134155,
+    0.27006033062934875,
+    0.03127405419945717
+  ],
+  "intact_fbx": "plate_game.fbx",
+  "pieces_fbx": "plate_pieces.fbx",
+  "recipe": "fracture",
+  "piece_count": 8,
+  "pieces": [
+    {
+      "visual": "VIS_Piece_00",
+      "collider": "COL_Piece_00",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 357,
+      "triangles": 710,
+      "closed": true,
+      "volume_m3": 5.256974548464577e-05
+    },
+    {
+      "visual": "VIS_Piece_01",
+      "collider": "COL_Piece_01",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 415,
+      "triangles": 826,
+      "closed": true,
+      "volume_m3": 5.435800847290588e-05
+    },
+    {
+      "visual": "VIS_Piece_02",
+      "collider": "COL_Piece_02",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 425,
+      "triangles": 846,
+      "closed": true,
+      "volume_m3": 5.152763221445371e-05
+    },
+    {
+      "visual": "VIS_Piece_03",
+      "collider": "COL_Piece_03",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 408,
+      "triangles": 812,
+      "closed": true,
+      "volume_m3": 4.995458609635415e-05
+    },
+    {
+      "visual": "VIS_Piece_04",
+      "collider": "COL_Piece_04",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 376,
+      "triangles": 748,
+      "closed": true,
+      "volume_m3": 5.083918473766848e-05
+    },
+    {
+      "visual": "VIS_Piece_05",
+      "collider": "COL_Piece_05",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 342,
+      "triangles": 680,
+      "closed": true,
+      "volume_m3": 5.196751673249416e-05
+    },
+    {
+      "visual": "VIS_Piece_06",
+      "collider": "COL_Piece_06",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 356,
+      "triangles": 708,
+      "closed": true,
+      "volume_m3": 5.280851601968833e-05
+    },
+    {
+      "visual": "VIS_Piece_07",
+      "collider": "COL_Piece_07",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 339,
+      "triangles": 674,
+      "closed": true,
+      "volume_m3": 5.178773829846589e-05
+    }
+  ],
+  "triangle_budget": 4000,
+  "game_triangles": 4000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": 1.9754016173773178e-09,
+  "elapsed_seconds": 26.535,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  }
+}

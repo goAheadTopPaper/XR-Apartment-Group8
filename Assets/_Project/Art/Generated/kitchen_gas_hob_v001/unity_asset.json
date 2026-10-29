@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "asset_name": "kitchen_gas_hob",
+  "asset_class": "prop",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "0279344b5f994c0f60674b4ee1e106383debff211600f9b16067750dd7c2c894",
+  "source_input_relative": "../download/master.glb",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 0.37883468555919125,
+  "stage": "prepared",
+  "master_stats": [
+    {
+      "vertices": 49834,
+      "triangles": 99990,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 67959,
+      "triangles": 99990,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 9.149651527404785e-08,
+      "vertices_before": 67959,
+      "vertices_after": 49834,
+      "boundaries_before": 34192,
+      "boundaries_after": 0
+    },
+    {
+      "operation": "longest_axis_z_box",
+      "source_axis": [
+        0.6477153897285461,
+        0.5772970914840698,
+        0.4971849322319031
+      ]
+    },
+    {
+      "operation": "area_weighted_box_yaw_alignment",
+      "radians": 0.3837107601576957
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.3581012785434723,
+    0.11376278847455978,
+    0.36025354266166687
+  ],
+  "intact_fbx": "kitchen_gas_hob_game.fbx",
+  "pieces_fbx": "",
+  "recipe": "static",
+  "piece_count": 0,
+  "pieces": [],
+  "triangle_budget": 8000,
+  "game_triangles": 8000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": null,
+  "elapsed_seconds": 10.107,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "asset_name": "cabinet_module",
+  "asset_class": "building",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "a727ddddafa4bb1714616f6e50e1f6085b3c1278d0bcafab202d14268efbb8d0",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 1.093334518518673,
+  "stage": "intact_inspection",
+  "master_stats": [
+    {
+      "vertices": 49972,
+      "triangles": 99988,
+      "closed": true,
+      "volume_m3": 0.3081765350067801
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 58288,
+      "triangles": 99988,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 9.348677396774292e-08,
+      "vertices_before": 58288,
+      "vertices_after": 49972,
+      "boundaries_before": 15854,
+      "boundaries_after": 0
+    },
+    {
+      "operation": "longest_axis_z_box",
+      "source_axis": [
+        -0.14904531836509705,
+        -0.4173502027988434,
+        0.896439790725708
+      ]
+    },
+    {
+      "operation": "area_weighted_box_yaw_alignment",
+      "radians": 0.5156267437557264
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.6000000238418579,
+    0.6000000238418579,
+    1.0
+  ],
+  "intact_fbx": "cabinet_module_game.fbx",
+  "pieces_fbx": "",
+  "recipe": "module",
+  "piece_count": 0,
+  "pieces": [],
+  "triangle_budget": 8000,
+  "game_triangles": 892,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": null,
+  "elapsed_seconds": 33.615,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  },
+  "special_authoring_completed": true,
+  "door_visual": "VIS_Door",
+  "door_collider": "COL_Door",
+  "hinge_unity_xyz": [
+    -0.282,
+    0.09,
+    0.297
+  ],
+  "module_authoring": {
+    "nominal_carcass_dimensions_metres": [
+      0.6000000238418579,
+      0.6000000238418579,
+      1.0
+    ],
+    "handle_projection_metres": 0.035,
+    "enterable_building": false,
+    "source_geometry_reused": [
+      "Cloud wood worktop UV surface projected flat"
+    ],
+    "locally_authored": [
+      "dimensioned hollow carcass and shelf",
+      "flat rigid door and finish replacing wrinkled generated facade",
+      "handle",
+      "separate box colliders"
+    ],
+    "note": "Cloud cabinet is an appearance proxy; its original dimensions and solid interior are not used as spatial evidence"
+  },
+  "local_authoring_seconds": 44.353
+}
