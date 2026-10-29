@@ -117,3 +117,4 @@ packages-lock.json text
 
 # Unity LightingData 是二进制，限定此路径，其他 YAML .asset 仍保留文本 diff。
 Assets/_Project/Scenes/SCN_Kitchen_Review/LightingData.asset filter=lfs diff=lfs merge=lfs -text
+Assets/_Project/Scenes/SCN_Kitchen_Cooking/LightingData.asset filter=lfs diff=lfs merge=lfs -text

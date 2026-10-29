@@ -126,3 +126,7 @@ $RECYCLE.BIN/
 # 导入包附带的旧版 PDF 手册不参与运行。
 /Assets/TextMesh Pro/Documentation/
 /Assets/TextMesh Pro/Documentation.meta
+
+# Local asset-pipeline Python caches
+__pycache__/
+*.py[cod]
