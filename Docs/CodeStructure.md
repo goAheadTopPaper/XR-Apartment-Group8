@@ -7,13 +7,14 @@
 | 位置 | 职责 | 主要入口 |
 | --- | --- | --- |
 | `Scripts/Data/` | benchmark、语义角色、参数登记、手部/水体配置、匿名反馈 schema | `BenchmarkRegistry`、`ModelAssumptions`、`SessionRecord` |
-| `Scripts/Simulation/` | 不引用 UnityEngine 的状态机、动作链和数学算法 | `SessionStateMachine`、`ChallengeTaskTracker`、`MotionKinematics`、`WaterVolume`、`CylindricalLiquid` |
+| `Scripts/Simulation/` | 不引用 UnityEngine 的状态机、动作链和数学算法 | `SessionStateMachine`、`ChallengeTaskTracker`、`MotionKinematics`、`WaterVolume`、`CylindricalLiquid`、`CookingProgress`、`EggBatch`、`TomatoEggRecipe` |
 | `Scripts/Runtime/Core/` | 主旅程接线、运行时方案切换与实际任务证据 | `JourneyRuntimeHost`、`RuntimeBenchmarkAdapter`、`TaskEvidenceBridge` |
 | `Scripts/Runtime/Feedback/`、`Storage/`、`UI/` | 正式反馈、匿名 CSV 写盘与世界空间引导/比较/恢复界面 | `FeedbackPortAdapter`、`LocalCsvStorageAdapter`、`JourneyWorldSpaceView` |
 | `Scripts/Runtime/Debug/` | 联调用替身和调试视图，保留测试用途 | `MockFeedbackAdapter`、`MockStorageAdapter`、`JourneyDebugUI` |
 | `Scripts/Runtime/Review/` | 场景语义标记、冰箱方案槽位、世界空间菜单 | `ReviewElement`、`BenchmarkSlotMarker`、`KitchenMenuController` |
 | `Scripts/Runtime/Interaction/` | 门/抽屉开合、手部呈现、手掌接触与持物防穿透 | `KinematicSwingDoor`、`KinematicLinearDrawer`、`ControllerHandPresentation`、`CollisionConstrainedGrabTransformer` |
 | `Scripts/Runtime/Water/` | 龙头、液体容器、水量流转及视觉表现 | `WaterTap`、`LiquidContainer`、`KitchenWaterSystem`、`LiquidStream`、`LiquidSurface` |
+| `Scripts/Runtime/Cooking/` | 独立烹饪样例的储物、切配承载、打蛋、搅拌、受热、翻炒、提示与重置 | `KitchenFridge`、`KitchenStoredIngredient`、`KitchenFoodVessel`、`KitchenEgg`、`KitchenStirTool`、`KitchenPrepTray`、`KitchenPanContents`、`KitchenSpatula`、`KitchenRecipeController`、`KitchenCookingStation` |
 | `Editor/` | 创建/适配项目资产，检查编辑状态，保存场景或 Prefab | 下表中的作者工具 |
 | `Tests/EditMode/`、`Tests/PlayMode/` | 纯逻辑、资源完整性、物理查询和真实 XRI 流程验证 | 各模块同名测试 |
 
@@ -43,6 +44,15 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 | 应用固定天空 | `KitchenLightingAuthoring`，`XR Apartment/Lighting/Apply AllSky Free Daylight` | 天空材质与场景天光；修改后按光照文档重烘焙 |
 | 初始化 XR | `XRApartment.EditorTools.XRProjectBootstrap.Configure` | Standalone OpenXR、New Input System 与项目目录；保留已有 Loader，不切平台、不重设 Android |
 | 调整反馈必填规则 | `BenchmarkFeedback.MissingRequiredFields` | `HasAllRequiredFields` 和会话完整性复用同一规则；Skipped/Aborted 需要原因 |
+| 导入生成物品及预碎 / 预切变体 | `KitchenPreparedAssetImporter`、`KitchenSpecialAssetImporter`、`PreparedKitchenProp`、`PreparedKitchenKnife` | Comfy / Blender 资产扩展；独立制作 Prefab，不写主评审场景；输入和限制见 `KitchenAssetPipeline.md` |
+
+烹饪入口为 `KitchenCookingAuthoring` 和 `SCN_Kitchen_Cooking`，不向正式动作链发送事件。其 partial 文件 `KitchenRecipeAuthoring` 管理菜谱专用模型、Prefab 和接线；`KitchenRecipeStage` 定义食材形态与动作枚举，纯逻辑 `TomatoEggRecipe` 保存实际动作证据，`KitchenRecipeController` 读取交互与烹饪状态。`EggBatch` 复用有限体积数学，水与蛋液的运行时登记分开；曲面显示复用 `LiquidSurface`。身体动作样例为 `CharacterMotionPreview`，柜门继续复用 `KinematicSwingDoor`，菜谱冰箱额外启用固定铰链旋转扫掠。最新回归 EditMode 145/145、PlayMode 49/49 通过，完整开冰箱至成菜检查见 [TomatoEggRecipe.md](TomatoEggRecipe.md)，资产来源见 [KitchenAssetPipeline.md](KitchenAssetPipeline.md)。
+
+`KitchenFoodVisualAuthoring` 是同一制作类的另一个 partial 文件，负责新生成番茄切面 / 小块和熟蛋 PBR、双精度模型的导入与引用检查。它只更新美术，沿用原交互 / 碰撞代理；`KitchenPanContents` 缓存并同步两档蛋块渲染器的熟化和烧焦颜色。当前美术与来源见 [FoodVisualUpgrade.md](FoodVisualUpgrade.md)。
+
+`KitchenCookwareAuthoring` 管理厨房内布置所需的生成厨具 / 冰箱门、陶瓷碗和水站专用副本，仍是同一制作类的 partial。`KitchenBurnerFlame` 只负责火焰开关，`KitchenHeatSource` 将它与实际食物蒸汽、加热分开控制；运行时没有增加全局服务或新程序集。布局、来源及操作见 [KitchenRoomAndCookware.md](KitchenRoomAndCookware.md)。
+
+驱动手柄位置的测试须先经过一个渲染更新，再等待物理步。`CollisionConstrainedGrabTransformer` 按 XRI 的 Dynamic / OnBeforeRender 阶段消费追踪姿态；只等待连续 FixedUpdate 会在慢帧追赶时跳过输入样本。两项旧抓取测试已用强制物理追赶复现并修正驱动时序，未放宽断言或改变运行时约束。
 
 `KitchenAuthoring` 集中公共资产路径、必需资源加载、编辑状态/场景检查和 Prefab 的加载—修改—保存—释放流程。不要在单个作者工具里重复这些规则。Prefab 修改失败也必须释放其编辑内容；保持 `.meta` 与资源一起移动。
 
