@@ -65,11 +65,14 @@ namespace XRApartment.EditorTools
             BuildRecipeAssets();
             PrepareCookwareVisuals();
             ConfigureCookwareProps();
-            BuildWorkbench();
+            PrepareFurnitureVisuals();
+            BuildFurniturePrefabs();
+            BuildRecipeWorkbench();
             if (!File.Exists(ScenePath)) BuildScene();
             var cookingScene = EditorSceneManager.OpenScene(ScenePath);
             EnsureWaterSupport(cookingScene);
             ApplyCookingWaterVariants(cookingScene);
+            ApplyFurnitureScene(cookingScene);
             var recipeRig = cookingScene.GetRootGameObjects().Single(go => go.name == "PREF_XR_KitchenRig");
             recipeRig.transform.SetPositionAndRotation(new Vector3(-3.15f, 0, 1.12f), Quaternion.identity);
             PrefabUtility.RecordPrefabInstancePropertyModifications(recipeRig.transform);
@@ -252,8 +255,6 @@ namespace XRApartment.EditorTools
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
-
-        static void BuildWorkbench() => BuildRecipeWorkbench();
 
         static void BuildScene()
         {

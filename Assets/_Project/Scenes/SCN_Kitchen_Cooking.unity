@@ -371,6 +371,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37172ef84a2654739b69a4a26f4b22ef, type: 3}
+--- !u!1001 &978079092
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096740212290083916, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5874356036532268206, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
+      propertyPath: m_Name
+      value: PREF_Furniture_DiningSet
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c638bdfc371ac4c60943a73e41cd29f0, type: 3}
 --- !u!1001 &1117300971
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -676,19 +733,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6478172746389552553, guid: fd8b1763634fc48d084bb721a77b64a1, type: 3}
       propertyPath: m_BoundingSphereOverride.w
-      value: 3.67342e-40
+      value: 6e-45
       objectReference: {fileID: 0}
     - target: {fileID: 6478172746389552553, guid: fd8b1763634fc48d084bb721a77b64a1, type: 3}
       propertyPath: m_BoundingSphereOverride.x
-      value: 9.1835e-41
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6478172746389552553, guid: fd8b1763634fc48d084bb721a77b64a1, type: 3}
       propertyPath: m_BoundingSphereOverride.y
-      value: 2.038748e-38
+      value: 1e-45
       objectReference: {fileID: 0}
     - target: {fileID: 6478172746389552553, guid: fd8b1763634fc48d084bb721a77b64a1, type: 3}
       propertyPath: m_BoundingSphereOverride.z
-      value: 8.127441e-39
+      value: 1.02e-43
       objectReference: {fileID: 0}
     - target: {fileID: 8789677049622091457, guid: fd8b1763634fc48d084bb721a77b64a1, type: 3}
       propertyPath: m_Name
@@ -712,9 +769,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 109490140680563811, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1698583224541480784, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
       propertyPath: m_Name
       value: PREF_Kitchen_Environment
+      objectReference: {fileID: 0}
+    - target: {fileID: 5337958970369052670, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7004804500364704422, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7576274359262510136, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -775,3 +844,4 @@ SceneRoots:
   - {fileID: 1117300971}
   - {fileID: 2040717629}
   - {fileID: 298124126}
+  - {fileID: 978079092}
