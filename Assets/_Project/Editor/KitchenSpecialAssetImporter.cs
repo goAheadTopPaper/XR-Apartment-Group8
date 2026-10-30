@@ -50,19 +50,12 @@ namespace XRApartment.EditorTools
             var folder = KitchenAuthoring.Root + "Art/Generated/" + version;
             var prefabFolder = KitchenAuthoring.Prefabs + "Generated/" + version;
             if (AssetDatabase.IsValidFolder(folder) || AssetDatabase.IsValidFolder(prefabFolder)) throw new InvalidOperationException("Keep existing version: " + version);
-            var source = Path.GetDirectoryName(Path.GetFullPath(path));
             KitchenAuthoring.EnsureFolder(folder);
             GameObject root = null;
             try
             {
-                KitchenPreparedAssetImporter.CopyRequired(source, common.intact_fbx, folder);
-                KitchenAuthoring.EnsureFolder(folder + "/Textures");
-                foreach (var file in Directory.GetFiles(Path.Combine(source, "Textures"), "*.png"))
-                    File.Copy(file, folder + "/Textures/" + Path.GetFileName(file));
-                File.Copy(path, folder + "/unity_asset.json");
-                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                KitchenPreparedAssetImporter.ImportFiles(path, common, folder);
                 var modelPath = folder + "/" + common.intact_fbx;
-                KitchenPreparedAssetImporter.ConfigureModel(modelPath);
                 if (common.asset_class == "character")
                 {
                     var importer = (ModelImporter)AssetImporter.GetAtPath(modelPath);
@@ -71,7 +64,6 @@ namespace XRApartment.EditorTools
                     importer.animationCompression = ModelImporterAnimationCompression.Off;
                     importer.SaveAndReimport();
                 }
-                KitchenPreparedAssetImporter.ConfigureTextures(folder);
                 var prefix = common.asset_class == "character" ? "PREF_Character_" : "PREF_Module_";
                 root = new GameObject(prefix + common.asset_name);
                 var model = UnityEngine.Object.Instantiate(KitchenAuthoring.LoadRequired<GameObject>(modelPath), root.transform);

@@ -14,7 +14,7 @@ namespace XRApartment.EditorTools
     {
         const string CookwareArt = Art + "Cookware/";
         const string CookwareSource = "ArtSource/KitchenAssets/Recipe/v003_cookware/";
-        static readonly string[] CookwareNames = { "fridge_body", "fridge_door", "frying_pan", "stockpot", "spatula", "ladle", "gas_hob", "whisk" };
+        static readonly string[] CookwareNames = { "frying_pan", "stockpot", "spatula", "ladle", "gas_hob", "whisk" };
 
         [MenuItem("XR Apartment/Cooking/Apply Realistic Kitchen and Gas Burner")]
         public static void ApplyRealisticKitchenMenu()
@@ -64,7 +64,7 @@ namespace XRApartment.EditorTools
                 KitchenPreparedAssetImporter.SetMap(material, "_MetallicGlossMap", "metallic_smoothness.png", folder);
                 KitchenPreparedAssetImporter.SetMap(material, "_BumpMap", "normal.png", folder);
                 KitchenPreparedAssetImporter.SetMap(material, "_OcclusionMap", "ao.png", folder);
-                material.SetFloat("_GlossMapScale", .6f); material.SetFloat("_BumpScale", asset.StartsWith("fridge") ? .02f : .22f);
+                material.SetFloat("_GlossMapScale", .6f); material.SetFloat("_BumpScale", .22f);
                 material.EnableKeyword("_METALLICGLOSSMAP"); material.EnableKeyword("_NORMALMAP");
                 if (asset == "gas_hob")
                 {
@@ -149,13 +149,6 @@ namespace XRApartment.EditorTools
             {
                 RemoveRealVisual(root); HideOldVisual(root.transform.Find("VIS_spatula"));
                 CookwareModel(root.transform, "spatula"); KitchenGrabAuthoring.ConfigureProp(root);
-            });
-            KitchenAuthoring.EditPrefab(RecipePrefabs + "PREF_Cooking_Fridge.prefab", root =>
-            {
-                RemoveRealVisual(root); HideOldVisual(root.transform.Find("VIS_fridge_body"));
-                CookwareModel(root.transform, "fridge_body");
-                var hinge = root.transform.Find("ACT_FridgeDoor"); RemoveRealVisual(hinge.gameObject);
-                HideOldVisual(hinge.Find("VIS_fridge_door")); CookwareModel(hinge, "fridge_door");
             });
             KitchenAuthoring.EditPrefab(RecipePrefabs + "PREF_Cooking_ChoppingBoard.prefab", root =>
             {

@@ -63,24 +63,10 @@ namespace XRApartment.EditorTools
                 manifest.asset_name + "_v" + manifest.version.ToString("000");
             if (AssetDatabase.IsValidFolder(folder) || AssetDatabase.IsValidFolder(prefabFolder))
                 throw new InvalidOperationException("Keep existing asset/prefab versions: " + manifest.asset_name);
-            var source = Path.GetDirectoryName(Path.GetFullPath(manifestPath));
             KitchenAuthoring.EnsureFolder(folder);
             try
             {
-                CopyRequired(source, manifest.intact_fbx, folder);
-                if (manifest.piece_count > 0) CopyRequired(source, manifest.pieces_fbx, folder);
-                var textureSource = Path.Combine(source, "Textures");
-                if (Directory.Exists(textureSource))
-                {
-                    KitchenAuthoring.EnsureFolder(folder + "/Textures");
-                    foreach (var image in Directory.GetFiles(textureSource, "*.png"))
-                        File.Copy(image, folder + "/Textures/" + Path.GetFileName(image));
-                }
-                File.Copy(manifestPath, folder + "/unity_asset.json");
-                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-                ConfigureModel(folder + "/" + manifest.intact_fbx);
-                if (manifest.piece_count > 0) ConfigureModel(folder + "/" + manifest.pieces_fbx);
-                ConfigureTextures(folder);
+                ImportFiles(manifestPath, manifest, folder);
                 var profile = ScriptableObject.CreateInstance<PreparedPropSettings>();
                 AssetDatabase.CreateAsset(profile, folder + "/SET_PreparedProp.asset");
                 var root = new GameObject("PREF_Prop_" + manifest.asset_name);
@@ -180,6 +166,35 @@ namespace XRApartment.EditorTools
             if (string.IsNullOrEmpty(filename) || filename != Path.GetFileName(filename) || Path.GetExtension(filename).ToLowerInvariant() != ".fbx")
                 throw new InvalidDataException("Expected a local FBX filename.");
             File.Copy(Path.Combine(source, filename), target + "/" + filename);
+        }
+
+        internal static void ImportFiles(string manifestPath, Manifest manifest, string folder)
+        {
+            var source = Path.GetDirectoryName(Path.GetFullPath(manifestPath));
+            var models = manifest.piece_count > 0 ? new[] { manifest.intact_fbx, manifest.pieces_fbx } : new[] { manifest.intact_fbx };
+            foreach (var model in models) CopyRequired(source, model, folder);
+            var textureSource = Path.Combine(source, "Textures");
+            if (Directory.Exists(textureSource))
+            {
+                KitchenAuthoring.EnsureFolder(folder + "/Textures");
+                foreach (var image in Directory.GetFiles(textureSource, "*.png"))
+                    File.Copy(image, folder + "/Textures/" + Path.GetFileName(image));
+            }
+            File.Copy(manifestPath, folder + "/unity_asset.json");
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            var modelPaths = models.Select(name => folder + "/" + name).ToArray();
+            foreach (var model in modelPaths) ConfigureModel(model);
+            // Keep FBX material dependencies as well as the four Standard PBR maps.
+            // Export-only metallic/roughness and unused embedded copies stay in ArtSource.
+            var required = new HashSet<string>(AssetDatabase.GetDependencies(modelPaths, true), StringComparer.Ordinal);
+            var maps = manifest.pbr_textures;
+            if (maps != null)
+                foreach (var map in new[] { maps.basecolor, maps.metallic_smoothness, maps.normal, maps.ao })
+                    if (!string.IsNullOrEmpty(map)) required.Add(folder + "/Textures/" + map);
+            if (Directory.Exists(folder + "/Textures"))
+                foreach (var image in Directory.GetFiles(folder + "/Textures", "*.png").Select(path => path.Replace('\\', '/')))
+                    if (!required.Contains(image)) AssetDatabase.DeleteAsset(image);
+            ConfigureTextures(folder);
         }
 
         internal static void ConfigureModel(string path)

@@ -25,8 +25,9 @@ namespace XRApartment.EditorTools
             PrepareGeneratedFoodVisuals();
             KitchenAuthoring.EnsureFolder(RecipeArt.TrimEnd('/'));
             KitchenAuthoring.EnsureFolder(RecipePrefabs.TrimEnd('/'));
-            foreach (var file in Directory.GetFiles("ArtSource/KitchenAssets/Recipe/v001", "*.fbx"))
-                File.Copy(file, RecipeArt + Path.GetFileName(file), true);
+            // The old procedural egg curds have been replaced by generated food visuals.
+            foreach (var name in new[] { "fridge_body", "fridge_door", "spatula", "chopping_board" })
+                File.Copy("ArtSource/KitchenAssets/Recipe/v001/" + name + ".fbx", RecipeArt + name + ".fbx", true);
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             foreach (var file in Directory.GetFiles(RecipeArt, "*.fbx")) KitchenPreparedAssetImporter.ConfigureModel(file);
             RecipeMaterials.Clear();
