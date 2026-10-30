@@ -2,6 +2,8 @@
 
 2026-10-28 的样例使用已确认的写实、简洁风格。厨房优先：盘子、番茄、胡萝卜、苹果、柠檬、鸡蛋、厨刀均来自实际 Comfy Cloud Pixal3D 任务；人物与柜体另作绑定、模块化样例。所有参考图、任务编号、参数、原始输出与处理结果都保留在 `ArtSource/KitchenAssets/`。
 
+截至 2026-10-30，实际 Cloud 任务累计 24 次。最新桌椅、吊灯与烹饪冰箱的生成结果、硬表面修整和 Unity 验证见 [KitchenFurniture.md](KitchenFurniture.md)；本页下方的早期批次验证保留其当时状态。
+
 ## 打开和使用
 
 - Unity 菜单 `XR Apartment/Cooking/Open Cooking Kitchen` 打开 `Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity`，进入 Play。

@@ -59,6 +59,10 @@ COMP5424 Scenario C 的**厨房设计评审原型**：在单一代表性厨房�
 
 - 厨房扩展的提交按版本控制、生成流程与来源、交互代码、美术资源、场景配置、测试和文档分类，目标分支为 `feature/hzc`。上面各阶段的“尚未提交 / 推送”为当时的历史状态，当前同步状态以 Git 为准；分支推送不代表 Windows Player / Quest Link 已验收。
 
+- 2026-10-30 用户确认浅橡木 / 暖白家具外观后，实际新增 4 次单图 Pixal3D，累计 24 次。`KitchenFurnitureAuthoring`（原制作类 partial）在独立烹饪场景替换餐桌、四把椅子、吊灯及冰箱可见模型；原环境 Prefab 不改。桌椅保留生成网格 / PBR，校正桌面与四脚接地；灯具保留生成木质顶帽，空心灯罩 / 吊线 / 顶盘本地制作；整机冰箱原始大平面 / 贴图不合格，当前精确箱体 / 门体 / 把手 / 层板 / 门内格为本地硬表面重建，沿用旧交互和碰撞。不得称为未经修整的 Cloud 成品。资源 `Art/Cooking/Furniture/`、`Prefabs/Furniture/`，加工 `Recipe/v004_furniture/`，来源和证据见 `Docs/KitchenFurniture.md`、`Validation/Furniture/`。只重烘焙烹饪场景。最新 EditMode 145/145、PlayMode 50/50，包含真实角色胶囊绕行餐桌 / 厨房前方通道及原完整菜谱；正式评审、Packages / XR / Build Settings 未改。Windows Player / Quest Link 未验收；家具集成与后续清理的提交 / 同步状态以 Git 为准。
+
+2026-10-30 家具集成之后清理：Unity 依赖与代码路径核对后删除 98 项无用导入资产（66 张纹理、27 个材质、3 个旧模型、2 份一次性诊断脚本），约 86.48 MiB，原始 ArtSource / 工作流 / 授权保留。普通与特殊资产导入共用 `KitchenPreparedAssetImporter.ImportFiles`，只保留 FBX 依赖与清单 PBR；当前冰箱由家具工具直接应用，旧中间外观和旧熟蛋不再自动导入。291 个场景 / Prefab / 登记参数 / 工程与 XR 配置校验不变，Runtime 源码未改。实际刀具、人物、柜体重导入和两次冰箱外观应用检查通过。EditMode 145/145；最新整批 PlayMode **49/50**，完整菜谱切片曾失败、同一最终源码下单独重跑 **1/1** 通过，批量稳定性未解决。独立搅蛋测试确认转移后停用蛋壳夹具，避免碎壳碰撞干扰；原断言不变。详情 `Docs/ProjectCleanup.md`，诊断与恢复备份在忽略的 `Logs/ProjectCleanup/`；提交 / 同步状态以 Git 为准。
+
 ## 必须入库 / 绝不入库
 
 **必须提交**：`Assets/**/*.meta`（与资源同一个提交）、`ProjectSettings/`、`Packages/manifest.json` + `packages-lock.json`、`Assets/XR/`、`Assets/XRI/`（这两个目录是 ProjectSettings 引用到的实际对象，漏提交会让队友加载器列表为空）。

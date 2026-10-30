@@ -46,15 +46,21 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 | 调整反馈必填规则 | `BenchmarkFeedback.MissingRequiredFields` | `HasAllRequiredFields` 和会话完整性复用同一规则；Skipped/Aborted 需要原因 |
 | 导入生成物品及预碎 / 预切变体 | `KitchenPreparedAssetImporter`、`KitchenSpecialAssetImporter`、`PreparedKitchenProp`、`PreparedKitchenKnife` | Comfy / Blender 资产扩展；独立制作 Prefab，不写主评审场景；输入和限制见 `KitchenAssetPipeline.md` |
 
-烹饪入口为 `KitchenCookingAuthoring` 和 `SCN_Kitchen_Cooking`，不向正式动作链发送事件。其 partial 文件 `KitchenRecipeAuthoring` 管理菜谱专用模型、Prefab 和接线；`KitchenRecipeStage` 定义食材形态与动作枚举，纯逻辑 `TomatoEggRecipe` 保存实际动作证据，`KitchenRecipeController` 读取交互与烹饪状态。`EggBatch` 复用有限体积数学，水与蛋液的运行时登记分开；曲面显示复用 `LiquidSurface`。身体动作样例为 `CharacterMotionPreview`，柜门继续复用 `KinematicSwingDoor`，菜谱冰箱额外启用固定铰链旋转扫掠。最新回归 EditMode 145/145、PlayMode 49/49 通过，完整开冰箱至成菜检查见 [TomatoEggRecipe.md](TomatoEggRecipe.md)，资产来源见 [KitchenAssetPipeline.md](KitchenAssetPipeline.md)。
+烹饪入口为 `KitchenCookingAuthoring` 和 `SCN_Kitchen_Cooking`，不向正式动作链发送事件。其 partial 文件 `KitchenRecipeAuthoring` 管理菜谱专用模型、Prefab 和接线；`KitchenRecipeStage` 定义食材形态与动作枚举，纯逻辑 `TomatoEggRecipe` 保存实际动作证据，`KitchenRecipeController` 读取交互与烹饪状态。`EggBatch` 复用有限体积数学，水与蛋液的运行时登记分开；曲面显示复用 `LiquidSurface`。身体动作样例为 `CharacterMotionPreview`，柜门继续复用 `KinematicSwingDoor`，菜谱冰箱额外启用固定铰链旋转扫掠。家具阶段回归曾通过 EditMode 145/145、PlayMode 50/50；其后的清理复测及测试波动见 [ProjectCleanup.md](ProjectCleanup.md)。完整开冰箱至成菜检查见 [TomatoEggRecipe.md](TomatoEggRecipe.md)，资产来源见 [KitchenAssetPipeline.md](KitchenAssetPipeline.md)。
 
 `KitchenFoodVisualAuthoring` 是同一制作类的另一个 partial 文件，负责新生成番茄切面 / 小块和熟蛋 PBR、双精度模型的导入与引用检查。它只更新美术，沿用原交互 / 碰撞代理；`KitchenPanContents` 缓存并同步两档蛋块渲染器的熟化和烧焦颜色。当前美术与来源见 [FoodVisualUpgrade.md](FoodVisualUpgrade.md)。
 
 `KitchenCookwareAuthoring` 管理厨房内布置所需的生成厨具 / 冰箱门、陶瓷碗和水站专用副本，仍是同一制作类的 partial。`KitchenBurnerFlame` 只负责火焰开关，`KitchenHeatSource` 将它与实际食物蒸汽、加热分开控制；运行时没有增加全局服务或新程序集。布局、来源及操作见 [KitchenRoomAndCookware.md](KitchenRoomAndCookware.md)。
 
+`KitchenFurnitureAuthoring` 是同一类的家具 partial，处理复核后的桌椅 / 吊灯、冰箱可见模型、LOD、材质和独立烹饪场景的餐区实例。正式评审的原环境 Prefab 不改；冰箱沿用原交互与碰撞代理。`KitchenFurnitureVerification` 检查保存后的引用、尺寸、LOD 和碰撞并生成实际 Unity 预览；具体来源和本地硬表面修整见 [KitchenFurniture.md](KitchenFurniture.md)。
+
 驱动手柄位置的测试须先经过一个渲染更新，再等待物理步。`CollisionConstrainedGrabTransformer` 按 XRI 的 Dynamic / OnBeforeRender 阶段消费追踪姿态；只等待连续 FixedUpdate 会在慢帧追赶时跳过输入样本。两项旧抓取测试已用强制物理追赶复现并修正驱动时序，未放宽断言或改变运行时约束。
 
+分阶段的组件测试还须清理上一阶段的物理夹具：打蛋转移断言后停用蛋壳，避免其落入碗内干扰独立搅拌检查。完整菜谱另有真实 XRI 流程覆盖，不靠忽略生产碰撞或改动烹饪阈值通过。
+
 `KitchenAuthoring` 集中公共资产路径、必需资源加载、编辑状态/场景检查和 Prefab 的加载—修改—保存—释放流程。不要在单个作者工具里重复这些规则。Prefab 修改失败也必须释放其编辑内容；保持 `.meta` 与资源一起移动。
+
+道具、人物与柜体共用 `KitchenPreparedAssetImporter.ImportFiles` 导入 FBX 和必要纹理：保留实际 FBX 依赖及清单中的 PBR 图，其余导出图留在 `ArtSource`。当前冰箱外观直接由家具工具应用，厨具工具不再安装随后会被替换的旧版本。冗余资源、一次性诊断代码的清理范围和验证见 [ProjectCleanup.md](ProjectCleanup.md)。
 
 ## 保留的具体模块
 
