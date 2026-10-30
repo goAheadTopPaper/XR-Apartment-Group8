@@ -1,0 +1,88 @@
+{
+  "date_local": "2026-10-30",
+  "unity": "2022.3.62f3",
+  "platform": "OSXEditor",
+  "build_target": "StandaloneWindows64",
+  "new_actual_cloud_jobs": 4,
+  "actual_cloud_jobs_total": 24,
+  "credits_consumed": null,
+  "python_tests": 12,
+  "blender_mesh_groups_verified": 5,
+  "editmode": {
+    "passed": 145,
+    "failed": 0
+  },
+  "playmode": {
+    "passed": 50,
+    "failed": 0
+  },
+  "recipe": {
+    "actions": "OpenFridge, TakeTomato, SliceTomato, DiceTomato, TakeEgg, TakeBowl, CrackEgg, BeatEgg, TurnOnStove, PlacePan, PourEgg, ScrambleEgg, AddTomato, StirFry",
+    "completed": true,
+    "eggMl": 50.0,
+    "tomatoGrams": 120.0,
+    "scrambledMetres": 3.367093801498413,
+    "stirFryMetres": 2.3865463733673096,
+    "capturedPieces": 16,
+    "presentationMeanMs": 0.04704051428571431,
+    "presentationMaxMs": 0.073709,
+    "presentationSamples": 70
+  },
+  "water": {
+    "beforeMl": 204.82684326171875,
+    "afterMl": 341.3780517578125,
+    "filledWhileHeld": true,
+    "cupPosition": {
+      "x": -4.710000038146973,
+      "y": 1.2649999856948853,
+      "z": 1.1799999475479126
+    },
+    "outletPosition": {
+      "x": -4.710000038146973,
+      "y": 1.3650000095367432,
+      "z": 1.1799999475479126
+    }
+  },
+  "character_route": "Actual 1.7m height / 0.2m radius CharacterController.Move around both dining table ends and across kitchen approach; all three waypoints reached within 0.025m horizontally. This is editor collision validation, not headset locomotion acceptance.",
+  "scope": "Cooking scene only. Formal review scene, shared environment prefab, Packages, XR and Build Settings unchanged.",
+  "quality": "Generated oak table and chair retained after alignment, scale, tabletop and four-foot contact correction; generated lamp oak collar retained. Fridge panels/door and hollow lamp shade reconstructed locally from approved reference. Raw defective meshes retained as provenance.",
+  "windows_player": "not_tested",
+  "quest_link": "not_tested",
+  "vr_frame_performance": "not_measured",
+  "isolated_registered_route": {
+    "passed": 1,
+    "failed": 0,
+    "duration_seconds": 1.5864079,
+    "result_file": "registered-route-results.xml",
+    "note": "After registering route dimensions, isolated execution exposed setup disabling its own runner. Setup now isolates only roots with rendering, collision or UI components, matching other scene tests; isolated rerun passes. No runtime physics or assertions relaxed."
+  },
+  "character_route_assumptions": [
+    "cooking_route_character_height",
+    "cooking_route_character_radius",
+    "cooking_route_start_x",
+    "cooking_route_start_z",
+    "cooking_route_far_end_x",
+    "cooking_route_approach_z"
+  ],
+  "protected_file_count": 63,
+  "protected_file_changes": [],
+  "evidence_sha256": {
+    "route-verification.json": "d81c589a910c37ad7cdc15a82c5d6f8b39a26b83bed5e7420c707aa3963d863a",
+    "registered-route-results.xml": "03edee4d359b45672fcb32682e4c57f9833249ae2ee0dfe07dcb07ccb7a86538",
+    "editmode-results.xml": "0feaf5205f721c12980b4f60b4ceefff0696b8ef98e3d160691246146c4f22aa",
+    "playmode-results.xml": "388f0098aa01e83f46aeef16f42a4a7e2ae4e73986a745d9ff984ad251da4fed",
+    "final-file-checks.json": "dbcef99df65ee2a6759d87bb57bb80387c5c080825417ee76b68e2fabd06cc96",
+    "recipe-scenario.json": "b6b1ac11946535433644d09de9cc66946d52e287738fcf4f1d5c789a7fb758fe",
+    "furniture-unity-lod1.png": "3b8b10cd97270f11e0203a6a9598ed080ca40f684c5d81c89d08e036efa77453",
+    "furniture-unity-studio.png": "561a0756c07aa54bbc8dfe75d0cb5fc8665392424139a9ff31c5c8603e633f62",
+    "tomato-egg-finished.png": "f1d7122c12e9db4d714e9b764610996b81b89c19f782a337f9a5b97371ecf836",
+    "dining-room.png": "65c5269dce0bcc19d7d290c4160c32bc4e0df5bb54d67b6d8f7ffaeadb5d3165",
+    "saved-scene-inspection.json": "8714ae744969f9b9089ba6936422520ca217ac08423288677c04eb09d51915a4",
+    "fridge-closed.png": "152676dc6bbd50b46b9185c64f1540dcbe39f3c76e68d3a483b1ace7e56abde6",
+    "kitchen-recipe-complete.png": "dac7c68f4144db15b2150e7764fe7e4ba034dec740bbe9ad614cbb754565ac8b",
+    "cloud-furniture-complete.png": "e240c13a8e4363835154be64151f28303013e600a91152ad61e2fbd8b579bea5",
+    "fridge-open.png": "df1cfd1622bfbc54165dbb1fe9ed0470f8e4ab86eeda1b33f10a637929cba507",
+    "blender-checks.json": "5768e9702933046564cef2ef5ba9af5da1973a5dec51ab52e43289ab77d5e24d",
+    "water-scenario.json": "8d49afb7586f0b5038c3e6a785a2a873599ed7abcf428a4cafebcbb8eccf00ff"
+  }
+}

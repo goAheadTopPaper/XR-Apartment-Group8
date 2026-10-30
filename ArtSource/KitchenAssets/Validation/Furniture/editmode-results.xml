@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="145" result="Passed" total="145" passed="145" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-29 17:19:42Z" end-time="2026-10-29 17:19:44Z" duration="1.4746077">
+  <test-suite type="TestSuite" id="1178" name="XR-Apartment-Group8" fullname="XR-Apartment-Group8" runstate="Runnable" testcasecount="145" result="Passed" start-time="2026-10-29 17:19:42Z" end-time="2026-10-29 17:19:44Z" duration="1.474608" total="145" passed="145" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties />
+    <test-suite type="Assembly" id="1353" name="XRApartment.Tests.EditMode.dll" fullname="/Users/happys/XR-Apartment-Group8/Library/ScriptAssemblies/XRApartment.Tests.EditMode.dll" runstate="Runnable" testcasecount="145" result="Passed" start-time="2026-10-29 17:19:42Z" end-time="2026-10-29 17:19:44Z" duration="1.441382" total="145" passed="145" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5189" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1354" name="XRApartment" fullname="XRApartment" runstate="Runnable" testcasecount="145" result="Passed" start-time="2026-10-29 17:19:42Z" end-time="2026-10-29 17:19:44Z" duration="1.440301" total="145" passed="145" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1355" name="Tests" fullname="XRApartment.Tests" runstate="Runnable" testcasecount="145" result="Passed" start-time="2026-10-29 17:19:42Z" end-time="2026-10-29 17:19:44Z" duration="1.439647" total="145" passed="145" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1181" name="BenchmarkRegistryTests" fullname="XRApartment.Tests.BenchmarkRegistryTests" classname="XRApartment.Tests.BenchmarkRegistryTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-29 17:19:42Z" end-time="2026-10-29 17:19:43Z" duration="0.050745" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1184" name="ExploreOnlyArchetype_IsExcludedFromChallengeOrder" fullname="XRApartment.Tests.BenchmarkRegistryTests.ExploreOnlyArchetype_IsExcludedFromChallengeOrder" methodname="ExploreOnlyArchetype_IsExcludedFromChallengeOrder" classname="XRApartment.Tests.BenchmarkRegistryTests" runstate="Runnable" seed="70832213" result="Passed" start-time="2026-10-29 17:19:42Z" end-time="2026-10-29 17:19:42Z" duration="0.027553" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1185" name="Find_UnknownId_ReturnsNullInsteadOfThrowing" fullname="XRApartment.Tests.BenchmarkRegistryTests.Find_UnknownId_ReturnsNullInsteadOfThrowing" methodname="Find_UnknownId_ReturnsNullInsteadOfThrowing" classname="XRApartment.Tests.BenchmarkRegistryTests" runstate="Runnable" seed="2037574303" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001348" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1183" name="Rotations_CycleTheSameThreeCombinationsWithoutRepetition" fullname="XRApartment.Tests.BenchmarkRegistryTests.Rotations_CycleTheSameThreeCombinationsWithoutRepetition" methodname="Rotations_CycleTheSameThreeCombinationsWithoutRepetition" classname="XRApartment.Tests.BenchmarkRegistryTests" runstate="Runnable" seed="1707483292" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002323" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1182" name="StandardBenchmarks_MatchTheFrozenPRDMapping" fullname="XRApartment.Tests.BenchmarkRegistryTests.StandardBenchmarks_MatchTheFrozenPRDMapping" methodname="StandardBenchmarks_MatchTheFrozenPRDMapping" classname="XRApartment.Tests.BenchmarkRegistryTests" runstate="Runnable" seed="1636618905" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001137" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1186" name="ChallengeTaskTrackerTests" fullname="XRApartment.Tests.ChallengeTaskTrackerTests" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.017970" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1187" name="Chain_IsTheEightStepsOfPRD84_InOrder" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.Chain_IsTheEightStepsOfPRD84_InOrder" methodname="Chain_IsTheEightStepsOfPRD84_InOrder" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="189732435" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002321" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1188" name="CompletingEveryStep_IsIdenticalRegardlessOfItemCount" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.CompletingEveryStep_IsIdenticalRegardlessOfItemCount" methodname="CompletingEveryStep_IsIdenticalRegardlessOfItemCount" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="1506636213" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001393" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1195" name="ItemCount_OutsideThreeToFive_IsRejected" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.ItemCount_OutsideThreeToFive_IsRejected" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.006995" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1190" name="ItemCount_OutsideThreeToFive_IsRejected(0,False)" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.ItemCount_OutsideThreeToFive_IsRejected(0,False)" methodname="ItemCount_OutsideThreeToFive_IsRejected" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="465828304" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.004393" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1191" name="ItemCount_OutsideThreeToFive_IsRejected(2,False)" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.ItemCount_OutsideThreeToFive_IsRejected(2,False)" methodname="ItemCount_OutsideThreeToFive_IsRejected" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="1783720768" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000271" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1192" name="ItemCount_OutsideThreeToFive_IsRejected(3,True)" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.ItemCount_OutsideThreeToFive_IsRejected(3,True)" methodname="ItemCount_OutsideThreeToFive_IsRejected" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="231620832" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000201" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1193" name="ItemCount_OutsideThreeToFive_IsRejected(5,True)" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.ItemCount_OutsideThreeToFive_IsRejected(5,True)" methodname="ItemCount_OutsideThreeToFive_IsRejected" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="848908245" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000180" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1194" name="ItemCount_OutsideThreeToFive_IsRejected(6,False)" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.ItemCount_OutsideThreeToFive_IsRejected(6,False)" methodname="ItemCount_OutsideThreeToFive_IsRejected" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="7443420" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000151" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1189" name="OutOfOrderAdvance_IsRejected" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.OutOfOrderAdvance_IsRejected" methodname="OutOfOrderAdvance_IsRejected" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="991825145" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000835" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1196" name="Reset_PutsTheSameBenchmarkBackAtTheFirstStep" fullname="XRApartment.Tests.ChallengeTaskTrackerTests.Reset_PutsTheSameBenchmarkBackAtTheFirstStep" methodname="Reset_PutsTheSameBenchmarkBackAtTheFirstStep" classname="XRApartment.Tests.ChallengeTaskTrackerTests" runstate="Runnable" seed="1824292613" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000662" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1197" name="CookingProgressTests" fullname="XRApartment.Tests.CookingProgressTests" classname="XRApartment.Tests.CookingProgressTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.007655" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1200" name="CapacityAndHotSolidRejectionDoNotLoseSourceVolume" fullname="XRApartment.Tests.CookingProgressTests.CapacityAndHotSolidRejectionDoNotLoseSourceVolume" methodname="CapacityAndHotSolidRejectionDoNotLoseSourceVolume" classname="XRApartment.Tests.CookingProgressTests" runstate="Runnable" seed="1159707103" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002791" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1198" name="HeatingStopsWhenRemovedAndOvercookingIsIrreversible" fullname="XRApartment.Tests.CookingProgressTests.HeatingStopsWhenRemovedAndOvercookingIsIrreversible" methodname="HeatingStopsWhenRemovedAndOvercookingIsIrreversible" classname="XRApartment.Tests.CookingProgressTests" runstate="Runnable" seed="1498064224" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000840" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1202" name="InvalidInputCannotCreateVolumeOrInstantCooking" fullname="XRApartment.Tests.CookingProgressTests.InvalidInputCannotCreateVolumeOrInstantCooking" methodname="InvalidInputCannotCreateVolumeOrInstantCooking" classname="XRApartment.Tests.CookingProgressTests" runstate="Runnable" seed="1275793453" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000635" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1201" name="NewRawEggDilutesMixingAndEmptyingResetsTheBatch" fullname="XRApartment.Tests.CookingProgressTests.NewRawEggDilutesMixingAndEmptyingResetsTheBatch" methodname="NewRawEggDilutesMixingAndEmptyingResetsTheBatch" classname="XRApartment.Tests.CookingProgressTests" runstate="Runnable" seed="604793526" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001011" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1199" name="StirringConservesVolumeAndPouringRetainsMixAndHeat" fullname="XRApartment.Tests.CookingProgressTests.StirringConservesVolumeAndPouringRetainsMixAndHeat" methodname="StirringConservesVolumeAndPouringRetainsMixAndHeat" classname="XRApartment.Tests.CookingProgressTests" runstate="Runnable" seed="932433018" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000490" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1203" name="CsvSessionStoreTests" fullname="XRApartment.Tests.CsvSessionStoreTests" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.217702" total="17" passed="17" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1209" name="CheckpointsAndAbortedSessions_DoNotRequireCompletedForm" fullname="XRApartment.Tests.CsvSessionStoreTests.CheckpointsAndAbortedSessions_DoNotRequireCompletedForm" methodname="CheckpointsAndAbortedSessions_DoNotRequireCompletedForm" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1895740507" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.040383" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1222" name="ConsumerException_DoesNotInvokeCallbackTwice" fullname="XRApartment.Tests.CsvSessionStoreTests.ConsumerException_DoesNotInvokeCallbackTwice" methodname="ConsumerException_DoesNotInvokeCallbackTwice" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="333367649" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.011620" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1214" name="CorruptCsv_IsNotOverwritten" fullname="XRApartment.Tests.CsvSessionStoreTests.CorruptCsv_IsNotOverwritten" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.012792" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1212" name="CorruptCsv_IsNotOverwritten(&quot;broken header\r\n&quot;)" fullname="XRApartment.Tests.CsvSessionStoreTests.CorruptCsv_IsNotOverwritten(&quot;broken header\r\n&quot;)" methodname="CorruptCsv_IsNotOverwritten" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1106297932" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.004723" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1213" name="CorruptCsv_IsNotOverwritten(&quot;\&quot;unclosed&quot;)" fullname="XRApartment.Tests.CsvSessionStoreTests.CorruptCsv_IsNotOverwritten(&quot;\&quot;unclosed&quot;)" methodname="CorruptCsv_IsNotOverwritten" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1906524656" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.004430" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1206" name="DifferentUsers_AddRows_WhileCheckpointAndRetryKeepOneRowPerSession" fullname="XRApartment.Tests.CsvSessionStoreTests.DifferentUsers_AddRows_WhileCheckpointAndRetryKeepOneRowPerSession" methodname="DifferentUsers_AddRows_WhileCheckpointAndRetryKeepOneRowPerSession" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="576808474" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.023329" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1207" name="EarlierCsvSummary_RemainsReadableAfterAddingChoiceDetails" fullname="XRApartment.Tests.CsvSessionStoreTests.EarlierCsvSummary_RemainsReadableAfterAddingChoiceDetails" methodname="EarlierCsvSummary_RemainsReadableAfterAddingChoiceDetails" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="2019483621" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.009859" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1210" name="LockedCsv_ReturnsFailure_PreservesOldContent_AndRetrySucceeds" fullname="XRApartment.Tests.CsvSessionStoreTests.LockedCsv_ReturnsFailure_PreservesOldContent_AndRetrySucceeds" methodname="LockedCsv_ReturnsFailure_PreservesOldContent_AndRetrySucceeds" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1992919446" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.016498" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1216" name="MissingIdentityAndUnknownSession_ReturnExplicitFailures" fullname="XRApartment.Tests.CsvSessionStoreTests.MissingIdentityAndUnknownSession_ReturnExplicitFailures" methodname="MissingIdentityAndUnknownSession_ReturnExplicitFailures" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="228637416" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001535" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1217" name="OlderRequestAndChangedModel_CannotReplaceNewerSnapshot" fullname="XRApartment.Tests.CsvSessionStoreTests.OlderRequestAndChangedModel_CannotReplaceNewerSnapshot" methodname="OlderRequestAndChangedModel_CannotReplaceNewerSnapshot" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="187830029" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.007601" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1204" name="ReviewPrefab_UsesLocalCsvForTheFeedbackHost" fullname="XRApartment.Tests.CsvSessionStoreTests.ReviewPrefab_UsesLocalCsvForTheFeedbackHost" methodname="ReviewPrefab_UsesLocalCsvForTheFeedbackHost" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1904882103" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.034080" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1205" name="Save_RestartRead_PreservesAllFieldsAndUnicodeMultilineText" fullname="XRApartment.Tests.CsvSessionStoreTests.Save_RestartRead_PreservesAllFieldsAndUnicodeMultilineText" methodname="Save_RestartRead_PreservesAllFieldsAndUnicodeMultilineText" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1342754128" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.008580" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1208" name="SavedRecord_IsIndependentFromCallerAndReadResults" fullname="XRApartment.Tests.CsvSessionStoreTests.SavedRecord_IsIndependentFromCallerAndReadResults" methodname="SavedRecord_IsIndependentFromCallerAndReadResults" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1739771554" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.012428" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1211" name="SharedStoreLock_PreventsAnotherInstanceFromWriting" fullname="XRApartment.Tests.CsvSessionStoreTests.SharedStoreLock_PreventsAnotherInstanceFromWriting" methodname="SharedStoreLock_PreventsAnotherInstanceFromWriting" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="133960195" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.004741" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1221" name="SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer" fullname="XRApartment.Tests.CsvSessionStoreTests.SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.020576" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1218" name="SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer(&quot;=1+1&quot;)" fullname="XRApartment.Tests.CsvSessionStoreTests.SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer(&quot;=1+1&quot;)" methodname="SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1980489945" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.006380" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1219" name="SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer(&quot;  @SUM(1,2)&quot;)" fullname="XRApartment.Tests.CsvSessionStoreTests.SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer(&quot;  @SUM(1,2)&quot;)" methodname="SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="2041134031" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.005186" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1220" name="SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer(&quot;\t=1+1&quot;)" fullname="XRApartment.Tests.CsvSessionStoreTests.SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer(&quot;\t=1+1&quot;)" methodname="SpreadsheetFormulaText_IsEscapedWithoutChangingRecoveredAnswer" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="1233382593" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.007130" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1215" name="UnwritableDestination_ReturnsFailure" fullname="XRApartment.Tests.CsvSessionStoreTests.UnwritableDestination_ReturnsFailure" methodname="UnwritableDestination_ReturnsFailure" classname="XRApartment.Tests.CsvSessionStoreTests" runstate="Runnable" seed="128995816" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.004863" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1340" name="CylindricalLiquidTests" fullname="XRApartment.Tests.CylindricalLiquidTests" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.012560" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1345" name="IncreasingTilt_LeavesLessRetainableWater" fullname="XRApartment.Tests.CylindricalLiquidTests.IncreasingTilt_LeavesLessRetainableWater" methodname="IncreasingTilt_LeavesLessRetainableWater" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="825171338" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.004229" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1348" name="SidewaysOrInvertedVessel_HasNoStableRetainedWater" fullname="XRApartment.Tests.CylindricalLiquidTests.SidewaysOrInvertedVessel_HasNoStableRetainedWater" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001923" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1346" name="SidewaysOrInvertedVessel_HasNoStableRetainedWater(1.0f,0.0f)" fullname="XRApartment.Tests.CylindricalLiquidTests.SidewaysOrInvertedVessel_HasNoStableRetainedWater(1.0f,0.0f)" methodname="SidewaysOrInvertedVessel_HasNoStableRetainedWater" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="2018213344" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000592" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1347" name="SidewaysOrInvertedVessel_HasNoStableRetainedWater(0.0f,-1.0f)" fullname="XRApartment.Tests.CylindricalLiquidTests.SidewaysOrInvertedVessel_HasNoStableRetainedWater(0.0f,-1.0f)" methodname="SidewaysOrInvertedVessel_HasNoStableRetainedWater" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="53521027" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000177" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1352" name="TiltedSurfaceSolver_ReconstructsTheRequestedVolume" fullname="XRApartment.Tests.CylindricalLiquidTests.TiltedSurfaceSolver_ReconstructsTheRequestedVolume" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002340" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1349" name="TiltedSurfaceSolver_ReconstructsTheRequestedVolume(0.05f)" fullname="XRApartment.Tests.CylindricalLiquidTests.TiltedSurfaceSolver_ReconstructsTheRequestedVolume(0.05f)" methodname="TiltedSurfaceSolver_ReconstructsTheRequestedVolume" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="1986735212" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000634" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1350" name="TiltedSurfaceSolver_ReconstructsTheRequestedVolume(0.4f)" fullname="XRApartment.Tests.CylindricalLiquidTests.TiltedSurfaceSolver_ReconstructsTheRequestedVolume(0.4f)" methodname="TiltedSurfaceSolver_ReconstructsTheRequestedVolume" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="1467283188" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000334" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1351" name="TiltedSurfaceSolver_ReconstructsTheRequestedVolume(0.85f)" fullname="XRApartment.Tests.CylindricalLiquidTests.TiltedSurfaceSolver_ReconstructsTheRequestedVolume(0.85f)" methodname="TiltedSurfaceSolver_ReconstructsTheRequestedVolume" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="1330083893" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000149" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1344" name="UprightVessel_WaterHeightMatchesFill" fullname="XRApartment.Tests.CylindricalLiquidTests.UprightVessel_WaterHeightMatchesFill" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002196" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1341" name="UprightVessel_WaterHeightMatchesFill(0.1f)" fullname="XRApartment.Tests.CylindricalLiquidTests.UprightVessel_WaterHeightMatchesFill(0.1f)" methodname="UprightVessel_WaterHeightMatchesFill" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="686130941" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000477" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1342" name="UprightVessel_WaterHeightMatchesFill(0.5f)" fullname="XRApartment.Tests.CylindricalLiquidTests.UprightVessel_WaterHeightMatchesFill(0.5f)" methodname="UprightVessel_WaterHeightMatchesFill" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="485606134" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000189" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1343" name="UprightVessel_WaterHeightMatchesFill(0.9f)" fullname="XRApartment.Tests.CylindricalLiquidTests.UprightVessel_WaterHeightMatchesFill(0.9f)" methodname="UprightVessel_WaterHeightMatchesFill" classname="XRApartment.Tests.CylindricalLiquidTests" runstate="Runnable" seed="780623731" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000139" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestFixture" id="1223" name="FeedbackValidationTests" fullname="XRApartment.Tests.FeedbackValidationTests" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.013775" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1226" name="CompletedFeedback_ChoicesOnlyDoesNotRequireWrittenExplanation" fullname="XRApartment.Tests.FeedbackValidationTests.CompletedFeedback_ChoicesOnlyDoesNotRequireWrittenExplanation" methodname="CompletedFeedback_ChoicesOnlyDoesNotRequireWrittenExplanation" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="268648565" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001782" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1224" name="CompletedFeedback_MapsFieldsToContractResult" fullname="XRApartment.Tests.FeedbackValidationTests.CompletedFeedback_MapsFieldsToContractResult" methodname="CompletedFeedback_MapsFieldsToContractResult" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="472544943" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000953" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1225" name="CompletedFeedback_ReportsEveryMissingRequiredField" fullname="XRApartment.Tests.FeedbackValidationTests.CompletedFeedback_ReportsEveryMissingRequiredField" methodname="CompletedFeedback_ReportsEveryMissingRequiredField" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="979531095" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001152" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1230" name="DraftSession_NewBenchmarkStartsCleanDraft" fullname="XRApartment.Tests.FeedbackValidationTests.DraftSession_NewBenchmarkStartsCleanDraft" methodname="DraftSession_NewBenchmarkStartsCleanDraft" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="2007408204" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001615" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1231" name="DraftSession_NewSessionStartsCleanDraft" fullname="XRApartment.Tests.FeedbackValidationTests.DraftSession_NewSessionStartsCleanDraft" methodname="DraftSession_NewSessionStartsCleanDraft" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="1202958104" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000721" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1229" name="DraftSession_PreservesEditsAcrossValidationAndUpdates" fullname="XRApartment.Tests.FeedbackValidationTests.DraftSession_PreservesEditsAcrossValidationAndUpdates" methodname="DraftSession_PreservesEditsAcrossValidationAndUpdates" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="1796051742" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000666" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1233" name="DraftSession_ReenteringSameRequestPreservesSkipReasonEdit" fullname="XRApartment.Tests.FeedbackValidationTests.DraftSession_ReenteringSameRequestPreservesSkipReasonEdit" methodname="DraftSession_ReenteringSameRequestPreservesSkipReasonEdit" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="1474846108" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001924" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1232" name="DraftSession_RejectsDraftFromAnotherBenchmark" fullname="XRApartment.Tests.FeedbackValidationTests.DraftSession_RejectsDraftFromAnotherBenchmark" methodname="DraftSession_RejectsDraftFromAnotherBenchmark" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="964053424" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000603" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1228" name="MismatchedIdentity_IsRejectedAtFieldLevel" fullname="XRApartment.Tests.FeedbackValidationTests.MismatchedIdentity_IsRejectedAtFieldLevel" methodname="MismatchedIdentity_IsRejectedAtFieldLevel" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="1183033807" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000286" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1227" name="SkippedFeedback_RequiresOutcomeReasonButNotRatings" fullname="XRApartment.Tests.FeedbackValidationTests.SkippedFeedback_RequiresOutcomeReasonButNotRatings" methodname="SkippedFeedback_RequiresOutcomeReasonButNotRatings" classname="XRApartment.Tests.FeedbackValidationTests" runstate="Runnable" seed="842469553" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000360" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1234" name="HeldPropSweepTests" fullname="XRApartment.Tests.HeldPropSweepTests" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.040732" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="ParameterizedMethod" id="1244" name="BothDynamicPropsAndKinematicDoors_BlockTheHeldProp" fullname="XRApartment.Tests.HeldPropSweepTests.BothDynamicPropsAndKinematicDoors_BlockTheHeldProp" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.016405" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1242" name="BothDynamicPropsAndKinematicDoors_BlockTheHeldProp(False)" fullname="XRApartment.Tests.HeldPropSweepTests.BothDynamicPropsAndKinematicDoors_BlockTheHeldProp(False)" methodname="BothDynamicPropsAndKinematicDoors_BlockTheHeldProp" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="1393787953" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.013949" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1243" name="BothDynamicPropsAndKinematicDoors_BlockTheHeldProp(True)" fullname="XRApartment.Tests.HeldPropSweepTests.BothDynamicPropsAndKinematicDoors_BlockTheHeldProp(True)" methodname="BothDynamicPropsAndKinematicDoors_BlockTheHeldProp" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="2033038638" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001524" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1236" name="DiagonalMotion_SlidesAlongWall" fullname="XRApartment.Tests.HeldPropSweepTests.DiagonalMotion_SlidesAlongWall" methodname="DiagonalMotion_SlidesAlongWall" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="1379168055" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001489" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1239" name="FastRotation_SweepsTheArcEvenWhenFinalPoseIsClear" fullname="XRApartment.Tests.HeldPropSweepTests.FastRotation_SweepsTheArcEvenWhenFinalPoseIsClear" methodname="FastRotation_SweepsTheArcEvenWhenFinalPoseIsClear" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="1910836207" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.003128" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1235" name="FastTranslation_CannotCrossThinWall" fullname="XRApartment.Tests.HeldPropSweepTests.FastTranslation_CannotCrossThinWall" methodname="FastTranslation_CannotCrossThinWall" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="1131659756" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000923" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1238" name="InitialSmallOverlap_RecoversOnOriginalSide" fullname="XRApartment.Tests.HeldPropSweepTests.InitialSmallOverlap_RecoversOnOriginalSide" methodname="InitialSmallOverlap_RecoversOnOriginalSide" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="292872145" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001632" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1241" name="LiftingAwayFromContact_AllowsRotationAgain" fullname="XRApartment.Tests.HeldPropSweepTests.LiftingAwayFromContact_AllowsRotationAgain" methodname="LiftingAwayFromContact_AllowsRotationAgain" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="218144002" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002349" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1246" name="OwnRigAndOwnColliders_DoNotBlockGrab" fullname="XRApartment.Tests.HeldPropSweepTests.OwnRigAndOwnColliders_DoNotBlockGrab" methodname="OwnRigAndOwnColliders_DoNotBlockGrab" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="942427622" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001698" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1237" name="PullingBack_ReturnsFreelyWithoutSnappingAcrossWall" fullname="XRApartment.Tests.HeldPropSweepTests.PullingBack_ReturnsFreelyWithoutSnappingAcrossWall" methodname="PullingBack_ReturnsFreelyWithoutSnappingAcrossWall" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="820247200" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001742" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1240" name="RestingOnTable_CanYawWithoutLifting" fullname="XRApartment.Tests.HeldPropSweepTests.RestingOnTable_CanYawWithoutLifting" methodname="RestingOnTable_CanYawWithoutLifting" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="30494199" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002125" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1247" name="SaturatedQuery_StopsInsteadOfIgnoringPotentialObstacle" fullname="XRApartment.Tests.HeldPropSweepTests.SaturatedQuery_StopsInsteadOfIgnoringPotentialObstacle" methodname="SaturatedQuery_StopsInsteadOfIgnoringPotentialObstacle" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="1483111804" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.003279" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1245" name="Triggers_DoNotBlockGrab" fullname="XRApartment.Tests.HeldPropSweepTests.Triggers_DoNotBlockGrab" methodname="Triggers_DoNotBlockGrab" classname="XRApartment.Tests.HeldPropSweepTests" runstate="Runnable" seed="811175759" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000972" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1248" name="JourneyCoordinatorTests" fullname="XRApartment.Tests.JourneyCoordinatorTests" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" testcasecount="23" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.097772" total="23" passed="23" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1258" name="CompletedB1AndSkippedB2_CanCompareUsingB1" fullname="XRApartment.Tests.JourneyCoordinatorTests.CompletedB1AndSkippedB2_CanCompareUsingB1" methodname="CompletedB1AndSkippedB2_CanCompareUsingB1" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1663673787" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.028953" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1262" name="Evidence_RejectsOldRunWrongStepAndDuplicateItem" fullname="XRApartment.Tests.JourneyCoordinatorTests.Evidence_RejectsOldRunWrongStepAndDuplicateItem" methodname="Evidence_RejectsOldRunWrongStepAndDuplicateItem" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1967288682" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001110" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1269" name="FailedPreviewRetryRemainsAnExplorePreview" fullname="XRApartment.Tests.JourneyCoordinatorTests.FailedPreviewRetryRemainsAnExplorePreview" methodname="FailedPreviewRetryRemainsAnExplorePreview" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="126767055" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000865" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1271" name="FailedStepRestoreKeepsEvidenceAndRetryKeepsStepAndRun" fullname="XRApartment.Tests.JourneyCoordinatorTests.FailedStepRestoreKeepsEvidenceAndRetryKeepsStepAndRun" methodname="FailedStepRestoreKeepsEvidenceAndRetryKeepsStepAndRun" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1354959819" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001438" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1255" name="FinalSaveFailure_LeavesComparisonOpenForRetry" fullname="XRApartment.Tests.JourneyCoordinatorTests.FinalSaveFailure_LeavesComparisonOpenForRetry" methodname="FinalSaveFailure_LeavesComparisonOpenForRetry" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="273056708" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001952" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1263" name="FiveItemPlan_TakesOutOnlyExistingItemsAndReturnsAllFive" fullname="XRApartment.Tests.JourneyCoordinatorTests.FiveItemPlan_TakesOutOnlyExistingItemsAndReturnsAllFive" methodname="FiveItemPlan_TakesOutOnlyExistingItemsAndReturnsAllFive" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="2010643919" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002154" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1261" name="InvalidFeedback_ReportsFieldErrorWithoutAdvancingOrSaving" fullname="XRApartment.Tests.JourneyCoordinatorTests.InvalidFeedback_ReportsFieldErrorWithoutAdvancingOrSaving" methodname="InvalidFeedback_ReportsFieldErrorWithoutAdvancingOrSaving" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="302516635" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.003947" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1254" name="NormalB1B2_FinishesOnlyAfterVerifiedFinalSave" fullname="XRApartment.Tests.JourneyCoordinatorTests.NormalB1B2_FinishesOnlyAfterVerifiedFinalSave" methodname="NormalB1B2_FinishesOnlyAfterVerifiedFinalSave" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1467396457" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001284" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1249" name="NormalB1B2_ValidatedFeedbackIsWrittenToCsvBeforeProgressing" fullname="XRApartment.Tests.JourneyCoordinatorTests.NormalB1B2_ValidatedFeedbackIsWrittenToCsvBeforeProgressing" methodname="NormalB1B2_ValidatedFeedbackIsWrittenToCsvBeforeProgressing" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1761447742" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.031438" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1266" name="PauseAfterFeedbackSaveFailure_PreservesTheOriginalRetry" fullname="XRApartment.Tests.JourneyCoordinatorTests.PauseAfterFeedbackSaveFailure_PreservesTheOriginalRetry" methodname="PauseAfterFeedbackSaveFailure_PreservesTheOriginalRetry" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="284235536" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002087" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1265" name="PauseDuringLoad_SavesThenResumesIntoChallenge" fullname="XRApartment.Tests.JourneyCoordinatorTests.PauseDuringLoad_SavesThenResumesIntoChallenge" methodname="PauseDuringLoad_SavesThenResumesIntoChallenge" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="984027251" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000885" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1259" name="PendingSkipReason_IsAvailableOnlyWhileSkippedFeedbackIsPending" fullname="XRApartment.Tests.JourneyCoordinatorTests.PendingSkipReason_IsAvailableOnlyWhileSkippedFeedbackIsPending" methodname="PendingSkipReason_IsAvailableOnlyWhileSkippedFeedbackIsPending" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1625271642" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000780" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1252" name="Plan_RejectsItemCountOutsideThreeToFiveTotal" fullname="XRApartment.Tests.JourneyCoordinatorTests.Plan_RejectsItemCountOutsideThreeToFiveTotal" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002898" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1250" name="Plan_RejectsItemCountOutsideThreeToFiveTotal(2)" fullname="XRApartment.Tests.JourneyCoordinatorTests.Plan_RejectsItemCountOutsideThreeToFiveTotal(2)" methodname="Plan_RejectsItemCountOutsideThreeToFiveTotal" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1263786093" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000852" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1251" name="Plan_RejectsItemCountOutsideThreeToFiveTotal(6)" fullname="XRApartment.Tests.JourneyCoordinatorTests.Plan_RejectsItemCountOutsideThreeToFiveTotal(6)" methodname="Plan_RejectsItemCountOutsideThreeToFiveTotal" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1363461298" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000286" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1253" name="Plan_RequiresExistingAndNewItems_AndCopiesInput" fullname="XRApartment.Tests.JourneyCoordinatorTests.Plan_RequiresExistingAndNewItems_AndCopiesInput" methodname="Plan_RequiresExistingAndNewItems_AndCopiesInput" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1698485005" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001453" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1264" name="ResetSupersedesRunAndRequiresFreshPhysicalEvidence" fullname="XRApartment.Tests.JourneyCoordinatorTests.ResetSupersedesRunAndRequiresFreshPhysicalEvidence" methodname="ResetSupersedesRunAndRequiresFreshPhysicalEvidence" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1746028895" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000971" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1270" name="RestoreTakeOutClearsOnlyItsPartialProgressAndKeepsTheRun" fullname="XRApartment.Tests.JourneyCoordinatorTests.RestoreTakeOutClearsOnlyItsPartialProgressAndKeepsTheRun" methodname="RestoreTakeOutClearsOnlyItsPartialProgressAndKeepsTheRun" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="982147915" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001392" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1256" name="SafeExit_ImmediatelyAbortsAndOldSceneCallbackIsStale" fullname="XRApartment.Tests.JourneyCoordinatorTests.SafeExit_ImmediatelyAbortsAndOldSceneCallbackIsStale" methodname="SafeExit_ImmediatelyAbortsAndOldSceneCallbackIsStale" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1296918576" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000743" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1267" name="SceneFailureWhilePaused_StillAttemptsPauseSaveAndKeepsSceneRetry" fullname="XRApartment.Tests.JourneyCoordinatorTests.SceneFailureWhilePaused_StillAttemptsPauseSaveAndKeepsSceneRetry" methodname="SceneFailureWhilePaused_StillAttemptsPauseSaveAndKeepsSceneRetry" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1362615915" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000675" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1257" name="SkippedBenchmarks_ProduceIncompleteOutcomeWithoutPreference" fullname="XRApartment.Tests.JourneyCoordinatorTests.SkippedBenchmarks_ProduceIncompleteOutcomeWithoutPreference" methodname="SkippedBenchmarks_ProduceIncompleteOutcomeWithoutPreference" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="415642156" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001001" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1272" name="SnapshotAndSaveAction_DoNotExposeMutableCoreRecord" fullname="XRApartment.Tests.JourneyCoordinatorTests.SnapshotAndSaveAction_DoNotExposeMutableCoreRecord" methodname="SnapshotAndSaveAction_DoNotExposeMutableCoreRecord" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1383002370" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001031" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1260" name="ValidFeedbackTurnsConflictAmberBeforeFailedSave_AndSafetyStaysSeparate" fullname="XRApartment.Tests.JourneyCoordinatorTests.ValidFeedbackTurnsConflictAmberBeforeFailedSave_AndSafetyStaysSeparate" methodname="ValidFeedbackTurnsConflictAmberBeforeFailedSave_AndSafetyStaysSeparate" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1306436755" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.002396" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1268" name="WrongLoadedBenchmark_FailsWithoutStartingAndRetryUsesNewRun" fullname="XRApartment.Tests.JourneyCoordinatorTests.WrongLoadedBenchmark_FailsWithoutStartingAndRetryUsesNewRun" methodname="WrongLoadedBenchmark_FailsWithoutStartingAndRetryUsesNewRun" classname="XRApartment.Tests.JourneyCoordinatorTests" runstate="Runnable" seed="1341979805" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000631" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1273" name="JourneyWorldSpaceViewTests" fullname="XRApartment.Tests.JourneyWorldSpaceViewTests" classname="XRApartment.Tests.JourneyWorldSpaceViewTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.209111" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1274" name="ComparisonInput_EnablesCompletedB1AndDisablesSkippedB2" fullname="XRApartment.Tests.JourneyWorldSpaceViewTests.ComparisonInput_EnablesCompletedB1AndDisablesSkippedB2" methodname="ComparisonInput_EnablesCompletedB1AndDisablesSkippedB2" classname="XRApartment.Tests.JourneyWorldSpaceViewTests" runstate="Runnable" seed="338248600" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.157890" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1275" name="PrefabHasWorldSpaceCanvasAndWiredSetupControls" fullname="XRApartment.Tests.JourneyWorldSpaceViewTests.PrefabHasWorldSpaceCanvasAndWiredSetupControls" methodname="PrefabHasWorldSpaceCanvasAndWiredSetupControls" classname="XRApartment.Tests.JourneyWorldSpaceViewTests" runstate="Runnable" seed="1289355758" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.048215" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1276" name="KinematicPalmSolverTests" fullname="XRApartment.Tests.KinematicPalmSolverTests" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.037636" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1278" name="DiagonalMovement_SlidesAlongWall" fullname="XRApartment.Tests.KinematicPalmSolverTests.DiagonalMovement_SlidesAlongWall" methodname="DiagonalMovement_SlidesAlongWall" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="1957720272" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.009921" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1277" name="FastMovement_CannotTunnelThroughWall" fullname="XRApartment.Tests.KinematicPalmSolverTests.FastMovement_CannotTunnelThroughWall" methodname="FastMovement_CannotTunnelThroughWall" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="341867147" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001523" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1280" name="HeldTarget_DoesNotBlockItsHand" fullname="XRApartment.Tests.KinematicPalmSolverTests.HeldTarget_DoesNotBlockItsHand" methodname="HeldTarget_DoesNotBlockItsHand" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="509410138" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000968" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1281" name="RigCollider_DoesNotBlockItsOwnHand" fullname="XRApartment.Tests.KinematicPalmSolverTests.RigCollider_DoesNotBlockItsOwnHand" methodname="RigCollider_DoesNotBlockItsOwnHand" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="1241709343" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001014" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1285" name="RigidbodyProp_IsLeftToExistingXriGrab" fullname="XRApartment.Tests.KinematicPalmSolverTests.RigidbodyProp_IsLeftToExistingXriGrab" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.004539" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1283" name="RigidbodyProp_IsLeftToExistingXriGrab(False)" fullname="XRApartment.Tests.KinematicPalmSolverTests.RigidbodyProp_IsLeftToExistingXriGrab(False)" methodname="RigidbodyProp_IsLeftToExistingXriGrab" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="1783008599" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.001706" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1284" name="RigidbodyProp_IsLeftToExistingXriGrab(True)" fullname="XRApartment.Tests.KinematicPalmSolverTests.RigidbodyProp_IsLeftToExistingXriGrab(True)" methodname="RigidbodyProp_IsLeftToExistingXriGrab" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="440607903" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000704" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1279" name="StartingInsideSurface_RecoversBeforeSweeping" fullname="XRApartment.Tests.KinematicPalmSolverTests.StartingInsideSurface_RecoversBeforeSweeping" methodname="StartingInsideSurface_RecoversBeforeSweeping" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="1945499750" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.009742" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1282" name="Trigger_DoesNotBlockHand" fullname="XRApartment.Tests.KinematicPalmSolverTests.Trigger_DoesNotBlockHand" methodname="Trigger_DoesNotBlockHand" classname="XRApartment.Tests.KinematicPalmSolverTests" runstate="Runnable" seed="464220397" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:43Z" duration="0.000972" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1286" name="KitchenSceneIntegrityTests" fullname="XRApartment.Tests.KitchenSceneIntegrityTests" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-29 17:19:43Z" end-time="2026-10-29 17:19:44Z" duration="0.687616" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <output><![CDATA[Couldn't create a Convex Mesh from source mesh "egg_Mid__300_Tris_" within the maximum polygons limit (256). The partial hull will be used. Consider simplifying your mesh.
+Couldn't create a Convex Mesh from source mesh "Lemon1_Mid__350_Tris_" within the maximum polygons limit (256). The partial hull will be used. Consider simplifying your mesh.
+]]></output>
+            <test-case id="1292" name="AllHeldProps_HaveCollisionConstrainedGrabsAndDisabledQueryProbes" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.AllHeldProps_HaveCollisionConstrainedGrabsAndDisabledQueryProbes" methodname="AllHeldProps_HaveCollisionConstrainedGrabsAndDisabledQueryProbes" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="654620082" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.012921" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1289" name="ControllerHands_AreWiredToTheProjectRigAndRegisteredParameters" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.ControllerHands_AreWiredToTheProjectRigAndRegisteredParameters" methodname="ControllerHands_AreWiredToTheProjectRigAndRegisteredParameters" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="1708694155" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.007795" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1294" name="CounterSurfaceAndFridgeSlot_MatchRegisteredPrototypeParameters" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.CounterSurfaceAndFridgeSlot_MatchRegisteredPrototypeParameters" methodname="CounterSurfaceAndFridgeSlot_MatchRegisteredPrototypeParameters" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="765595757" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.004618" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1291" name="DressingProps_UseRegisteredMetreScaleAndBoundGrabColliders" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.DressingProps_UseRegisteredMetreScaleAndBoundGrabColliders" methodname="DressingProps_UseRegisteredMetreScaleAndBoundGrabColliders" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="622146520" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.068952" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1290" name="ImportedGeometry_HasMeshesCollidersAndBuiltInMaterials" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.ImportedGeometry_HasMeshesCollidersAndBuiltInMaterials" methodname="ImportedGeometry_HasMeshesCollidersAndBuiltInMaterials" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="246843409" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.009688" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1288" name="Scene_HasNoMissingScriptsOrBrokenPrefabInstances" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.Scene_HasNoMissingScriptsOrBrokenPrefabInstances" methodname="Scene_HasNoMissingScriptsOrBrokenPrefabInstances" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="1878371976" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.010963" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1287" name="StartupScene_IsTheAuthoredKitchen" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.StartupScene_IsTheAuthoredKitchen" methodname="StartupScene_IsTheAuthoredKitchen" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="1840444219" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.008903" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1293" name="WaterAndSky_AreWiredToTheSelectedAssets" fullname="XRApartment.Tests.KitchenSceneIntegrityTests.WaterAndSky_AreWiredToTheSelectedAssets" methodname="WaterAndSky_AreWiredToTheSelectedAssets" classname="XRApartment.Tests.KitchenSceneIntegrityTests" runstate="Runnable" seed="1721053233" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.040595" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1295" name="MotionKinematicsTests" fullname="XRApartment.Tests.MotionKinematicsTests" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.010770" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1302" name="SlideDistance_ScalesWithProgress" fullname="XRApartment.Tests.MotionKinematicsTests.SlideDistance_ScalesWithProgress" methodname="SlideDistance_ScalesWithProgress" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" seed="1504601413" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001236" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1298" name="SmoothStep_ClampsOutOfRangeInput" fullname="XRApartment.Tests.MotionKinematicsTests.SmoothStep_ClampsOutOfRangeInput" methodname="SmoothStep_ClampsOutOfRangeInput" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" seed="650714468" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000628" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1296" name="SmoothStep_FixesEndpointsAndMidpoint" fullname="XRApartment.Tests.MotionKinematicsTests.SmoothStep_FixesEndpointsAndMidpoint" methodname="SmoothStep_FixesEndpointsAndMidpoint" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" seed="277786331" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000311" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1297" name="SmoothStep_IsMonotonicInsideUnitRange" fullname="XRApartment.Tests.MotionKinematicsTests.SmoothStep_IsMonotonicInsideUnitRange" methodname="SmoothStep_IsMonotonicInsideUnitRange" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" seed="279629630" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001442" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1299" name="StepToward_AdvancesTowardTargetWithoutOvershooting" fullname="XRApartment.Tests.MotionKinematicsTests.StepToward_AdvancesTowardTargetWithoutOvershooting" methodname="StepToward_AdvancesTowardTargetWithoutOvershooting" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" seed="303285716" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000546" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1300" name="StepToward_IgnoresNonPositiveDelta" fullname="XRApartment.Tests.MotionKinematicsTests.StepToward_IgnoresNonPositiveDelta" methodname="StepToward_IgnoresNonPositiveDelta" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" seed="1874060614" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000192" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1301" name="SwingAngle_SignFollowsHingeSide" fullname="XRApartment.Tests.MotionKinematicsTests.SwingAngle_SignFollowsHingeSide" methodname="SwingAngle_SignFollowsHingeSide" classname="XRApartment.Tests.MotionKinematicsTests" runstate="Runnable" seed="462080532" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000193" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1303" name="SessionRecordTests" fullname="XRApartment.Tests.SessionRecordTests" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.009866" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1307" name="AbortedTask_IsNotAResolvedBenchmark" fullname="XRApartment.Tests.SessionRecordTests.AbortedTask_IsNotAResolvedBenchmark" methodname="AbortedTask_IsNotAResolvedBenchmark" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="242827209" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001202" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1310" name="AllSkipped_IsCompleteAsIncompleteWithoutPreference" fullname="XRApartment.Tests.SessionRecordTests.AllSkipped_IsCompleteAsIncompleteWithoutPreference" methodname="AllSkipped_IsCompleteAsIncompleteWithoutPreference" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="884249231" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000860" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1304" name="CompletedFeedback_HasNoMissingFields" fullname="XRApartment.Tests.SessionRecordTests.CompletedFeedback_HasNoMissingFields" methodname="CompletedFeedback_HasNoMissingFields" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="1432671689" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000484" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1305" name="CompletedFeedback_RequiresChoicesButAllowsEmptyExplanation" fullname="XRApartment.Tests.SessionRecordTests.CompletedFeedback_RequiresChoicesButAllowsEmptyExplanation" methodname="CompletedFeedback_RequiresChoicesButAllowsEmptyExplanation" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="1198997146" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001163" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1311" name="CompletedSession_RequiresMatchingOutcomeAndTradeOff" fullname="XRApartment.Tests.SessionRecordTests.CompletedSession_RequiresMatchingOutcomeAndTradeOff" methodname="CompletedSession_RequiresMatchingOutcomeAndTradeOff" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="1513567635" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000248" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1312" name="Record_CarriesNoPersonalIdentityField" fullname="XRApartment.Tests.SessionRecordTests.Record_CarriesNoPersonalIdentityField" methodname="Record_CarriesNoPersonalIdentityField" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="1383940454" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001031" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1308" name="Record_IncompleteWithoutFinalPreferenceOrModelVersion" fullname="XRApartment.Tests.SessionRecordTests.Record_IncompleteWithoutFinalPreferenceOrModelVersion" methodname="Record_IncompleteWithoutFinalPreferenceOrModelVersion" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="1386462530" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000593" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1309" name="Record_WithABenchmarkStillUnjudged_IsNotComplete" fullname="XRApartment.Tests.SessionRecordTests.Record_WithABenchmarkStillUnjudged_IsNotComplete" methodname="Record_WithABenchmarkStillUnjudged_IsNotComplete" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="264247875" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000770" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1306" name="SkippedTask_RequiresAReason" fullname="XRApartment.Tests.SessionRecordTests.SkippedTask_RequiresAReason" methodname="SkippedTask_RequiresAReason" classname="XRApartment.Tests.SessionRecordTests" runstate="Runnable" seed="45598990" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000565" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1313" name="SessionStateMachineTests" fullname="XRApartment.Tests.SessionStateMachineTests" classname="XRApartment.Tests.SessionStateMachineTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.004208" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1319" name="ChallengeCannotRestart_OnceEveryBenchmarkIsResolved" fullname="XRApartment.Tests.SessionStateMachineTests.ChallengeCannotRestart_OnceEveryBenchmarkIsResolved" methodname="ChallengeCannotRestart_OnceEveryBenchmarkIsResolved" classname="XRApartment.Tests.SessionStateMachineTests" runstate="Runnable" seed="2120493654" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000382" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1318" name="ExitRequested_IsAvailableFromAnyLiveState" fullname="XRApartment.Tests.SessionStateMachineTests.ExitRequested_IsAvailableFromAnyLiveState" methodname="ExitRequested_IsAvailableFromAnyLiveState" classname="XRApartment.Tests.SessionStateMachineTests" runstate="Runnable" seed="795818042" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000239" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1314" name="HappyPath_ReachesFinishedThroughAllThreeBenchmarks" fullname="XRApartment.Tests.SessionStateMachineTests.HappyPath_ReachesFinishedThroughAllThreeBenchmarks" methodname="HappyPath_ReachesFinishedThroughAllThreeBenchmarks" classname="XRApartment.Tests.SessionStateMachineTests" runstate="Runnable" seed="2046584957" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000755" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1317" name="PauseAndResume_ReturnToTheStateTheyLeft" fullname="XRApartment.Tests.SessionStateMachineTests.PauseAndResume_ReturnToTheStateTheyLeft" methodname="PauseAndResume_ReturnToTheStateTheyLeft" classname="XRApartment.Tests.SessionStateMachineTests" runstate="Runnable" seed="1508547072" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000331" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1315" name="PreferenceConfirmation_BlockedUntilEveryBenchmarkResolved" fullname="XRApartment.Tests.SessionStateMachineTests.PreferenceConfirmation_BlockedUntilEveryBenchmarkResolved" methodname="PreferenceConfirmation_BlockedUntilEveryBenchmarkResolved" classname="XRApartment.Tests.SessionStateMachineTests" runstate="Runnable" seed="609508368" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000237" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1316" name="SkippedBenchmark_StillCountsAsResolved_SoSafetyStopIsNotAFailure" fullname="XRApartment.Tests.SessionStateMachineTests.SkippedBenchmark_StillCountsAsResolved_SoSafetyStopIsNotAFailure" methodname="SkippedBenchmark_StillCountsAsResolved_SoSafetyStopIsNotAFailure" classname="XRApartment.Tests.SessionStateMachineTests" runstate="Runnable" seed="2137262273" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000256" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1320" name="TaskEvidenceContractTests" fullname="XRApartment.Tests.TaskEvidenceContractTests" classname="XRApartment.Tests.TaskEvidenceContractTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.002756" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1322" name="Contract_ProvidesTheExpectedReplaceablePorts" fullname="XRApartment.Tests.TaskEvidenceContractTests.Contract_ProvidesTheExpectedReplaceablePorts" methodname="Contract_ProvidesTheExpectedReplaceablePorts" classname="XRApartment.Tests.TaskEvidenceContractTests" runstate="Runnable" seed="1031001700" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000621" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1321" name="PublicContracts_KeepDataSimulationRuntimeDependencyDirection" fullname="XRApartment.Tests.TaskEvidenceContractTests.PublicContracts_KeepDataSimulationRuntimeDependencyDirection" methodname="PublicContracts_KeepDataSimulationRuntimeDependencyDirection" classname="XRApartment.Tests.TaskEvidenceContractTests" runstate="Runnable" seed="292620336" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000472" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1323" name="TomatoEggRecipeTests" fullname="XRApartment.Tests.TomatoEggRecipeTests" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.004977" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1324" name="BlockedDoorEasingCanResumeWithoutApplyingEasingTwice" fullname="XRApartment.Tests.TomatoEggRecipeTests.BlockedDoorEasingCanResumeWithoutApplyingEasingTwice" methodname="BlockedDoorEasingCanResumeWithoutApplyingEasingTwice" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" seed="735202336" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000555" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1329" name="BurntIsTerminalUntilReset" fullname="XRApartment.Tests.TomatoEggRecipeTests.BurntIsTerminalUntilReset" methodname="BurntIsTerminalUntilReset" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" seed="522131989" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000803" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1327" name="ColdFoodCannotCompleteEvenWithAllGestures" fullname="XRApartment.Tests.TomatoEggRecipeTests.ColdFoodCannotCompleteEvenWithAllGestures" methodname="ColdFoodCannotCompleteEvenWithAllGestures" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" seed="698920962" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000343" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1326" name="MissingDicingCannotBeReplacedByHotIngredients" fullname="XRApartment.Tests.TomatoEggRecipeTests.MissingDicingCannotBeReplacedByHotIngredients" methodname="MissingDicingCannotBeReplacedByHotIngredients" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" seed="1316297282" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000214" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1330" name="PartialPreparationCanBeObservedWithoutSkippingMissingSteps" fullname="XRApartment.Tests.TomatoEggRecipeTests.PartialPreparationCanBeObservedWithoutSkippingMissingSteps" methodname="PartialPreparationCanBeObservedWithoutSkippingMissingSteps" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" seed="1497597196" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000236" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1328" name="RequiresActualScramblingAndFinalStirFry" fullname="XRApartment.Tests.TomatoEggRecipeTests.RequiresActualScramblingAndFinalStirFry" methodname="RequiresActualScramblingAndFinalStirFry" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" seed="456633521" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000257" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1325" name="StartsWithOpeningFridgeAndCannotFinishWithoutActions" fullname="XRApartment.Tests.TomatoEggRecipeTests.StartsWithOpeningFridgeAndCannotFinishWithoutActions" methodname="StartsWithOpeningFridgeAndCannotFinishWithoutActions" classname="XRApartment.Tests.TomatoEggRecipeTests" runstate="Runnable" seed="863243231" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000242" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1331" name="WaterVolumeTests" fullname="XRApartment.Tests.WaterVolumeTests" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.008051" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1339" name="CapacityMustBePositiveAndFinite" fullname="XRApartment.Tests.WaterVolumeTests.CapacityMustBePositiveAndFinite" methodname="CapacityMustBePositiveAndFinite" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" seed="1433901578" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001639" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1334" name="EmptySourceCannotCreateWaterInReceiver" fullname="XRApartment.Tests.WaterVolumeTests.EmptySourceCannotCreateWaterInReceiver" methodname="EmptySourceCannotCreateWaterInReceiver" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" seed="189259869" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000679" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1338" name="InvalidFlowDoesNotCorruptStoredVolume" fullname="XRApartment.Tests.WaterVolumeTests.InvalidFlowDoesNotCorruptStoredVolume" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001735" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1335" name="InvalidFlowDoesNotCorruptStoredVolume(float.NaN)" fullname="XRApartment.Tests.WaterVolumeTests.InvalidFlowDoesNotCorruptStoredVolume(float.NaN)" methodname="InvalidFlowDoesNotCorruptStoredVolume" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" seed="1170531382" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000411" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1336" name="InvalidFlowDoesNotCorruptStoredVolume(float.PositiveInfinity)" fullname="XRApartment.Tests.WaterVolumeTests.InvalidFlowDoesNotCorruptStoredVolume(float.PositiveInfinity)" methodname="InvalidFlowDoesNotCorruptStoredVolume" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" seed="427695156" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000124" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1337" name="InvalidFlowDoesNotCorruptStoredVolume(-100.0f)" fullname="XRApartment.Tests.WaterVolumeTests.InvalidFlowDoesNotCorruptStoredVolume(-100.0f)" methodname="InvalidFlowDoesNotCorruptStoredVolume" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" seed="473251943" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000120" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1332" name="PouringIntoAlmostFullCup_OnlyTransfersAvailableSpace" fullname="XRApartment.Tests.WaterVolumeTests.PouringIntoAlmostFullCup_OnlyTransfersAvailableSpace" methodname="PouringIntoAlmostFullCup_OnlyTransfersAvailableSpace" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" seed="1567126391" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.000297" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1333" name="RepeatedTransfers_ConserveWaterAndNeverGoNegative" fullname="XRApartment.Tests.WaterVolumeTests.RepeatedTransfers_ConserveWaterAndNeverGoNegative" methodname="RepeatedTransfers_ConserveWaterAndNeverGoNegative" classname="XRApartment.Tests.WaterVolumeTests" runstate="Runnable" seed="534633104" result="Passed" start-time="2026-10-29 17:19:44Z" end-time="2026-10-29 17:19:44Z" duration="0.001622" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

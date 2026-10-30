@@ -125,6 +125,8 @@ namespace XRApartment.Tests
             Assert.IsTrue(egg.GetComponent<PreparedKitchenProp>().TryCrack());
             Assert.That(egg.GetComponent<KitchenEgg>().LastReceivedMillilitres, Is.EqualTo(50).Within(.001f));
             Assert.AreEqual(CookingStage.Raw, bowl.Stage);
+            // Transfer is verified; loose shells must not obstruct the independent whisking fixture.
+            egg.SetActive(false);
             var whisk = Load(Cooking + "PREF_Cooking_Whisk.prefab", Vector3.up * -.005f);
             var grab = whisk.GetComponent<XRGrabInteractable>(); hand.transform.position = whisk.transform.position;
             yield return null; manager.SelectEnter((IXRSelectInteractor)hand, grab);
