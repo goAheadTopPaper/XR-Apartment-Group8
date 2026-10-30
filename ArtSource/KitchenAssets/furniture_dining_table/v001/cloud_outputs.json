@@ -1,0 +1,48 @@
+{
+  "job_id": "6a0985b7-738e-45c3-bd9c-0aaaffa6f88a",
+  "archive_sha256": "cc8a933657bb1b2850d425765fc4367d7003bedfef42d892c04ae100250bfbfd",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/furniture_dining_table/v001/master_glb_00001.glb",
+      "bytes": 11609172,
+      "sha256": "287714486be7570a50cdd6903c663d9f22cb67f4be8e33fdf2871ed55391090e",
+      "file": "furniture_dining_table/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/furniture_dining_table/v001/basecolor_00001.png",
+      "bytes": 4001069,
+      "sha256": "71b4bd57cbf18bd66ab2dd2b193f4b411ff07f39a0014ec8ddc15d3cc62f7b3c",
+      "file": "furniture_dining_table/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/furniture_dining_table/v001/metallic_00001.png",
+      "bytes": 141313,
+      "sha256": "c897a1e23f2c94255202815faefd25cd5b6bdfc878951bc0b139870088bd72db",
+      "file": "furniture_dining_table/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/furniture_dining_table/v001/roughness_00001.png",
+      "bytes": 571400,
+      "sha256": "d59fafbd26332a096a7dec951a84391bde40618708799b8fbdd7cf074ad82319",
+      "file": "furniture_dining_table/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/furniture_dining_table/v001/normal_00001.png",
+      "bytes": 1634971,
+      "sha256": "9cb71ffc14928c99247d86e1d597fd3613947666bfe2043fc26000f829ec041f",
+      "file": "furniture_dining_table/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/furniture_dining_table/v001/ao_00001.png",
+      "bytes": 608260,
+      "sha256": "921fadad51d3502bbb471920064026a88f3f8a81058c19c36a4de228eb36cbd5",
+      "file": "furniture_dining_table/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/furniture_dining_table/v001/render_preview_00001.png",
+      "bytes": 342026,
+      "sha256": "041c4fe8b2efc8b96cda2e558862e3248a9a9bed8ef35ffa210061eb75dceb00",
+      "file": "furniture_dining_table/v001/download/cloud_render_preview.png"
+    }
+  }
+}

@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "workflow_version": "KitchenAssets_v1",
-  "checked_date_local": "2026-10-29",
+  "checked_date_local": "2026-10-30",
   "source_template_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62",
-  "cloud_generation_status": "20_actual_pixal_jobs_completed_19_single_1_multiview_contrast",
-  "actual_cloud_pilot_assets": 20,
+  "cloud_generation_status": "24_actual_pixal_jobs_completed_23_single_1_multiview_contrast",
+  "actual_cloud_pilot_assets": 24,
   "cloud_backend_version": null,
   "workflows": [
     {
@@ -32,7 +32,7 @@
       "links": 124,
       "status": "actual_generation_and_Unity_FBX_import_tested",
       "required_images": 1,
-      "generation_jobs_run": 19,
+      "generation_jobs_run": 23,
       "credits_consumed": null,
       "model_files": [
         "birefnet.safetensors",
@@ -53,8 +53,8 @@
     "python_tests": 12,
     "blender_tests": 7,
     "unity_editmode_tests": 145,
-    "unity_playmode_tests": 49,
-    "fbx_import_samples": "15 actual generated kitchen props, local casing/plumbing derivatives and vendor ceramics; previous character/cabinet samples retained",
+    "unity_playmode_tests": 50,
+    "fbx_import_samples": "Generated kitchen assets plus furniture derivatives; 4 new actual Pixal3D jobs reviewed and integrated",
     "quest_link": "not_tested"
   },
   "local_normalisation_verified_in_cloud_ui": true,
@@ -62,7 +62,8 @@
     "Character body motion/seam tests passed; shoulder and cloth art need manual retopology; facial rig not implemented.",
     "Calibrated four-view Pixal3D ran successfully; visual output rejected and not placed in the kitchen.",
     "Credit charges not confirmed; visible balance before/after nine jobs was 6631.",
-    "Fridge body image-to-3D casing had warped broad planes; local hard-surface casing/liner used. Generated door retained after debris removal and rear liner repair."
+    "Fridge body image-to-3D casing had warped broad planes; local hard-surface casing/liner used. Generated door retained after debris removal and rear liner repair.",
+    "Furniture batch: generated oak table/chair aligned and calibrated; lamp oak collar retained with locally rebuilt hollow shade. Closed fridge raw mesh rejected for warped planes; precise casing/door and mechanical detail locally reconstructed from approved reference."
   ],
   "post_bake_scene_check": {
     "passed": 1,
@@ -72,5 +73,7 @@
   "recipe_validation": "../../ArtSource/KitchenAssets/Validation/FoodVisuals/validation.json",
   "recipe_preview": "../../ArtSource/KitchenAssets/Validation/FoodVisuals/tomato-egg-finished.png",
   "cookware_validation": "../../ArtSource/KitchenAssets/Validation/KitchenRoom/validation.json",
-  "cookware_preview": "../../ArtSource/KitchenAssets/Validation/KitchenRoom/kitchen-room-ready.png"
+  "cookware_preview": "../../ArtSource/KitchenAssets/Validation/KitchenRoom/kitchen-room-ready.png",
+  "furniture_validation": "../../ArtSource/KitchenAssets/Validation/Furniture/validation.json",
+  "furniture_preview": "../../ArtSource/KitchenAssets/Validation/Furniture/dining-room.png"
 }

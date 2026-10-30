@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "asset_name": "furniture_pendant_shade",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 281120,
+  "quality": "high",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/furniture_pendant_shade_single_v001.png"
+  },
+  "reference_sha256": {
+    "single": "c35fa798177de41e0af7120ca75575f3aa2bec3b6df845686d64fd957932447b"
+  },
+  "design_review": {
+    "approved": true,
+    "approval_evidence": "User confirmed 2026-10-30: 确认，按这套生成并集成, matching light oak table/chair, ivory pendant and single-door refrigerator; cooking sandbox integration",
+    "style_board": "../References/Kitchen_StyleBoard_v001.png"
+  },
+  "scale": {
+    "reference_span_metres": 0.4,
+    "status": "prototype asset-production assumption, not client fact",
+    "orientation": "Blender Z-up / Unity Y-up",
+    "pivot": "bottom centre; refrigerator derived moving door has hinge pivot"
+  },
+  "parameters": {
+    "master_faces": 100000,
+    "master_texture": 2048,
+    "master_normal": 2048,
+    "master_ao": 1024,
+    "game_triangles": 8000,
+    "game_texture": 2048
+  },
+  "postprocess_recipe": {
+    "kind": "static",
+    "pieces": 0
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "reference_provider": "built-in Image Gen",
+    "reference_prompt_file": "../References/furniture_pendant_shade_prompt.txt"
+  },
+  "generation": {
+    "status": "generated_reviewed_integrated_cooking_scene",
+    "job_id": "41ba5179-bf96-4ed3-ac6b-5167509ed44c",
+    "elapsed_seconds": 47.7,
+    "credits_consumed": null
+  },
+  "outputs": {
+    "master_glb": "../furniture_pendant_shade/v001/download/master.glb",
+    "preview_png": "../Recipe/v004_furniture/pendant_review.png",
+    "pbr_textures": {
+      "basecolor": "../furniture_pendant_shade/v001/TexturesSource/basecolor.png",
+      "metallic": "../furniture_pendant_shade/v001/TexturesSource/metallic.png",
+      "roughness": "../furniture_pendant_shade/v001/TexturesSource/roughness.png",
+      "normal": "../furniture_pendant_shade/v001/TexturesSource/normal.png",
+      "ao": "../furniture_pendant_shade/v001/TexturesSource/ao.png"
+    },
+    "game_glb": "../Recipe/v004_furniture/pendant.glb",
+    "normalized_master_glb": "../furniture_pendant_shade/v001/prepared/furniture_pendant_shade_master.glb",
+    "prepared_manifest": "../furniture_pendant_shade/v001/prepared/unity_asset.json",
+    "scene_derivative": "../Recipe/v004_furniture/visual_provenance.json",
+    "prepared_source_game_glb": "../furniture_pendant_shade/v001/prepared/furniture_pendant_shade_game.glb",
+    "scene_prefab": "Assets/_Project/Prefabs/Furniture/PREF_Furniture_Pendant.prefab",
+    "cloud_preview_png": "../furniture_pendant_shade/v001/download/cloud_render_preview.png",
+    "prepared_source_unity_fbx": "../furniture_pendant_shade/v001/prepared/furniture_pendant_shade_game.fbx",
+    "unity_fbx": "../Recipe/v004_furniture/pendant.fbx"
+  },
+  "acceptance": {
+    "cloud_generation": "passed_output_downloaded",
+    "unity_import": "passed_saved_FBX_Standard_PBR_LOD",
+    "visual_quality": "raw_shade_rejected; generated_oak_collar_retained; local_hollow_spun_shade_cord_canopy",
+    "interaction": "passed_complete_recipe_and_character_controller_layout",
+    "quest_link": "not_tested",
+    "ready_for_editor_prototype": false,
+    "scene_version_ready": true
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true
+  },
+  "human_cleanup": {
+    "human_manual_minutes": 0,
+    "agent_authoring_minutes": null,
+    "notes": [
+      "Raw shade rejected: irregular rim and hallucinated brass loop. Generated oak collar retained; smooth hollow shade, cord and canopy locally reconstructed from approved reference."
+    ]
+  },
+  "processing": {
+    "game_triangles": 8000,
+    "piece_count": 0,
+    "game_basecolor_size": [
+      2048,
+      2048
+    ]
+  }
+}

@@ -24,7 +24,8 @@ def main():
         row.update({name: generation.get(name) for name in ("job_id", "elapsed_seconds", "compute_hours_displayed", "credits_consumed")})
         row.update({name: processing.get(name) for name in ("game_triangles", "piece_count")})
         row["game_basecolor_size"] = "x".join(map(str, processing.get("game_basecolor_size", [])))
-        row["human_cleanup_minutes"] = asset.get("human_cleanup", {}).get("minutes")
+        cleanup = asset.get("human_cleanup", {})
+        row["human_cleanup_minutes"] = cleanup.get("minutes", cleanup.get("human_manual_minutes"))
         row["agent_authoring_minutes"] = asset.get("human_cleanup", {}).get("agent_authoring_minutes")
         row.update({name: acceptance.get(name) for name in ("visual_quality", "unity_import", "interaction", "body_animation", "facial_lipsync", "quest_link")})
         rows.append(row)
@@ -37,9 +38,12 @@ def main():
     names = {"plate": "盘子", "tomato": "番茄", "carrot": "胡萝卜", "apple": "苹果", "lemon": "柠檬", "egg": "鸡蛋", "knife": "厨刀",
              "kitchen_character": "人物实验样例", "cabinet_module": "柜体模块", "cabinet_multiview": "四视角柜体对照",
              "kitchen_fridge_body":"冰箱箱体参考", "kitchen_fridge_door":"独立冰箱门", "kitchen_frying_pan":"煎锅",
-             "kitchen_stockpot":"双耳汤锅", "kitchen_spatula":"锅铲", "kitchen_ladle":"汤勺", "kitchen_gas_hob":"燃气灶", "kitchen_whisk":"搅拌器"}
+             "kitchen_stockpot":"双耳汤锅", "kitchen_spatula":"锅铲", "kitchen_ladle":"汤勺", "kitchen_gas_hob":"燃气灶", "kitchen_whisk":"搅拌器",
+             "furniture_dining_table":"浅橡木餐桌", "furniture_dining_chair":"配套餐椅", "furniture_pendant_shade":"暖白吊灯", "furniture_refrigerator":"单门冰箱"}
     status = {"kitchen_character": "身体动作已测；肩部与衣物待精修，口型未做", "cabinet_module": "空心柜身与独立铰链门已测", "cabinet_multiview": "技术导入通过；外观不合格，排除"}
     status["kitchen_fridge_body"] = "生成外壳平面不合格；参考其设计本地重建箱体，生成门保留"
+    status["furniture_refrigerator"] = "原始平面 / 贴图不合格；当前机械结构本地重建"
+    status["furniture_pendant_shade"] = "保留生成木质顶帽；空心灯罩 / 吊线本地重建"
     lines = ["# 首批生成与处理结果", "", "数据来自各资产 manifest；缺项保留为空，未核实的费用不写成零。", "",
              "| 物品 | 输入 | 生成秒数 | 游戏三角形 | 碎片 / 切片 | 状态 |", "| --- | --- | ---: | ---: | ---: | --- |"]
     for row in rows:

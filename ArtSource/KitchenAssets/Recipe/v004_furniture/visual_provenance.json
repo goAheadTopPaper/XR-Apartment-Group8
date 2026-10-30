@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "assets": {
+    "dining_table": {
+      "meshes": [
+        {
+          "name": "VIS_Cloud_dining_table",
+          "vertices": 9357,
+          "triangles": 12000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.75,
+          -0.42500001192092896,
+          0.0
+        ],
+        [
+          0.7500000596046448,
+          0.42500001192092896,
+          0.7598156929016113
+        ]
+      ],
+      "lod1_triangles": 3000,
+      "cleanup": {
+        "yaw_radians": 2.562194417409175,
+        "calibrated_size_m": [
+          1.5,
+          0.85,
+          0.76
+        ],
+        "flattened_table_centre_vertices": 131,
+        "four_foot_contacts_corrected": true,
+        "geometry": "Pixal3D, aligned and calibrated; source loop UV retained"
+      },
+      "job_id": "6a0985b7-738e-45c3-bd9c-0aaaffa6f88a",
+      "master_sha256": "287714486be7570a50cdd6903c663d9f22cb67f4be8e33fdf2871ed55391090e"
+    },
+    "dining_chair": {
+      "meshes": [
+        {
+          "name": "VIS_Cloud_dining_chair",
+          "vertices": 9851,
+          "triangles": 12000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.24500000476837158,
+          -0.26499998569488525,
+          0.0
+        ],
+        [
+          0.2449999898672104,
+          0.26499998569488525,
+          0.8299999833106995
+        ]
+      ],
+      "lod1_triangles": 3000,
+      "cleanup": {
+        "yaw_radians": 0.5703189074518997,
+        "calibrated_size_m": [
+          0.49,
+          0.53,
+          0.83
+        ],
+        "flattened_table_centre_vertices": 0,
+        "four_foot_contacts_corrected": true,
+        "geometry": "Pixal3D, aligned and calibrated; source loop UV retained"
+      },
+      "job_id": "b896a67e-5393-492b-aacf-16ee35124d71",
+      "master_sha256": "c494a0ae36a6569d3fc74c53973c5535c8b290edb6133f046af9b35c4f3e996e"
+    },
+    "pendant_shade": {
+      "meshes": [
+        {
+          "name": "VIS_IvoryEnamel",
+          "vertices": 2400,
+          "triangles": 4604,
+          "closed": false,
+          "volume_m3": null
+        },
+        {
+          "name": "VIS_Cloud_pendant_shade",
+          "vertices": 281,
+          "triangles": 267,
+          "closed": false,
+          "volume_m3": null
+        },
+        {
+          "name": "VIS_Brass",
+          "vertices": 384,
+          "triangles": 764,
+          "closed": true,
+          "volume_m3": 2.0874073319798953e-05
+        },
+        {
+          "name": "VIS_Cable",
+          "vertices": 128,
+          "triangles": 252,
+          "closed": true,
+          "volume_m3": 1.8073078333902137e-05
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.20000000298023224,
+          -0.20000000298023224,
+          0.0
+        ],
+        [
+          0.20000000298023224,
+          0.20000000298023224,
+          0.9000000357627869
+        ]
+      ],
+      "lod1_triangles": 2397,
+      "cleanup": "Raw shade rejected: irregular rim and hallucinated brass loop. Generated oak collar retained; smooth hollow shade, cord and canopy locally reconstructed from approved reference.",
+      "job_id": "41ba5179-bf96-4ed3-ac6b-5167509ed44c",
+      "master_sha256": "34a236e56b6c682c2b5eb5df1cf1a436197a2c5d86b1bfc61dff4e6bb41b14e5"
+    },
+    "refrigerator": {
+      "body": {
+        "meshes": [
+          {
+            "name": "VIS_FridgeEnamel",
+            "vertices": 480,
+            "triangles": 940,
+            "closed": true,
+            "volume_m3": 0.19988027023474486
+          },
+          {
+            "name": "VIS_FridgeLiner",
+            "vertices": 1152,
+            "triangles": 2256,
+            "closed": true,
+            "volume_m3": 0.05984969259325694
+          },
+          {
+            "name": "VIS_OpalLamp",
+            "vertices": 96,
+            "triangles": 188,
+            "closed": true,
+            "volume_m3": 0.0002129628034490413
+          },
+          {
+            "name": "VIS_ShelfGlass",
+            "vertices": 288,
+            "triangles": 564,
+            "closed": true,
+            "volume_m3": 0.018530431494253288
+          },
+          {
+            "name": "VIS_BrushedSteel",
+            "vertices": 864,
+            "triangles": 1692,
+            "closed": true,
+            "volume_m3": 0.0007029961035403828
+          },
+          {
+            "name": "VIS_Crisper",
+            "vertices": 384,
+            "triangles": 752,
+            "closed": true,
+            "volume_m3": 0.008641886614333407
+          },
+          {
+            "name": "VIS_DoorGasket",
+            "vertices": 1792,
+            "triangles": 3536,
+            "closed": true,
+            "volume_m3": 0.0016788753976115698
+          }
+        ],
+        "bounds_blender": [
+          [
+            -0.36000001430511475,
+            -0.34700000286102295,
+            0.0
+          ],
+          [
+            0.35999998450279236,
+            0.33000001311302185,
+            1.809999942779541
+          ]
+        ],
+        "lod1_triangles": 3494
+      },
+      "door": {
+        "meshes": [
+          {
+            "name": "VIS_FridgeEnamel",
+            "vertices": 96,
+            "triangles": 188,
+            "closed": true,
+            "volume_m3": 0.0920846889648893
+          },
+          {
+            "name": "VIS_FridgeLiner",
+            "vertices": 960,
+            "triangles": 1880,
+            "closed": true,
+            "volume_m3": 0.020684215562175114
+          },
+          {
+            "name": "VIS_DoorGasket",
+            "vertices": 384,
+            "triangles": 752,
+            "closed": true,
+            "volume_m3": 0.0009511574664252644
+          },
+          {
+            "name": "VIS_Crisper",
+            "vertices": 288,
+            "triangles": 564,
+            "closed": true,
+            "volume_m3": 0.0011705439129265566
+          },
+          {
+            "name": "VIS_BrushedSteel",
+            "vertices": 1344,
+            "triangles": 2668,
+            "closed": true,
+            "volume_m3": 0.0004391422273644248
+          }
+        ],
+        "bounds_blender": [
+          [
+            -0.002499997615814209,
+            -0.11699999868869781,
+            0.00950002670288086
+          ],
+          [
+            0.687999963760376,
+            0.12849999964237213,
+            1.745500087738037
+          ]
+        ],
+        "lod1_triangles": 2196
+      },
+      "cleanup": "Cloud closed refrigerator rejected for warped planes and streaked baked shading. All precision casing, door, handle, liner, shelves, trim and bins locally reconstructed from approved reference; original Cloud model/PBR retained for traceability. Existing interaction proxies unchanged.",
+      "job_id": "12187f5e-e184-4f0b-91a7-3d520a308282",
+      "master_sha256": "ecab44c073b85c8e2160c8c3c3d1a27a0866a58500c988e6786372ed5a98d9ed",
+      "assembled_glb": {
+        "file": "refrigerator.glb",
+        "door_hinge_blender": [
+          -0.345,
+          -0.37,
+          0.04
+        ],
+        "sha256": "f860a1328f74ee6b99d53303009c04bf0af495a2c1b4235a37e5967f5de0246d"
+      }
+    }
+  }
+}

@@ -171,5 +171,6 @@ def mechanical():
     print("RECIPE_MECHANICAL_MODELS_READY", len(sources))
 
 
-tomato()
-mechanical()
+if __name__ == "__main__":
+    tomato()
+    mechanical()

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "asset_name": "furniture_dining_chair",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 281110,
+  "quality": "high",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/furniture_dining_chair_single_v001.png"
+  },
+  "reference_sha256": {
+    "single": "38572d93a86ea452d936b7d1575eb79f1ea75b5dfc589d4befcaf62105f9cb0a"
+  },
+  "design_review": {
+    "approved": true,
+    "approval_evidence": "User confirmed 2026-10-30: 确认，按这套生成并集成, matching light oak table/chair, ivory pendant and single-door refrigerator; cooking sandbox integration",
+    "style_board": "../References/Kitchen_StyleBoard_v001.png"
+  },
+  "scale": {
+    "reference_span_metres": 0.83,
+    "status": "prototype asset-production assumption, not client fact",
+    "orientation": "Blender Z-up / Unity Y-up",
+    "pivot": "bottom centre; refrigerator derived moving door has hinge pivot"
+  },
+  "parameters": {
+    "master_faces": 100000,
+    "master_texture": 2048,
+    "master_normal": 2048,
+    "master_ao": 1024,
+    "game_triangles": 12000,
+    "game_texture": 2048
+  },
+  "postprocess_recipe": {
+    "kind": "static",
+    "pieces": 0
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "reference_provider": "built-in Image Gen",
+    "reference_prompt_file": "../References/furniture_dining_chair_prompt.txt"
+  },
+  "generation": {
+    "status": "generated_reviewed_integrated_cooking_scene",
+    "job_id": "b896a67e-5393-492b-aacf-16ee35124d71",
+    "elapsed_seconds": 40.49,
+    "credits_consumed": null
+  },
+  "outputs": {
+    "master_glb": "../furniture_dining_chair/v001/download/master.glb",
+    "preview_png": "../Recipe/v004_furniture/dining_chair_review.png",
+    "pbr_textures": {
+      "basecolor": "../furniture_dining_chair/v001/TexturesSource/basecolor.png",
+      "metallic": "../furniture_dining_chair/v001/TexturesSource/metallic.png",
+      "roughness": "../furniture_dining_chair/v001/TexturesSource/roughness.png",
+      "normal": "../furniture_dining_chair/v001/TexturesSource/normal.png",
+      "ao": "../furniture_dining_chair/v001/TexturesSource/ao.png"
+    },
+    "game_glb": "../Recipe/v004_furniture/dining_chair.glb",
+    "normalized_master_glb": "../furniture_dining_chair/v001/prepared/furniture_dining_chair_master.glb",
+    "prepared_manifest": "../furniture_dining_chair/v001/prepared/unity_asset.json",
+    "scene_derivative": "../Recipe/v004_furniture/visual_provenance.json",
+    "prepared_source_game_glb": "../furniture_dining_chair/v001/prepared/furniture_dining_chair_game.glb",
+    "scene_prefab": "Assets/_Project/Prefabs/Furniture/PREF_Furniture_DiningChair.prefab",
+    "cloud_preview_png": "../furniture_dining_chair/v001/download/cloud_render_preview.png",
+    "prepared_source_unity_fbx": "../furniture_dining_chair/v001/prepared/furniture_dining_chair_game.fbx",
+    "unity_fbx": "../Recipe/v004_furniture/dining_chair.fbx"
+  },
+  "acceptance": {
+    "cloud_generation": "passed_output_downloaded",
+    "unity_import": "passed_saved_FBX_Standard_PBR_LOD",
+    "visual_quality": "reviewed_generated_geometry_after_alignment_scale_and_table_plane_repair",
+    "interaction": "passed_complete_recipe_and_character_controller_layout",
+    "quest_link": "not_tested",
+    "ready_for_editor_prototype": true,
+    "scene_version_ready": true
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true
+  },
+  "human_cleanup": {
+    "human_manual_minutes": 0,
+    "agent_authoring_minutes": null,
+    "notes": [
+      {
+        "yaw_radians": 0.5703189074518997,
+        "calibrated_size_m": [
+          0.49,
+          0.53,
+          0.83
+        ],
+        "flattened_table_centre_vertices": 0,
+        "geometry": "Pixal3D, aligned and calibrated; source loop UV retained"
+      }
+    ]
+  },
+  "processing": {
+    "game_triangles": 12000,
+    "piece_count": 0,
+    "game_basecolor_size": [
+      2048,
+      2048
+    ]
+  }
+}
