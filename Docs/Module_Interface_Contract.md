@@ -4,6 +4,10 @@
 **适用范围**：P0 B1=Proud+F2、B2=Flush-oriented+F2 的运行时评审旅程及 Core、Feedback、UI、Conflict Detection、Storage 的交接  
 **需求依据**：Lean PRD v0.3 Final §§8–12、FR-01/02/03/05/06/07/09/10/11/12、SAFE-01。本文约定模块交接，不代替 PRD 验收。现有模型与 PRD 的差异单独记录，由模型模块修复。
 
+独立烹饪场景的 `RESET ROOM` 不属于正式会话命令。`KitchenCookingStation.ResetStarting` 仅在原有烹饪重置开始时通知同场景的 `KitchenRoomReset`，先取消外部道具抓取、恢复姿态并清理水体，再由原工作台恢复食材、菜谱和冰箱。它不调用 Core，不改反馈 / CSV，也不重载或重置其他场景；正式评审仍必须经过 Core 的重置效果与回执。
+
+玩家的移动偏好由 Rig 上的 `KitchenLocomotionSettings` 管理：只在瞬移与连续平移之间切换 XRI 输入及移动组件，保存在本机 PlayerPrefs，不提交 Core 命令或任务证据，不重置会话、物品或 CSV。独立的移动设置面板使用左手 Y / Menu 或键盘 F8，避开正式恢复菜单的右手 B / Escape；打开移动设置时暂时停止摇杆走路、转向及瞬移，关闭后恢复当前偏好。它不接管 Core 的暂停 / 恢复，也不改变 `Time.timeScale`。地面瞬移的落点与直线路径碰撞检查仅用于玩家移动约束，不产生 FR-06 设计冲突或 SAFE-01 安全结论。
+
 ## 1. 使用顺序与共同规则
 
 1. **第一关仅交付契约**：流程负责人已审查本文、拟修改文件与分工；各工作包负责人已核对下述 C# 公共签名、状态与失败规则。本文现作为跨分支接口基线；共享接口变更先修本文并审查，再改代码。

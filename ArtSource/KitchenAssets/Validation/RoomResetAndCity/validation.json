@@ -1,0 +1,55 @@
+{
+  "date_local": "2026-10-31",
+  "base_commit": "1ebd98eba2fb8b931c342a2a68b9e7a2220de040",
+  "unity": "2022.3.62f3",
+  "build_target": "StandaloneWindows64",
+  "scope": "Independent cooking scene; in-place room reset; player pose and other scenes retained",
+  "editmode": {
+    "passed": 145,
+    "failed": 0,
+    "duration_seconds": 0.3041637,
+    "failed_cases": []
+  },
+  "playmode_batch": {
+    "passed": 51,
+    "failed": 1,
+    "duration_seconds": 118.8044238,
+    "failed_cases": [
+      {
+        "test": "XRApartment.Tests.TomatoEggRecipePlayTests.CompleteRecipeUsesFridgeKnifeEggPourAndSpatulaAndCanReset",
+        "message": "  Place the pan on the actual hot surface. Pan=(-2.51, 1.04, 1.96), up=(0.26, 0.97, 0.00), heat=(-2.66, 1.11, 1.95)\n  Expected: True\n  But was:  False\n"
+      }
+    ]
+  },
+  "room_reset_final": {
+    "passed": 2,
+    "failed": 0,
+    "duration_seconds": 1.4591617,
+    "failed_cases": []
+  },
+  "source": "Assets/ThirdParty/PolyHaven/JoburgCentralSunset/SOURCE.json",
+  "sky_shader": "Skybox/Panoramic",
+  "sky_rotation_degrees": 120,
+  "cooking_lighting_bake": "passed",
+  "windows_player": "not_tested",
+  "quest_link": "not_tested",
+  "file_checks": {
+    "unchanged_protected_files": 226,
+    "expected_runtime_changes": [
+      "Assets/_Project/Scripts/Runtime/Cooking/KitchenCookingStation.cs",
+      "Assets/_Project/Scripts/Runtime/Water/KitchenWaterSystem.cs",
+      "Assets/_Project/Scripts/Runtime/Water/LiquidContainer.cs"
+    ],
+    "unexpected_protected_changes": [],
+    "missing_meta": [],
+    "orphan_meta": [],
+    "duplicate_guids": []
+  },
+  "evidence_sha256": {
+    "scene-inspection.json": "4f4dc5be962a4fe828bc9a97c6afc6aae8f52da6c1e23a000e18c735e4e44725",
+    "dining-city.png": "6b0e878eb816c556648d633e2b7017318c37052a92ce5857d630ba68698a5e9a",
+    "file-verification.json": "0c0fc51f4290f6cbafe60fbe7a5c861a363e7c43b337747bbfaef50452cc2c3d",
+    "room-reset-final-results.xml": "770dab4a884efe82aa51ea4965c605403189d8d67b138a75ce36cddc86736c4f",
+    "kitchen-window.png": "383d9d93dd32af0762ccb055157da166b29c0a5cb4ae05e0298d3ae1dd01976c"
+  }
+}

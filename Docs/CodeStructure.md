@@ -54,6 +54,8 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 
 `KitchenFurnitureAuthoring` 是同一类的家具 partial，处理复核后的桌椅 / 吊灯、冰箱可见模型、LOD、材质和独立烹饪场景的餐区实例。正式评审的原环境 Prefab 不改；冰箱沿用原交互与碰撞代理。`KitchenFurnitureVerification` 检查保存后的引用、尺寸、LOD 和碰撞并生成实际 Unity 预览；具体来源和本地硬表面修整见 [KitchenFurniture.md](KitchenFurniture.md)。
 
+`KitchenRoomReset` 订阅工作台的 `ResetStarting`，补充同场景中外部持物、水体、动作特效和门 / 抽屉的恢复；不重载场景，也不触碰正式会话或其他场景。`KitchenRoomAuthoring` 仍是原制作类的 partial，负责控制器绑定、按钮标签和烹饪专用城市天空；原评审 AllSky 保留。见 [RoomResetAndCity.md](RoomResetAndCity.md)。
+
 驱动手柄位置的测试须先经过一个渲染更新，再等待物理步。`CollisionConstrainedGrabTransformer` 按 XRI 的 Dynamic / OnBeforeRender 阶段消费追踪姿态；只等待连续 FixedUpdate 会在慢帧追赶时跳过输入样本。两项旧抓取测试已用强制物理追赶复现并修正驱动时序，未放宽断言或改变运行时约束。
 
 分阶段的组件测试还须清理上一阶段的物理夹具：打蛋转移断言后停用蛋壳，避免其落入碗内干扰独立搅拌检查。完整菜谱另有真实 XRI 流程覆盖，不靠忽略生产碰撞或改动烹饪阈值通过。
@@ -66,6 +68,8 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 
 - 门体和抽屉共享 `MotionKinematics`，各自保留小型运动适配；禁用时只移除自己的监听，不清除其他模块的监听。
 - `KinematicPalmSolver` 处理静态表面的手掌球，`HeldPropSweep` 处理整个持物的平移与旋转。两者碰撞规则不同，分别维护。
+- `KitchenInteractionSimulator` 只把编辑器模拟器的 FPS 走路交给原有 `XRBodyTransformer` / `CharacterController`，避免直接改追踪位置绕过碰撞；输入和手部模式继续复用 XRI。项目模拟器 Prefab 使用这个派生组件，见 [KeyboardLocomotion.md](KeyboardLocomotion.md)。
+- `KitchenLocomotionSettings` 维护瞬移 / 平移的本机偏好，`LocomotionSettingsView` 提供左手 Y / Menu 与 F8 设置入口；`KitchenTeleportationProvider` / `KitchenTeleportationArea` 约束实际 XRI 瞬移落点和路径。共享 Prefab 接线由 `KitchenLocomotionAuthoring` 统一制作，旧演示菜单转交同一状态；见 [LocomotionModes.md](LocomotionModes.md)。
 - `ReviewElement`、`BenchmarkSlotMarker` 是场景语义入口；状态机和反馈 schema 仍有 PRD 职责，不能按“当前未接 UI”删除。
 - 手部/水体参数来自登记表；不把几何尺寸分散回运行时脚本。当前正式旅程为 B1/B2，共用动作链、交互约束与环境；B3 的代理资源保留，不自动进入主线的 P0 会话计划。
 

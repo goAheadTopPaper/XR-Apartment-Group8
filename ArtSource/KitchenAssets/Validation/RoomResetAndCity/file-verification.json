@@ -1,0 +1,12 @@
+{
+  "unchanged_protected_files": 226,
+  "expected_runtime_changes": [
+    "Assets/_Project/Scripts/Runtime/Cooking/KitchenCookingStation.cs",
+    "Assets/_Project/Scripts/Runtime/Water/KitchenWaterSystem.cs",
+    "Assets/_Project/Scripts/Runtime/Water/LiquidContainer.cs"
+  ],
+  "unexpected_protected_changes": [],
+  "missing_meta": [],
+  "orphan_meta": [],
+  "duplicate_guids": []
+}

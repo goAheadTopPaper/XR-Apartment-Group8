@@ -49,6 +49,10 @@ Open the repository root in Unity Hub and select **2022.3.62f3**. After UPM fini
 
 For headset-free testing in the Editor, use the included XR Interaction Simulator and follow its in-Play prompts (`Y`). The simulator is useful for checking interaction logic, but it does not replace spatial, comfort, or device acceptance testing with Quest Link.
 
+The project simulator routes default FPS keyboard walking through the rig's character collision, so solid cabinets and walls block movement. Independent controller/head pose editing remains available for tracking experiments. See [Keyboard locomotion](Docs/KeyboardLocomotion.md).
+
+Open **Movement** with the left controller's **Y / Menu**, or **F8** on the keyboard. Choose **Teleport** (the first-run default) or **Continuous**; the choice is saved locally. Continuous uses the left stick to walk; both modes retain right-stick snap turning and teleport. The settings panel stops locomotion while open. See [Movement controls and limits](Docs/LocomotionModes.md).
+
 For headset Play testing, run the Editor on Windows, connect Quest Link (or Windows Virtual Desktop for development), and turn off **Use XR Interaction Simulator in scenes** in **Project Settings → XR Plug-in Management → XR Interaction Toolkit**. Virtual Desktop on Mac streams the desktop and does not supply this PCVR connection. Keep the Windows64 build target unchanged.
 
 ## 3. Current Implementation
@@ -96,6 +100,8 @@ The tomato cut surfaces and cooked egg now use two additional actual Comfy Cloud
 Cooking now takes place inside the small kitchen, with washing by the window, preparation on the back counter and a gas hob on the right. Select its black front knob to light/extinguish the blue gas flames. Eight further Comfy Cloud jobs supplied the fridge door and main cookware; a locally refined fridge casing and vendor ceramic meshes complete the set. [Kitchen layout, cookware sources and current verification](Docs/KitchenRoomAndCookware.md) document the changes.
 
 The cooking sandbox also includes a matching oak dining table, four chairs, an ivory pendant and a refined single-door fridge. Four actual Pixal3D furniture jobs were reviewed; the generated wood furniture is retained, while the fridge's manufactured panels and the lamp's hollow shade were rebuilt locally for clean geometry. [Furniture sources, saved Prefabs and scene validation](Docs/KitchenFurniture.md) describe this batch and its limits.
+
+The counter's **RESET ROOM** button restores the cooking sandbox, including loose props, food, water and fire, while keeping the player in place. A CC0 urban rooftop panorama provides a city view through the windows. [Reset scope, city asset and verification](Docs/RoomResetAndCity.md) describe this extension.
 
 Related asset and maintenance notes:
 
