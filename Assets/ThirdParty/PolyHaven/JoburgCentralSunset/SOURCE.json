@@ -1,0 +1,16 @@
+{
+  "asset": "sunset_jhbcentral",
+  "title": "Joburg Central Sunset",
+  "authors": {
+    "photography": "Dimitrios Savva",
+    "processing": "Greg Zaal"
+  },
+  "source_page": "https://polyhaven.com/a/sunset_jhbcentral",
+  "download_url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/exr/4k/sunset_jhbcentral_4k.exr",
+  "license": "CC0-1.0",
+  "license_page": "https://polyhaven.com/license",
+  "acquired_local": "2026-10-30",
+  "format": "OpenEXR 4K equirectangular",
+  "bytes": 18180266,
+  "sha256": "aadcdd1a62b1cd6355444756946a5122ad9de88f190ac1d6ac6cb914f3da7677"
+}
