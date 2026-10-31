@@ -76,8 +76,7 @@ namespace XRApartment.EditorTools
             var recipeRig = cookingScene.GetRootGameObjects().Single(go => go.name == "PREF_XR_KitchenRig");
             recipeRig.transform.SetPositionAndRotation(new Vector3(-3.15f, 0, 1.12f), Quaternion.identity);
             PrefabUtility.RecordPrefabInstancePropertyModifications(recipeRig.transform);
-            RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
-            RenderSettings.customReflection = KitchenAuthoring.LoadRequired<Cubemap>("Assets/ThirdParty/AllSkyFree/ColdSunset/Cold Sunset Equirect.png");
+            ConfigureCookingRoom(cookingScene);
             KitchenAuthoring.SaveScene(cookingScene);
             AssetDatabase.SaveAssets();
             Debug.Log("COOKING_AUTHORING_READY " + ScenePath);

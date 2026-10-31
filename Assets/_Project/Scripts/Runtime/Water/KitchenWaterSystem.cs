@@ -57,10 +57,15 @@ namespace XRApartment.Runtime
 
         public void ResetWater()
         {
+            ClearFlow();
+            foreach (var container in LiquidContainer.Active) if (container != null) container.ResetWater();
+        }
+
+        public void ClearFlow()
+        {
             for (int i = 0; i < parcels.Length; i++) parcels[i] = default;
             ActiveParcels = 0;
             InjectedMillilitres = DrainedMillilitres = SpilledMillilitres = 0;
-            foreach (var container in LiquidContainer.Active) if (container != null) container.ResetWater();
             if (splashes != null) splashes.Clear();
         }
 

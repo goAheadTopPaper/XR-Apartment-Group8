@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
@@ -29,6 +30,7 @@ namespace XRApartment.Runtime
         RigidbodyInterpolation[] resetInterpolation;
         int restoreThrowFrame = -1;
         float nextLabel;
+        public event Action ResetStarting;
         public void Configure(Transform[] targets, XRSimpleInteractable reset, KitchenFoodVessel mixing,
             KitchenFoodVessel frying, KitchenHeatSource stove, TextMesh label)
         { resetTargets = targets; resetButton = reset; bowl = mixing; pan = frying; heat = stove; status = label; }
@@ -56,6 +58,7 @@ namespace XRApartment.Runtime
         void ResetSelected(UnityEngine.XR.Interaction.Toolkit.SelectEnterEventArgs args) => ResetStation();
         public void ResetStation()
         {
+            ResetStarting?.Invoke();
             var pending = restoreThrowFrame >= 0;
             for (var i = 0; i < grabs.Length; i++)
                 if (grabs[i] != null)

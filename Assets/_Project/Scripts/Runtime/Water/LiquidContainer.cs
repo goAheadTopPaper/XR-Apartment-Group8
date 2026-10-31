@@ -55,6 +55,7 @@ namespace XRApartment.Runtime
         public void ResetWater()
         {
             Initialize();
+            if (stream != null) stream.Stop();
             if (water == null) return;
             water.Remove(water.Amount);
             water.Add(water.Capacity * initialFill);
