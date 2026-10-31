@@ -5,6 +5,9 @@
     "XRApartment.Simulation",
     "XRApartment.Runtime",
     "Unity.XR.Interaction.Toolkit",
+    "Unity.XR.CoreUtils",
+    "Unity.InputSystem",
+    "UnityEngine.UI",
     "Unity.TextMeshPro"
   ],
   "optionalUnityReferences": [

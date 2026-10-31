@@ -8,13 +8,11 @@ namespace XRApartment.Runtime
     /// In-room demo menu: return-to-start, pause, smooth-locomotion toggle. Buttons are
     /// resolved by child name so the editor builder and this controller stay decoupled.
     /// Pause zeroes simulation time (kinematic doors, physics) while XRI events keep the
-    /// menu itself operable; labels always reflect the current state. The smooth-move
-    /// provider belongs to the Starter Assets sample, so it is looked up by type name
-    /// instead of a compile-time reference — Samples are replaced wholesale on upgrades.
+    /// menu itself operable; labels always reflect the current state. Movement changes
+    /// go through the same preference controller as the player's movement settings panel.
     [RequireComponent(typeof(Canvas))]
     public class KitchenMenuController : MonoBehaviour
     {
-        const string SmoothMoveTypeName = "DynamicMoveProvider";
 
         [SerializeField] private string resetButtonName = "BTN_Reset";
         [SerializeField] private string pauseButtonName = "BTN_Pause";
@@ -23,7 +21,7 @@ namespace XRApartment.Runtime
         private XROrigin rig;
         private Vector3 startPosition;
         private Quaternion startRotation;
-        private Behaviour smoothMove;
+        private KitchenLocomotionSettings locomotion;
         private Button pauseButton;
         private Button locomotionButton;
 
@@ -34,14 +32,8 @@ namespace XRApartment.Runtime
             {
                 startPosition = rig.transform.position;
                 startRotation = rig.transform.rotation;
-                foreach (var behaviour in rig.GetComponentsInChildren<Behaviour>(true))
-                {
-                    if (behaviour != null && behaviour.GetType().Name == SmoothMoveTypeName)
-                    {
-                        smoothMove = behaviour;
-                        break;
-                    }
-                }
+                locomotion = rig.GetComponent<KitchenLocomotionSettings>();
+                if (locomotion != null) locomotion.Changed += RefreshLabels;
             }
 
             WireButton(resetButtonName, ResetToStart);
@@ -73,16 +65,22 @@ namespace XRApartment.Runtime
 
         public void ToggleSmoothLocomotion()
         {
-            if (smoothMove != null) smoothMove.enabled = !smoothMove.enabled;
+            if (locomotion != null) locomotion.SetMode(locomotion.Mode == KitchenMovementMode.Smooth
+                ? KitchenMovementMode.Teleport : KitchenMovementMode.Smooth);
             RefreshLabels();
+        }
+
+        private void OnDestroy()
+        {
+            if (locomotion != null) locomotion.Changed -= RefreshLabels;
         }
 
         private void RefreshLabels()
         {
             SetLabel(pauseButton, Time.timeScale == 0f ? "继续" : "暂停");
-            SetLabel(locomotionButton, smoothMove == null
-                ? "平滑移动：不可用"
-                : smoothMove.enabled ? "平滑移动：开" : "平滑移动：关");
+            SetLabel(locomotionButton, locomotion == null
+                ? "移动设置：不可用"
+                : locomotion.Mode == KitchenMovementMode.Smooth ? "移动：平移" : "移动：瞬移");
         }
 
         private static void SetLabel(Button button, string text)
