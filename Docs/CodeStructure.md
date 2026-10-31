@@ -56,6 +56,8 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 
 `KitchenRoomReset` 订阅工作台的 `ResetStarting`，补充同场景中外部持物、水体、动作特效和门 / 抽屉的恢复；不重载场景，也不触碰正式会话或其他场景。`KitchenRoomAuthoring` 仍是原制作类的 partial，负责控制器绑定、按钮标签和烹饪专用城市天空；原评审 AllSky 保留。见 [RoomResetAndCity.md](RoomResetAndCity.md)。
 
+城市厨房现为默认启动场景。`KitchenRoomAuthoring.ConfigureMainScene` 设置构建第 0 项和 Editor Play 入口，`Open Main Kitchen` 打开主厨房；编辑器启动时仅恢复一次 Play 入口，显式打开评审菜单后不随脚本重编译覆盖。正式评审保留为第二个构建场景，Core / 反馈 / CSV 仍只在该场景运行。
+
 驱动手柄位置的测试须先经过一个渲染更新，再等待物理步。`CollisionConstrainedGrabTransformer` 按 XRI 的 Dynamic / OnBeforeRender 阶段消费追踪姿态；只等待连续 FixedUpdate 会在慢帧追赶时跳过输入样本。两项旧抓取测试已用强制物理追赶复现并修正驱动时序，未放宽断言或改变运行时约束。
 
 分阶段的组件测试还须清理上一阶段的物理夹具：打蛋转移断言后停用蛋壳，避免其落入碗内干扰独立搅拌检查。完整菜谱另有真实 XRI 流程覆盖，不靠忽略生产碰撞或改动烹饪阈值通过。

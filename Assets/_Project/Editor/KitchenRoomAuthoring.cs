@@ -16,6 +16,65 @@ namespace XRApartment.EditorTools
         const string CityTexture = "Assets/ThirdParty/PolyHaven/JoburgCentralSunset/sunset_jhbcentral_4k.exr";
         const string CitySky = Art + "MAT_Sky_CookingCity.mat";
         const string RoomResetPrefab = Prefabs + "PREF_Cooking_RoomReset.prefab";
+        const string MainPlaySessionKey = "XRApartment.MainKitchenPlayInitialized";
+
+        [InitializeOnLoadMethod]
+        static void RestoreMainPlayOnEditorStartup()
+        {
+            if (SessionState.GetBool(MainPlaySessionKey, false)) return;
+            EditorApplication.delayCall += () =>
+            {
+                if (SessionState.GetBool(MainPlaySessionKey, false)) return;
+                SessionState.SetBool(MainPlaySessionKey, true);
+                var first = EditorBuildSettings.scenes.FirstOrDefault(scene => scene.enabled);
+                if (first == null || first.path != ScenePath || EditorSceneManager.playModeStartScene != null) return;
+                var main = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
+                if (main != null) EditorSceneManager.playModeStartScene = main;
+            };
+        }
+
+        [MenuItem("XR Apartment/Open Main Kitchen", priority = 0)]
+        public static void OpenMainKitchen()
+        {
+            Open();
+            if (SceneManager.GetActiveScene().path == ScenePath)
+                EditorSceneManager.playModeStartScene = KitchenAuthoring.LoadRequired<SceneAsset>(ScenePath);
+        }
+
+        [MenuItem("XR Apartment/Cooking/Use City Kitchen as Main Scene")]
+        public static void ConfigureMainScene()
+        {
+            KitchenAuthoring.RequireEditMode();
+            var asset = KitchenAuthoring.LoadRequired<SceneAsset>(ScenePath);
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+                if (SceneManager.GetSceneAt(i).isDirty)
+                    throw new InvalidOperationException("Save scene edits before configuring the main kitchen.");
+
+            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) }
+                .Concat(EditorBuildSettings.scenes.Where(scene => scene.path != ScenePath)).ToArray();
+            EditorSceneManager.playModeStartScene = asset;
+            VerifyMainScene();
+        }
+
+        public static void VerifyMainScene()
+        {
+            KitchenAuthoring.RequireEditMode();
+            var first = EditorBuildSettings.scenes.FirstOrDefault(scene => scene.enabled);
+            if (first == null || first.path != ScenePath ||
+                AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene) != ScenePath)
+                throw new InvalidOperationException("The city kitchen is not configured as the build and Editor Play entry.");
+            var main = EditorSceneManager.OpenScene(ScenePath);
+            if (RenderSettings.skybox != KitchenAuthoring.LoadRequired<Material>(CitySky))
+                throw new InvalidOperationException("The main kitchen must use the city panorama sky.");
+            var missing = main.GetRootGameObjects().SelectMany(root => root.GetComponentsInChildren<Transform>(true))
+                .Sum(t => GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject));
+            if (missing != 0) throw new InvalidOperationException("The main kitchen contains missing scripts.");
+            AssetDatabase.SaveAssets();
+            Debug.Log("KITCHEN_MAIN_SCENE_READY main=" + main.path + " editorPlay=" +
+                AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene) + " sky=" +
+                AssetDatabase.GetAssetPath(RenderSettings.skybox) + " scenes=" + EditorBuildSettings.scenes.Length +
+                " missingScripts=" + missing + " target=" + EditorUserBuildSettings.activeBuildTarget);
+        }
 
         [MenuItem("XR Apartment/Cooking/Apply Room Reset and City View")]
         public static void ApplyRoomMenu()

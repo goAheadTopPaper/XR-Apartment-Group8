@@ -2,6 +2,10 @@
 
 独立烹饪场景 `SCN_Kitchen_Cooking` 的台面按钮现在显示 **RESET ROOM**。用手柄选择按钮后，原有食材 / 菜谱重置与房间其余物品一起恢复，无需重新加载场景。玩家当前位置保持不变。
 
+按用户后续要求，该城市窗景厨房已设为主场景：Build Settings 第 0 项为 `SCN_Kitchen_Cooking`，正式评审 `SCN_Kitchen_Review` 保留为第 1 项。菜单 `XR Apartment/Open Main Kitchen` 打开主厨房；`Cooking/Use City Kitchen as Main Scene` 重新应用构建顺序与本机 Editor Play 入口。显式打开正式评审菜单会清除本机 Play 覆盖，以便测试评审流程；主场景切换不把烹饪过程变成正式评审记录。
+
+Unity 的 Play 起始场景覆盖只属于当前编辑器会话。项目会在编辑器启动后，根据 Build Settings 的首个启用场景恢复一次城市厨房 Play 入口；同一会话后续的脚本重编译不会覆盖显式选择的评审场景。构建场景顺序保存在版本控制中，启动恢复逻辑复用 `KitchenRoomAuthoring`，不新增运行时引导场景。
+
 ## 恢复范围
 
 - 食材、切片、碎盘与蛋壳回到初始状态；菜谱进度、受热与烧焦状态清空，炉火关闭。

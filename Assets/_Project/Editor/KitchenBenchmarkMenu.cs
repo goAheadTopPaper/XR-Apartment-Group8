@@ -18,7 +18,10 @@ namespace XRApartment.EditorTools
         {
             if (Application.isPlaying) return;
             if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
                 EditorSceneManager.OpenScene(KitchenAuthoring.ScenePath);
+                EditorSceneManager.playModeStartScene = null;
+            }
         }
 
         [MenuItem("XR Apartment/Benchmark/Apply B1 - Proud + F2")]

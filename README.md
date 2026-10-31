@@ -33,8 +33,9 @@ The product scope and acceptance criteria are defined in the [Lean PRD v0.3 Fina
 | Input | New Input System only (`activeInputHandler: 1`) |
 | XR | OpenXR + XR Interaction Toolkit 3.5.0 |
 | Target experience | Windows PC build, used with **Quest 3 + Quest Link** |
-| Scene | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
-| Data | Local CSV on the host PC; no account, server, or network service required |
+| Main scene | `Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity` (city panorama and cooking) |
+| Review scene | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
+| Data | Review journey: local CSV on the host PC; no account, server, or network service required |
 
 ### Clone and Open
 
@@ -45,7 +46,9 @@ cd XR-Apartment-Group8
 git lfs pull
 ```
 
-Open the repository root in Unity Hub and select **2022.3.62f3**. After UPM finishes its first package resolution, select **XR Apartment → Open Kitchen Review Scene** from the Unity menu, or open the scene listed above directly. This scene is enabled in `ProjectSettings/EditorBuildSettings.asset`.
+Open the repository root in Unity Hub and select **2022.3.62f3**. After UPM finishes its first package resolution, select **XR Apartment → Open Main Kitchen**. The city-panorama cooking kitchen is the first enabled scene in `ProjectSettings/EditorBuildSettings.asset`, so a Player build starts there. **XR Apartment → Cooking → Use City Kitchen as Main Scene** also sets the local Editor's Play start scene.
+
+The formal review journey remains available through **XR Apartment → Open Kitchen Review Scene**, which clears the Editor Play override so the opened review scene can be tested. It remains the second build scene. The cooking entry point does not collect the formal review feedback or CSV records.
 
 For headset-free testing in the Editor, use the included XR Interaction Simulator and follow its in-Play prompts (`Y`). The simulator is useful for checking interaction logic, but it does not replace spatial, comfort, or device acceptance testing with Quest Link.
 
@@ -134,7 +137,7 @@ Assets/_Project/
   Art/                 Kitchen models, materials, and textures
   Editor/              Shared kitchen authoring, journey UI builders, and XR setup
   Prefabs/             Environment, benchmarks, interactables, and UI Prefabs
-  Scenes/              SCN_Kitchen_Review (build entry point)
+  Scenes/              SCN_Kitchen_Cooking (build entry), SCN_Kitchen_Review
   Scripts/
     Data/               Benchmarks, parameters, feedback categories, and session records
     Simulation/         Workflow state machine, task tracking, contracts, and kinematics
