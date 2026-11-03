@@ -34,6 +34,8 @@ namespace XRApartment.Tests
         bool restoreSimulator, hadPreference;
         int preference;
         float timeScale;
+        InputSettings.BackgroundBehavior previousBackgroundBehavior;
+        InputSettings.EditorInputBehaviorInPlayMode previousEditorInputBehavior;
 
         [UnitySetUp] public IEnumerator SetUp()
         {
@@ -41,6 +43,10 @@ namespace XRApartment.Tests
             preference = PlayerPrefs.GetInt(KitchenLocomotionSettings.PreferenceKey);
             PlayerPrefs.DeleteKey(KitchenLocomotionSettings.PreferenceKey);
             timeScale = Time.timeScale; Time.timeScale = 1;
+            previousBackgroundBehavior = InputSystem.settings.backgroundBehavior;
+            previousEditorInputBehavior = InputSystem.settings.editorInputBehaviorInPlayMode;
+            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             previous = SceneManager.GetActiveScene();
             var existing = Object.FindObjectOfType<XRInteractionSimulator>();
             restoreSimulator = existing != null;
@@ -78,6 +84,8 @@ namespace XRApartment.Tests
             if (hadPreference) PlayerPrefs.SetInt(KitchenLocomotionSettings.PreferenceKey, preference);
             else PlayerPrefs.DeleteKey(KitchenLocomotionSettings.PreferenceKey);
             PlayerPrefs.Save(); Time.timeScale = timeScale;
+            InputSystem.settings.editorInputBehaviorInPlayMode = previousEditorInputBehavior;
+            InputSystem.settings.backgroundBehavior = previousBackgroundBehavior;
             if (restoreSimulator && XRInteractionSimulator.instance == null)
                 Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(SimulatorPath));
         }

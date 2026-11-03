@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using TMPro;
+using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
@@ -80,6 +81,8 @@ namespace XRApartment.EditorTools
             var provider = root.GetComponentInChildren<KitchenTeleportationProvider>(true);
             var snap = root.GetComponentInChildren<SnapTurnProvider>(true);
             move.moveSpeed = 1.5f; move.enableFly = false; move.enableStrafe = true; move.enabled = false;
+            // Keep small analog steps and high-frame-rate steps subject to capsule collision.
+            root.GetComponent<XROrigin>().Origin.GetComponent<CharacterController>().minMoveDistance = 0f;
             provider.delayTime = 0;
             snap.turnAmount = 45; snap.debounceTime = .35f;
             foreach (var turn in root.GetComponentsInChildren<ContinuousTurnProvider>(true)) turn.enabled = false;

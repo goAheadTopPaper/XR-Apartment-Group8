@@ -15,7 +15,7 @@
 
 ## 碰撞和瞬移范围
 
-连续平移复用现有 `DynamicMoveProvider → XRBodyTransformer → CharacterControllerBodyManipulator`，由角色胶囊阻挡柜体和墙面。键盘 FPS 走路继续使用此前修复的同一路径。
+连续平移复用现有 `DynamicMoveProvider → XRBodyTransformer → CharacterControllerBodyManipulator`，由角色胶囊阻挡柜体和墙面。胶囊的最小移动距离设为零，让小幅摇杆输入和高帧率下的短步长也能进入碰撞求解。键盘 FPS 走路继续使用同一路径。
 
 原有瞬移射线位于 XRI 的第 31 位 `Teleport` 层，而旧区域的交互掩码为 Default。本次将区域统一到既有 Teleport 层，并在实际 `SM_Ground` 上增加可瞬移标记；没有创建覆盖墙体的大矩形地板或改变原碰撞几何。普通抓取 / 菜谱交互仍使用原交互层。
 

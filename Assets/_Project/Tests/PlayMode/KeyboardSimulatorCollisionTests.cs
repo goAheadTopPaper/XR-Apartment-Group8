@@ -6,6 +6,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
@@ -24,12 +25,18 @@ namespace XRApartment.Tests
         Transform rig, head;
         bool restoreSimulator;
         float previousTimeScale;
+        InputSettings.BackgroundBehavior previousBackgroundBehavior;
+        InputSettings.EditorInputBehaviorInPlayMode previousEditorInputBehavior;
 
         [UnitySetUp]
         public IEnumerator SetUp()
         {
             previousTimeScale = Time.timeScale;
             Time.timeScale = 1;
+            previousBackgroundBehavior = InputSystem.settings.backgroundBehavior;
+            previousEditorInputBehavior = InputSystem.settings.editorInputBehaviorInPlayMode;
+            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             previous = SceneManager.GetActiveScene();
             var existing = Object.FindObjectOfType<XRInteractionSimulator>();
             restoreSimulator = existing != null;
@@ -84,6 +91,8 @@ namespace XRApartment.Tests
             if (restoreSimulator && XRInteractionSimulator.instance == null)
                 Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(SimulatorPath));
             Time.timeScale = previousTimeScale;
+            InputSystem.settings.editorInputBehaviorInPlayMode = previousEditorInputBehavior;
+            InputSystem.settings.backgroundBehavior = previousBackgroundBehavior;
         }
 
         static void SetInput(XRInputValueReader<float> reader, float value)
