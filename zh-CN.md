@@ -31,7 +31,8 @@ COMP5424 Scenario C 的厨房设计评审原型。参与者在同一个厨房里
 | 输入 | 仅新 Input System（`activeInputHandler: 1`） |
 | XR | OpenXR + XR Interaction Toolkit 3.5.0 |
 | 目标体验 | Windows PC 构建，通过 **Quest 3 + Quest Link** 使用 |
-| 场景 | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
+| 主场景 | `Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity` |
+| 评审场景 | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
 | 数据 | 写入运行电脑的本地 CSV，不需要账号、服务器或网络服务 |
 
 ### 克隆并打开
@@ -43,7 +44,7 @@ cd XR-Apartment-Group8
 git lfs pull
 ```
 
-用 Unity Hub 打开仓库根目录，并选择 **2022.3.62f3**。UPM 首次解析完成后，在 Unity 菜单选择 **XR Apartment → Open Kitchen Review Scene**；也可直接打开上表所列场景。`ProjectSettings/EditorBuildSettings.asset` 中已启用该场景。
+用 Unity Hub 打开仓库根目录，并选择 **2022.3.62f3**。构建启动后先进入城市烹饪厨房。按左手 **Y / Menu** 或键盘 **F8** 打开移动菜单，选择 **Start Design Review**，从 Setup 开始正式评审。在编辑器中，也可通过 **XR Apartment → Open Kitchen Review Scene** 直接打开评审场景并清除 Play 覆盖。
 
 编辑器无头显测试可使用项目随附的 XR Interaction Simulator；进入 Play 后查看模拟器提示（`Y`）。模拟器适合检查交互逻辑，不可代替 Quest Link 的空间、舒适度或设备验收。
 

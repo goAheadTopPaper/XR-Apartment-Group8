@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion;
 
@@ -13,18 +14,27 @@ namespace XRApartment.Runtime.UI
         [SerializeField] GameObject panel;
         [SerializeField] TMP_Text current, instructions;
         [SerializeField] Button teleport, smooth, close;
+        [SerializeField] Button enterReview;
         [SerializeField] Image blink;
         [SerializeField, Min(.1f)] float headDistance = .8f;
         [SerializeField, Min(.02f)] float blinkSeconds = .12f;
         InputAction toggle;
         float blinkRemaining;
         public bool IsOpen => panel != null && panel.activeSelf;
+        const string CookingScene = "SCN_Kitchen_Cooking";
+        const string ReviewScene = "SCN_Kitchen_Review";
 
         void Awake()
         {
             teleport.onClick.AddListener(ChooseTeleport);
             smooth.onClick.AddListener(ChooseSmooth);
             close.onClick.AddListener(Close);
+            if (enterReview != null)
+            {
+                enterReview.gameObject.SetActive(gameObject.scene.name == CookingScene &&
+                    Application.CanStreamedLevelBeLoaded(ReviewScene));
+                enterReview.onClick.AddListener(EnterReview);
+            }
             toggle = new InputAction("Movement settings", InputActionType.Button);
             toggle.AddBinding("<XRController>{LeftHand}/secondaryButton");
             toggle.AddBinding("<XRController>{LeftHand}/menuButton");
@@ -59,11 +69,20 @@ namespace XRApartment.Runtime.UI
             teleport.onClick.RemoveListener(ChooseTeleport);
             smooth.onClick.RemoveListener(ChooseSmooth);
             close.onClick.RemoveListener(Close);
+            if (enterReview != null) enterReview.onClick.RemoveListener(EnterReview);
         }
 
         void ChooseTeleport() => settings.SelectTeleport();
         void ChooseSmooth() => settings.SelectSmooth();
         void OnToggle(InputAction.CallbackContext _) { if (IsOpen) Close(); else Open(); }
+
+        void EnterReview()
+        {
+            if (!enterReview.isActiveAndEnabled || !enterReview.interactable) return;
+            enterReview.interactable = false;
+            SceneManager.LoadScene(ReviewScene, LoadSceneMode.Single);
+            Time.timeScale = 1f;
+        }
 
         public void Open()
         {

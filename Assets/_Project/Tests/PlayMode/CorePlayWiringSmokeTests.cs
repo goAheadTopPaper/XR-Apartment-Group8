@@ -22,6 +22,41 @@ using XRApartment.Simulation;
 public class CorePlayWiringSmokeTests
 {
     [UnityTest]
+    public IEnumerator DefaultCookingSceneOffersAnXRReachableEntryToTheFormalReview()
+    {
+        SceneManager.LoadScene(0);
+        yield return null;
+        Assert.AreEqual("SCN_Kitchen_Cooking", SceneManager.GetActiveScene().name);
+        var view = Object.FindObjectOfType<LocomotionSettingsView>();
+        view.Open();
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+        var entry = view.transform.Find("Panel/EnterReview").GetComponent<Button>();
+        Assert.IsTrue(entry.isActiveAndEnabled && entry.interactable);
+        var start = Camera.main.transform.position;
+        var aim = entry.transform.position;
+        var pointer = new TrackedDeviceEventData(EventSystem.current)
+        {
+            button = PointerEventData.InputButton.Left,
+            layerMask = -1,
+            rayPoints = new List<Vector3> { start, aim + (aim - start).normalized * .1f }
+        };
+        var hits = new List<RaycastResult>();
+        view.GetComponent<TrackedDeviceGraphicRaycaster>().Raycast(pointer, hits);
+        Assert.IsTrue(hits.Any(hit => hit.gameObject == entry.gameObject));
+        ExecuteEvents.Execute<IPointerClickHandler>(entry.gameObject, pointer, ExecuteEvents.pointerClickHandler);
+        yield return null;
+        Assert.AreEqual("SCN_Kitchen_Review", SceneManager.GetActiveScene().name);
+        var host = Object.FindObjectOfType<JourneyRuntimeHost>();
+        Assert.IsNull(host.StartupError);
+        Assert.AreEqual(SessionState.Setup, host.Core.Snapshot.State);
+        var reviewMenu = Object.FindObjectOfType<LocomotionSettingsView>();
+        reviewMenu.Open();
+        Assert.IsFalse(reviewMenu.transform.Find("Panel/EnterReview").gameObject.activeInHierarchy);
+        reviewMenu.Close();
+    }
+
+    [UnityTest]
     public IEnumerator ComparisonSkipShortcutHasAUsableXRRaycastTarget()
     {
         SceneManager.LoadScene("SCN_Kitchen_Review");

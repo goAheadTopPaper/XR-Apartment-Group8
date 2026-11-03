@@ -164,7 +164,7 @@ namespace XRApartment.EditorTools
                 root.GetComponent<TrackedDeviceGraphicRaycaster>().checkFor3DOcclusion = false;
                 root.GetComponent<TrackedDeviceGraphicRaycaster>().checkFor2DOcclusion = false;
                 root.GetComponent<CanvasScaler>().dynamicPixelsPerUnit = 20;
-                var panel = Rect("Panel", root.transform, 0, 0, 640, 430);
+                var panel = Rect("Panel", root.transform, 0, 0, 640, 464);
                 panel.localScale = Vector3.one * .0008f;
                 panel.gameObject.AddComponent<Image>().color = new Color(.04f, .065f, .09f, .98f);
                 Label("Title", panel, 0, 162, 570, 48, 34, "MOVEMENT");
@@ -173,12 +173,14 @@ namespace XRApartment.EditorTools
                 var smooth = Button("Smooth", panel, 148, 42, 270, 70, "CONTINUOUS");
                 var instructions = Label("Instructions", panel, 0, -45, 570, 100, 24,
                     "Push either stick forward to aim.\nRelease to teleport. Right stick: snap turn.");
-                Label("Shortcut", panel, -80, -151, 400, 44, 20, "Left Y / Menu  |  Keyboard F8");
-                var close = Button("Close", panel, 218, -151, 150, 55, "CLOSE");
+                Label("Shortcut", panel, 0, -199, 570, 36, 20, "Left Y / Menu  |  Keyboard F8");
+                var enterReview = Button("EnterReview", panel, -93, -143, 380, 55, "START DESIGN REVIEW");
+                var close = Button("Close", panel, 218, -143, 150, 55, "CLOSE");
                 var view = root.AddComponent<LocomotionSettingsView>();
                 var data = new SerializedObject(view);
                 Set(data, "panel", panel.gameObject); Set(data, "current", current); Set(data, "instructions", instructions);
                 Set(data, "teleport", teleport); Set(data, "smooth", smooth); Set(data, "close", close);
+                Set(data, "enterReview", enterReview);
                 data.ApplyModifiedPropertiesWithoutUndo();
                 PrefabUtility.SaveAsPrefabAsset(root, MenuPath);
             }

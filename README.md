@@ -48,7 +48,7 @@ git lfs pull
 
 Open the repository root in Unity Hub and select **2022.3.62f3**. After UPM finishes its first package resolution, select **XR Apartment → Open Main Kitchen**. The city-panorama cooking kitchen is the first enabled scene in `ProjectSettings/EditorBuildSettings.asset`, so a Player build starts there. **XR Apartment → Cooking → Use City Kitchen as Main Scene** also sets the local Editor's Play start scene.
 
-The formal review journey remains available through **XR Apartment → Open Kitchen Review Scene**, which clears the Editor Play override so the opened review scene can be tested. It remains the second build scene. The cooking entry point does not collect the formal review feedback or CSV records.
+In the cooking kitchen, open the movement menu with **left Y / Menu** or **F8**, then select **Start Design Review**. This loads the second build scene and starts a fresh review at Setup. In the Editor, **XR Apartment → Open Kitchen Review Scene** opens it directly and clears the Play override.
 
 For headset-free testing in the Editor, use the included XR Interaction Simulator and follow its in-Play prompts (`Y`). The simulator is useful for checking interaction logic, but it does not replace spatial, comfort, or device acceptance testing with Quest Link.
 
