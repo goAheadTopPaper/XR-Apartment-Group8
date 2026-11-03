@@ -4,7 +4,7 @@
 
 按用户后续要求，该城市窗景厨房已设为主场景：Build Settings 第 0 项为 `SCN_Kitchen_Cooking`，正式评审 `SCN_Kitchen_Review` 保留为第 1 项。菜单 `XR Apartment/Open Main Kitchen` 打开主厨房；`Cooking/Use City Kitchen as Main Scene` 重新应用构建顺序与本机 Editor Play 入口。显式打开正式评审菜单会清除本机 Play 覆盖，以便测试评审流程；主场景切换不把烹饪过程变成正式评审记录。
 
-Unity 的 Play 起始场景覆盖只属于当前编辑器会话。项目会在编辑器启动后，根据 Build Settings 的首个启用场景恢复一次城市厨房 Play 入口；同一会话后续的脚本重编译不会覆盖显式选择的评审场景。构建场景顺序保存在版本控制中，启动恢复逻辑复用 `KitchenRoomAuthoring`，不新增运行时引导场景。
+Unity 的 Play 起始场景覆盖只属于当前编辑器会话。项目会在编辑器启动后，根据 Build Settings 的首个启用场景恢复一次城市厨房 Play 入口；同一会话后续的脚本重编译不会覆盖显式选择的评审场景。运行 PlayMode 测试时优先加载 Test Runner 的临时场景，退出 Play 后恢复此前的覆盖。构建场景顺序与编辑器入口由 `KitchenRoomAuthoring` 维护。
 
 ## 恢复范围
 

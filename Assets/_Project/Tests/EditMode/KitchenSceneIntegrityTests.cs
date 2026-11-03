@@ -14,6 +14,7 @@ namespace XRApartment.Tests
     public class KitchenSceneIntegrityTests
     {
         const string ScenePath = "Assets/_Project/Scenes/SCN_Kitchen_Review.unity";
+        const string CookingScenePath = "Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity";
         Scene scene;
         bool openedForTests;
 
@@ -36,11 +37,10 @@ namespace XRApartment.Tests
             .SelectMany(root => root.GetComponentsInChildren<T>(true)).ToArray();
 
         [Test]
-        public void StartupScene_IsTheAuthoredKitchen()
+        public void BuildStartsInTheCityKitchenAndIncludesTheFormalReview()
         {
-            var enabledScenes = EditorBuildSettings.scenes.Where(item => item.enabled).ToArray();
-            Assert.AreEqual(1, enabledScenes.Length);
-            Assert.AreEqual(ScenePath, enabledScenes[0].path);
+            var enabledScenes = EditorBuildSettings.scenes.Where(item => item.enabled).Select(item => item.path);
+            CollectionAssert.AreEqual(new[] { CookingScenePath, ScenePath }, enabledScenes);
             Assert.AreEqual(0, Components<BenchmarkSlotMarker>().Length,
                 "Benchmarks are now instantiated into the runtime slot in Play.");
             Assert.AreEqual(1, Components<JourneyRuntimeHost>().Length);

@@ -17,10 +17,12 @@ namespace XRApartment.EditorTools
         const string CitySky = Art + "MAT_Sky_CookingCity.mat";
         const string RoomResetPrefab = Prefabs + "PREF_Cooking_RoomReset.prefab";
         const string MainPlaySessionKey = "XRApartment.MainKitchenPlayInitialized";
+        const string SuspendedPlaySceneKey = "XRApartment.SuspendedPlayScene";
 
         [InitializeOnLoadMethod]
         static void RestoreMainPlayOnEditorStartup()
         {
+            EditorApplication.playModeStateChanged += PreserveTestRunnerScene;
             if (SessionState.GetBool(MainPlaySessionKey, false)) return;
             EditorApplication.delayCall += () =>
             {
@@ -31,6 +33,26 @@ namespace XRApartment.EditorTools
                 var main = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
                 if (main != null) EditorSceneManager.playModeStartScene = main;
             };
+        }
+
+        static void PreserveTestRunnerScene(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.ExitingEditMode &&
+                EditorSceneManager.playModeStartScene != null &&
+                SceneManager.GetActiveScene().path.StartsWith("Assets/InitTestScene", StringComparison.Ordinal))
+            {
+                // Unity Test Framework saves its temporary runner scene before entering Play.
+                var previous = AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene);
+                SessionState.SetString(SuspendedPlaySceneKey, previous);
+                EditorSceneManager.playModeStartScene = null;
+            }
+            else if (state == PlayModeStateChange.EnteredEditMode)
+            {
+                var previous = SessionState.GetString(SuspendedPlaySceneKey, string.Empty);
+                SessionState.EraseString(SuspendedPlaySceneKey);
+                if (!string.IsNullOrEmpty(previous) && EditorSceneManager.playModeStartScene == null)
+                    EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(previous);
+            }
         }
 
         [MenuItem("XR Apartment/Open Main Kitchen", priority = 0)]
