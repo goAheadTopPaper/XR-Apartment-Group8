@@ -376,7 +376,7 @@ Core 在 Unity 主线程按序处理命令。可预期拒绝不抛异常、不�
 | 方向 | 消息 | 规则 |
 | --- | --- | --- |
 | Core → 场景 | `IReviewScenePort.Execute(action, completed)`，`action.Type=LoadBenchmark` | 以 `SceneActionResult.RequestId` 返回**实际**加载的方案 ID、成功/失败。切换时解除旧实例订阅、清理任务物/区域状态，只替换 benchmark 槽位，保留共同厨房/XR Rig/UI。失败恢复前一确认方案；不能恢复则报告失败并阻止 Challenge。 |
-| Core → 场景 | 同一 `Execute`，动作类型为 ResetTask/ReturnItem/ReplayBenchmark/Recenter | 返回同 `RequestId` 的结果；恢复物品、门/抽屉和任务状态；Recenter 只处理定位。重置或重新开始 Challenge 产生新的 `RunId`。 |
+| Core → 场景 | 同一 `Execute`，动作类型为 ResetTask/ReturnItem/ReplayBenchmark/Recenter | 返回同 `RequestId` 的结果；恢复物品、门/抽屉和任务状态；Recenter 恢复水平位置并保留当前眼高。重置或重新开始 Challenge 产生新的 `RunId`。 |
 | Core → 场景 | 同一 `Execute`，动作为 `RestoreCurrentStep`，`Step` 等于当前步骤 | 场景适配恢复该步骤入口的门和共享物品状态、重置当前步骤的证据采集；不移动 XR Rig。Core 仅在成功回执后清空当前步骤部分进度，保留此前步骤与同一 `RunId`。不得把恢复当成真实任务证据。 |
 | 场景 → Core | `EvidenceObserved(TaskEvidence)` | 当前 `RunId`、方案、步骤和物品/区域必须匹配；Core 按步骤及稳定 item ID 去重，无需通用 event ID。 |
 

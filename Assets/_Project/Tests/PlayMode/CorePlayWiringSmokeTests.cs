@@ -514,7 +514,7 @@ public class CorePlayWiringSmokeTests
         Assert.AreEqual(SessionState.Setup, host.Core.Snapshot.State);
         Assert.That(panel.Find("Error").GetComponent<TMP_Text>().text,
             Does.Contain("Choose a posture"));
-        setup.Find("Standing").GetComponent<Button>().onClick.Invoke();
+        setup.Find("Seated").GetComponent<Button>().onClick.Invoke();
         setup.Find("Calibrate").GetComponent<Button>().onClick.Invoke();
         button.onClick.Invoke();
         Assert.AreEqual(SessionState.Orientation, host.Core.Snapshot.State);
@@ -522,6 +522,18 @@ public class CorePlayWiringSmokeTests
         Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("Orientation"));
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
+        MoveHead(-3.45f, 1.15f);
+        var head = Camera.main.transform;
+        var eyeHeight = head.position.y;
+        var recovery = Object.FindObjectOfType<RecoveryMenuView>();
+        recovery.Open();
+        recovery.transform.Find("Panel/Recenter").GetComponent<Button>().onClick.Invoke();
+        yield return null;
+        var anchor = GameObject.Find("ANCHOR_Rig_Recenter").transform;
+        Assert.That(head.position.x, Is.EqualTo(anchor.position.x).Within(.001f));
+        Assert.That(head.position.z, Is.EqualTo(anchor.position.z).Within(.001f));
+        Assert.That(head.position.y, Is.EqualTo(eyeHeight).Within(.001f), "Recenter must preserve calibrated eye height.");
+        recovery.transform.Find("Panel/Close").GetComponent<Button>().onClick.Invoke();
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.StartChallenge, BenchmarkId = "B1" }).Accepted);
         yield return null;

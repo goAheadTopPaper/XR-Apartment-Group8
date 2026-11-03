@@ -233,7 +233,12 @@ namespace XRApartment.Runtime.Core
                     case JourneyActionType.Recenter:
                         if (xrOrigin == null || xrHead == null || recenterAnchor == null)
                             error = "XR rig or recenter anchor is missing.";
-                        else xrOrigin.position += recenterAnchor.position - xrHead.position;
+                        else
+                        {
+                            var offset = recenterAnchor.position - xrHead.position;
+                            offset.y = 0f;
+                            xrOrigin.position += offset;
+                        }
                         break;
                     default:
                         error = "Unsupported scene action.";
