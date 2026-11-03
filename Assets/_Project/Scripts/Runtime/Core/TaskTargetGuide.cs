@@ -198,7 +198,7 @@ namespace XRApartment.Runtime.Core
                 : new[] { "ACCESS_FridgeFreshDoor", "ACCESS_FridgeFreezerDoor" };
             foreach (var id in ids)
             {
-                if (evidenceBridge.HasEmitted(step, id) || !identities.TryGetValue(id, out var access))
+                if (evidenceBridge.IsAccessReady(step, id) || !identities.TryGetValue(id, out var access))
                     continue;
                 Transform handle = null;
                 foreach (var child in access.GetComponentsInChildren<Transform>())

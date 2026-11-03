@@ -385,12 +385,12 @@ Core 在 Unity 主线程按序处理命令。可预期拒绝不抛异常、不�
 | 八步任务 | 推进所需证据 |
 | --- | --- |
 | Approach | XR Rig 到达当前方案登记的操作区，记录区域 ID；按钮不能直接完成。 |
-| Open | 指定 `FridgeDoor`/`FridgeDrawer` 的**实际运动进度**达到 TaskConfig 开启阈值；不能以 `IsOpen` 目标值或 select 点击代替。 |
+| Open | 在该步骤内，所有指定 `FridgeDoor`/`FridgeDrawer` 的**实际运动进度**同时达到 TaskConfig 开启阈值，再逐件上报。 |
 | Take out | `TaskConfig.Items` 中标为原有的物品逐件离开来源 `StorageZone`；总任务物品数为 3–5，原有物品不必单独达到 3 件。 |
 | Temporary placement | 上述物品逐件进入登记的 `CounterSurface` 临时区且已释放抓取；瞬间经过碰撞体不计。 |
 | Reorganise | 登记储物区至少发生一次指定真实物品重定位，再由参与者确认；只记录动作及确认，不判断整理质量。 |
 | Put back | 原有物品与标为新购的物品（两类合计 3–5 件）逐件进入各自有效目标 `StorageZone` 且已释放；按 item ID 和目标区核对。 |
-| Close | 本次涉及的门/抽屉实际回到关闭阈值；不以点击代替。 |
+| Close | 在该步骤内，本次涉及的门/抽屉实际同时达到关闭阈值，再逐件上报。进入步骤时已达到阈值的门/抽屉仍可参与检查。 |
 | Leave | XR Rig 离开操作区并达到登记离开区/边界，记录空间事件；按钮不能直接完成。 |
 
 每步由 Core 核对当前方案、步骤及证据，切换/重置后用 `RunId` 排除迟到事件。Take out、Temporary placement、Put back 以各步骤的 item ID 集合计数，重复进入区域不能重复推进。现有 `KinematicSwingDoor`/`KinematicLinearDrawer`、XRI 抓取和移动继续使用；场景适配监听运动完成和区域变化，不重写底层交互。`ReviewElement` 的语义角色用于跨方案解析目标，不按 B1/B2 硬编码门数。任务可跳过：原因必填、保留证据，进入该方案 Feedback.Pending；四项评价可空，最终 outcome 为 Incomplete。两方案均跳过时不强迫偏好。现有 F2 两扇门与 PRD Final 单门要求的差异由模型模块修复，不以本轮旧模型完成 P0 验收。

@@ -786,8 +786,23 @@ public class CorePlayWiringSmokeTests
             Assert.Greater(arrow.GetComponent<MeshFilter>().sharedMesh.normals[0].z, 0f,
                 "The triangle front face must point toward the viewer");
             Assert.NotNull(arrow.GetComponent<MeshRenderer>().sharedMaterial);
-            Identity("ACCESS_FridgeFreezerDoor").GetComponent<KinematicSwingDoor>().Toggle();
-            Identity("ACCESS_FridgeFreshDoor").GetComponent<KinematicSwingDoor>().Toggle();
+            var freezerDoor = Identity("ACCESS_FridgeFreezerDoor").GetComponent<KinematicSwingDoor>();
+            var freshDoor = Identity("ACCESS_FridgeFreshDoor").GetComponent<KinematicSwingDoor>();
+            if (id == "B1")
+            {
+                freezerDoor.SetOpen(true);
+                yield return new WaitForSeconds(1.2f);
+                Assert.IsTrue(Object.FindObjectOfType<TaskTargetGuide>().VisibleTargets
+                    .Contains("ACCESS_FridgeFreshDoor"));
+                freezerDoor.SetOpen(false);
+                yield return new WaitForSeconds(1.2f);
+                freshDoor.SetOpen(true);
+                yield return new WaitForSeconds(1.2f);
+                Assert.AreEqual(ChallengeStep.Open, host.Core.Snapshot.CurrentStep,
+                    "Opening doors one at a time must not advance when one is closed again.");
+            }
+            freezerDoor.SetOpen(true);
+            freshDoor.SetOpen(true);
             yield return new WaitForSeconds(1.2f);
             Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.TakeOut);
@@ -839,14 +854,21 @@ public class CorePlayWiringSmokeTests
             Assert.AreEqual(2, host.Core.Snapshot.CompletedItemCount,
                 "A released tomato resting on the upper Fresh shelf must increment PutBack");
             AssertZoneHighlights("ZONE_FreshDestination");
+            if (id == "B1")
+            {
+                freezerDoor.SetOpen(false);
+                yield return new WaitForSeconds(1.2f);
+                Assert.That(freezerDoor.Progress, Is.LessThan(.1));
+                Assert.AreEqual(ChallengeStep.PutBack, host.Core.Snapshot.CurrentStep);
+            }
             PlaceRestingOnShelf(items[2], "SHELF_Fresh_Lower");
             yield return new WaitForSeconds(.35f);
             Assert.AreEqual(ChallengeStep.Close, host.Core.Snapshot.CurrentStep);
-            yield return RestoreAtStep(host, ChallengeStep.Close);
+            if (id == "B2") yield return RestoreAtStep(host, ChallengeStep.Close);
             yield return null;
             AssertZoneHighlights();
-            Identity("ACCESS_FridgeFreshDoor").GetComponent<KinematicSwingDoor>().Toggle();
-            Identity("ACCESS_FridgeFreezerDoor").GetComponent<KinematicSwingDoor>().Toggle();
+            freshDoor.SetOpen(false);
+            if (id == "B2") freezerDoor.SetOpen(false);
             yield return new WaitForSeconds(1.2f);
             Assert.AreEqual(ChallengeStep.Leave, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.Leave);

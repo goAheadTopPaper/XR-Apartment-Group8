@@ -16,7 +16,7 @@ namespace XRApartment.Runtime.Core
         private readonly Dictionary<string, TaskEvidenceIdentity> identities =
             new Dictionary<string, TaskEvidenceIdentity>();
         private readonly Dictionary<string, bool> sourceWasInside = new Dictionary<string, bool>();
-        private readonly Dictionary<string, float> previousProgress = new Dictionary<string, float>();
+        private readonly Dictionary<string, float> accessMeasurements = new Dictionary<string, float>();
         private readonly Dictionary<string, float> dwell = new Dictionary<string, float>();
         private readonly HashSet<string> taken = new HashSet<string>();
         private readonly HashSet<string> placed = new HashSet<string>();
@@ -39,6 +39,9 @@ namespace XRApartment.Runtime.Core
 
         public bool HasEmitted(ChallengeStep step, string itemOrTargetId) =>
             emitted.Contains(step + ":" + itemOrTargetId);
+
+        internal bool IsAccessReady(ChallengeStep step, string objectId) =>
+            TryMeasureReadyAccess(step, objectId, out _);
 
         public bool Bind(SessionPlan plan, IJourneyCore journey, string benchmark, long run)
         {
@@ -63,12 +66,11 @@ namespace XRApartment.Runtime.Core
             {
                 TaskEvidenceIdentity identity;
                 if (!identities.TryGetValue(access.ObjectId, out identity) ||
-                    identity.Role != access.Role || !identity.TryGetAccessProgress(out var progress))
+                    identity.Role != access.Role || !identity.TryGetAccessProgress(out _))
                 {
                     LastError = "Missing moving access target: " + access.ObjectId;
                     return false;
                 }
-                previousProgress[access.ObjectId] = progress;
             }
             if (!HasZone(plan.Task.ApproachZoneId, ReviewRole.CirculationZone) ||
                 !HasZone(plan.Task.LeaveZoneId, ReviewRole.CirculationZone))
@@ -126,7 +128,7 @@ namespace XRApartment.Runtime.Core
             task = null;
             identities.Clear();
             sourceWasInside.Clear();
-            previousProgress.Clear();
+            accessMeasurements.Clear();
             dwell.Clear();
             taken.Clear();
             placed.Clear();
@@ -156,10 +158,6 @@ namespace XRApartment.Runtime.Core
             foreach (var item in task.Items)
                 if (item.IsExistingItem && identities.TryGetValue(item.ItemId, out var identity))
                     sourceWasInside[item.ItemId] = Inside(item.SourceZoneId, SourcePosition(identity));
-            foreach (var access in task.AccessTargets)
-                if (identities.TryGetValue(access.ObjectId, out var identity) &&
-                    identity.TryGetAccessProgress(out var progress))
-                    previousProgress[access.ObjectId] = progress;
         }
 
         public void ItemReturnedToTray(string itemId)
@@ -195,25 +193,6 @@ namespace XRApartment.Runtime.Core
                 snapshot.ActiveBenchmarkId == benchmarkId && snapshot.ActiveRunId == runId &&
                 snapshot.CurrentStep.HasValue;
 
-            foreach (var access in task.AccessTargets)
-            {
-                TaskEvidenceIdentity identity;
-                float progress;
-                if (!identities.TryGetValue(access.ObjectId, out identity) ||
-                    !identity.TryGetAccessProgress(out progress)) continue;
-                float previous;
-                previousProgress.TryGetValue(access.ObjectId, out previous);
-                if (active && snapshot.CurrentStep == ChallengeStep.Open &&
-                    previous < task.OpenProgressThreshold && progress >= task.OpenProgressThreshold)
-                    Emit(ChallengeStep.Open, access.ObjectId, access.Role,
-                        access.ObjectId, null, progress, false);
-                if (active && snapshot.CurrentStep == ChallengeStep.Close &&
-                    previous > task.ClosedProgressThreshold && progress <= task.ClosedProgressThreshold)
-                    Emit(ChallengeStep.Close, access.ObjectId, access.Role,
-                        access.ObjectId, null, progress, false);
-                previousProgress[access.ObjectId] = progress;
-            }
-
             foreach (var item in task.Items)
             {
                 if (!item.IsExistingItem) continue;
@@ -238,6 +217,10 @@ namespace XRApartment.Runtime.Core
                     if (Inside(task.ApproachZoneId, rigHead.position))
                         Emit(ChallengeStep.Approach, task.ApproachZoneId,
                             ReviewRole.CirculationZone, null, null, 0f, false);
+                    break;
+                case ChallengeStep.Open:
+                case ChallengeStep.Close:
+                    ObserveAccessTargets(snapshot.CurrentStep.Value);
                     break;
                 case ChallengeStep.TemporaryPlacement:
                     foreach (var item in task.Items)
@@ -283,6 +266,28 @@ namespace XRApartment.Runtime.Core
                             null, task.LeaveZoneId, 0f, false);
                     break;
             }
+        }
+
+        private bool TryMeasureReadyAccess(ChallengeStep step, string objectId, out float progress)
+        {
+            progress = 0f;
+            if (task == null || !identities.TryGetValue(objectId, out var identity) || identity == null ||
+                !identity.TryGetAccessProgress(out progress)) return false;
+            return step == ChallengeStep.Open
+                ? progress >= task.OpenProgressThreshold : progress <= task.ClosedProgressThreshold;
+        }
+
+        private void ObserveAccessTargets(ChallengeStep step)
+        {
+            // Check the whole set before emitting. A door can move again after it reaches a threshold.
+            foreach (var access in task.AccessTargets)
+            {
+                if (!TryMeasureReadyAccess(step, access.ObjectId, out var progress)) return;
+                accessMeasurements[access.ObjectId] = progress;
+            }
+            foreach (var access in task.AccessTargets)
+                Emit(step, access.ObjectId, access.Role,
+                    access.ObjectId, null, accessMeasurements[access.ObjectId], false);
         }
 
         private void ObserveStoragePlacement(TaskItemSpec item, TaskEvidenceIdentity identity,
