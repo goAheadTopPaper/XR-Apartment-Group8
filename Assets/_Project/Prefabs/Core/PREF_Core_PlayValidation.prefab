@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionId: 
-  modelVersion: mzh-1f501b3-kitchen-f2-single-door-v1
+  modelVersion: mzh-1f501b3-kitchen-f2-hunyuan-v2
   benchmarkOrder:
   - B1
   - B2

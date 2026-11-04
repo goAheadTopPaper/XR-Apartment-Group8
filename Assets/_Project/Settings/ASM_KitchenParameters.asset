@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 839ddfbd3944708448ee11c3e2473f7b, type: 3}
   m_Name: ASM_KitchenParameters
   m_EditorClassIdentifier: 
-  modelVersion: mzh-1f501b3-kitchen-f2-single-door-v1
+  modelVersion: mzh-1f501b3-kitchen-f2-hunyuan-v2
   parameters:
   - key: room_width
     valueMetres: 3.613
