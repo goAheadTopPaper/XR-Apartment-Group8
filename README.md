@@ -181,7 +181,7 @@ See the [Core Review Playbook](Docs/Core_Review_Playbook.md) and [Scene Wiring G
 
 - The build and experience target is **StandaloneWindows64 + Quest Link**. Running as an Android APK or standalone Quest app is not a current delivery target.
 - The runtime is configured for B1 and B2 only. Other designs in the registry or assets are not part of the current formal review journey. B3/F4, F3 Explore-only, and position markers are future scope under the PRD.
-- B1 and B2 use one shared large single-door F2 with prototype dimensions recorded in the Assumption Register. See [F2 geometry](Docs/F2AndWindows.md). F3/F4 still need to be aligned with PRD Final §6.2 in P1. Design acceptance requires checking the model, dimensions and behavior in the approved Quest Link setup.
+- B1 and B2 use one shared large single-door F2 with prototype dimensions recorded in the Assumption Register. See [F2 and window geometry](Docs/F2AndWindows.md). F3/F4 still need to be aligned with PRD Final §6.2 in P1. Design acceptance requires checking the model, dimensions and behavior in the approved Quest Link setup.
 - The workflow contract includes conflict and safety notification interfaces, but the current core Prefab does not bind `conflictSource` / `safetySource`, and the repository has no corresponding runtime detection implementation. Therefore, **objective geometric conflict prompts, Yellow-to-Amber feedback linkage, and independent Red safety prompts are not yet implemented**.
 - CSV read-back verification and automated tests do not provide a UI for restoring sessions across application launches.
 

@@ -57,6 +57,34 @@ public class CorePlayWiringSmokeTests
     }
 
     [UnityTest]
+    public IEnumerator KitchenAndDiningWindowsFillTheOpeningsInBothScenes()
+    {
+        foreach (var scene in new[] { "SCN_Kitchen_Review", "SCN_Kitchen_Cooking" })
+        {
+            SceneManager.LoadScene(scene);
+            yield return null;
+            var environment = GameObject.Find("PREF_Kitchen_Environment").transform;
+            var windows = environment.Find("PREF_Kitchen_Windows");
+            Assert.NotNull(windows, scene);
+            Assert.NotNull(windows.Find("Window_Dining/Frame_Mullion"));
+            foreach (var (path, centre) in new[] {
+                ("Window_Sink/Glass", new Vector3(-5.174f, 1.935f, 1.448f)),
+                ("Window_Dining/Glass_Left", new Vector3(-5.125f, 1.76f, -1.40f)),
+                ("Window_Dining/Glass_Right", new Vector3(-5.125f, 1.76f, -.32f)) })
+            {
+                var pane = windows.Find(path);
+                Assert.NotNull(pane, scene + " " + path);
+                var collider = pane.GetComponent<BoxCollider>();
+                Assert.IsTrue(collider.Raycast(new Ray(centre + Vector3.right * .35f, Vector3.left),
+                    out _, .5f), scene + " " + path + " should close the exterior opening");
+                var material = pane.GetComponent<MeshRenderer>().sharedMaterial;
+                Assert.That(material.color.a, Is.InRange(.01f, .2f));
+                Assert.GreaterOrEqual(material.renderQueue, 3000);
+            }
+        }
+    }
+
+    [UnityTest]
     public IEnumerator ComparisonSkipShortcutHasAUsableXRRaycastTarget()
     {
         SceneManager.LoadScene("SCN_Kitchen_Review");

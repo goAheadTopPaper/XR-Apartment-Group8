@@ -88,17 +88,30 @@ namespace XRApartment.Tests
         }
 
         [Test]
-        public void ImportedGeometry_HasMeshesCollidersAndBuiltInMaterials()
+        public void EnvironmentGeometry_HasMeshesCollidersAndBuiltInMaterials()
         {
             var environment = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Environment");
+            var windows = environment.transform.Find("PREF_Kitchen_Windows");
+            Assert.IsNotNull(windows);
             var filters = environment.GetComponentsInChildren<MeshFilter>();
             Assert.IsNotEmpty(filters);
             foreach (var filter in filters)
             {
                 Assert.IsNotNull(filter.sharedMesh, filter.name);
-                var collider = filter.GetComponent<MeshCollider>();
-                Assert.IsNotNull(collider, filter.name);
-                Assert.AreSame(filter.sharedMesh, collider.sharedMesh, filter.name);
+                if (filter.transform.IsChildOf(windows))
+                {
+                    var collider = filter.GetComponent<BoxCollider>();
+                    Assert.IsNotNull(collider, filter.name);
+                    Assert.IsTrue(collider.enabled && !collider.isTrigger, filter.name);
+                    Assert.AreEqual(filter.sharedMesh.bounds, new Bounds(collider.center, collider.size),
+                        filter.name);
+                }
+                else
+                {
+                    var collider = filter.GetComponent<MeshCollider>();
+                    Assert.IsNotNull(collider, filter.name);
+                    Assert.AreSame(filter.sharedMesh, collider.sharedMesh, filter.name);
+                }
                 foreach (var material in filter.GetComponent<Renderer>().sharedMaterials)
                 {
                     Assert.IsNotNull(material, filter.name);

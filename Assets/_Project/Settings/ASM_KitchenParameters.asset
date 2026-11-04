@@ -824,3 +824,45 @@ MonoBehaviour:
     owner: D/E
     status: Prototype assumption
     verification: Unity prototype geometry; client validation pending.
+  - key: kitchen_window_glazing_width
+    valueMetres: 1
+    source: Measured from SM_KitchenWindow inner jambs, including seal overlap.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: kitchen_window_glazing_height
+    valueMetres: 1.4103
+    source: Measured from SM_KitchenWindow sill and head, including seal overlap.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: dining_window_opening_width
+    valueMetres: 2.2822
+    source: Measured from SM_WindowTable jambs, including trim overlap.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: dining_window_opening_height
+    valueMetres: 1.2041
+    source: Measured from SM_WindowTable sill and head, including trim overlap.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: dining_window_frame_face
+    valueMetres: 0.042
+    source: Prototype frame and center mullion face width.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: dining_window_frame_depth
+    valueMetres: 0.062
+    source: Prototype dining window frame depth.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: fixed_window_glazing_thickness
+    valueMetres: 0.006
+    source: Prototype glass collision and render thickness.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
