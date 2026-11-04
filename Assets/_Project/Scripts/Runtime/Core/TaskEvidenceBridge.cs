@@ -40,8 +40,15 @@ namespace XRApartment.Runtime.Core
         public bool HasEmitted(ChallengeStep step, string itemOrTargetId) =>
             emitted.Contains(step + ":" + itemOrTargetId);
 
-        internal bool IsAccessReady(ChallengeStep step, string objectId) =>
-            TryMeasureReadyAccess(step, objectId, out _);
+        internal TaskEvidenceIdentity FindNextAccess(ChallengeStep step)
+        {
+            if (task == null) return null;
+            foreach (var target in task.AccessTargets)
+                if (!TryMeasureReadyAccess(step, target.ObjectId, out _) &&
+                    identities.TryGetValue(target.ObjectId, out var identity))
+                    return identity;
+            return null;
+        }
 
         public bool Bind(SessionPlan plan, IJourneyCore journey, string benchmark, long run)
         {
@@ -144,7 +151,7 @@ namespace XRApartment.Runtime.Core
                 snapshot.CurrentStep != ChallengeStep.Open) return true;
             InteractionBlocked?.Invoke(snapshot.IsBusy
                 ? "Wait for the current scene action before grabbing task items."
-                : "Open both fridge doors before grabbing task items (" + itemId + ").");
+                : "Open the fridge door before grabbing task items (" + itemId + ").");
             return false;
         }
 

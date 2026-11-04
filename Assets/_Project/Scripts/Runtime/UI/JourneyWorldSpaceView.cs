@@ -520,12 +520,12 @@ namespace XRApartment.Runtime.UI
             switch (step)
             {
                 case ChallengeStep.Approach: return "Move your headset into the GREEN approach zone.";
-                case ChallengeStep.Open: return "Fully open BOTH upper Freezer and lower Fresh doors.";
-                case ChallengeStep.TakeOut: return "Remove TOMATO and ONION from the upper FREEZER.";
+                case ChallengeStep.Open: return "Fully open the fridge door.";
+                case ChallengeStep.TakeOut: return "Remove TOMATO and ONION from the upper source shelf.";
                 case ChallengeStep.TemporaryPlacement: return "Release TOMATO and ONION on the PURPLE counter highlight.";
-                case ChallengeStep.Reorganise: return "Move and release TOMATO or ONION from PURPLE onto ANY lower Fresh shelf. Wait briefly, then confirm.";
-                case ChallengeStep.PutBack: return "Release all THREE items onto ANY lower Fresh shelf. Include the CEREAL BOX.";
-                case ChallengeStep.Close: return "Fully close BOTH Fresh and Freezer doors.";
+                case ChallengeStep.Reorganise: return "Move and release TOMATO or ONION from PURPLE onto ANY lower shelf. Wait briefly, then confirm.";
+                case ChallengeStep.PutBack: return "Release all THREE items onto ANY lower shelf. Include the CEREAL BOX.";
+                case ChallengeStep.Close: return "Fully close the fridge door.";
                 case ChallengeStep.Leave: return "Exit GREEN, then move your headset into the BLUE zone.";
                 default: return "Follow the target guide.";
             }

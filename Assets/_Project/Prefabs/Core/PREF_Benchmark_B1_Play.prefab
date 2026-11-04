@@ -55,28 +55,5 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6037717378919584301, guid: ce308a4303077439ab708b13ac78e3a0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8262047827070546088}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ce308a4303077439ab708b13ac78e3a0, type: 3}
---- !u!1 &1378921462880690502 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6037717378919584301, guid: ce308a4303077439ab708b13ac78e3a0, type: 3}
-  m_PrefabInstance: {fileID: 4677179752604119915}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &8262047827070546088
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1378921462880690502}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7eaa3b8684164c83a6f18470148ed62f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stableId: ACCESS_FridgeFreshDoor
-  role: 0
-  taskItem: 0

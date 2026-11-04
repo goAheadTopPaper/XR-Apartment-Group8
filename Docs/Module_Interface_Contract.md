@@ -393,9 +393,9 @@ Core 在 Unity 主线程按序处理命令。可预期拒绝不抛异常、不�
 | Close | 在该步骤内，本次涉及的门/抽屉实际同时达到关闭阈值，再逐件上报。进入步骤时已达到阈值的门/抽屉仍可参与检查。 |
 | Leave | XR Rig 离开操作区并达到登记离开区/边界，记录空间事件；按钮不能直接完成。 |
 
-每步由 Core 核对当前方案、步骤及证据，切换/重置后用 `RunId` 排除迟到事件。Take out、Temporary placement、Put back 以各步骤的 item ID 集合计数，重复进入区域不能重复推进。现有 `KinematicSwingDoor`/`KinematicLinearDrawer`、XRI 抓取和移动继续使用；场景适配监听运动完成和区域变化，不重写底层交互。`ReviewElement` 的语义角色用于跨方案解析目标，不按 B1/B2 硬编码门数。任务可跳过：原因必填、保留证据，进入该方案 Feedback.Pending；四项评价可空，最终 outcome 为 Incomplete。两方案均跳过时不强迫偏好。现有 F2 两扇门与 PRD Final 单门要求的差异由模型模块修复，不以本轮旧模型完成 P0 验收。
+每步由 Core 核对当前方案、步骤及证据，切换/重置后用 `RunId` 排除迟到事件。Take out、Temporary placement、Put back 以各步骤的 item ID 集合计数，重复进入区域不能重复推进。现有 `KinematicSwingDoor`/`KinematicLinearDrawer`、XRI 抓取和移动继续使用；场景适配监听运动完成和区域变化，不重写底层交互。`ReviewElement` 的语义角色用于跨方案解析目标，不按 B1/B2 硬编码门数。任务可跳过：原因必填、保留证据，进入该方案 Feedback.Pending；四项评价可空，最终 outcome 为 Incomplete。两方案均跳过时不强迫偏好。B1/B2 共用同一个大型单门 F2（PRD Final §6.2）；此模型变更不等于 P0 验收。
 
-**当前 Core Play 验证场景的任务布局（不改变公共 DTO）**：两件原有物品从上方 Freezer 的 `ZONE_FreezerSource` 取出，临放台面后与一件新购物品一起放入下方 Fresh。`ZONE_FreshDestination` 是一个稳定的逻辑 `ReturnZoneId`，可由下方三格各自的触发体共同实现；任一格有效，但必须已释放并稳定停留，路过不计。Open/Close 对上、下两扇实际访问门逐一取证。此布局是现有 F2 双门代理的 Play 验证接线，不改变前述模型与 PRD Final §6.2 偏差的状态，也不要求其他模块按 Prefab 名称写死流程。
+**当前 Core Play 验证场景的任务布局（不改变公共 DTO）**：两件原有物品从上层取物区 `ZONE_FreezerSource` 取出，临放台面后与一件新购物品一起放入下层储物区。`ZONE_FreshDestination` 是一个稳定的逻辑 `ReturnZoneId`，可由下方三格各自的触发体共同实现；任一格有效，但必须已释放并稳定停留，路过不计。Open/Close 对同一个 `ACCESS_FridgeDoor` 取证；任务箭头由已绑定的 `TaskConfig.AccessTargets` 解析目标。保留内部储物区 ID 以兼容既有记录。
 
 ## 6. UI、反馈与冲突接口
 

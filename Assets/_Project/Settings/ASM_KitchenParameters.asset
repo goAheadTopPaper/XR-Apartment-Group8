@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 839ddfbd3944708448ee11c3e2473f7b, type: 3}
   m_Name: ASM_KitchenParameters
   m_EditorClassIdentifier: 
-  modelVersion: mzh-1f501b3-kitchen-adapted
+  modelVersion: mzh-1f501b3-kitchen-f2-single-door-v1
   parameters:
   - key: room_width
     valueMetres: 3.613
@@ -794,3 +794,33 @@ MonoBehaviour:
     owner: Hzc
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
+  - key: f2_leaf_width
+    valueMetres: 0.72
+    source: Single door spans the registered F2 body with a side reveal.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: f2_leaf_height
+    valueMetres: 1.8000001
+    source: Single door spans the registered F2 body with top and bottom reveals.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: f2_hinge_front
+    valueMetres: 0.4
+    source: Hinge axis at the front of the closed panel relative to the F2 root.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: f2_closed_leaf_clearance
+    valueMetres: 0.01
+    source: Nominal closed leaf to liner and shelf fronts.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.
+  - key: f2_handle_projection
+    valueMetres: 0.0405
+    source: F2 handle projection in front of the closed panel.
+    owner: D/E
+    status: Prototype assumption
+    verification: Unity prototype geometry; client validation pending.

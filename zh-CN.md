@@ -157,7 +157,7 @@ PlayMode 覆盖场景启动、B1/B2 任务流程、比较输入交互、XR 射�
 
 - 构建与体验目标是 **StandaloneWindows64 + Quest Link**；本项目不以 Android APK/Quest 一体机运行作为当前交付目标。不要为方便测试切换 Android 平台。
 - 运行时配置只绑定 B1、B2。注册表或资源中存在其他方案，不代表它们已纳入当前正式评审旅程；B3/F4、F3 Explore-only 与位置 marker 按 PRD 属后续范围。
-- 当前 F2 代理为上下两扇门，而 PRD Final §6.2 要求大型单开门；F3/F4 代理形态也与 PRD 定义不完全一致，且属于后续范围。修正和验收须逐件核对门数、铰链、开启方向、碰撞与登记参数。Prefab 存在或自动化测试通过不代表模型已通过设计验收。
+- B1 和 B2 共用大型单开门 F2，原型尺寸已登记。详见 [F2 几何](Docs/F2AndWindows.md)。F3/F4 留到 P1 按 PRD Final §6.2 调整。设计验收还须在批准的 Quest Link 环境中核对模型、尺寸和交互。
 - 流程契约包含冲突与安全通知接口，但当前核心 Prefab 未绑定 `conflictSource` / `safetySource`，仓库中也没有相应运行时检测实现。因此，**客观几何冲突提示、Yellow→Amber 反馈联动和独立 Red 安全提示尚未完成**。
 - CSV 读回验证和自动化测试不提供跨启动的会话恢复 UI。
 

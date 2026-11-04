@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionId: 
-  modelVersion: mzh-1f501b3-kitchen-adapted
+  modelVersion: mzh-1f501b3-kitchen-f2-single-door-v1
   benchmarkOrder:
   - B1
   - B2
@@ -80,9 +80,7 @@ MonoBehaviour:
     TemporaryZoneId: 
     ReturnZoneId: ZONE_FreshDestination
   accessTargets:
-  - ObjectId: ACCESS_FridgeFreezerDoor
-    Role: 0
-  - ObjectId: ACCESS_FridgeFreshDoor
+  - ObjectId: ACCESS_FridgeDoor
     Role: 0
   approachZoneId: ZONE_Approach
   leaveZoneId: ZONE_Leave

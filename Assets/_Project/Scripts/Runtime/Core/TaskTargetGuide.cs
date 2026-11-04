@@ -193,21 +193,13 @@ namespace XRApartment.Runtime.Core
 
         private void AddNextAccess(ChallengeStep step, List<Vector3> positions)
         {
-            var ids = step == ChallengeStep.Open
-                ? new[] { "ACCESS_FridgeFreezerDoor", "ACCESS_FridgeFreshDoor" }
-                : new[] { "ACCESS_FridgeFreshDoor", "ACCESS_FridgeFreezerDoor" };
-            foreach (var id in ids)
-            {
-                if (evidenceBridge.IsAccessReady(step, id) || !identities.TryGetValue(id, out var access))
-                    continue;
-                Transform handle = null;
-                foreach (var child in access.GetComponentsInChildren<Transform>())
-                    if (child.name == "Handle") { handle = child; break; }
-                positions.Add((handle != null ? handle.position : access.transform.position) +
-                    Vector3.up * 0.13f);
-                visibleTargets.Add(id);
-                return;
-            }
+            var access = evidenceBridge.FindNextAccess(step);
+            if (access == null) return;
+            Transform handle = null;
+            foreach (var child in access.GetComponentsInChildren<Transform>())
+                if (child.name == "Handle") { handle = child; break; }
+            positions.Add((handle != null ? handle.position : access.transform.position) + Vector3.up * 0.13f);
+            visibleTargets.Add(access.StableId);
         }
 
         private void AddNextItem(ChallengeStep step, List<Vector3> positions)

@@ -20,6 +20,7 @@ namespace XRApartment.Runtime
         [SerializeField, Min(0.05f)] private float openDurationSeconds = 0.8f;
         [SerializeField] private bool startOpen = false;
         [SerializeField] private BoxCollider sweepProbe;
+        [SerializeField] private BoxCollider handleSweepProbe;
         [SerializeField] private HandInteractionProfile collisionProfile;
         [SerializeField, Range(.1f, 5f)] private float sweepStepDegrees = .5f;
 
@@ -27,6 +28,7 @@ namespace XRApartment.Runtime
         private bool openTarget;
         private double progress; // 0 closed .. 1 open
         private HeldPropSweep sweep;
+        private HeldPropSweep handleSweep;
 
         public bool IsOpen => openTarget;
         public double Progress => progress;
@@ -37,7 +39,11 @@ namespace XRApartment.Runtime
             openTarget = startOpen;
             progress = startOpen ? 1.0 : 0.0;
             if (sweepProbe != null && collisionProfile != null)
+            {
                 sweep = new HeldPropSweep(sweepProbe, transform, collisionProfile.ContactLayers);
+                if (handleSweepProbe != null)
+                    handleSweep = new HeldPropSweep(handleSweepProbe, transform, collisionProfile.ContactLayers);
+            }
             Apply();
         }
 
@@ -88,13 +94,15 @@ namespace XRApartment.Runtime
             // A thin door close to its frame needs finer angular coverage than
             // a held pot. Subdivide the same conservative sweep, never skip it.
             var step = Mathf.Min(collisionProfile.GrabRotationStepDegrees, sweepStepDegrees);
-            var accepted = sweep.Resolve(new Pose(transform.position, transform.rotation),
-                new Pose(transform.position, parentRotation * rotation), null,
-                collisionProfile.Length("grab_contact_skin"), step,
-                Mathf.Max(collisionProfile.GrabRotationIterations, Mathf.CeilToInt(openAngleDegrees / step) + 1));
-            // A door has a fixed hinge; overlap recovery must not translate it.
-            if ((accepted.position - transform.position).sqrMagnitude < .000001f)
-                transform.rotation = accepted.rotation;
+            var start = new Pose(transform.position, transform.rotation);
+            var skin = collisionProfile.Length("grab_contact_skin");
+            var iterations = Mathf.Max(collisionProfile.GrabRotationIterations,
+                Mathf.CeilToInt(openAngleDegrees / step) + 1);
+            var accepted = SweepRotation(sweep, start, parentRotation * rotation, skin, step, iterations);
+            // The pull projects from the far end of the leaf, not from the hinge.
+            if (handleSweep != null)
+                accepted = SweepRotation(handleSweep, start, accepted, skin, step, iterations);
+            transform.rotation = accepted;
             // Keep the timeline when unobstructed. Feeding an eased angle back
             // as linear time would ease twice and stall the door near closed.
             if (Quaternion.Angle(transform.rotation, parentRotation * rotation) > .01f)
@@ -102,6 +110,15 @@ namespace XRApartment.Runtime
                 var acceptedAngle = Mathf.DeltaAngle(0, transform.localEulerAngles.y);
                 progress = MotionKinematics.InverseSmoothStep(acceptedAngle / (openAngleDegrees * swingSign));
             }
+        }
+
+        private static Quaternion SweepRotation(HeldPropSweep probe, Pose start, Quaternion rotation,
+            float skin, float step, int iterations)
+        {
+            var accepted = probe.Resolve(start, new Pose(start.position, rotation), null, skin, step, iterations);
+            // A door has a fixed hinge; overlap recovery must not translate it.
+            return (accepted.position - start.position).sqrMagnitude < .000001f
+                ? accepted.rotation : start.rotation;
         }
     }
 }

@@ -245,8 +245,7 @@ public class CorePlayWiringSmokeTests
             { Type = JourneyCommandType.StartChallenge, BenchmarkId = benchmark }).Accepted);
             MoveHead(-1.90f, 1.05f);
             yield return null;
-            Identity("ACCESS_FridgeFreezerDoor").GetComponent<KinematicSwingDoor>().SetOpenImmediate(true);
-            Identity("ACCESS_FridgeFreshDoor").GetComponent<KinematicSwingDoor>().SetOpenImmediate(true);
+            Identity("ACCESS_FridgeDoor").GetComponent<KinematicSwingDoor>().SetOpenImmediate(true);
             yield return null;
             Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
 
@@ -328,9 +327,7 @@ public class CorePlayWiringSmokeTests
             tomato.Grab.selectFilters.GetAll(filters);
             Assert.IsTrue(filters.Any(filter => !filter.Process(null, tomato.Grab)),
                 id + " must reject early task-item selection");
-            Identity("ACCESS_FridgeFreezerDoor").GetComponent<KinematicSwingDoor>()
-                .SetOpenImmediate(true);
-            Identity("ACCESS_FridgeFreshDoor").GetComponent<KinematicSwingDoor>()
+            Identity("ACCESS_FridgeDoor").GetComponent<KinematicSwingDoor>()
                 .SetOpenImmediate(true);
             yield return null;
             Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
@@ -589,9 +586,15 @@ public class CorePlayWiringSmokeTests
             Assert.IsTrue(host.Submit(new JourneyCommand
             { Type = JourneyCommandType.ShowBenchmark, BenchmarkId = id }).Accepted);
             yield return null;
-            var door = Identity("ACCESS_FridgeFreshDoor").transform;
-            Assert.Less(door.position.x, -2.1f, id + " fresh door must face the room");
-            Assert.Less(door.position.z, 1.8f, id + " fresh door must not face the wall");
+            var fridge = GameObject.Find("PREF_Fridge_F2");
+            var door = Identity("ACCESS_FridgeDoor").transform;
+            Assert.AreSame(fridge.transform, door.parent);
+            Assert.AreEqual(1, fridge.GetComponentsInChildren<KinematicSwingDoor>().Length);
+            var panel = door.Find("Panel");
+            Assert.That(panel.localScale.x, Is.EqualTo(.72f).Within(.001f));
+            Assert.That(panel.localScale.y, Is.EqualTo(1.80f).Within(.001f));
+            Assert.Less(door.position.x, -2.1f, id + " F2 door must face the room");
+            Assert.Less(door.position.z, 1.8f, id + " F2 door must not face the wall");
         }
     }
 
@@ -621,8 +624,7 @@ public class CorePlayWiringSmokeTests
             Assert.IsFalse(fresh.ContainsPoint(freezer.transform.position),
                 id + " must not count Freezer as a Fresh destination");
             AssertPreparationPlateItems();
-            Assert.NotNull(Identity("ACCESS_FridgeFreezerDoor"));
-            Assert.NotNull(Identity("ACCESS_FridgeFreshDoor"));
+            Assert.NotNull(Identity("ACCESS_FridgeDoor"));
         }
     }
 
@@ -706,8 +708,7 @@ public class CorePlayWiringSmokeTests
                 .Single(transform => transform.name == "PREF_Fridge_F2");
             Assert.IsNull(fridge.Find("OPENING_FridgeDoor_Fresh"));
             Assert.IsNull(fridge.Find("OPENING_FridgeDoor_Freezer"));
-            Identity("ACCESS_FridgeFreshDoor").GetComponent<KinematicSwingDoor>().Toggle();
-            Identity("ACCESS_FridgeFreezerDoor").GetComponent<KinematicSwingDoor>().Toggle();
+            Identity("ACCESS_FridgeDoor").GetComponent<KinematicSwingDoor>().Toggle();
             yield return new WaitForSeconds(1.2f);
             AssertExteriorBrightness(fridge, 1.02f, id + " Fresh");
             AssertExteriorBrightness(fridge, 1.57f, id + " Freezer");
@@ -779,31 +780,34 @@ public class CorePlayWiringSmokeTests
             yield return null;
             AssertZoneHighlights();
             Assert.IsTrue(Object.FindObjectOfType<TaskTargetGuide>().VisibleTargets
-                .Contains("ACCESS_FridgeFreezerDoor"));
+                .Contains("ACCESS_FridgeDoor"));
             var arrow = GameObject.Find("GUIDE_Green_DownTriangle");
             Assert.NotNull(arrow);
             Assert.IsNull(arrow.GetComponent<Collider>());
             Assert.Greater(arrow.GetComponent<MeshFilter>().sharedMesh.normals[0].z, 0f,
                 "The triangle front face must point toward the viewer");
             Assert.NotNull(arrow.GetComponent<MeshRenderer>().sharedMaterial);
-            var freezerDoor = Identity("ACCESS_FridgeFreezerDoor").GetComponent<KinematicSwingDoor>();
-            var freshDoor = Identity("ACCESS_FridgeFreshDoor").GetComponent<KinematicSwingDoor>();
+            var door = Identity("ACCESS_FridgeDoor").GetComponent<KinematicSwingDoor>();
             if (id == "B1")
             {
-                freezerDoor.SetOpen(true);
+                var obstacle = new GameObject("Obstacle in the F2 swing");
+                var pivot = door.transform;
+                var inSwing = Quaternion.Euler(0, 35, 0) * new Vector3(-.6f, 1f, 0);
+                obstacle.transform.position = pivot.TransformPoint(inSwing);
+                obstacle.AddComponent<BoxCollider>().size = Vector3.one * .09f;
+                Physics.SyncTransforms();
+                door.SetOpen(true);
                 yield return new WaitForSeconds(1.2f);
-                Assert.IsTrue(Object.FindObjectOfType<TaskTargetGuide>().VisibleTargets
-                    .Contains("ACCESS_FridgeFreshDoor"));
-                freezerDoor.SetOpen(false);
-                yield return new WaitForSeconds(1.2f);
-                freshDoor.SetOpen(true);
-                yield return new WaitForSeconds(1.2f);
+                Assert.That(door.Progress, Is.InRange(.1, .85),
+                    "A physical obstacle should stop the door partway through the swing");
                 Assert.AreEqual(ChallengeStep.Open, host.Core.Snapshot.CurrentStep,
-                    "Opening doors one at a time must not advance when one is closed again.");
+                    "A blocked door cannot satisfy the open task");
+                Object.Destroy(obstacle);
+                yield return null;
             }
-            freezerDoor.SetOpen(true);
-            freshDoor.SetOpen(true);
+            door.SetOpen(true);
             yield return new WaitForSeconds(1.2f);
+            Assert.That(door.Progress, Is.EqualTo(1).Within(.001), id + " must open fully");
             Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.TakeOut);
             yield return null;
@@ -854,22 +858,15 @@ public class CorePlayWiringSmokeTests
             Assert.AreEqual(2, host.Core.Snapshot.CompletedItemCount,
                 "A released tomato resting on the upper Fresh shelf must increment PutBack");
             AssertZoneHighlights("ZONE_FreshDestination");
-            if (id == "B1")
-            {
-                freezerDoor.SetOpen(false);
-                yield return new WaitForSeconds(1.2f);
-                Assert.That(freezerDoor.Progress, Is.LessThan(.1));
-                Assert.AreEqual(ChallengeStep.PutBack, host.Core.Snapshot.CurrentStep);
-            }
             PlaceRestingOnShelf(items[2], "SHELF_Fresh_Lower");
             yield return new WaitForSeconds(.35f);
             Assert.AreEqual(ChallengeStep.Close, host.Core.Snapshot.CurrentStep);
-            if (id == "B2") yield return RestoreAtStep(host, ChallengeStep.Close);
+            yield return RestoreAtStep(host, ChallengeStep.Close);
             yield return null;
             AssertZoneHighlights();
-            freshDoor.SetOpen(false);
-            if (id == "B2") freezerDoor.SetOpen(false);
+            door.SetOpen(false);
             yield return new WaitForSeconds(1.2f);
+            Assert.That(door.Progress, Is.EqualTo(0).Within(.001), id + " must close fully");
             Assert.AreEqual(ChallengeStep.Leave, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.Leave);
             yield return null;
@@ -1039,13 +1036,13 @@ public class CorePlayWiringSmokeTests
         var start = host.Submit(new JourneyCommand
         { Type = JourneyCommandType.StartChallenge, BenchmarkId = "B1" });
         Assert.IsTrue(start.Accepted, start.Message);
-        var activeDoor = Identity("ACCESS_FridgeFreshDoor");
+        var activeDoor = Identity("ACCESS_FridgeDoor");
         apply.Invoke(null, new object[] { "B2" });
         yield return null;
         Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
         Assert.AreEqual("B1", adapter.CurrentBenchmarkId,
             "Preview must not bypass the active task's workflow guard.");
-        Assert.AreSame(activeDoor, Identity("ACCESS_FridgeFreshDoor"),
+        Assert.AreSame(activeDoor, Identity("ACCESS_FridgeDoor"),
             "Rejected preview must preserve task targets and evidence bindings.");
     }
 
