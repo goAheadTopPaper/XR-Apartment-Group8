@@ -21,6 +21,9 @@ namespace XRApartment.Runtime
         public float HeatDose { get { Initialize(); return progress == null ? 0 : progress.Dose; } }
         public KitchenIngredientKind IngredientKind => ingredientKind;
         public KitchenCutForm CutForm => cutForm;
+        public bool ReadyForPan => (ingredientKind == KitchenIngredientKind.Tomato && cutForm == KitchenCutForm.Diced) ||
+            (ingredientKind == KitchenIngredientKind.Beef && cutForm == KitchenCutForm.Strip) ||
+            (ingredientKind == KitchenIngredientKind.Onion && cutForm == KitchenCutForm.Slice);
         public float Grams => grams;
         public Vector3 PresentationUp => presentationUp;
         public PreparedKitchenProp Prepared { get { Initialize(); return prepared; } }
@@ -33,7 +36,7 @@ namespace XRApartment.Runtime
             if (progress != null || profile == null) return;
             progress = new CookingProgress(profile.cookedSeconds, profile.burntSeconds);
             tint = new MaterialPropertyBlock();
-            if (ingredientKind == KitchenIngredientKind.Tomato)
+            if (ingredientKind != KitchenIngredientKind.Other)
             {
                 var body = GetComponent<Rigidbody>();
                 if (body != null)
@@ -67,7 +70,9 @@ namespace XRApartment.Runtime
         public void Heat(float intensity, float seconds)
         {
             Initialize(); if (progress == null || (prepared != null && prepared.IsSplit)) return;
-            progress.Advance(intensity, seconds); ApplyTint();
+            var previous = progress.Stage;
+            progress.Advance(intensity, seconds);
+            if (progress.Stage != previous) ApplyTint();
         }
         void Restore(float dose) { Initialize(); if (progress == null) return; progress.Restore(dose); ApplyTint(); }
         void ApplyTint()
@@ -78,7 +83,10 @@ namespace XRApartment.Runtime
                 if (!visuals[i].name.StartsWith("COL_"))
                     for (var j = 0; j < originalColours[i].Length; j++)
                     {
-                        tint.SetColor("_Color", originalColours[i][j] * colour);
+                        var original = originalColours[i][j];
+                        var result = ingredientKind == KitchenIngredientKind.Beef && progress.Stage == CookingStage.Cooked
+                            ? Color.Lerp(original, new Color(.30f, .17f, .105f), .85f) : original * colour;
+                        tint.SetColor("_Color", result);
                         visuals[i].SetPropertyBlock(tint, j);
                     }
         }

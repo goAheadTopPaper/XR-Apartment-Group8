@@ -18,6 +18,7 @@ namespace XRApartment.Runtime
         KitchenStoredIngredient[] stored;
         KitchenPanContents panContents;
         KitchenPrepTray[] trays;
+        bool[] stockedTargets;
         Vector3[] positions;
         Quaternion[] rotations;
         PreparedKitchenProp[] prepared;
@@ -31,15 +32,30 @@ namespace XRApartment.Runtime
         int restoreThrowFrame = -1;
         float nextLabel;
         public event Action ResetStarting;
+        public bool IsResetting => restoreThrowFrame >= 0;
+        public KitchenFridge ActiveFridge => fridge;
         public void Configure(Transform[] targets, XRSimpleInteractable reset, KitchenFoodVessel mixing,
             KitchenFoodVessel frying, KitchenHeatSource stove, TextMesh label)
         { resetTargets = targets; resetButton = reset; bowl = mixing; pan = frying; heat = stove; status = label; }
         public void ConfigureRecipe(KitchenRecipeController flow, KitchenFridge storage) { recipe = flow; fridge = storage; }
+        internal void UseFridge(KitchenFridge storage)
+        {
+            fridge = storage;
+            foreach (var item in stored) item.UseFridge(storage);
+            if (recipe != null) recipe.UseFridge(storage);
+        }
         void Awake()
         {
+            stockedTargets = new bool[resetTargets.Length];
             positions = new Vector3[resetTargets.Length]; rotations = new Quaternion[resetTargets.Length];
             for (var i = 0; i < resetTargets.Length; i++)
-            { positions[i] = resetTargets[i].position; rotations[i] = resetTargets[i].rotation; }
+            {
+                var target = resetTargets[i];
+                stockedTargets[i] = target.TryGetComponent<KitchenStoredIngredient>(out var stock) && stock.Fridge == fridge && fridge != null;
+                var frame = stockedTargets[i] ? fridge.transform : null;
+                positions[i] = frame == null ? target.position : frame.InverseTransformPoint(target.position);
+                rotations[i] = frame == null ? target.rotation : Quaternion.Inverse(frame.rotation) * target.rotation;
+            }
             prepared = GetComponentsInChildren<PreparedKitchenProp>(true);
             ingredients = GetComponentsInChildren<CookableIngredient>(true);
             eggs = GetComponentsInChildren<KitchenEgg>(true);
@@ -83,9 +99,12 @@ namespace XRApartment.Runtime
                 if (body != null && !body.isKinematic) { body.velocity = Vector3.zero; body.angularVelocity = Vector3.zero; }
             for (var i = 0; i < resetTargets.Length; i++)
             {
-                resetTargets[i].SetPositionAndRotation(positions[i], rotations[i]);
+                var frame = stockedTargets[i] ? fridge.transform : null;
+                var position = frame == null ? positions[i] : frame.TransformPoint(positions[i]);
+                var rotation = frame == null ? rotations[i] : frame.rotation * rotations[i];
+                resetTargets[i].SetPositionAndRotation(position, rotation);
                 var body = targetBodies[i]; if (body == null) continue;
-                body.position = positions[i]; body.rotation = rotations[i];
+                body.position = position; body.rotation = rotation;
                 if (!body.isKinematic) { body.velocity = Vector3.zero; body.angularVelocity = Vector3.zero; body.Sleep(); }
             }
             foreach (var body in bodies)

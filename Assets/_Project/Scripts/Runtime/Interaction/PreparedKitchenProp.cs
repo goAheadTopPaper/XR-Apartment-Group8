@@ -8,7 +8,7 @@ namespace XRApartment.Runtime
 {
     public enum PreparedPropKind { Fracture, Slice, Eggshell }
 
-    /// Switches an intact prop to pieces derived in Blender. Pieces are reused on reset.
+    /// Switches an intact prop to pre-authored pieces. Pieces are reused on reset.
     [RequireComponent(typeof(Rigidbody))]
     public sealed class PreparedKitchenProp : MonoBehaviour
     {

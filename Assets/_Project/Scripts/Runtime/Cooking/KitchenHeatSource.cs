@@ -66,8 +66,19 @@ namespace XRApartment.Runtime
             foreach (var pair in foods)
                 if (pair.Key != null && pair.Key.enabled && pair.Key.gameObject.activeInHierarchy && pair.Value != null && heatedFoods.Add(pair.Value))
                     pair.Value.Heat(1, Time.fixedDeltaTime);
-            var containsFood = heatedFoods.Count > 0;
-            foreach (var vessel in heatedVessels) if (vessel.Batch.Millilitres > .01f) containsFood = true;
+            var solidFood = heatedFoods.Count > 0;
+            var burnt = false;
+            foreach (var ingredient in heatedFoods) if (ingredient.Stage == XRApartment.Data.CookingStage.Burnt) burnt = true;
+            var liquidFood = false;
+            foreach (var vessel in heatedVessels)
+            {
+                if (vessel.Batch.Millilitres > .01f) liquidFood = true;
+                var pan = vessel.PanContents;
+                if (pan == null || pan.CapturedCount == 0) continue;
+                solidFood = true;
+                if (pan.IsBurnt) burnt = true;
+            }
+            var containsFood = liquidFood || solidFood;
             if (sizzle != null)
             {
                 if (containsFood && !sizzle.isPlaying && sizzle.clip != null) sizzle.Play();
@@ -75,9 +86,7 @@ namespace XRApartment.Runtime
             }
             if (foodVapour != null)
             {
-                var emission = foodVapour.emission; emission.enabled = heatedFoods.Count > 0;
-                var burnt = false;
-                foreach (var ingredient in heatedFoods) if (ingredient.Stage == XRApartment.Data.CookingStage.Burnt) burnt = true;
+                var emission = foodVapour.emission; emission.enabled = solidFood;
                 var main = foodVapour.main; main.startColor = burnt ? new Color(.17f, .14f, .1f, .28f) : new Color(.9f, .9f, .86f, .15f);
             }
         }

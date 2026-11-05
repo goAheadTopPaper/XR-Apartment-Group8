@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -108,11 +109,18 @@ namespace XRApartment.Tests
         }
         IEnumerator PlaceAndRelease(DrivenGrabInteractor hand, GameObject target)
         {
-            // Wait on rendered game time, matching XRI's throw-smoothing window.
-            // Several physics catch-up steps alone do not establish a still hand.
-            var until = Time.time + .4f;
-            while (Time.time < until) yield return null;
-            Drop(hand, target); yield return null; yield return null;
+            // XRI skips throw samples at very short frame times. Feed a stationary
+            // hand across 0.4 seconds of 90 Hz frames before the real SelectExit.
+            var originalDelta = Time.captureDeltaTime;
+            Time.captureDeltaTime = 1f / 90f;
+            try
+            {
+                for (var frame = 0; frame < 36; frame++) yield return null;
+                Drop(hand, target);
+                yield return null;
+                yield return null;
+            }
+            finally { Time.captureDeltaTime = originalDelta; }
         }
         IEnumerator ToggleDoor(KitchenFridge fridge)
         {
@@ -132,16 +140,22 @@ namespace XRApartment.Tests
             Assert.IsFalse(fridge.Contains(item.transform.position), "Food must leave through the open doorway: " + item.name);
             Assert.IsTrue(item.GetComponent<KitchenStoredIngredient>().WasRetrieved);
         }
-        IEnumerator CutWithKnife(GameObject knife, PreparedKitchenProp food)
+        IEnumerator CutWithKnife(GameObject knife, PreparedKitchenProp food, float bladeOffset = .055f)
         {
-            var centre = food.GetComponent<Rigidbody>().worldCenterOfMass;
+            var body = food.GetComponent<Rigidbody>();
             var upright = Quaternion.Euler(90, 0, 0);
-            yield return MoveHeld(right, knife, centre + Vector3.right * .055f + Vector3.up * .18f, upright, 28);
+            var stroke = body.worldCenterOfMass + Vector3.right * bladeOffset + Vector3.up * .18f;
+            yield return MoveHeld(right, knife, stroke, upright, 28);
+            var attach = knife.GetComponent<XRGrabInteractable>().GetAttachTransform(right);
+            var grip = knife.transform.InverseTransformPoint(attach.position);
+            var gripOffset = upright * Vector3.Scale(grip, knife.transform.lossyScale);
             for (var i = 0; i < 65 && !food.IsSplit; i++)
             {
-                var actual = food.GetComponent<Rigidbody>().worldCenterOfMass;
-                right.transform.position += new Vector3(Mathf.Clamp(actual.x + .055f - knife.transform.position.x, -.005f, .005f),
-                    -.004f, Mathf.Clamp(actual.z - knife.transform.position.z, -.005f, .005f));
+                // Anchor each input sample to the food. Accumulating correction from
+                // the stopped solid blade can steer the tracked wrist off the board.
+                var centre = body.worldCenterOfMass;
+                stroke = new Vector3(centre.x + bladeOffset, stroke.y - .004f, centre.z);
+                right.transform.position = stroke + gripOffset;
                 yield return null;
                 yield return new WaitForFixedUpdate();
             }
@@ -173,7 +187,7 @@ namespace XRApartment.Tests
             {
                 Assert.That(grab.transform.position.x, Is.InRange(-5.06f,-1.45f), "Outside kitchen: "+grab.name);
                 Assert.That(grab.transform.position.z, Is.InRange(.60f,2.39f), "Outside kitchen: "+grab.name);
-                Assert.That(grab.transform.position.y, Is.GreaterThan(.9f), "Unsupported: "+grab.name);
+                AssertOnKitchenSupport(grab.transform);
                 Assert.IsNotNull(grab.GetComponent<CollisionConstrainedGrabTransformer>(), grab.name);
             }
             var heat = station.GetComponentInChildren<KitchenHeatSource>();
@@ -233,9 +247,14 @@ namespace XRApartment.Tests
         {
             yield return LoadKitchen(); yield return Frames(120);
             foreach (var body in station.GetComponentsInChildren<Rigidbody>())
-                Assert.That(body.transform.position.y, Is.GreaterThan(.9f), "Unsupported initial placement: " + body.name + " at " + body.position);
+                AssertOnKitchenSupport(body.transform);
             foreach (var vessel in station.GetComponentsInChildren<KitchenFoodVessel>())
                 Assert.That(Vector3.Dot(vessel.transform.up, Vector3.up), Is.GreaterThan(.95f), "Initial vessel tipped: " + vessel.name);
+        }
+
+        void AssertOnKitchenSupport(Transform target)
+        {
+            KitchenCookingTests.AssertOnKitchenSupport(target, station.GetComponent<KitchenCookingStation>().ActiveFridge);
         }
 
         [UnityTest] public IEnumerator SweptFridgeDoorStopsAtObstacleAndCanResume()
@@ -276,6 +295,187 @@ namespace XRApartment.Tests
             station.GetComponent<KitchenCookingStation>().ResetStation();
         }
 
+        [UnityTest] public IEnumerator BeefOnionRecipeUsesGrabsCutsHeatStirAndServing()
+        {
+            yield return LoadKitchen();
+            var workbench = station.GetComponent<KitchenCookingStation>();
+            var flow = station.GetComponent<KitchenRecipeController>();
+            var heading = station.transform.Find("UI_CookingInstructions/Heading").GetComponent<TMP_Text>();
+            var fridgeDetail = station.transform.Find("UI_FridgeInstructions/Detail").GetComponent<TMP_Text>();
+            var fridge = workbench.ActiveFridge;
+            var beef = station.transform.Find("STOCK_Beef").GetComponent<CookableIngredient>();
+            var onion = station.transform.Find("STOCK_Onion").GetComponent<CookableIngredient>();
+            var pan = station.transform.Find("PREF_Cooking_FryingPan").GetComponent<KitchenFoodVessel>();
+            var contents = pan.GetComponent<KitchenPanContents>();
+            var stove = station.GetComponentInChildren<KitchenHeatSource>();
+            var board = station.transform.Find("PREF_Cooking_ChoppingBoard");
+            var plate = station.transform.Find("PREF_Prop_plate/Intact");
+            var knife = station.GetComponentInChildren<PreparedKitchenKnife>().GetComponentInParent<XRGrabInteractable>();
+            var knifeRest = new Pose(knife.transform.position, knife.transform.rotation);
+            var spatula = station.GetComponentInChildren<KitchenSpatula>();
+
+            SelectKitchenControl("ACT_RECIPE");
+            yield return Frames(5);
+            Assert.AreEqual(KitchenRecipeChoice.BeefOnion, flow.ActiveRecipe);
+            Assert.AreEqual(BeefOnionStep.TakeIngredients, flow.BeefStep);
+            AssertOnKitchenSupport(beef.transform);
+            AssertOnKitchenSupport(onion.transform);
+            Assert.IsFalse(contents.TryReceive(beef));
+            Assert.IsFalse(contents.TryReceive(onion));
+
+            var panBody = pan.GetComponent<Rigidbody>();
+            // This fixture holds the pan at the physical burner position for repeatable ingredient entry.
+            // The tomato-and-egg test also places the pan using the XRI grip.
+            panBody.isKinematic = true;
+            var burner = station.transform.Find("LOC_BurnerSurface").position;
+            pan.transform.SetPositionAndRotation(burner, Quaternion.identity);
+            panBody.position = burner;
+            panBody.rotation = Quaternion.identity;
+            Physics.SyncTransforms();
+            var cut = board.position + new Vector3(0f, .029f, .09f);
+            yield return TakeAndCut(fridge, beef, knife, knifeRest, cut, .055f);
+            var strips = beef.Prepared.Pieces.ToArray();
+            Assert.AreEqual(4, strips.Length);
+            yield return ReleaseIntoPan(strips, pan, contents);
+            Assert.AreEqual(BeefOnionStep.TakeIngredients, flow.BeefStep, "Beef alone cannot satisfy the recipe.");
+            yield return new WaitForSecondsRealtime(.22f);
+            Assert.AreEqual("For this recipe: an onion.", fridgeDetail.text);
+
+            yield return TakeAndCut(fridge, onion, knife, knifeRest, cut, .043f);
+            var quarters = onion.Prepared.Pieces.ToArray();
+            Assert.AreEqual(4, quarters.Length);
+            Assert.AreEqual(BeefOnionStep.AddToPan, flow.BeefStep);
+            yield return ReleaseIntoPan(quarters, pan, contents);
+            Assert.AreEqual(8, contents.CapturedCount);
+            Assert.That(contents.BeefGrams, Is.EqualTo(150f).Within(.01f));
+            Assert.That(contents.OnionGrams, Is.EqualTo(80f).Within(.01f));
+            Assert.AreEqual(CookingStage.Raw, contents.BeefStage);
+            Assert.AreEqual(CookingStage.Raw, contents.OnionStage);
+            Assert.AreEqual(BeefOnionStep.CookAndStir, flow.BeefStep);
+
+            SelectKitchenControl("ACT_STOVE");
+            yield return Frames(3);
+            Assert.IsTrue(stove.IsHeating(pan));
+            Assert.IsTrue(stove.GetComponent<AudioSource>().isPlaying);
+            for (var i = 0; i < 700 && contents.OnionStage != CookingStage.Cooked; i++) yield return new WaitForFixedUpdate();
+            Assert.AreEqual(CookingStage.Cooked, contents.BeefStage);
+            Assert.AreEqual(CookingStage.Cooked, contents.OnionStage);
+            Assert.AreEqual(BeefOnionStep.CookAndStir, flow.BeefStep, "Heat alone cannot replace spatula motion.");
+            var pieces = strips.Concat(quarters).Select(piece => piece.GetComponent<CookableIngredient>()).ToArray();
+            var doses = pieces.Select(piece => piece.HeatDose).ToArray();
+            // Exercise the burnt guard with the actual captured dish, then restore the measured doses for serving.
+            pan.Heat(1f, 100f);
+            Assert.AreEqual(BeefOnionStep.Burnt, flow.BeefStep);
+            Assert.IsFalse(contents.BeefOnionPlated);
+            for (var index = 0; index < pieces.Length; index++)
+            {
+                pieces[index].ResetCooking();
+                pieces[index].Heat(1f, doses[index]);
+            }
+            Assert.AreEqual(BeefOnionStep.CookAndStir, flow.BeefStep);
+            var beforeStir = strips.Select(strip => strip.transform.position).ToArray();
+            yield return Pick(right, spatula.gameObject);
+            for (var stroke = 0; stroke < 6 && flow.BeefStep == BeefOnionStep.CookAndStir; stroke++)
+                yield return StirWithSpatula(spatula, pan, 90);
+            Assert.IsTrue(strips.Where((strip, index) => Vector3.Distance(strip.transform.position, beforeStir[index]) > .005f).Any());
+            Assert.AreEqual(BeefOnionStep.TurnOffStove, flow.BeefStep, "Stir measured " + contents.BeefOnionStirDistance);
+            yield return MoveHeld(right, spatula.gameObject, pan.transform.position + new Vector3(.24f, .24f, -.18f), spatula.transform.rotation, 26);
+            Drop(right, spatula.gameObject);
+            SelectKitchenControl("ACT_STOVE");
+            Assert.AreEqual(BeefOnionStep.Plate, flow.BeefStep);
+
+            panBody.isKinematic = false;
+            yield return Pick(left, pan.gameObject);
+            yield return MoveHeld(left, pan.gameObject, pan.transform.position + Vector3.up * .32f, Quaternion.identity, 30);
+            var pour = plate.position + new Vector3(-.073f, .20f, 0f);
+            yield return MoveHeld(left, pan.gameObject, pour + Vector3.up * .14f, Quaternion.identity, 85);
+            yield return MoveHeld(left, pan.gameObject, pour, Quaternion.identity, 26);
+            Assert.IsFalse(contents.BeefOnionPlated, "A level pan must not serve the dish.");
+            var tilted = Quaternion.Euler(0, 0, -65f);
+            var wrongAim = pour + Vector3.back * .22f;
+            yield return MoveHeld(left, pan.gameObject, wrongAim + Vector3.up * .14f, tilted, 35);
+            yield return MoveHeld(left, pan.gameObject, wrongAim, tilted, 25);
+            Assert.IsFalse(contents.BeefOnionPlated, "A tilt away from the plate must not serve the dish.");
+            yield return MoveHeld(left, pan.gameObject, wrongAim + Vector3.up * .14f, tilted, 25);
+            yield return MoveHeld(left, pan.gameObject, pour + Vector3.up * .14f, tilted, 35);
+            yield return MoveHeld(left, pan.gameObject, pour, tilted, 26);
+            yield return new WaitForSeconds(.35f);
+            Assert.AreEqual(BeefOnionStep.Served, flow.BeefStep,
+                "Pan " + pan.transform.position + " up " + pan.transform.up + " plate " + plate.position);
+            Assert.That(heading.text, Does.Contain("SERVED"));
+            Assert.AreEqual(0, contents.CapturedCount);
+            Assert.IsTrue(strips.Concat(quarters).All(piece => piece.transform.parent == plate));
+            yield return MoveHeld(left, pan.gameObject, pan.transform.position + new Vector3(-.24f, .28f, 0f),
+                Quaternion.identity, 30);
+            Capture("beef-onion-served", plate.position + new Vector3(.14f, .37f, .26f), plate.position);
+            var plateObject = plate.parent.gameObject;
+            yield return Pick(right, plateObject);
+            var previousPlateHeight = plate.position.y;
+            yield return MoveHeld(right, plateObject, plateObject.transform.position + Vector3.up * .18f,
+                plateObject.transform.rotation, 30);
+            Assert.That(plate.position.y, Is.GreaterThan(previousPlateHeight + .13f));
+            Assert.IsTrue(strips.Concat(quarters).All(piece => piece.transform.parent == plate));
+
+            workbench.ResetStation();
+            yield return Frames(8);
+            for (var frame = 0; frame < 4 && workbench.IsResetting; frame++) yield return null;
+            Assert.IsFalse(workbench.IsResetting);
+            Assert.AreEqual(KitchenRecipeChoice.BeefOnion, flow.ActiveRecipe);
+            Assert.AreEqual(BeefOnionStep.TakeIngredients, flow.BeefStep);
+            Assert.IsFalse(contents.BeefOnionPlated);
+            Assert.IsFalse(beef.Prepared.IsSplit);
+            Assert.IsFalse(onion.Prepared.IsSplit);
+            Assert.IsTrue(fridge.Contains(beef.transform.position) && fridge.Contains(onion.transform.position));
+            Assert.IsFalse(stove.IsOn);
+
+            SelectKitchenControl("ACT_RECIPE");
+            yield return Frames(6);
+            Assert.AreEqual(KitchenRecipeChoice.TomatoEgg, flow.ActiveRecipe);
+            Assert.AreEqual(TomatoEggStep.OpenFridge, flow.Recipe.Step);
+        }
+
+        void SelectKitchenControl(string name)
+        {
+            var control = station.transform.Find(name).GetComponent<XRSimpleInteractable>();
+            control.interactionManager = manager;
+            manager.SelectEnter((IXRSelectInteractor)right, control);
+            manager.SelectExit((IXRSelectInteractor)right, control);
+        }
+
+        IEnumerator TakeAndCut(KitchenFridge fridge, CookableIngredient food, XRGrabInteractable knife,
+            Pose knifeRest, Vector3 cut, float bladeOffset)
+        {
+            yield return ToggleDoor(fridge);
+            yield return Retrieve(left, food.gameObject, fridge);
+            yield return ToggleDoor(fridge);
+            yield return MoveHeld(left, food.gameObject, cut + Vector3.up * .25f, Quaternion.identity, 120);
+            yield return MoveHeld(left, food.gameObject, cut, Quaternion.identity, 25);
+            yield return PlaceAndRelease(left, food.gameObject);
+            Assert.That(Vector3.Distance(food.transform.position, cut), Is.LessThan(.06f), food.name);
+            yield return Pick(right, knife.gameObject);
+            yield return CutWithKnife(knife.gameObject, food.Prepared, bladeOffset);
+            yield return MoveHeld(right, knife.gameObject, knifeRest.position + Vector3.up * .28f, knifeRest.rotation, 30);
+            yield return MoveHeld(right, knife.gameObject, knifeRest.position + Vector3.up * .008f, knifeRest.rotation, 30);
+            yield return PlaceAndRelease(right, knife.gameObject);
+        }
+
+        IEnumerator ReleaseIntoPan(Rigidbody[] pieces, KitchenFoodVessel pan, KitchenPanContents contents)
+        {
+            foreach (var piece in pieces)
+            {
+                yield return Pick(left, piece.gameObject);
+                yield return MoveHeld(left, piece.gameObject, piece.position + Vector3.up * .18f, piece.rotation, 22);
+                var centre = pan.transform.position - piece.centerOfMass;
+                yield return MoveHeld(left, piece.gameObject, centre + Vector3.up * .16f, Quaternion.identity, 36);
+                yield return MoveHeld(left, piece.gameObject, centre + Vector3.up * .045f, Quaternion.identity, 24);
+                Assert.IsFalse(contents.TryReceive(piece.GetComponent<CookableIngredient>()), "Held food cannot enter the pan.");
+                yield return PlaceAndRelease(left, piece.gameObject);
+                yield return Frames(18);
+                Assert.AreEqual(pan.transform, piece.transform.parent,
+                    piece.name + " missed the pan mouth at " + pan.transform.InverseTransformPoint(piece.worldCenterOfMass));
+            }
+        }
+
         [UnityTest] public IEnumerator CompleteRecipeUsesFridgeKnifeEggPourAndSpatulaAndCanReset()
         {
             yield return LoadKitchen();
@@ -303,20 +503,33 @@ namespace XRApartment.Tests
             yield return MoveHeld(left, tomato.gameObject, cutPosition, Quaternion.identity, 35); yield return PlaceAndRelease(left, tomato.gameObject);
             Assert.That(Vector3.Distance(tomato.transform.position,cutPosition),Is.LessThan(.065f), "Tomato must reach the actual kitchen board.");
             yield return Frames(12); yield return Pick(right, knife); yield return CutWithKnife(knife, tomato);
+            var knifePark = board.transform.position + new Vector3(.32f, .4f, -.12f);
+            var cuttingGrip = Quaternion.Euler(90, 0, 0);
+            yield return MoveHeld(right, knife, knifePark, cuttingGrip, 22);
             var slices = tomato.Pieces.Select(b => b.GetComponent<PreparedKitchenProp>()).ToArray();
             var prep = station.transform.Find("PREF_Cooking_TomatoBowl").gameObject;
             var prepRest = prep.transform.position;
+            var boardSurface = board.GetComponent<Collider>();
             var dicedCount = 0;
             foreach (var slice in slices)
             {
+                var sliceBody = slice.GetComponent<Rigidbody>();
                 yield return Pick(left, slice.gameObject);
                 yield return MoveHeld(left, slice.gameObject, slice.transform.position + Vector3.up * .25f, slice.transform.rotation, 24);
-                var slicePlace = cutPosition + Vector3.forward * .13f;
+                // The slices keep the original tomato pivot. Place the actual
+                // centre of mass clear of the pile and inside the board edge.
+                var centreOffset = Vector3.Scale(sliceBody.centerOfMass, slice.transform.lossyScale);
+                var slicePlace = cutPosition + new Vector3(-.115f, .06f, -.025f) - Vector3.ProjectOnPlane(centreOffset, Vector3.up);
                 yield return MoveHeld(left, slice.gameObject, slicePlace + Vector3.up * .25f, Quaternion.identity, 25);
                 yield return MoveHeld(left, slice.gameObject, slicePlace, Quaternion.identity, 20);
-                yield return PlaceAndRelease(left, slice.gameObject); yield return Frames(6);
+                var heldCentre = sliceBody.worldCenterOfMass;
+                yield return PlaceAndRelease(left, slice.gameObject); yield return Frames(20);
+                var centre = sliceBody.worldCenterOfMass;
+                Assert.IsTrue(boardSurface.Raycast(new Ray(centre + Vector3.up * .025f, Vector3.down), out _, .125f),
+                    $"{slice.name} must settle on the chopping board before cutting. Centre {centre:F3}, " +
+                    $"held centre {heldCentre:F3}, requested pivot {slicePlace:F3}, board {boardSurface.bounds}.");
                 yield return CutWithKnife(knife, slice);
-                yield return MoveHeld(right, knife, board.transform.position + new Vector3(.32f, .4f, -.12f), Quaternion.Euler(90, 0, 0), 22);
+                yield return MoveHeld(right, knife, knifePark, cuttingGrip, 22);
                 // Clear each chopped slice into the actual prep bowl, as a player
                 // would, leaving room for the next knife stroke.
                 foreach (var body in slice.Pieces)
@@ -429,12 +642,19 @@ namespace XRApartment.Tests
             finally { recorder.Dispose(); }
             Capture("tomato-egg-finished", pan.transform.position + new Vector3(.14f, .43f, .31f), pan.transform.position + Vector3.up * .02f);
             Capture("kitchen-recipe-complete", new Vector3(-3.05f, 1.95f, .7f), new Vector3(-3.4f, 1.1f, 1.95f));
+            yield return new WaitForSecondsRealtime(.22f);
+            var heading = station.transform.Find("UI_CookingInstructions/Heading").GetComponent<TMP_Text>();
+            var detail = station.transform.Find("UI_CookingInstructions/Detail").GetComponent<TMP_Text>();
+            Assert.That(heading.text, Does.Contain("READY"));
+            Assert.That(detail.text, Does.Contain("50 mL egg").And.Contain($"{contents.TomatoGrams:0} g tomato"));
             File.WriteAllText("Logs/TomatoEggRecipe/recipe-scenario.json", JsonUtility.ToJson(new RecipeReport {
                 actions = flow.Recipe.Actions.ToString(), completed = flow.Recipe.Ready, eggMl = pan.Batch.Millilitres,
                 tomatoGrams = contents.TomatoGrams, scrambledMetres = contents.EggScrambleDistance,
                 stirFryMetres = contents.StirFryDistance, capturedPieces = contents.CapturedCount,
                 presentationMeanMs = meanPresentationMs, presentationMaxMs = maxPresentationMs, presentationSamples = presentationSamples }, true));
             pan.Heat(1, 100); yield return null; Assert.AreEqual(TomatoEggStep.Burnt, flow.Recipe.Step);
+            yield return new WaitForSecondsRealtime(.22f);
+            Assert.That(heading.text, Does.Contain("BURNT"));
             station.GetComponent<KitchenCookingStation>().ResetStation(); yield return Frames(4);
             Assert.AreEqual(TomatoEggStep.OpenFridge, flow.Recipe.Step); Assert.IsFalse(fridge.Accessible);
             Assert.AreEqual(0, contents.CapturedCount); Assert.AreEqual(0, pan.Batch.Millilitres);

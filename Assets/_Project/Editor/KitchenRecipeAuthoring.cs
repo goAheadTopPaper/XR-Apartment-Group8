@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
 using XRApartment.Runtime;
@@ -19,6 +20,7 @@ namespace XRApartment.EditorTools
         const string RecipeProfilePath = KitchenAuthoring.Settings + "SET_TomatoEggCooking.asset";
         const string RecipeTomato = KitchenAuthoring.Prefabs + "Generated/tomato_v002/PREF_Prop_tomato.prefab";
         static readonly Dictionary<Material, Material> RecipeMaterials = new Dictionary<Material, Material>();
+        static readonly Quaternion CounterLabelRotation = Quaternion.Euler(90f, 0f, 0f);
 
         static void BuildRecipeAssets()
         {
@@ -67,6 +69,8 @@ namespace XRApartment.EditorTools
                 });
             }
             BuildRecipeFridge(profile); BuildRecipeSpatula(); BuildRecipeBoard();
+            BuildBeefStockPrefab();
+            BuildOnionStockPrefab();
             BuildVessel("TomatoBowl", .09f, .008f, .065f, .004f, false, profile);
             KitchenAuthoring.EditPrefab(Prefabs + "PREF_Cooking_TomatoBowl.prefab", root =>
                 ConfigurePrepTray(root, false, .09f, .09f, .008f, .085f));
@@ -284,21 +288,60 @@ namespace XRApartment.EditorTools
                 var eggs = new KitchenEgg[3];
                 for (var i = 0; i < eggs.Length; i++)
                     eggs[i] = Stock(root.transform, fridge, RecipePrefabs + "PREF_Prop_egg.prefab", KitchenStoredFood.Egg, new Vector3(-.02f + .09f * i, 1.334f, .08f), targets).GetComponent<KitchenEgg>();
+                AddPantryStock(root.transform, fridge, targets);
                 var reset = Button(root.transform, "RESET", new Vector3(-4.22f, table + .025f, 1.68f), new Color(.1f, .28f, .3f));
-                var label = Child(root.transform, "UI_CookingInstructions"); label.position = new Vector3(-3.60f, 1.62f, 2.20f); label.rotation = Quaternion.identity;
-                var text = label.gameObject.AddComponent<TextMesh>(); text.characterSize = .009f; text.fontSize = 40; text.anchor = TextAnchor.UpperCenter; text.color = new Color(.055f, .075f, .08f);
                 var flow = root.AddComponent<KitchenRecipeController>();
                 var slices = tomato.transform.Find("DerivedPieces").Cast<Transform>().Select(t => t.GetComponent<PreparedKitchenProp>()).ToArray();
                 flow.Configure(profile, fridge, tomato, slices, eggs, bowl, pan, stove);
-                var frontHint = Child(root.transform, "UI_FridgeInstructions"); frontHint.position = new Vector3(-1.87f, 1.96f, 1.48f);
-                var frontText = frontHint.gameObject.AddComponent<TextMesh>(); frontText.characterSize = .007f; frontText.fontSize = 40;
-                frontText.anchor = TextAnchor.UpperCenter; frontText.color = text.color; frontText.text = flow.Instructions;
-                flow.SetFridgeHint(frontText);
-                text.text = flow.Instructions;
-                var station = root.AddComponent<KitchenCookingStation>(); station.Configure(targets.ToArray(), reset, bowl, pan, stove, text); station.ConfigureRecipe(flow, fridge);
+                var station = root.AddComponent<KitchenCookingStation>(); station.Configure(targets.ToArray(), reset, bowl, pan, stove, null); station.ConfigureRecipe(flow, fridge);
+                ConfigureBeefOnionWorkbench(root);
+                ConfigureRecipeGuides(root);
                 PrefabUtility.SaveAsPrefabAsset(root, StationPath);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [MenuItem("XR Apartment/Cooking/Apply Recipe Guides")]
+        public static void ApplyRecipeGuides() => KitchenAuthoring.EditPrefab(StationPath, ConfigureRecipeGuides);
+
+        private static void ConfigureRecipeGuides(GameObject workbench)
+        {
+            var controller = workbench.GetComponent<KitchenRecipeController>();
+            var station = new SerializedObject(workbench.GetComponent<KitchenCookingStation>());
+            station.FindProperty("status").objectReferenceValue = null;
+            station.ApplyModifiedPropertiesWithoutUndo();
+            workbench.transform.Find("ACT_RESET/Label").localRotation = CounterLabelRotation;
+            workbench.transform.Find("ACT_RECIPE/Label").localRotation = CounterLabelRotation;
+            controller.SetFridgeHint(null);
+            controller.ConfigureGuides(
+                BuildRecipeGuide(workbench.transform, "UI_CookingInstructions",
+                    new Vector3(-3.60f, 1.57f, 2.20f), 740f),
+                BuildRecipeGuide(workbench.transform, "UI_FridgeInstructions",
+                    new Vector3(-2.16f, 2.02f, 1.42f), 660f));
+        }
+
+        private static KitchenRecipeController.Guide BuildRecipeGuide(
+            Transform workbench, string name, Vector3 position, float width)
+        {
+            var old = workbench.Find(name);
+            if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
+            var card = KitchenLocomotionAuthoring.Rect(name, workbench, 0f, 0f, width, 230f);
+            card.SetPositionAndRotation(position, Quaternion.identity);
+            card.localScale = Vector3.one * .001f;
+            var canvas = card.gameObject.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            var background = card.gameObject.AddComponent<Image>();
+            background.color = new Color(.045f, .077f, .10f, .98f);
+            background.raycastTarget = false;
+            var stripe = KitchenLocomotionAuthoring.Rect("Edge", card, -width * .5f + 5f, 0f, 10f, 230f)
+                .gameObject.AddComponent<Image>();
+            stripe.color = new Color(.25f, .71f, .72f);
+            stripe.raycastTarget = false;
+            var heading = KitchenLocomotionAuthoring.Label("Heading", card, 4f, 76f, width - 62f, 38f, 27, "RECIPE");
+            var action = KitchenLocomotionAuthoring.Label("Action", card, 4f, 12f, width - 62f, 80f, 30, "");
+            var detail = KitchenLocomotionAuthoring.Label("Detail", card, 4f, -72f, width - 62f, 50f, 23, "");
+            heading.alignment = action.alignment = detail.alignment = TMPro.TextAlignmentOptions.MidlineLeft;
+            return new KitchenRecipeController.Guide { heading = heading, action = action, detail = detail };
         }
 
         static GameObject Stock(Transform parent, KitchenFridge fridge, string prefab, KitchenStoredFood kind, Vector3 local, List<Transform> targets)
@@ -307,6 +350,49 @@ namespace XRApartment.EditorTools
             item.transform.rotation = fridge.transform.rotation;
             item.AddComponent<KitchenStoredIngredient>().Configure(fridge, kind);
             return item;
+        }
+
+        [MenuItem("XR Apartment/Cooking/Apply Pantry Stock")]
+        public static void ApplyPantryStock()
+        {
+            KitchenAuthoring.RequireEditMode();
+            BuildBeefStockPrefab();
+            BuildOnionStockPrefab();
+            KitchenAuthoring.EditPrefab(StationPath, root =>
+            {
+                var station = new SerializedObject(root.GetComponent<KitchenCookingStation>());
+                var targets = station.FindProperty("resetTargets");
+                var current = Enumerable.Range(0, targets.arraySize)
+                    .Select(i => (Transform)targets.GetArrayElementAtIndex(i).objectReferenceValue).ToList();
+                AddPantryStock(root.transform, root.GetComponentInChildren<KitchenFridge>(), current);
+                targets.arraySize = current.Count;
+                for (var index = 0; index < current.Count; index++)
+                    targets.GetArrayElementAtIndex(index).objectReferenceValue = current[index];
+                station.ApplyModifiedPropertiesWithoutUndo();
+                ConfigureBeefOnionWorkbench(root);
+            });
+        }
+
+        private static void AddPantryStock(Transform root, KitchenFridge fridge, List<Transform> targets)
+        {
+            Add("Banana", new Vector3(-.15f, .634f, .015f));
+            var oldOnion = root.Find("STOCK_Onion");
+            if (oldOnion != null && oldOnion.GetComponent<PreparedKitchenProp>() == null)
+            {
+                targets.Remove(oldOnion);
+                UnityEngine.Object.DestroyImmediate(oldOnion.gameObject);
+            }
+            Add("Onion", new Vector3(.14f, .634f, .115f), OnionPrefab);
+            Add("Cheese", new Vector3(.12f, .634f, -.12f));
+            Add("Beef", new Vector3(.12f, 1.336f, -.15f), BeefPrefab);
+
+            void Add(string name, Vector3 position, string prefab = null)
+            {
+                if (root.Find("STOCK_" + name) != null) return;
+                if (prefab == null) prefab = KitchenAuthoring.Prefabs + "Props/PREF_Prop_" + name + ".prefab";
+                var item = Stock(root, fridge, prefab, KitchenStoredFood.Other, position, targets);
+                item.name = "STOCK_" + name;
+            }
         }
     }
 }

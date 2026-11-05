@@ -191,12 +191,13 @@ namespace XRApartment.Tests
             if (!Object.FindObjectsOfType<AudioListener>().Any(listener => listener.isActiveAndEnabled))
                 manager.gameObject.AddComponent<AudioListener>();
             var station = System.Array.Find(roots, go => go.name == "PREF_Cooking_Workbench");
+            var fridge = station.GetComponent<KitchenCookingStation>().ActiveFridge;
             var bowl = station.transform.Find("PREF_Cooking_MixingBowl").GetComponent<KitchenFoodVessel>();
             for (var i = 0; i < 80; i++) yield return new WaitForFixedUpdate();
             foreach (var prop in station.GetComponentsInChildren<PreparedKitchenProp>())
             {
                 Assert.IsFalse(prop.IsSplit, "Initial placement must not break " + prop.name);
-                Assert.That(prop.transform.position.y, Is.GreaterThan(.9f), "Prop fell off the authored table: " + prop.name);
+                AssertOnKitchenSupport(prop.transform, fridge);
             }
             foreach (var vessel in station.GetComponentsInChildren<KitchenFoodVessel>())
             {
@@ -223,6 +224,21 @@ namespace XRApartment.Tests
             station.GetComponent<KitchenCookingStation>().ResetStation();
             Assert.AreEqual(CookingStage.Empty, bowl.Stage);
             foreach (var prop in station.GetComponentsInChildren<PreparedKitchenProp>()) Assert.IsFalse(prop.IsSplit);
+        }
+
+        internal static void AssertOnKitchenSupport(Transform target, KitchenFridge fridge)
+        {
+            var position = target.position;
+            if (target.GetComponent<KitchenStoredIngredient>() == null)
+            {
+                Assert.That(position.y, Is.GreaterThan(.9f), "Unsupported initial placement: " + target.name + " at " + position);
+                return;
+            }
+            var supportRay = new Ray(position + Vector3.up * .04f, Vector3.down);
+            Assert.IsTrue(fridge.Contains(position) && fridge.GetComponentsInChildren<BoxCollider>()
+                .Any(part => part.name.StartsWith("VIS_Shelf_", System.StringComparison.Ordinal) &&
+                    part.Raycast(supportRay, out _, .09f)),
+                "Fridge stock must rest above an actual shelf: " + target.name + " at " + position);
         }
 
         void CaptureCookingScene(Camera source, Vector3 target)

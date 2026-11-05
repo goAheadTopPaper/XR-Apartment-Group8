@@ -2,9 +2,11 @@ using System;
 
 namespace XRApartment.Data
 {
-    public enum KitchenIngredientKind { Other, Tomato }
-    public enum KitchenCutForm { Whole, Slice, Diced }
+    public enum KitchenIngredientKind { Other, Tomato, Beef, Onion }
+    public enum KitchenCutForm { Whole, Slice, Diced, Strip }
     public enum KitchenStoredFood { Tomato, Egg, Other }
+    public enum KitchenRecipeChoice { TomatoEgg, BeefOnion }
+    public enum BeefOnionStep { TakeIngredients, CutIngredients, AddToPan, CookAndStir, TurnOffStove, Plate, Served, Burnt }
     public enum TomatoEggStep
     {
         OpenFridge, TakeTomato, SliceTomato, DiceTomato, TakeEgg, TakeBowl,

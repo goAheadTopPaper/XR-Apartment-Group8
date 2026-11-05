@@ -165,7 +165,8 @@ namespace XRApartment.EditorTools
             var old = root.transform.Find("ACT_Blade"); if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
             var blade = Child(root.transform, "ACT_Blade");
             var trigger = blade.gameObject.AddComponent<BoxCollider>();
-            trigger.isTrigger = true; trigger.center = new Vector3(-.055f, .006f, 0); trigger.size = new Vector3(.18f, .024f, .08f);
+            trigger.isTrigger = true; trigger.center = new Vector3(-.055f, .006f, 0);
+            ConfigureKnifeContact(trigger);
             var tip = Child(blade, "BladeTip"); tip.localPosition = new Vector3(-.14f, .009f, 0);
             blade.gameObject.AddComponent<PreparedKitchenKnife>().Configure(root.GetComponent<XRGrabInteractable>(), tip);
             var attach = root.transform.Find("ATT_Handle") ?? Child(root.transform, "ATT_Handle");
@@ -173,6 +174,15 @@ namespace XRApartment.EditorTools
             root.GetComponent<XRGrabInteractable>().attachTransform = attach;
             KitchenGrabAuthoring.ConfigureProp(root);
         });
+
+        internal static void ConfigureKnifeContact(BoxCollider blade)
+        {
+            // The solid guard encloses the whole knife. Its safe stop can put the
+            // accepted cutting edge slightly above a slice lying flat on the board.
+            const float depth = .12f;
+            blade.size = new Vector3(.18f, .024f, depth);
+            Parameter("cooking_knife_cut_contact_depth", depth);
+        }
 
         static void BuildVessel(string name, float radius, float bottom, float height, float wall, bool heated, KitchenCookingProfile profile)
         {
@@ -278,7 +288,7 @@ namespace XRApartment.EditorTools
         static XRSimpleInteractable Button(Transform parent, string name, Vector3 position, Color colour)
         {
             var button = Cube(parent, "ACT_" + name, position, new Vector3(.075f, .03f, .055f), Material(name, colour, 0, .3f));
-            var label = Child(button.transform, "Label"); label.localPosition = Vector3.up * .6f; label.localRotation = Quaternion.Euler(90, 180, 0);
+            var label = Child(button.transform, "Label"); label.localPosition = Vector3.up * .6f; label.localRotation = CounterLabelRotation;
             // Undo the visual cube scale for legible text in world metres.
             label.localScale = new Vector3(1 / .075f, 1 / .03f, 1 / .055f);
             var text = label.gameObject.AddComponent<TextMesh>(); text.text = name; text.characterSize = .007f; text.fontSize = 40; text.anchor = TextAnchor.MiddleCenter;

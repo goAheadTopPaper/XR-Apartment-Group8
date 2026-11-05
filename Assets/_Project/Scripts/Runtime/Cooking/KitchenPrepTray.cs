@@ -6,7 +6,7 @@ using XRApartment.Data;
 
 namespace XRApartment.Runtime
 {
-    /// Diced food stays physical on a resting board/bowl. On pickup it is carried
+    /// Prepared food stays physical on a resting board/bowl. On pickup it is carried
     /// with the container, then released to gravity when tipped or put down.
     [RequireComponent(typeof(XRGrabInteractable))]
     public sealed class KitchenPrepTray : MonoBehaviour
@@ -41,7 +41,7 @@ namespace XRApartment.Runtime
         {
             var body = other.attachedRigidbody; if (body == null) return;
             var food = body.GetComponent<CookableIngredient>();
-            if (food == null || food.IngredientKind != KitchenIngredientKind.Tomato || food.CutForm != KitchenCutForm.Diced) return;
+            if (food == null || !food.ReadyForPan) return;
             foreach (var known in items) if (known.food == food) { if (grab.isSelected) Carry(known); return; }
             if (items.Count >= 32) return;
             var colliders = food.GetComponentsInChildren<Collider>(true);

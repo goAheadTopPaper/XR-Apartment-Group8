@@ -866,3 +866,33 @@ MonoBehaviour:
     owner: D/E
     status: Prototype assumption
     verification: Unity prototype geometry; client validation pending.
+  - key: cooking_beef_stock_width
+    valueMetres: 0.144
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_beef_stock_depth
+    valueMetres: 0.08
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_beef_stock_height
+    valueMetres: 0.019
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_serving_radius
+    valueMetres: 0.082
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_knife_cut_contact_depth
+    valueMetres: 0.12
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.

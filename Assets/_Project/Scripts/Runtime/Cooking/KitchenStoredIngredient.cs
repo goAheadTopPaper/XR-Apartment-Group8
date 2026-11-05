@@ -16,8 +16,10 @@ namespace XRApartment.Runtime
         XRGrabInteractable grab;
         bool heldSinceReset;
         public bool WasRetrieved { get; private set; }
+        internal KitchenFridge Fridge => fridge;
         public bool canProcess => isActiveAndEnabled;
         public void Configure(KitchenFridge source, KitchenStoredFood role) { fridge = source; food = role; }
+        internal void UseFridge(KitchenFridge source) => fridge = source;
         void Awake() => grab = GetComponent<XRGrabInteractable>();
         void OnEnable()
         {

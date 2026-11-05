@@ -187,7 +187,7 @@ namespace XRApartment.EditorTools
             finally { Object.DestroyImmediate(root); }
         }
 
-        static RectTransform Rect(string name, Transform parent, float x, float y, float width, float height)
+        internal static RectTransform Rect(string name, Transform parent, float x, float y, float width, float height)
         {
             var rect = (RectTransform)new GameObject(name, typeof(RectTransform)).transform;
             rect.gameObject.layer = LayerMask.NameToLayer("UI");
@@ -196,7 +196,7 @@ namespace XRApartment.EditorTools
             return rect;
         }
 
-        static TMP_Text Label(string name, Transform parent, float x, float y, float width, float height, int size, string value)
+        internal static TMP_Text Label(string name, Transform parent, float x, float y, float width, float height, int size, string value)
         {
             var rect = Rect(name, parent, x, y, width, height);
             var text = rect.gameObject.AddComponent<TextMeshProUGUI>();
@@ -205,7 +205,7 @@ namespace XRApartment.EditorTools
             return text;
         }
 
-        static Button Button(string name, Transform parent, float x, float y, float width, float height, string label)
+        internal static Button Button(string name, Transform parent, float x, float y, float width, float height, string label)
         {
             var rect = Rect(name, parent, x, y, width, height);
             var image = rect.gameObject.AddComponent<Image>(); image.color = new Color(.1f, .28f, .36f);
