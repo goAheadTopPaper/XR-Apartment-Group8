@@ -9,12 +9,18 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 using TMPro;
+using Unity.XR.CoreUtils;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.XR.Interaction.Toolkit.Attachment;
 using UnityEngine.XR.Interaction.Toolkit.Filtering;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using XRApartment.Runtime.Core;
 using XRApartment.Runtime.Feedback;
 using XRApartment.Runtime;
 using XRApartment.Runtime.Debugging;
+using XRApartment.Runtime.Storage;
 using XRApartment.Runtime.UI;
 using XRApartment.Data;
 using XRApartment.Simulation;
@@ -27,6 +33,9 @@ public class CorePlayWiringSmokeTests
         SceneManager.LoadScene(0);
         yield return null;
         Assert.AreEqual("SCN_Kitchen_Cooking", SceneManager.GetActiveScene().name);
+        if (!UnityEngine.XR.XRSettings.isDeviceActive)
+            Assert.AreEqual(XROrigin.TrackingOriginMode.NotSpecified,
+                Object.FindObjectOfType<XROrigin>().RequestedTrackingOriginMode);
         var view = Object.FindObjectOfType<LocomotionSettingsView>();
         view.Open();
         yield return null;
@@ -50,6 +59,15 @@ public class CorePlayWiringSmokeTests
         var host = Object.FindObjectOfType<JourneyRuntimeHost>();
         Assert.IsNull(host.StartupError);
         Assert.AreEqual(SessionState.Setup, host.Core.Snapshot.State);
+        Assert.IsNotNull(host.GetComponent<ReviewBoundarySafety>());
+        if (!UnityEngine.XR.XRSettings.isDeviceActive)
+        {
+            Assert.AreEqual(XROrigin.TrackingOriginMode.Floor,
+                Object.FindObjectOfType<XROrigin>().RequestedTrackingOriginMode);
+            yield return new WaitForSecondsRealtime(.15f);
+            Assert.IsNull(host.Core.Snapshot.CurrentSafety, "Simulation has no physical play area.");
+            Assert.IsNull(GameObject.Find("Physical Play Area Warning"));
+        }
         var reviewMenu = Object.FindObjectOfType<LocomotionSettingsView>();
         reviewMenu.Open();
         Assert.IsFalse(reviewMenu.transform.Find("Panel/EnterReview").gameObject.activeInHierarchy);
@@ -143,6 +161,11 @@ public class CorePlayWiringSmokeTests
         EventSystem.current.RaycastAll(mouse, hits);
         Assert.IsTrue(hits.Any(hit => hit.gameObject.GetComponentInParent<TMP_InputField>() == field),
             "Mouse input must reach the trade-off field in Editor Play Mode.");
+        shell.Render(new JourneySnapshot { State = SessionState.ComparisonSummary, Save = SaveStatus.Failed },
+            JourneyErrorCode.OperationFailed, "Simulated locked CSV.");
+        var write = field.transform.parent.Find("Write in VR").GetComponent<Button>();
+        Assert.IsFalse(write.IsInteractable(), "A failed save retains the submitted comparison for Retry.");
+        Assert.That(field.text, Does.Contain("B1 was skipped"));
     }
 
     [UnityTest]
@@ -277,6 +300,19 @@ public class CorePlayWiringSmokeTests
             yield return null;
             Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
 
+            var run = host.Core.Snapshot.ActiveRunId;
+            var recovery = Object.FindObjectOfType<RecoveryMenuView>();
+            recovery.Open();
+            yield return null;
+            var posture = benchmark == "B1" ? "UseStandingView" : "UseSeatedView";
+            ClickTrackedButton(recovery.GetComponent<TrackedDeviceGraphicRaycaster>(),
+                recovery.transform.Find("Panel/" + posture));
+            Assert.AreEqual(run, host.Core.Snapshot.ActiveRunId);
+            Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
+            Assert.That(Camera.main.GetComponentInParent<XROrigin>().CameraInOriginSpaceHeight,
+                Is.EqualTo(benchmark == "B1" ? 1.65f : 1.20f).Within(.001f));
+            recovery.transform.Find("Panel/Close").GetComponent<Button>().onClick.Invoke();
+
             var item = Identity("ITEM_Tomato");
             Identity("ITEM_Onion").Body.isKinematic = true;
             var guard = item.GetComponent<CollisionConstrainedGrabTransformer>();
@@ -325,6 +361,123 @@ public class CorePlayWiringSmokeTests
             var nextState = benchmark == "B1" ? SessionState.Explore : SessionState.ComparisonSummary;
             for (var frame = 0; frame < 60 && host.Core.Snapshot.State != nextState; frame++) yield return null;
             Assert.AreEqual(nextState, host.Core.Snapshot.State);
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator SeatedControllerRayCanTakeOutAndReturnAFridgeItemInBothBenchmarks()
+    {
+        SceneManager.LoadScene("SCN_Kitchen_Review");
+        yield return null;
+        var host = Object.FindObjectOfType<JourneyRuntimeHost>();
+        Assert.IsNull(host.StartupError);
+        Assert.IsTrue(host.Submit(new JourneyCommand
+        { Type = JourneyCommandType.CompleteSetup, PrerequisitesMet = true }).Accepted);
+        Assert.IsTrue(host.Submit(new JourneyCommand
+        { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
+        MoveHead(-1.90f, 1.05f);
+        var origin = Camera.main.GetComponentInParent<XROrigin>();
+        var recovery = Object.FindObjectOfType<RecoveryMenuView>();
+        recovery.Open();
+        yield return null;
+        ClickTrackedButton(recovery.GetComponent<TrackedDeviceGraphicRaycaster>(),
+            recovery.transform.Find("Panel/UseSeatedView"));
+        ClickTrackedButton(recovery.GetComponent<TrackedDeviceGraphicRaycaster>(),
+            recovery.transform.Find("Panel/Close"));
+        Assert.That(origin.CameraInOriginSpaceHeight, Is.EqualTo(1.20f).Within(.001f));
+
+        var controller = origin.CameraFloorOffsetObject.transform.Find("Right Controller");
+        Assert.NotNull(controller);
+        var tracker = controller.GetComponent<TrackedPoseDriver>();
+        Assert.NotNull(tracker);
+        var hand = controller.GetComponentInChildren<NearFarInteractor>(true);
+        Assert.NotNull(hand);
+        var active = controller.gameObject.activeSelf;
+        var tracking = tracker.enabled;
+        var select = hand.selectInput;
+        var inputMode = select.inputSourceMode;
+        var attach = hand.GetComponent<InteractionAttachController>();
+        Assert.NotNull(attach);
+        Assert.IsTrue(attach.useManipulationInput);
+        var manipulation = attach.manipulationInput;
+        var manipulationMode = manipulation.inputSourceMode;
+        var originalDelta = Time.captureDeltaTime;
+        try
+        {
+            tracker.enabled = false;
+            controller.gameObject.SetActive(true);
+            select.inputSourceMode = XRInputButtonReader.InputSourceMode.ManualValue;
+            manipulation.inputSourceMode = XRInputValueReader<Vector2>.InputSourceMode.ManualValue;
+            // Maintain realistic Dynamic/Fixed phase sampling in batch mode.
+            Time.captureDeltaTime = 1f / 90f;
+            var targets = new List<IXRInteractable>();
+            foreach (var benchmark in new[] { "B1", "B2" })
+            {
+                Assert.IsTrue(host.Submit(new JourneyCommand
+                { Type = JourneyCommandType.ShowBenchmark, BenchmarkId = benchmark }).Accepted);
+                yield return null;
+                var item = Identity("ITEM_Tomato");
+                var zone = Identity("ZONE_FreshDestination");
+                var door = Identity("ACCESS_FridgeDoor").GetComponent<KinematicSwingDoor>();
+                PlaceRestingOnShelf(item, "SHELF_Fresh_Lower");
+                var target = item.Grab.colliders[0].bounds.center;
+                var wrist = new Vector3(target.x, .90f, 1.02f);
+                controller.SetPositionAndRotation(wrist, Quaternion.LookRotation(target - wrist));
+                Physics.SyncTransforms();
+                for (var frame = 0; frame < 18; frame++) yield return null;
+                hand.GetValidTargets(targets);
+                CollectionAssert.DoesNotContain(targets, item.Grab, benchmark + " closed door must occlude the food");
+
+                door.SetOpenImmediate(true);
+                Physics.SyncTransforms();
+                for (var frame = 0; frame < 18; frame++) yield return null;
+                hand.GetValidTargets(targets);
+                CollectionAssert.Contains(targets, item.Grab, benchmark + " low shelf needs a reachable ray target");
+                select.QueueManualState(true, 1f);
+                for (var frame = 0; frame < 8 && !item.Grab.isSelected; frame++) yield return null;
+                Assert.IsTrue(item.Grab.isSelected, benchmark + " grip must select the low item");
+                yield return null;
+                Assert.AreEqual(NearFarInteractor.Region.Far, hand.selectionRegion.Value);
+
+                // Supply the stick value to the rig's actual attach controller.
+                // The wrist stays at seated height while the food moves along the ray.
+                manipulation.manualValue = Vector2.down;
+                var deadline = Time.realtimeSinceStartup + 3f;
+                while (item.Grab.colliders[0].bounds.center.z > target.z - .43f &&
+                    Time.realtimeSinceStartup < deadline)
+                    yield return null;
+                var extracted = item.Grab.colliders[0].bounds.center;
+                Assert.IsFalse(zone.ContainsPoint(extracted),
+                    benchmark + " ray-held item must physically leave the shelf");
+                Assert.That(extracted.z, Is.LessThan(target.z - .40f));
+
+                manipulation.manualValue = Vector2.up;
+                deadline = Time.realtimeSinceStartup + 3f;
+                while (item.Grab.colliders[0].bounds.center.z < target.z - .025f &&
+                    Time.realtimeSinceStartup < deadline)
+                    yield return null;
+                manipulation.manualValue = Vector2.zero;
+                for (var frame = 0; frame < 24; frame++) yield return null;
+                var held = item.Grab.colliders[0].bounds.center;
+                select.QueueManualState(false, 0f);
+                for (var frame = 0; frame < 12; frame++) yield return null;
+                Assert.IsFalse(item.Grab.isSelected, benchmark + " grip release must drop the item");
+                var stored = item.Grab.colliders[0].bounds.center;
+                Assert.IsTrue(zone.ContainsPoint(stored),
+                    $"{benchmark} returned food must remain in the refrigerator. " +
+                    $"Shelf {target:F3}, extracted {extracted:F3}, before release {held:F3}, settled {stored:F3}.");
+                Assert.That(Vector3.Distance(stored, target), Is.LessThan(.09f),
+                    benchmark + " returned food must be on the original low shelf");
+            }
+        }
+        finally
+        {
+            Time.captureDeltaTime = originalDelta;
+            manipulation.manualValue = Vector2.zero;
+            manipulation.inputSourceMode = manipulationMode;
+            select.inputSourceMode = inputMode;
+            controller.gameObject.SetActive(active);
+            tracker.enabled = tracking;
         }
     }
 
@@ -539,16 +692,47 @@ public class CorePlayWiringSmokeTests
         Assert.AreEqual(SessionState.Setup, host.Core.Snapshot.State);
         Assert.That(panel.Find("Error").GetComponent<TMP_Text>().text,
             Does.Contain("Choose a posture"));
+        var origin = Camera.main.GetComponentInParent<XROrigin>();
+        var rig = origin.Origin.transform;
+        var floorOffset = origin.CameraFloorOffsetObject.transform;
+        var head = origin.Camera.transform;
+        var tracked = new[] { head, floorOffset.Find("Left Controller"), floorOffset.Find("Right Controller") };
+        var oldLocal = tracked.Select(t => t.localPosition).ToArray();
+        var oldWorld = tracked.Select(t => t.position).ToArray();
+        var originalRig = rig.position;
+        var originalFloorOffset = floorOffset.localPosition;
         setup.Find("Seated").GetComponent<Button>().onClick.Invoke();
+        setup.Find("RaiseEye").GetComponent<Button>().onClick.Invoke();
         setup.Find("Calibrate").GetComponent<Button>().onClick.Invoke();
+        Assert.AreEqual(originalRig, rig.position);
+        Assert.AreEqual(originalFloorOffset, floorOffset.localPosition);
+        Assert.That(origin.CameraInOriginSpaceHeight, Is.EqualTo(1.25f).Within(.001f));
+        for (var i = 0; i < tracked.Length; i++)
+        {
+            Assert.AreEqual(oldLocal[i], tracked[i].localPosition, "Device poses must stay in tracking space.");
+            Assert.That(Vector3.Distance(tracked[i].position - oldWorld[i], head.position - oldWorld[0]),
+                Is.LessThan(.001f), "The headset and both hands must shift together.");
+        }
+        Assert.That(rig.GetComponent<CharacterController>().height, Is.EqualTo(1.25f).Within(.001f));
         button.onClick.Invoke();
         Assert.AreEqual(SessionState.Orientation, host.Core.Snapshot.State);
         Assert.IsFalse(setup.gameObject.activeSelf);
         Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("Orientation"));
+        var orientation = panel.Find("OrientationControls");
+        var landing = GameObject.Find("PREF_Kitchen_TeleportArea").GetComponent<Collider>().bounds.center;
+        var landingXZ = new Vector2(landing.x, landing.z);
+        Assert.That(Vector2.Distance(landingXZ, new Vector2(head.position.x, head.position.z)), Is.GreaterThan(.1f));
+        orientation.Find("PracticeTeleport").GetComponent<Button>().onClick.Invoke();
+        var practice = orientation.Find("PracticeStatus").GetComponent<TMP_Text>();
+        var deadline = Time.realtimeSinceStartup + 2f;
+        while (Time.realtimeSinceStartup < deadline && !practice.text.Contains("Teleport [done]")) yield return null;
+        Assert.That(practice.text, Does.Contain("Teleport [done]"), "The calibrated rig must land through the real provider. " +
+            panel.Find("Error").GetComponent<TMP_Text>().text);
+        Assert.That(Vector2.Distance(landingXZ, new Vector2(head.position.x, head.position.z)), Is.LessThan(.02f));
+        Assert.That(origin.CameraInOriginSpaceHeight, Is.EqualTo(1.25f).Within(.001f));
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
         MoveHead(-3.45f, 1.15f);
-        var head = Camera.main.transform;
         var eyeHeight = head.position.y;
         var recovery = Object.FindObjectOfType<RecoveryMenuView>();
         recovery.Open();
@@ -566,12 +750,44 @@ public class CorePlayWiringSmokeTests
         Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("ChallengeActive"));
         Assert.That(panel.Find("Design").GetComponent<TMP_Text>().text, Does.Contain("B1"));
         Assert.That(panel.Find("Progress").GetComponent<TMP_Text>().text, Does.Contain("1/8"));
+        recovery.Open();
+        yield return null;
+        var run = host.Core.Snapshot.ActiveRunId;
+        var raycaster = recovery.GetComponent<TrackedDeviceGraphicRaycaster>();
+        var standingView = recovery.transform.Find("Panel/UseStandingView");
+        var hand = origin.GetComponentInChildren<NearFarInteractor>(true);
+        var controller = hand.transform.parent.gameObject;
+        var cup = GameObject.Find("PREF_Prop_Cup").GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        var controllerWasActive = controller.activeSelf;
+        try
+        {
+            // A headless run can leave the authored motion controllers dormant.
+            controller.SetActive(true);
+            Assert.IsTrue(hand.isActiveAndEnabled);
+            hand.StartManualInteraction((UnityEngine.XR.Interaction.Toolkit.Interactables.IXRSelectInteractable)cup);
+            Assert.IsTrue(cup.isSelected);
+            ClickTrackedButton(raycaster, standingView);
+            Assert.That(origin.CameraInOriginSpaceHeight, Is.EqualTo(1.25f).Within(.001f));
+            Assert.That(recovery.transform.Find("Panel/Operation").GetComponent<TMP_Text>().text, Does.Contain("Put down"));
+        }
+        finally
+        {
+            if (hand.hasSelection) hand.EndManualInteraction();
+            controller.SetActive(controllerWasActive);
+        }
+        ClickTrackedButton(raycaster, standingView);
+        Assert.That(origin.CameraInOriginSpaceHeight, Is.EqualTo(1.65f).Within(.001f));
         Assert.IsTrue(host.Submit(new JourneyCommand { Type = JourneyCommandType.Pause }).Accepted);
         yield return null;
         Assert.IsEmpty(Object.FindObjectOfType<TaskTargetGuide>().VisibleTargets);
+        ClickTrackedButton(raycaster, recovery.transform.Find("Panel/UseSeatedView"));
+        Assert.That(origin.CameraInOriginSpaceHeight, Is.EqualTo(1.25f).Within(.001f),
+            "The seated height adjusted during Setup should be retained.");
         Assert.IsTrue(host.Submit(new JourneyCommand { Type = JourneyCommandType.Resume }).Accepted);
         Assert.That(panel.Find("State").GetComponent<TMP_Text>().text, Does.Contain("ChallengeActive"));
         Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
+        Assert.AreEqual(run, host.Core.Snapshot.ActiveRunId);
+        Assert.AreEqual(ChallengeStep.Approach, host.Core.Snapshot.CurrentStep);
     }
 
     [UnityTest]
@@ -784,6 +1000,15 @@ public class CorePlayWiringSmokeTests
         SceneManager.LoadScene("SCN_Kitchen_Review");
         yield return null;
         var host = Object.FindObjectOfType<JourneyRuntimeHost>();
+        var canvas = GameObject.Find("PREF_UI_ExploreChallenge").transform;
+        var raycaster = canvas.GetComponent<TrackedDeviceGraphicRaycaster>();
+        var full = canvas.Find("ChallengePanel");
+        var compact = canvas.Find("ChallengeCompactPanel");
+        var fullConfirm = full.Find("ConfirmReorganisation").GetComponent<Button>();
+        var compactConfirm = compact.Find("ConfirmReorganisation").GetComponent<Button>();
+        var compactInstruction = compact.Find("Instruction").GetComponent<TMP_Text>();
+        Assert.AreEqual("XR Apartment/Review Keyboard Surface", full.GetComponent<Image>().material.shader.name);
+        Assert.AreEqual("XR Apartment/Review Keyboard Surface", compact.GetComponent<Image>().material.shader.name);
         Assert.IsNull(host.StartupError);
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.CompleteSetup, PrerequisitesMet = true }).Accepted);
@@ -797,6 +1022,7 @@ public class CorePlayWiringSmokeTests
             yield return null;
             Assert.AreEqual(ChallengeStep.Approach, host.Core.Snapshot.CurrentStep);
             yield return null;
+            AssertChallengeTextFits(full);
             AssertZoneHighlights("ZONE_Approach");
             yield return RestoreAtStep(host, ChallengeStep.Approach);
             var items = new[] { Identity("ITEM_Tomato"), Identity("ITEM_Onion"), Identity("ITEM_CerealBox") };
@@ -816,26 +1042,13 @@ public class CorePlayWiringSmokeTests
                 "The triangle front face must point toward the viewer");
             Assert.NotNull(arrow.GetComponent<MeshRenderer>().sharedMaterial);
             var door = Identity("ACCESS_FridgeDoor").GetComponent<KinematicSwingDoor>();
-            if (id == "B1")
-            {
-                var obstacle = new GameObject("Obstacle in the F2 swing");
-                var pivot = door.transform;
-                var inSwing = Quaternion.Euler(0, 35, 0) * new Vector3(-.6f, 1f, 0);
-                obstacle.transform.position = pivot.TransformPoint(inSwing);
-                obstacle.AddComponent<BoxCollider>().size = Vector3.one * .09f;
-                Physics.SyncTransforms();
-                door.SetOpen(true);
-                yield return new WaitForSeconds(1.2f);
-                Assert.That(door.Progress, Is.InRange(.1, .85),
-                    "A physical obstacle should stop the door partway through the swing");
-                Assert.AreEqual(ChallengeStep.Open, host.Core.Snapshot.CurrentStep,
-                    "A blocked door cannot satisfy the open task");
-                Object.Destroy(obstacle);
-                yield return null;
-            }
+            yield return AssertBlockedOpening(host, id, door);
             door.SetOpen(true);
-            yield return new WaitForSeconds(1.2f);
-            Assert.That(door.Progress, Is.EqualTo(1).Within(.001), id + " must open fully");
+            var openingDeadline = Time.time + 2.5f;
+            while (door.Progress < .999 && Time.time < openingDeadline) yield return null;
+            Assert.That(door.Progress, Is.EqualTo(1).Within(.001),
+                id + " must open fully after the obstruction is removed. Hinge " + door.transform.localEulerAngles);
+            yield return null;
             Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.TakeOut);
             yield return null;
@@ -849,6 +1062,7 @@ public class CorePlayWiringSmokeTests
             Assert.AreEqual(ChallengeStep.TemporaryPlacement, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.TemporaryPlacement);
             yield return null;
+            AssertChallengeTextFits(full);
             AssertZoneHighlights("ZONE_Temporary");
             Place(items[0], -3.50f, 1.06f, 1.94f);
             Place(items[1], -3.36f, 1.06f, 1.94f);
@@ -857,22 +1071,37 @@ public class CorePlayWiringSmokeTests
             yield return RestoreAtStep(host, ChallengeStep.Reorganise);
             yield return null;
             AssertZoneHighlights("ZONE_Temporary");
+            Assert.IsTrue(fullConfirm.gameObject.activeInHierarchy);
+            Assert.IsFalse(fullConfirm.interactable);
+            ClickTrackedButton(raycaster, full.Find("Compact"));
+            yield return null;
+            Assert.IsTrue(compactConfirm.gameObject.activeInHierarchy);
+            Assert.IsFalse(compactConfirm.interactable);
+            AssertChallengeTextFits(compact);
+            Assert.AreEqual(0, host.Core.Snapshot.CompletedItemCount);
             Place(items[0], -1.99f, 1.46f, 1.80f);
             yield return new WaitForSeconds(.35f);
             Assert.AreEqual(ChallengeStep.Reorganise, host.Core.Snapshot.CurrentStep,
                 "Returning to Freezer is not a Fresh reorganisation");
+            Assert.IsFalse(compactConfirm.interactable);
             var shelf = GameObject.Find("SHELF_Fresh_Lower").GetComponent<Collider>().bounds;
             var shelfFront = new Vector3(shelf.max.x - .03f, shelf.max.y + .1f,
                 shelf.min.z + .04f);
             Assert.That(shelfFront.z, Is.InRange(shelf.min.z, shelf.max.z));
             Place(items[0], shelfFront.x, shelfFront.y, shelfFront.z);
             yield return new WaitForSeconds(.35f);
-            var reorganisation = host.Submit(new JourneyCommand
-            { Type = JourneyCommandType.ConfirmReorganisation });
-            Assert.IsTrue(reorganisation.Accepted,
-                reorganisation.ErrorCode + ": " + reorganisation.Message);
+            Assert.AreEqual(1, host.Core.Snapshot.CompletedItemCount);
+            Assert.IsTrue(fullConfirm.interactable);
+            Assert.IsTrue(compactConfirm.interactable);
+            StringAssert.Contains("Item moved", compactInstruction.text);
+            AssertChallengeTextFits(compact);
             AssertZoneHighlights();
+            ClickTrackedButton(raycaster, compactConfirm.transform);
             Assert.AreEqual(ChallengeStep.PutBack, host.Core.Snapshot.CurrentStep);
+            Assert.IsFalse(compactConfirm.gameObject.activeSelf);
+            yield return null;
+            ClickTrackedButton(raycaster, compact.Find("Expand"));
+            Assert.IsTrue(full.gameObject.activeInHierarchy);
             yield return RestoreAtStep(host, ChallengeStep.PutBack);
             yield return null;
             AssertZoneHighlights("ZONE_FreshDestination");
@@ -890,11 +1119,15 @@ public class CorePlayWiringSmokeTests
             yield return new WaitForSeconds(.35f);
             Assert.AreEqual(ChallengeStep.Close, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.Close);
+            AssertRestoredStoragePositions(items);
             yield return null;
             AssertZoneHighlights();
             door.SetOpen(false);
-            yield return new WaitForSeconds(1.2f);
-            Assert.That(door.Progress, Is.EqualTo(0).Within(.001), id + " must close fully");
+            var closingDeadline = Time.time + 2.5f;
+            while (door.Progress > .001 && Time.time < closingDeadline) yield return null;
+            Assert.That(door.Progress, Is.EqualTo(0).Within(.001),
+                id + " must close fully. Hinge " + door.transform.localEulerAngles);
+            yield return null;
             Assert.AreEqual(ChallengeStep.Leave, host.Core.Snapshot.CurrentStep);
             yield return RestoreAtStep(host, ChallengeStep.Leave);
             yield return null;
@@ -921,6 +1154,17 @@ public class CorePlayWiringSmokeTests
             yield return null;
             Assert.AreEqual(id == "B1" ? SessionState.Explore : SessionState.ComparisonSummary,
                 host.Core.Snapshot.State);
+            if (id == "B2")
+            {
+                Assert.IsTrue(host.Core.Snapshot.Conflicts.Single().FeedbackRecorded);
+                Assert.That(GameObject.Find("ReviewDesignConflict").GetComponentInChildren<TMP_Text>().text,
+                    Does.Contain("Feedback recorded"));
+                ReadResult saved = null;
+                host.GetComponent<LocalCsvStorageAdapter>().TryRead(host.Core.Snapshot.SessionId, result => saved = result);
+                Assert.IsTrue(saved.Succeeded, saved.Message);
+                Assert.AreEqual("B2", saved.Record.conflicts.Single().combinationId);
+                Assert.IsTrue(saved.Record.conflicts.Single().feedbackRecorded);
+            }
         }
         var shell = Object.FindObjectOfType<JourneyPhaseFiveView>();
         var comparison = Object.FindObjectOfType<JourneyComparisonInputView>(true);
@@ -932,17 +1176,218 @@ public class CorePlayWiringSmokeTests
             "An empty trade-off must keep the comparison open.");
         Assert.That(shell.transform.Find("ComparisonPanel/Status").GetComponent<TMP_Text>().text,
             Does.Contain("trade-off"));
-        comparison.transform.Find("Prefer B1").GetComponent<Button>().onClick.Invoke();
-        comparison.GetComponentInChildren<TMP_InputField>(true).text = "B1 versus B2 sensor run";
-        confirm.onClick.Invoke();
+        ClickComparisonButton(shell, comparison.transform.Find("Prefer B1"));
+        var write = comparison.transform.Find("Write in VR");
+        ClickComparisonButton(shell, write);
+        var keyboard = shell.transform.Find("TradeOffKeyboard");
+        yield return null;
+        Assert.AreNotEqual(confirm.gameObject, ComparisonRayHit(shell, confirm.transform),
+            "A ray must not be able to confirm while the keyboard is open.");
+        EnterTradeOff(shell, keyboard, "B1 room x");
+        ClickComparisonButton(shell, keyboard.Find("Backspace"));
+        Assert.AreEqual("B1 room ", comparison.Capture().TradeOffSummary);
+        Assert.IsTrue(host.Submit(new JourneyCommand { Type = JourneyCommandType.Pause }).Accepted);
+        Assert.IsFalse(keyboard.gameObject.activeInHierarchy);
+        yield return null;
+        var recovery = Object.FindObjectOfType<RecoveryMenuView>();
+        Assert.IsTrue(recovery.IsOpen);
+        ClickTrackedButton(recovery.GetComponent<TrackedDeviceGraphicRaycaster>(),
+            recovery.transform.Find("Panel/UseSeatedView"));
+        Assert.AreEqual(SessionState.Paused, host.Core.Snapshot.State);
+        Assert.That(Camera.main.GetComponentInParent<XROrigin>().CameraInOriginSpaceHeight,
+            Is.EqualTo(1.20f).Within(.001f));
+        var resume = recovery.transform.Find("Panel/Resume").GetComponent<Button>();
+        Assert.IsTrue(resume.IsInteractable());
+        resume.onClick.Invoke();
+        yield return null;
+        Assert.AreEqual(SessionState.ComparisonSummary, host.Core.Snapshot.State);
+        Assert.IsFalse(recovery.IsOpen);
+        Assert.IsFalse(keyboard.gameObject.activeInHierarchy);
+        Assert.AreEqual("B1 room ", comparison.Capture().TradeOffSummary);
+        ClickComparisonButton(shell, write);
+        yield return null;
+        EnterTradeOff(shell, keyboard, "and B2 fit.");
+        ClickComparisonButton(shell, keyboard.Find("Done"));
+        Assert.IsFalse(keyboard.gameObject.activeInHierarchy);
+        ClickComparisonButton(shell, confirm.transform);
         yield return new WaitForSeconds(.1f);
         Assert.AreEqual(SessionState.Finished, host.Core.Snapshot.State);
         Assert.AreEqual(SaveStatus.Verified, host.Core.Snapshot.Save);
         Assert.AreEqual(XRApartment.Data.SessionOutcome.Completed, host.Core.Snapshot.Outcome);
+        ReadResult final = null;
+        var session = host.Core.Snapshot.SessionId;
+        host.GetComponent<LocalCsvStorageAdapter>().TryRead(session, result => final = result);
+        Assert.IsTrue(final.Succeeded, final.Message);
+        Assert.AreEqual(session, final.Record.sessionId);
+        CollectionAssert.AreEqual(new[] { "B1", "B2" }, final.Record.benchmarkOrder);
+        Assert.IsTrue(final.Record.IsComplete(2), "The final CSV must contain both complete feedback entries and a valid comparison.");
+        Assert.AreEqual(TaskOutcome.Completed, final.Record.FindFeedback("B1").taskOutcome);
+        Assert.AreEqual(TaskOutcome.Completed, final.Record.FindFeedback("B2").taskOutcome);
+        Assert.AreEqual("B1", final.Record.finalPreferenceCombinationId);
+        Assert.AreEqual("B1 room and B2 fit.", final.Record.finalTradeOffSummary);
+        var conflict = final.Record.conflicts.Single();
+        Assert.AreEqual("B2", conflict.combinationId);
+        Assert.AreEqual("door-sweep/ACCESS_FridgeDoor/cabinet-left", conflict.issueId);
+        Assert.AreEqual("ACCESS_FridgeDoor", conflict.objectId);
+        Assert.AreEqual(ReviewRole.FridgeDoor, conflict.role);
+        Assert.AreEqual("flush_panel_depth", conflict.assumptionKey);
+        Assert.AreEqual(final.Record.modelVersion, conflict.modelVersion);
+        Assert.That(conflict.measurement, Is.InRange(20f, 40f));
+        Assert.That(conflict.sessionSeconds, Is.InRange(0f, final.Record.totalSeconds));
+        Assert.IsTrue(conflict.feedbackRecorded);
+        var boundaries = final.Record.comfortOrAbort.Where(item => item.type == "boundary_warning").ToArray();
+        Assert.AreEqual(2, boundaries.Length, "A second warning after clearance should be recorded separately.");
+        Assert.IsTrue(boundaries.All(item => item.combinationId == "B2" &&
+            item.sessionSeconds > 0f && item.sessionSeconds <= final.Record.totalSeconds));
+    }
+
+    private static void AssertChallengeTextFits(Transform card)
+    {
+        foreach (var label in card.GetComponentsInChildren<TMP_Text>())
+        {
+            label.ForceMeshUpdate();
+            Assert.IsFalse(label.isTextOverflowing, "Challenge label must fit: " + label.text);
+        }
     }
 
     private static TaskEvidenceIdentity Identity(string id) =>
         Object.FindObjectsOfType<TaskEvidenceIdentity>().Single(item => item.StableId == id);
+
+    private static void EnterTradeOff(JourneyPhaseFiveView shell, Transform keyboard, string text)
+    {
+        foreach (var character in text)
+        {
+            if (char.IsUpper(character)) ClickComparisonButton(shell, keyboard.Find("Shift"));
+            var key = character == ' ' ? "Space" : "Key " + char.ToUpperInvariant(character);
+            ClickComparisonButton(shell, keyboard.Find(key));
+        }
+    }
+
+    private static void ClickComparisonButton(JourneyPhaseFiveView shell, Transform target) =>
+        ClickTrackedButton(shell.GetComponent<TrackedDeviceGraphicRaycaster>(), target);
+
+    private static void ClickTrackedButton(TrackedDeviceGraphicRaycaster raycaster, Transform target)
+    {
+        var hit = TrackedRayHit(raycaster, target, out var pointer);
+        Assert.AreEqual(target.gameObject, hit, "Tracked ray must reach " + target.name);
+        ExecuteEvents.Execute<IPointerClickHandler>(hit, pointer, ExecuteEvents.pointerClickHandler);
+    }
+
+    private static GameObject ComparisonRayHit(JourneyPhaseFiveView shell, Transform target) =>
+        TrackedRayHit(shell.GetComponent<TrackedDeviceGraphicRaycaster>(), target, out _);
+
+    private static GameObject TrackedRayHit(TrackedDeviceGraphicRaycaster raycaster, Transform target,
+        out TrackedDeviceEventData pointer)
+    {
+        Canvas.ForceUpdateCanvases();
+        var start = Camera.main.transform.position;
+        pointer = new TrackedDeviceEventData(EventSystem.current)
+        {
+            button = PointerEventData.InputButton.Left,
+            layerMask = -1,
+            rayPoints = new List<Vector3> { start, start + (target.position - start).normalized * 3f }
+        };
+        var hits = new List<RaycastResult>();
+        raycaster.Raycast(pointer, hits);
+        return hits.Count > 0 ? hits[0].gameObject : null;
+    }
+
+    private static IEnumerator AssertBlockedOpening(JourneyRuntimeHost host, string benchmark, KinematicSwingDoor door)
+    {
+        // B1 uses an unregistered object. B2 moves one of its actual registered
+        // trim pieces into the arc only for this positive test, then restores it.
+        var registered = benchmark == "B2";
+        var obstacle = registered ? GameObject.Find("TRIM_Filler_Left") : new GameObject("Loose obstacle in the F2 swing");
+        Assert.NotNull(obstacle);
+        if (!registered) obstacle.AddComponent<BoxCollider>();
+        var pose = obstacle.transform;
+        var position = pose.position;
+        var scale = pose.localScale;
+        var inSwing = Quaternion.Euler(0, 35, 0) * new Vector3(-.6f, 1f, 0);
+        pose.position = door.transform.TransformPoint(inSwing);
+        pose.localScale = Vector3.one * .09f;
+        Physics.SyncTransforms();
+        door.SetOpen(true);
+        yield return new WaitForSeconds(1.2f);
+        Assert.That(door.Progress, Is.InRange(.1, .85));
+        Assert.AreEqual(ChallengeStep.Open, host.Core.Snapshot.CurrentStep,
+            "A blocked door cannot satisfy the open task");
+
+        var notices = host.Core.Snapshot.Conflicts;
+        Assert.AreEqual(registered ? 1 : 0, notices.Count);
+        if (registered)
+        {
+            var notice = notices.Single();
+            Assert.AreEqual("B2", notice.BenchmarkId);
+            Assert.AreEqual("door-sweep/ACCESS_FridgeDoor/cabinet-left", notice.IssueId);
+            Assert.AreEqual("flush_panel_depth", notice.AssumptionKey);
+            Assert.That(notice.Measurement, Is.InRange(20f, 40f));
+            Assert.IsFalse(notice.FeedbackRecorded);
+            var marker = GameObject.Find("ReviewDesignConflict");
+            Assert.That(marker.GetComponentInChildren<TMP_Text>().text, Does.Contain("Design conflict"));
+            yield return AssertBoundaryWarningDuringConflict(host, marker);
+            pose.position = position;
+            pose.localScale = scale;
+        }
+        else Object.Destroy(obstacle);
+        yield return null;
+        Physics.SyncTransforms();
+    }
+
+    private static IEnumerator AssertBoundaryWarningDuringConflict(JourneyRuntimeHost host, GameObject marker)
+    {
+        var boundary = host.GetComponent<ReviewBoundarySafety>();
+        var apply = typeof(ReviewBoundarySafety).GetMethod("ApplyClearanceSample",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        Assert.NotNull(apply);
+        var run = host.Core.Snapshot.ActiveRunId;
+        // Feed simulated distances through the production warning source and real CSV adapter.
+        apply.Invoke(boundary, new object[] { .20f });
+        var banner = GameObject.Find("Physical Play Area Warning");
+        Assert.NotNull(banner);
+        var caption = banner.GetComponent<TMP_Text>();
+        Assert.That(caption.text, Does.Contain("SAFETY"));
+        Assert.That(caption.color.g, Is.LessThan(.5f));
+        Assert.IsFalse(marker.activeSelf);
+        Assert.IsFalse(host.Core.Snapshot.Conflicts.Single().FeedbackRecorded);
+        Assert.AreEqual(ChallengeStep.Open, host.Core.Snapshot.CurrentStep);
+
+        apply.Invoke(boundary, new object[] { .30f });
+        apply.Invoke(boundary, new object[] { null });
+        Assert.IsTrue(banner.activeSelf, "Hysteresis and a missing sample must retain the warning.");
+        var recovery = Object.FindObjectOfType<RecoveryMenuView>();
+        recovery.Open();
+        yield return null;
+        var raycaster = recovery.GetComponent<TrackedDeviceGraphicRaycaster>();
+        ClickTrackedButton(raycaster, recovery.transform.Find("Panel/Pause"));
+        Assert.AreEqual(SessionState.Paused, host.Core.Snapshot.State);
+        Assert.IsTrue(banner.activeSelf);
+        ReadResult paused = null;
+        host.GetComponent<LocalCsvStorageAdapter>().TryRead(host.Core.Snapshot.SessionId, value => paused = value);
+        Assert.IsTrue(paused.Succeeded, paused.Message);
+        var warning = paused.Record.comfortOrAbort.Single(item => item.type == "boundary_warning");
+        Assert.AreEqual("B2", warning.combinationId);
+        Assert.That(warning.sessionSeconds, Is.GreaterThan(0f));
+        Assert.IsFalse(paused.Record.conflicts.Single().feedbackRecorded);
+
+        apply.Invoke(boundary, new object[] { .36f });
+        Assert.IsFalse(banner.activeSelf);
+        Assert.IsNull(host.Core.Snapshot.CurrentSafety);
+        Assert.IsFalse(marker.activeSelf, "Design geometry should stay hidden during pause.");
+        yield return null;
+        ClickTrackedButton(raycaster, recovery.transform.Find("Panel/Resume"));
+        Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
+        Assert.AreEqual(run, host.Core.Snapshot.ActiveRunId);
+        Assert.AreEqual(ChallengeStep.Open, host.Core.Snapshot.CurrentStep);
+        Assert.IsTrue(marker.activeSelf);
+        Assert.IsFalse(recovery.IsOpen);
+
+        apply.Invoke(boundary, new object[] { .20f });
+        Assert.IsTrue(banner.activeSelf);
+        apply.Invoke(boundary, new object[] { .36f });
+        Assert.IsFalse(banner.activeSelf);
+        Assert.IsTrue(marker.activeSelf);
+    }
 
     private static IEnumerator RestoreAtStep(JourneyRuntimeHost host, ChallengeStep step)
     {
@@ -975,6 +1420,27 @@ public class CorePlayWiringSmokeTests
         Assert.NotNull(itemCollider, item.StableId + " needs a physical collider");
         var restingY = item.transform.position.y + shelf.max.y + .005f - itemCollider.bounds.min.y;
         Place(item, shelf.center.x, restingY, shelf.center.z);
+    }
+
+    private static void AssertRestoredStoragePositions(TaskEvidenceIdentity[] items)
+    {
+        var zone = Identity("ZONE_FreshDestination");
+        var shelves = zone.GetComponents<BoxCollider>();
+        var bounds = items.Select(item => item.Grab.colliders[0].bounds).ToArray();
+        var usedShelves = bounds.Select(item => shelves.OrderBy(shelf =>
+            Mathf.Abs(shelf.bounds.center.y - item.center.y)).First()).ToArray();
+        CollectionAssert.AllItemsAreUnique(usedShelves, "Recovery must use the available refrigerator shelves.");
+        for (var index = 0; index < bounds.Length; index++)
+        {
+            var item = bounds[index];
+            Assert.IsTrue(zone.ContainsPoint(item.center));
+            var supported = Physics.RaycastAll(new Vector3(item.center.x, item.min.y + .01f, item.center.z),
+                Vector3.down, .025f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)
+                .Any(hit => hit.collider.attachedRigidbody == null && hit.normal.y > .9f);
+            Assert.IsTrue(supported, items[index].StableId + " needs a physical shelf directly below it.");
+            for (var other = index + 1; other < bounds.Length; other++)
+                Assert.IsFalse(item.Intersects(bounds[other]), "Recovered items must not overlap.");
+        }
     }
 
     private static void MoveHead(float x, float z)
@@ -1075,7 +1541,7 @@ public class CorePlayWiringSmokeTests
     }
 
     [UnityTest]
-    public IEnumerator HostStartsAndLoadsBothBenchmarks()
+    public IEnumerator WorldSpaceExplorePreviewsBothBenchmarksAndStartsTheNextChallenge()
     {
         SceneManager.LoadScene("SCN_Kitchen_Review");
         yield return null;
@@ -1087,12 +1553,40 @@ public class CorePlayWiringSmokeTests
         { Type = JourneyCommandType.CompleteSetup, PrerequisitesMet = true }).Accepted);
         Assert.IsTrue(host.Submit(new JourneyCommand
         { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
-        Assert.IsTrue(host.Submit(new JourneyCommand
-        { Type = JourneyCommandType.ShowBenchmark, BenchmarkId = "B1" }).Accepted);
         yield return null;
-        Assert.AreEqual("B1", host.GetComponent<RuntimeBenchmarkAdapter>().CurrentBenchmarkId);
-        Assert.IsTrue(host.Submit(new JourneyCommand
-        { Type = JourneyCommandType.StartChallenge, BenchmarkId = "B1" }).Accepted);
+        var canvas = GameObject.Find("PREF_UI_ExploreChallenge").transform;
+        var raycaster = canvas.GetComponent<TrackedDeviceGraphicRaycaster>();
+        ClickTrackedButton(raycaster, canvas.Find("ExplorePanel/BeginExplore"));
+        yield return null;
+        var toolbar = canvas.Find("ExploreToolbar");
+        var title = toolbar.Find("Design").GetComponent<TMP_Text>();
+        var status = toolbar.Find("Status").GetComponent<TMP_Text>();
+        var challenge = toolbar.Find("Challenge").GetComponent<Button>();
+        var adapter = host.GetComponent<RuntimeBenchmarkAdapter>();
+        Assert.IsFalse(challenge.interactable);
+        Assert.That(status.text, Does.Contain("same F2 fridge"));
+        Assert.AreEqual("XR Apartment/Review Keyboard Surface", toolbar.GetComponent<Image>().material.shader.name);
+
+        ClickTrackedButton(raycaster, toolbar.Find("PreviewB2"));
+        yield return null;
+        Assert.AreEqual("B2", adapter.CurrentBenchmarkId);
+        Assert.AreEqual("Preview B2", title.text);
+        Assert.That(status.text, Does.Contain("Flush + F2").And.Contain("opening clearance"));
+        Assert.That(status.text, Does.Contain("Next Challenge  |  B1"));
+        title.ForceMeshUpdate();
+        Assert.IsFalse(title.isTextOverflowing);
+        Assert.IsFalse(challenge.interactable, "Previewing out of order must leave the task order intact.");
+        Assert.AreEqual(0, host.Core.Snapshot.ActiveRunId);
+
+        ClickTrackedButton(raycaster, toolbar.Find("PreviewB1"));
+        yield return null;
+        Assert.AreEqual("B1", adapter.CurrentBenchmarkId);
+        Assert.AreEqual("Preview B1", title.text);
+        Assert.That(status.text, Does.Contain("Proud + F2").And.Contain("passing by"));
+        status.ForceMeshUpdate();
+        Assert.IsFalse(status.isTextOverflowing);
+        Assert.IsTrue(challenge.interactable);
+        ClickTrackedButton(raycaster, challenge.transform);
         yield return null;
         Assert.AreEqual(SessionState.ChallengeActive, host.Core.Snapshot.State);
         Assert.AreEqual(ChallengeStep.Approach, host.Core.Snapshot.CurrentStep);
@@ -1104,9 +1598,15 @@ public class CorePlayWiringSmokeTests
         yield return null;
         yield return null;
         Assert.AreEqual(SessionState.Explore, host.Core.Snapshot.State);
-        Assert.IsTrue(host.Submit(new JourneyCommand
-        { Type = JourneyCommandType.ShowBenchmark, BenchmarkId = "B2" }).Accepted);
+        Assert.That(status.text, Does.Contain("Next Challenge  |  B2"));
+        ClickTrackedButton(raycaster, toolbar.Find("PreviewB2"));
         yield return null;
-        Assert.AreEqual("B2", host.GetComponent<RuntimeBenchmarkAdapter>().CurrentBenchmarkId);
+        Assert.AreEqual("B2", adapter.CurrentBenchmarkId);
+        status.ForceMeshUpdate();
+        Assert.IsFalse(status.isTextOverflowing);
+        ClickTrackedButton(raycaster, challenge.transform);
+        yield return null;
+        Assert.AreEqual("B2", host.Core.Snapshot.ActiveBenchmarkId);
+        Assert.AreEqual(ChallengeStep.Approach, host.Core.Snapshot.CurrentStep);
     }
 }

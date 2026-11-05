@@ -8,6 +8,10 @@
 
 玩家的移动偏好由 Rig 上的 `KitchenLocomotionSettings` 管理：只在瞬移与连续平移之间切换 XRI 输入及移动组件，保存在本机 PlayerPrefs，不提交 Core 命令或任务证据，不重置会话、物品或 CSV。独立的移动设置面板使用左手 Y / Menu 或键盘 F8，避开正式恢复菜单的右手 B / Escape；打开移动设置时暂时停止摇杆走路、转向及瞬移，关闭后恢复当前偏好。它不接管 Core 的暂停 / 恢复，也不改变 `Time.timeScale`。地面瞬移的落点与直线路径碰撞检查仅用于玩家移动约束，不产生 FR-06 设计冲突或 SAFE-01 安全结论。
 
+正式评审的 Setup 和 Recovery Menu 共用本次会话的站姿、坐姿眼高校准（ACC-01、FR-12）。校准调整 XR Origin 下方的虚拟追踪偏移，保持头显和手柄的相对姿态、瞬移地面参考以及实体边界坐标。Recovery Menu 在评审及暂停时允许重新校准，操作沿用当前 run、进度与反馈草稿。姿态调整属于本地可访问性设置，使用现有会话和保存接口。
+
+FR-11 的恢复步骤先为本步骤的全部物品计算有效摆位，再一次应用。储物区可包含多个层板的感应体，恢复时依次分配不同层板和槽位，并用真实实体碰撞体确认下方有支撑。空间不足时保留当前状态并返回失败。恢复摆位沿用原物品、方案与 run，任务仍按真实门体和物品状态推进。
+
 ## 1. 使用顺序与共同规则
 
 1. **第一关仅交付契约**：流程负责人已审查本文、拟修改文件与分工；各工作包负责人已核对下述 C# 公共签名、状态与失败规则。本文现作为跨分支接口基线；共享接口变更先修本文并审查，再改代码。
@@ -45,7 +49,7 @@
 | `benchmarkIds` | 按实际可用模型和本次评审目的明确给出有序、唯一 ID；首轮集成使用 B1/B2。B3 是否加入由后续会话计划决定，不因注册表中存在就自动进入。 |
 | `taskConfig` | 每个 Challenge **总共 3–5 件不同物品**，包含至少一件原有物品和一件新购物品；不是“先取出 3–5 件，再额外加入新购食品”。Take out 只统计原有物品，Put back 统计全部任务物品。B1/B2 复用同一组 ID、数量、角色与等价目标区；只变几何。 |
 
-所有跨模块 ID 均为非空稳定字符串，不含姓名或账号；时间明确为 UTC 或会话内单调秒数。只读快照及保存输入须复制集合，不能向 UI 暴露可变 `SessionRecord`。创建计划时验证每个 ID 能由 `BenchmarkRegistry.Find()` 找到、允许 Challenge，且 Prefab、语义目标及任务配置可用。失败返回 `PlanInvalid` 和缺失项，停留 Setup。现有 `BenchmarkRegistry.OrderFor()` 固定三项，不作为 P0 顺序来源。`BENCH_B1/B2/B3.asset` 的 `controlledQuestion` 当前为空；正式比较前由负责人填写 PRD Final §6.3 的实际受控问题，不从模型外观推断结论。
+所有跨模块 ID 均为非空稳定字符串，不含姓名或账号；时间明确为 UTC 或会话内单调秒数。只读快照及保存输入须复制集合，不能向 UI 暴露可变 `SessionRecord`。创建计划时验证每个 ID 能由 `BenchmarkRegistry.Find()` 找到、允许 Challenge，且 Prefab、语义目标及任务配置可用。失败返回 `PlanInvalid` 和缺失项，停留 Setup。P0 顺序来自会话计划。Explore 根据已经确认的方案 ID 从同一注册表读取 B1/B2 的柜体策略、冰箱类型和 PRD Final §6.3 受控问题。问题以观察任务表述，柜体实际表现由参与者体验并记录。
 
 | 共享类型 | 必须包含 | 生产者 → 消费者 |
 | --- | --- | --- |
@@ -322,6 +326,8 @@ namespace XRApartment.Simulation
 
 `TaskConfig.Items` 的 `Count` 必须为 3–5，`ItemId` 各异，至少各有一件 `IsExistingItem=true/false`。新购物品的 `SourceZoneId` 可为 `null`；原有物品必须有来源区。所有物品均须有放回目标区，原有物品须有临时放置区。`AccessTargets` 至少包含一个稳定对象 ID，角色只能为 `FridgeDoor`/`FridgeDrawer`；Open/Close 必须分别收齐全部目标。区域、阈值、访问目标和物品在创建计划时校验，不能在 B1/B2 中途变更。
 
+正式评审的 `ISafetySource` 只采纳活跃 XR 运行时在 Floor 跟踪模式下报告的物理边界，以及该运行时中有效的头显和控制器位置。接近边界产生独立的红色文字警示，离开后以不同距离阈值清除；没有有效边界或追踪时不把虚拟房间碰撞当成物理边界。安全通知不进入任务或 CSV 证据，暂停和退出沿用现有会话操作。
+
 ## 4. 唯一流程状态与推进接口
 
 ```
@@ -403,6 +409,10 @@ Core 在 Unity 主线程按序处理命令。可预期拒绝不抛异常、不�
 
 UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反馈、比较、暂停及错误；只通过命令提交意图。按钮是否可用由快照决定，但 Core 仍验证每条命令。UI 不直接设置 `SessionState`、方案 ID 或保存成功标志。临时 Debug UI 只用于 Play 测试，采用同一命令和反馈接口，正式 UI 可替换它。
 
+整理步骤的快照物品进度为 0/1 或 1/1。Core 接受任一原有物品释放到登记的储物区后，完整版与紧凑版任务卡都允许提交整理确认。两种任务卡显示在前景，物品和目标区提示继续标在实际几何处。
+
+最终比较的必填取舍说明可以用手柄射线在同一世界空间面板内编辑，也可以用电脑键盘输入。两种操作编辑同一个草稿，由 `IComparisonInputView.Capture()` 交给 Core。暂停或关闭键盘保留已输入的文字，跳过组合的快捷说明仍由参与者主动选择。取舍内容、验证规则及本地记录格式沿用现有契约。
+
 | 输入/输出 | 合同 |
 | --- | --- |
 | `FeedbackRequest` → `FeedbackValidationResult`（Feedback 工作包） | 完成方案必须有 Combination ID、Decision、Category、Importance；Short explanation、Experience、Everyday impact、Discovery mode 不阻塞。Task outcome 仍由 Core 的 Completed/Skipped 决定。跳过要求原因，评价可空。失败返回 `fieldId → errorCode/message`，取消/无效不改 Core 状态。Core Mock 使用同一输入输出，不绕过 session/方案匹配。 |
@@ -413,6 +423,10 @@ UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反�
 这与 PRD Final §10.2 的“反馈后 Amber”一致。`SaveStatus` 单独呈现持久化结果：反馈有效但保存失败时，Amber 保持，同时显示明确的“本地保存失败/可重试”；不得用颜色暗示记录已安全落盘。Conflict Detection 对门扇/抽屉与登记阻挡区等可复现几何事实作判断，读取 `ASM_KitchenParameters` 的登记值及版本，不自动判定“舒适”“方便”或“空间足够”。UI 负责视觉，检测模块负责测量，Core 负责 issue 与反馈的关联。Red 不复用 Yellow/Amber 等级。
 
 `ConflictNotice.FeedbackRecorded` 由 Core 在发给 UI 的快照副本中设置：Conflict Detection 产生的原始 notice 始终不决定颜色。Core 将最小冲突关联复制为 `SessionRecord.conflicts`，包含 issue、方案、模型、对象、登记参数、测量及反馈已记录状态。`JourneySnapshot.CurrentSafety` 保留当前 Red 安全通知，安全来源以同一 `SafetyEventId` 的 `IsActive=false` 通知解除；它不改变设计冲突状态。
+
+边界提示出现后，等待有效的安全距离采样再解除。缺少有效采样时保持当前提示状态。Core 将每次新触发的 `boundary_warning` 写入现有 `SessionRecord.comfortOrAbort`，包括匿名会话内秒数和当时的方案（如有）。连续有效的同一警示只记一次，解除后再次触发可另记一次。使用同一组本地保存检查点，保留风险事件与设计冲突的独立性。时间从评审场景启动计起。
+
+F2 门扇与把手的扫掠检测复用实际限制门体运动的查询。仅把当前方案内显式登记的固定柜板作为设计障碍，物品、玩家、未登记的几何及查询饱和不产生设计证据。`door-sweep/<门 ID>/<柜板 ID>` 的 `Measurement` 记录受阻时实际已到达的角度（度），`AssumptionKey` 指向障碍的登记参数。切换、复位等程序定位不产生新证据。布局实验独立于正式评审会话。
 
 ## 7. 本地保存接口与终态
 

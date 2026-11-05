@@ -16,4 +16,4 @@ MonoBehaviour:
   cabinet: 0
   fridge: 0
   modes: 3
-  controlledQuestion: 
+  controlledQuestion: How does the projecting fridge affect passing by and opening the door?

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1427046387661183225}
   - component: {fileID: 3496899199328470668}
   - component: {fileID: 2592519387565221235}
+  - component: {fileID: 6692029761969340351}
   m_Layer: 0
   m_Name: TRIM_Filler_Left
   m_TagString: Untagged
@@ -105,6 +106,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6692029761969340351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2646770227228915069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca854ebcbf5f44f5c8f301963a3c491a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  stableId: cabinet-left
+  displayName: cabinet side filler
+  assumptionKey: flush_panel_depth
 --- !u!1 &3747678769489596994
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,6 +165,7 @@ GameObject:
   - component: {fileID: 4588359637553687915}
   - component: {fileID: 3810437161985286216}
   - component: {fileID: 5902270183872767958}
+  - component: {fileID: 6840798963678270131}
   m_Layer: 0
   m_Name: TRIM_Filler_Right
   m_TagString: Untagged
@@ -242,6 +259,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6840798963678270131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4212287592720128731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca854ebcbf5f44f5c8f301963a3c491a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  stableId: cabinet-right
+  displayName: cabinet side filler
+  assumptionKey: flush_panel_depth
 --- !u!1 &4486314945182532113
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,6 +337,7 @@ GameObject:
   - component: {fileID: 4219553173960573004}
   - component: {fileID: 9052084387841325033}
   - component: {fileID: 2489518323272709892}
+  - component: {fileID: 8898909654267065401}
   m_Layer: 0
   m_Name: TRIM_Bridge_Top
   m_TagString: Untagged
@@ -398,6 +431,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8898909654267065401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5899808216364398788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca854ebcbf5f44f5c8f301963a3c491a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  stableId: cabinet-top
+  displayName: upper cabinet trim
+  assumptionKey: flush_panel_depth
 --- !u!1001 &2184786675136535739
 PrefabInstance:
   m_ObjectHideFlags: 0

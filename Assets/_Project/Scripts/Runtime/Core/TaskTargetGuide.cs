@@ -74,7 +74,8 @@ namespace XRApartment.Runtime.Core
             }
             var snapshot = host.Core.Snapshot;
             if (snapshot.State != SessionState.ChallengeActive || snapshot.IsBusy ||
-                !snapshot.CurrentStep.HasValue)
+                !snapshot.CurrentStep.HasValue ||
+                (snapshot.CurrentStep == ChallengeStep.Reorganise && snapshot.CompletedItemCount > 0))
             {
                 HideZoneHints();
                 ShowCount(0);
@@ -152,8 +153,6 @@ namespace XRApartment.Runtime.Core
                     ShowZoneHint("ZONE_Temporary");
                     break;
                 case ChallengeStep.Reorganise:
-                    if (evidenceBridge.HasEmitted(step, "ITEM_Tomato") ||
-                        evidenceBridge.HasEmitted(step, "ITEM_Onion")) break;
                     ShowZoneHint(AnyTargetItemHeld(step)
                         ? "ZONE_FreshDestination" : "ZONE_Temporary");
                     break;
@@ -231,9 +230,6 @@ namespace XRApartment.Runtime.Core
             var ids = step == ChallengeStep.PutBack
                 ? new[] { "ITEM_Tomato", "ITEM_Onion", "ITEM_CerealBox" }
                 : new[] { "ITEM_Tomato", "ITEM_Onion" };
-            if (step == ChallengeStep.Reorganise &&
-                (evidenceBridge.HasEmitted(step, "ITEM_Tomato") ||
-                 evidenceBridge.HasEmitted(step, "ITEM_Onion"))) return;
             foreach (var id in ids)
                 if (!evidenceBridge.HasEmitted(step, id) &&
                     identities.TryGetValue(id, out var held) &&

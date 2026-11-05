@@ -36,6 +36,9 @@ namespace XRApartment.Runtime.Core
         public event Action<TaskEvidence> EvidenceObserved;
         public event Action<string> InteractionBlocked;
         public string LastError { get; private set; }
+        internal float SessionSeconds => sessionStartedAt < 0f ? 0f : Time.realtimeSinceStartup - sessionStartedAt;
+
+        private void Awake() => sessionStartedAt = Time.realtimeSinceStartup;
 
         public bool HasEmitted(ChallengeStep step, string itemOrTargetId) =>
             emitted.Contains(step + ":" + itemOrTargetId);
@@ -119,7 +122,6 @@ namespace XRApartment.Runtime.Core
                 identities[itemId].Grab.selectFilters.Add(guard);
                 grabGuards.Add(itemId, guard);
             }
-            if (sessionStartedAt < 0f) sessionStartedAt = Time.realtimeSinceStartup;
             LastError = null;
             return true;
         }
@@ -332,7 +334,7 @@ namespace XRApartment.Runtime.Core
                 Step = step, Role = role, ObjectId = objectId,
                 ItemId = role == ReviewRole.CirculationZone || objectId != null ? null : key,
                 ZoneId = zoneId ?? (role == ReviewRole.CirculationZone ? key : null),
-                OccurredAtSessionSeconds = Time.realtimeSinceStartup - sessionStartedAt,
+                OccurredAtSessionSeconds = SessionSeconds,
                 Measurement = measurement, Released = released
             });
         }

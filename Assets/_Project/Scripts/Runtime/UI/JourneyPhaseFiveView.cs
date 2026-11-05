@@ -41,11 +41,13 @@ namespace XRApartment.Runtime.UI
         [SerializeField] private Button feedbackOpen, feedbackCancel, feedbackSubmit;
         [SerializeField] private Button skippedContinueButton;
         [SerializeField] private Button comparisonConfirm, saveRetry, safetyPause, safetyExit;
+        [SerializeField] private Shader keyboardSurfaceShader, keyboardTextShader;
         [SerializeField, Min(0.5f)] private float headDistance = 0.8f;
 
         private readonly Dictionary<string, FeedbackDraft> drafts = new Dictionary<string, FeedbackDraft>();
         private JourneySnapshot snapshot;
         private FinalComparison comparisonDraft = new FinalComparison();
+        private CanvasGroup comparisonInputGroup;
         private string lastError = "";
         private string activeDraftKey;
         private bool feedbackOpenNow;
@@ -95,6 +97,8 @@ namespace XRApartment.Runtime.UI
 
         private void LateUpdate()
         {
+            if (recoveryMenu != null && recoveryMenu.IsOpen && comparisonInput is JourneyComparisonInputView keyboardView)
+                keyboardView.CloseKeyboard();
             if (snapshot == null || xrOrigin == null || xrOrigin.Camera == null) return;
             var camera = xrOrigin.Camera.transform;
             var forward = Vector3.ProjectOnPlane(camera.forward, Vector3.up).normalized;
@@ -143,6 +147,8 @@ namespace XRApartment.Runtime.UI
                 if (component is IComparisonInputView) { comparisonInput = component; break; }
             if (comparisonInput == null)
                 comparisonInput = comparisonInputSlot.gameObject.AddComponent<JourneyComparisonInputView>();
+            if (comparisonInput is JourneyComparisonInputView keyboardView)
+                keyboardView.ConfigureKeyboardShaders(keyboardSurfaceShader, keyboardTextShader);
             var dependency = comparisonInputSlot.Find("Dependency");
             if (dependency != null) dependency.gameObject.SetActive(false);
         }
@@ -156,7 +162,7 @@ namespace XRApartment.Runtime.UI
             Label(feedbackTitle, DesignName(id) + " | Feedback");
             Label(feedbackOutcome, "Task result: " + outcome +
                 (outcome == TaskOutcome.Skipped ? " | reason: " + (host?.CurrentFeedbackRequest?.OutcomeReason ?? "recorded") :
-                 " | Decision, Category, Importance and short explanation required"));
+                 " | Decision, Category and Importance required"));
             Label(feedbackStatus, outcome == TaskOutcome.Skipped
                 ? current.Save == SaveStatus.Failed
                     ? "Skip feedback is retained. Local save failed; use Retry. " + lastError
@@ -196,11 +202,19 @@ namespace XRApartment.Runtime.UI
                     : current.Save == SaveStatus.Pending
                         ? "Saving final comparison; Finished is locked until read back verification."
                         : string.IsNullOrEmpty(lastError)
-                            ? "Enter the main trade-off, then confirm. If one task was skipped, you can use its context."
+                            ? "Choose a design, then use Write in VR or type the main trade-off before confirming."
                             : lastError);
-            if (comparisonInputSlot != null) comparisonInputSlot.gameObject.SetActive(ComparisonInput != null);
-            if (comparisonConfirm != null) comparisonConfirm.interactable = ComparisonInput != null &&
-                !current.IsBusy && current.Save != SaveStatus.Failed;
+            var safetyActive = current.CurrentSafety?.IsActive == true;
+            var canEdit = ComparisonInput != null && !current.IsBusy && current.Save != SaveStatus.Failed && !safetyActive;
+            if (!canEdit && comparisonInput is JourneyComparisonInputView keyboardView) keyboardView.CloseKeyboard();
+            if (comparisonInputSlot != null)
+            {
+                comparisonInputSlot.gameObject.SetActive(ComparisonInput != null);
+                if (comparisonInputGroup == null)
+                    comparisonInputGroup = comparisonInputSlot.gameObject.AddComponent<CanvasGroup>();
+                comparisonInputGroup.interactable = canEdit;
+            }
+            if (comparisonConfirm != null) comparisonConfirm.interactable = canEdit;
         }
 
         private static string Summary(JourneySnapshot current, string id)
@@ -340,7 +354,7 @@ namespace XRApartment.Runtime.UI
         {
             if (host == null || snapshot == null || ComparisonInput == null ||
                 snapshot.State != SessionState.ComparisonSummary || snapshot.IsBusy ||
-                snapshot.Save == SaveStatus.Failed) return;
+                snapshot.Save == SaveStatus.Failed || snapshot.CurrentSafety?.IsActive == true) return;
             CaptureComparison();
             var preference = comparisonDraft.PreferredBenchmarkId;
             var hasCompleted = false;
@@ -364,6 +378,7 @@ namespace XRApartment.Runtime.UI
                 Label(comparisonStatus, error);
                 return;
             }
+            comparisonDraft.TradeOffSummary = comparisonDraft.TradeOffSummary?.Trim();
             var result = host.Submit(new JourneyCommand
             { Type = JourneyCommandType.ConfirmComparison, Comparison = comparisonDraft });
             if (!result.Accepted)

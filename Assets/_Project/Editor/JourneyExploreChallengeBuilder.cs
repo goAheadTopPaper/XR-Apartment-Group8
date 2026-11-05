@@ -60,6 +60,20 @@ namespace XRApartment.EditorTools
                     challengeCompact.gameObject.SetActive(false);
                 }
                 challengeCompact.anchoredPosition = new Vector2(-345, 240);
+                ((RectTransform)challengeCompact.Find("Expand")).anchoredPosition = new Vector2(-105, -91);
+                var compactConfirm = challengeCompact.Find("ConfirmReorganisation");
+                if (compactConfirm == null)
+                    compactConfirm = Button("ConfirmReorganisation", challengeCompact, 105, -91, 198, 48,
+                        "Confirm", font).transform;
+                compactConfirm.gameObject.SetActive(false);
+                ConfigureReviewOverlay(challenge, challengeCompact);
+                FitChallengeText(challenge.Find("Step").GetComponent<TMP_Text>(), 30);
+                FitChallengeText(challenge.Find("Instruction").GetComponent<TMP_Text>(), 33);
+                FitChallengeText(challengeCompact.Find("Title").GetComponent<TMP_Text>(), 28);
+                FitChallengeText(challengeCompact.Find("Instruction").GetComponent<TMP_Text>(), 28);
+                foreach (var card in new Transform[] { challenge, challengeCompact })
+                    foreach (var button in card.GetComponentsInChildren<Button>(true))
+                        FitChallengeText(button.GetComponentInChildren<TMP_Text>(true), 28);
                 var pending = root.Find("PendingPanel");
                 if (pending.Find("Pause") == null)
                     Button("Pause", pending, -105, -120, 180, 55, "Pause", font);
@@ -136,6 +150,8 @@ namespace XRApartment.EditorTools
             Assign(fields, "challengeCompactInstruction", panel.transform.Find("ChallengeCompactPanel/Instruction").GetComponent<TMP_Text>());
             Assign(fields, "challengeCompactButton", panel.transform.Find("ChallengePanel/Compact").GetComponent<Button>());
             Assign(fields, "challengeExpandButton", panel.transform.Find("ChallengeCompactPanel/Expand").GetComponent<Button>());
+            Assign(fields, "challengeCompactConfirmButton",
+                panel.transform.Find("ChallengeCompactPanel/ConfirmReorganisation").GetComponent<Button>());
             Assign(fields, "pendingPauseButton", panel.transform.Find("PendingPanel/Pause").GetComponent<Button>());
             Assign(fields, "pausedPanel", panel.transform.Find("PausedPanel").gameObject);
             Assign(fields, "pausedStatus", panel.transform.Find("PausedPanel/Status").GetComponent<TMP_Text>());
@@ -275,7 +291,9 @@ namespace XRApartment.EditorTools
                 var design = toolbar.Find("Design") as RectTransform;
                 design.anchoredPosition = new Vector2(-290, 105);
                 design.sizeDelta = new Vector2(170, 68);
-                design.GetComponent<TMP_Text>().text = "Explore";
+                var designLabel = design.GetComponent<TMP_Text>();
+                designLabel.text = "Explore";
+                designLabel.fontSize = 30;
                 var status = toolbar.Find("Status") as RectTransform;
                 status.anchoredPosition = new Vector2(0, -35);
                 status.sizeDelta = new Vector2(980, 115);
@@ -301,7 +319,9 @@ namespace XRApartment.EditorTools
                 {
                     pauseButton.anchoredPosition = new Vector2(-440, 105);
                     pauseButton.sizeDelta = new Vector2(100, 58);
+                    pauseButton.GetComponentInChildren<TMP_Text>(true).fontSize = 26;
                 }
+                ConfigureReviewOverlay(intro, toolbar);
                 var pending = root.Find("PendingPanel") as RectTransform;
                 pending.sizeDelta = new Vector2(465, 340);
                 var pendingMessage = pending.Find("Status") as RectTransform;
@@ -339,6 +359,25 @@ namespace XRApartment.EditorTools
             EditorSceneManager.SaveScene(scene);
         }
 
+        private static void ConfigureReviewOverlay(params Transform[] panels)
+        {
+            const string art = KitchenAuthoring.Root + "Art/UI/";
+            var surface = KitchenAuthoring.LoadRequired<Material>(art + "MAT_UI_RecoverySurface.mat");
+            var text = KitchenAuthoring.LoadRequired<Material>(art + "MAT_UI_RecoveryText.mat");
+            foreach (var panel in panels)
+            {
+                foreach (var image in panel.GetComponentsInChildren<Image>(true)) image.material = surface;
+                foreach (var label in panel.GetComponentsInChildren<TMP_Text>(true)) label.fontSharedMaterial = text;
+            }
+        }
+
+        private static void FitChallengeText(TMP_Text label, float maximum)
+        {
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 22f;
+            label.fontSizeMax = maximum;
+        }
+
         [MenuItem("XR Apartment/UI/Build and wire Explore Challenge UI")]
         public static void BuildAndWire()
         {
@@ -351,11 +390,10 @@ namespace XRApartment.EditorTools
             }
             var views = Object.FindObjectsOfType<JourneyWorldSpaceView>(true);
             var hosts = Object.FindObjectsOfType<JourneyRuntimeHost>(true);
-            var bridges = Object.FindObjectsOfType<TaskEvidenceBridge>(true);
             var origins = Object.FindObjectsOfType<XROrigin>(true);
-            if (views.Length != 1 || hosts.Length != 1 || bridges.Length != 1 || origins.Length != 1)
+            if (views.Length != 1 || hosts.Length != 1 || origins.Length != 1)
             {
-                Debug.LogError("Explore/Challenge wiring needs one journey view, host, evidence bridge and XR Origin.");
+                Debug.LogError("Explore/Challenge wiring needs one journey view, host and XR Origin.");
                 return;
             }
 
@@ -372,7 +410,6 @@ namespace XRApartment.EditorTools
             canvas.worldCamera = origins[0].Camera;
             var view = new SerializedObject(views[0]);
             Assign(view, "host", hosts[0]);
-            Assign(view, "evidenceBridge", bridges[0]);
             Assign(view, "stageOnePanel", views[0].transform.Find("Panel").gameObject);
             Assign(view, "explorePanel", panel.transform.Find("ExplorePanel").gameObject);
             Assign(view, "challengePanel", panel.transform.Find("ChallengePanel").gameObject);

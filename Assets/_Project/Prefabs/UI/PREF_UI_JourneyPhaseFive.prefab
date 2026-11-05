@@ -1518,6 +1518,8 @@ MonoBehaviour:
   saveRetry: {fileID: 6172525488604994006}
   safetyPause: {fileID: 7005290302518471265}
   safetyExit: {fileID: 7909385931932365596}
+  keyboardSurfaceShader: {fileID: 4800000, guid: 3f7dcafec58c84c3aa9b29b13d24ba3d, type: 3}
+  keyboardTextShader: {fileID: 4800000, guid: dd89cf5b9246416f84610a006f916af7, type: 3}
   headDistance: 0.8
 --- !u!1 &1659884369599135110
 GameObject:

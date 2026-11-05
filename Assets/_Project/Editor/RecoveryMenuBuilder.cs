@@ -88,6 +88,8 @@ namespace XRApartment.EditorTools
             finally { Object.DestroyImmediate(root); }
             }
 
+            KitchenAuthoring.EditPrefab(PrefabPath, ConfigurePostureControls);
+
             var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
             if (scene.path != ScenePath)
                 throw new System.InvalidOperationException("Open SCN_Kitchen_Review before scene wiring.");
@@ -116,6 +118,58 @@ namespace XRApartment.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
+        }
+
+        internal static void ConfigurePostureControls(GameObject root)
+        {
+            var panel = root.transform.Find("Panel");
+            var font = TMP_Settings.defaultFontAsset;
+            var seated = panel.Find("UseSeatedView")?.GetComponent<Button>() ??
+                Button("UseSeatedView", panel, -120, -310, 195, 57, "Calibrate seated", font);
+            var standing = panel.Find("UseStandingView")?.GetComponent<Button>() ??
+                Button("UseStandingView", panel, 103, -310, 195, 57, "Calibrate standing", font);
+            var hint = panel.Find("PostureHint")?.GetComponent<TMP_Text>() ??
+                Label("PostureHint", panel, 0, -270, 825, 27, 19,
+                    "Sit or stand first, then calibrate that view.", font);
+            var close = (RectTransform)panel.Find("Close");
+            close.anchoredPosition = new Vector2(-329, -310);
+            close.sizeDelta = new Vector2(152, 57);
+            var safeExit = (RectTransform)panel.Find("SafeExit");
+            safeExit.anchoredPosition = new Vector2(326, -310);
+            safeExit.sizeDelta = new Vector2(175, 62);
+            var fields = new SerializedObject(root.GetComponent<RecoveryMenuView>());
+            Assign(fields, "useSeatedView", seated);
+            Assign(fields, "useStandingView", standing);
+            Assign(fields, "postureHint", hint);
+            fields.ApplyModifiedPropertiesWithoutUndo();
+            ConfigureMenuMaterials(root, font);
+        }
+
+        private static void ConfigureMenuMaterials(GameObject root, TMP_FontAsset font)
+        {
+            const string art = KitchenAuthoring.Root + "Art/UI/";
+            const string surfacePath = art + "MAT_UI_RecoverySurface.mat";
+            const string textPath = art + "MAT_UI_RecoveryText.mat";
+            var surface = AssetDatabase.LoadAssetAtPath<Material>(surfacePath);
+            if (surface == null)
+            {
+                surface = new Material(JourneyPhaseFiveBuilder.ReviewPanelShader);
+                AssetDatabase.CreateAsset(surface, surfacePath);
+            }
+            var text = AssetDatabase.LoadAssetAtPath<Material>(textPath);
+            if (text == null)
+            {
+                text = new Material(font.material);
+                AssetDatabase.CreateAsset(text, textPath);
+            }
+            else text.CopyPropertiesFromMaterial(font.material);
+            text.shader = JourneyPhaseFiveBuilder.ReviewFontShader;
+            // Keep normal uGUI ordering, including the generated input-field caret.
+            surface.renderQueue = text.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            foreach (var image in root.GetComponentsInChildren<Image>(true)) image.material = surface;
+            foreach (var label in root.GetComponentsInChildren<TMP_Text>(true)) label.fontSharedMaterial = text;
+            EditorUtility.SetDirty(surface);
+            EditorUtility.SetDirty(text);
         }
 
         private static string ToName(string name) => char.ToUpperInvariant(name[0]) + name.Substring(1);

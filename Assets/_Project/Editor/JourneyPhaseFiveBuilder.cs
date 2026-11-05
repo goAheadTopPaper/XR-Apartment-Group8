@@ -17,6 +17,16 @@ namespace XRApartment.EditorTools
     {
         private const string PrefabPath = "Assets/_Project/Prefabs/UI/PREF_UI_JourneyPhaseFive.prefab";
         private const string ScenePath = "Assets/_Project/Scenes/SCN_Kitchen_Review.unity";
+        internal static Shader ReviewPanelShader => KitchenAuthoring.LoadRequired<Shader>(
+            "Assets/_Project/Art/UI/SH_ReviewKeyboardSurface.shader");
+        internal static Shader ReviewFontShader => KitchenAuthoring.LoadRequired<Shader>(
+            "Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader");
+
+        internal static void SetKeyboardShaders(SerializedObject view)
+        {
+            Ref(view, "keyboardSurfaceShader", ReviewPanelShader);
+            Ref(view, "keyboardTextShader", ReviewFontShader);
+        }
 
         [MenuItem("XR Apartment/UI/Compact phase five save status")]
         public static void CompactSaveStatus()
@@ -144,6 +154,7 @@ namespace XRApartment.EditorTools
             Ref(data, "saveRetry", retry);
             Ref(data, "safetyPause", pause);
             Ref(data, "safetyExit", exit);
+            SetKeyboardShaders(data);
             data.FindProperty("headDistance").floatValue = 0.8f;
             data.ApplyModifiedPropertiesWithoutUndo();
             feedback.gameObject.SetActive(false);

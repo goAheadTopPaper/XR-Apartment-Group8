@@ -19,6 +19,8 @@ namespace XRApartment.Runtime
         Transform rig;
 
         public bool QuerySaturated { get; private set; }
+        public Collider RotationBlocker { get; private set; }
+        internal Collider RecoveryBlocker { get; private set; }
 
         public HeldPropSweep(BoxCollider probe, Transform prop, int layers)
         {
@@ -38,6 +40,8 @@ namespace XRApartment.Runtime
             float rotationStepDegrees, int rotationIterations)
         {
             QuerySaturated = false;
+            RotationBlocker = null;
+            RecoveryBlocker = null;
             rig = ownerRig;
             // ComputePenetration in Unity 2022 requires an enabled query collider.
             // It is disabled again before XRI or the physics simulation can observe it.
@@ -72,6 +76,7 @@ namespace XRApartment.Runtime
                     if (!Physics.ComputePenetration(probe, pose.position, pose.rotation,
                             obstacle, obstacle.transform.position, obstacle.transform.rotation,
                             out var normal, out var depth)) continue;
+                    if (RecoveryBlocker == null) RecoveryBlocker = obstacle;
                     pose.position += normal * (depth + skin);
                     moved = true;
                 }
@@ -164,7 +169,11 @@ namespace XRApartment.Runtime
             var count = Overlap(pose, margin);
             if (QuerySaturated) return true;
             for (var i = 0; i < count; i++)
-                if (Blocks(overlaps[i])) return true;
+                if (Blocks(overlaps[i]))
+                {
+                    RotationBlocker = overlaps[i];
+                    return true;
+                }
             return false;
         }
 

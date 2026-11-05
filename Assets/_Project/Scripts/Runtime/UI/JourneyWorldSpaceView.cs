@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using XRApartment.Data;
 using XRApartment.Runtime.Core;
 using XRApartment.Simulation;
@@ -36,7 +38,6 @@ namespace XRApartment.Runtime.UI
         [SerializeField, Min(0.8f)] private float headFollowDistance = 1.0f;
         [SerializeField] private float headFollowVerticalOffset = 0f;
         [Header("Explore and Challenge")]
-        [SerializeField] private TaskEvidenceBridge evidenceBridge;
         [SerializeField] private GameObject stageOnePanel, explorePanel, challengePanel, pendingPanel;
         [SerializeField] private TMP_Text exploreDesign, exploreDescription, exploreStatus, exploreError;
         [SerializeField] private TMP_Text challengeBenchmark, challengeStep, challengeInstruction;
@@ -63,7 +64,7 @@ namespace XRApartment.Runtime.UI
         [SerializeField] private TMP_InputField skipReasonField;
         [SerializeField] private GameObject challengeCompactPanel;
         [SerializeField] private TMP_Text challengeCompactTitle, challengeCompactInstruction;
-        [SerializeField] private Button challengeCompactButton, challengeExpandButton;
+        [SerializeField] private Button challengeCompactButton, challengeExpandButton, challengeCompactConfirmButton;
 
         private JourneySnapshot snapshot;
         private int page;
@@ -72,7 +73,10 @@ namespace XRApartment.Runtime.UI
             heldPracticeObjects = new System.Collections.Generic.HashSet<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
         private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable[] practiceGrabObjects;
         private bool reset, resetPending, exitUnderstood;
-        private float desiredEyeHeight = 1.65f;
+        private float standingEyeHeight = 1.65f;
+        private float seatedEyeHeight = 1.20f;
+        private Transform eyeHeightOffset;
+        private XRBaseInteractor[] reviewInteractors;
         private float floorWorldY;
         private string requestedBenchmark;
         private bool retryExploreLoad;
@@ -82,10 +86,17 @@ namespace XRApartment.Runtime.UI
         private bool[] originalHandVisibility;
         private bool Setup => snapshot != null && snapshot.State == SessionState.Setup;
         private bool Orientation => snapshot != null && snapshot.State == SessionState.Orientation;
+        private float DesiredEyeHeight => seated ? seatedEyeHeight : standingEyeHeight;
+        internal string CalibratedPosture => calibrated ? (seated ? "Seated" : "Standing") : null;
 
         private void Awake()
         {
-            if (xrOrigin != null) floorWorldY = xrOrigin.transform.position.y;
+            if (xrOrigin != null)
+            {
+                floorWorldY = xrOrigin.transform.position.y;
+                reviewInteractors = xrOrigin.GetComponentsInChildren<XRBaseInteractor>(true);
+            }
+            if (recoveryMenu != null) recoveryMenu.SetPostureView(this);
             CacheMenuHandRenderers();
             Wire(previousButton, Previous); Wire(nextButton, Next);
             Wire(standingButton, Standing); Wire(seatedButton, Seated); Wire(calibrateButton, Calibrate);
@@ -98,6 +109,7 @@ namespace XRApartment.Runtime.UI
             Wire(previewB1Button, PreviewB1); Wire(previewB2Button, PreviewB2);
             Wire(startChallengeButton, StartChallenge);
             Wire(confirmReorganisationButton, ConfirmReorganisation);
+            Wire(challengeCompactConfirmButton, ConfirmReorganisation);
             Wire(restoreStepButton, RestoreCurrentStep);
             Wire(exploreExitButton, SafeExit); Wire(toolbarExitButton, SafeExit);
             Wire(challengeExitButton, SafeExit); Wire(pendingExitButton, SafeExit);
@@ -198,6 +210,7 @@ namespace XRApartment.Runtime.UI
             Unwire(previewB1Button, PreviewB1); Unwire(previewB2Button, PreviewB2);
             Unwire(startChallengeButton, StartChallenge);
             Unwire(confirmReorganisationButton, ConfirmReorganisation);
+            Unwire(challengeCompactConfirmButton, ConfirmReorganisation);
             Unwire(restoreStepButton, RestoreCurrentStep);
             Unwire(exploreExitButton, SafeExit); Unwire(toolbarExitButton, SafeExit);
             Unwire(challengeExitButton, SafeExit); Unwire(pendingExitButton, SafeExit);
@@ -309,17 +322,16 @@ namespace XRApartment.Runtime.UI
             {
                 if (code == JourneyErrorCode.OperationFailed) retryExploreLoad = true;
                 else if (code == JourneyErrorCode.None && !current.IsBusy) retryExploreLoad = false;
+                var design = host?.FindBenchmark(displayed);
                 Label(exploreDesign, string.IsNullOrEmpty(displayed)
-                    ? "No design loaded" : "Current design: " + displayed);
+                    ? "Choose a design to preview" : "Current design  |  " + displayed);
                 Label(exploreDescription,
-                    "Explore lets you preview B1 and B2 freely. Next, Challenge guides you through eight real kitchen tasks for each design.");
+                    "Both designs use the same large single-door F2 fridge. Preview the cabinet arrangements, then try the same eight kitchen actions in each design.");
                 Label(exploreStatus, "Start Explore to open the design choices.");
                 Label(exploreError, code == JourneyErrorCode.None ? "" : code + ": " + message);
-                Label(exploreToolbarDesign, "Explore");
+                Label(exploreToolbarDesign, design == null ? "Explore" : "Preview " + design.Id);
                 Label(exploreToolbarStatus, current.IsBusy ? "Loading design. Please wait." :
-                    next != null
-                        ? "Preview " + next + ", then press Challenge to start the " + next + " task."
-                        : "Both B1 and B2 Challenges are complete.");
+                    ExploreGuidance(design, next));
                 Label(exploreToolbarError, code == JourneyErrorCode.None ? "" : code + ": " + message);
                 if (previewB1Button != null) previewB1Button.interactable =
                     !current.IsBusy && !retryExploreLoad && HasBenchmark(current, "B1");
@@ -352,22 +364,19 @@ namespace XRApartment.Runtime.UI
                     Label(challengeInstruction, StepInstruction(step));
                     Label(challengeCompactTitle, current.ActiveBenchmarkId + "  |  Step " +
                         ((int)step + 1) + "/8  " + StepTitle(step));
-                    Label(challengeCompactInstruction, StepInstruction(step));
+                    bool reorganising = step == ChallengeStep.Reorganise;
+                    bool moved = reorganising && current.CompletedItemCount > 0;
+                    Label(challengeCompactInstruction, moved
+                        ? "Item moved. Select Confirm to continue." : StepInstruction(step));
                     Label(challengeItems, current.TotalItemCount > 0
                         ? "Items " + current.CompletedItemCount + " / " + current.TotalItemCount
-                        : "Follow the green target guide in the kitchen.");
-                    bool moved = evidenceBridge != null &&
-                        (evidenceBridge.HasEmitted(ChallengeStep.Reorganise, "ITEM_Tomato") ||
-                         evidenceBridge.HasEmitted(ChallengeStep.Reorganise, "ITEM_Onion"));
-                    if (confirmReorganisationButton != null)
-                    {
-                        confirmReorganisationButton.gameObject.SetActive(step == ChallengeStep.Reorganise);
-                        confirmReorganisationButton.interactable = moved && !current.IsBusy;
-                    }
+                        : "Follow the green guide.");
+                    SetReorganisationButton(confirmReorganisationButton, reorganising, moved && !current.IsBusy);
+                    SetReorganisationButton(challengeCompactConfirmButton, reorganising, moved && !current.IsBusy);
                     Label(challengeStatus, current.IsBusy ? "Updating scene..." :
-                        step == ChallengeStep.Reorganise && !moved
+                        reorganising && !moved
                             ? "Move and release an existing item in the marked storage zone."
-                            : step == ChallengeStep.Reorganise
+                            : reorganising
                                 ? "Item moved. Confirm your reorganisation."
                                 : "Progress advances after the real interaction is accepted.");
                 }
@@ -495,6 +504,19 @@ namespace XRApartment.Runtime.UI
             return false;
         }
 
+        private static string ExploreGuidance(BenchmarkDefinition design, string next)
+        {
+            var guide = next == null ? "Both Challenges are complete." : "Next Challenge  |  " + next + ". " +
+                (design?.Id == next ? "Select Challenge to begin." : "Preview " + next + " to begin.");
+            if (design == null)
+                return "Choose B1 or B2. Both previews use the same F2 fridge.\n" + guide;
+            var cabinet = design.Cabinet == CabinetStrategy.Proud ? "Proud" : "Flush";
+            var description = design.Id + "  |  " + cabinet + " + " + design.Fridge;
+            if (!string.IsNullOrWhiteSpace(design.ControlledQuestion))
+                description += "\n" + design.ControlledQuestion;
+            return description + "\n" + guide;
+        }
+
         private static string NextUnresolved(JourneySnapshot current)
         {
             if (current.BenchmarkOrder == null || current.BenchmarkOutcomes == null) return null;
@@ -509,7 +531,7 @@ namespace XRApartment.Runtime.UI
             switch (step)
             {
                 case ChallengeStep.TakeOut: return "Take out";
-                case ChallengeStep.TemporaryPlacement: return "Temporary placement";
+                case ChallengeStep.TemporaryPlacement: return "Place on counter";
                 case ChallengeStep.PutBack: return "Put back";
                 default: return step.ToString();
             }
@@ -523,7 +545,7 @@ namespace XRApartment.Runtime.UI
                 case ChallengeStep.Open: return "Fully open the fridge door.";
                 case ChallengeStep.TakeOut: return "Remove TOMATO and ONION from the upper source shelf.";
                 case ChallengeStep.TemporaryPlacement: return "Release TOMATO and ONION on the PURPLE counter highlight.";
-                case ChallengeStep.Reorganise: return "Move and release TOMATO or ONION from PURPLE onto ANY lower shelf. Wait briefly, then confirm.";
+                case ChallengeStep.Reorganise: return "Move TOMATO or ONION from the purple counter to a lower fridge shelf. Release it, then confirm.";
                 case ChallengeStep.PutBack: return "Release all THREE items onto ANY lower shelf. Include the CEREAL BOX.";
                 case ChallengeStep.Close: return "Fully close the fridge door.";
                 case ChallengeStep.Leave: return "Exit GREEN, then move your headset into the BLUE zone.";
@@ -572,8 +594,16 @@ namespace XRApartment.Runtime.UI
         private void ConfirmReorganisation()
         {
             if (snapshot == null || snapshot.State != SessionState.ChallengeActive ||
-                snapshot.CurrentStep != ChallengeStep.Reorganise || snapshot.IsBusy || host == null) return;
+                snapshot.CurrentStep != ChallengeStep.Reorganise || snapshot.CompletedItemCount == 0 ||
+                snapshot.IsBusy || host == null) return;
             host.Submit(new JourneyCommand { Type = JourneyCommandType.ConfirmReorganisation });
+        }
+
+        private static void SetReorganisationButton(Button button, bool visible, bool interactable)
+        {
+            if (button == null) return;
+            button.gameObject.SetActive(visible);
+            button.interactable = interactable;
         }
 
         private void RestoreCurrentStep()
@@ -687,7 +717,7 @@ namespace XRApartment.Runtime.UI
                 };
                 Label(pageTitle, titles[page]); Label(pageBody, bodies[page]);
                 Label(setupHintText, (postureChosen ? (seated ? "Seated" : "Standing") : "Choose posture") +
-                    " | Eye " + desiredEyeHeight.ToString("0.00") + " m" +
+                    " | Eye " + DesiredEyeHeight.ToString("0.00") + " m" +
                     (calibrated ? " | Ready" : " | Calibrate"));
             }
             else
@@ -697,7 +727,7 @@ namespace XRApartment.Runtime.UI
                 string[] bodies = {
                     TeleportPracticeInstruction(),
                     "Aim the controller ray at Select practice and press the UI trigger. Use the same ray to choose review controls.",
-                    "Grip any movable kitchen object, then release it safely on the counter. The grab check completes after release. Move the panel to compact mode for a clear view.",
+                    "Aim the ray and hold grip to grab a distant object. Tilt that hand's stick back to pull or forward to push. Release an object on the counter to finish practice.",
                     "Press Reset view to recenter through the journey scene adapter. Recheck your physical play area after reset.",
                     "Safe exit is available throughout the guide. It ends this session. Use it if unsafe or unwell. Confirm this before entering Explore."
                 };
@@ -739,16 +769,23 @@ namespace XRApartment.Runtime.UI
         }
         private void Previous() { if (page > 0) { page--; Refresh(); } }
         private void Next() { if (PageComplete()) { page++; Refresh(); } }
-        private void Standing()
-        { seated = false; postureChosen = true; desiredEyeHeight = 1.65f; calibrated = false; Refresh(); }
-        private void Seated()
-        { seated = true; postureChosen = true; desiredEyeHeight = 1.20f; calibrated = false; Refresh(); }
+        private void Standing() => ChooseSetupPosture(false);
+        private void Seated() => ChooseSetupPosture(true);
+        private void ChooseSetupPosture(bool useSeated)
+        {
+            seated = useSeated;
+            postureChosen = true;
+            calibrated = false;
+            Refresh();
+        }
         private void LowerEye() { AdjustEye(-0.05f); }
         private void RaiseEye() { AdjustEye(0.05f); }
         private void AdjustEye(float step)
         {
             if (!Setup || !postureChosen) return;
-            desiredEyeHeight = Mathf.Clamp(desiredEyeHeight + step, 0.90f, 1.95f);
+            var height = Mathf.Clamp(DesiredEyeHeight + step, 0.90f, 1.95f);
+            if (seated) seatedEyeHeight = height;
+            else standingEyeHeight = height;
             calibrated = false;
             Refresh();
         }
@@ -760,17 +797,66 @@ namespace XRApartment.Runtime.UI
             if (xrOrigin == null || xrOrigin.Camera == null)
             { Error("XR Origin and tracked camera are required for calibration."); return; }
             if (!ApplyEyeHeight())
-            { Error("Eye height calibration could not move the XR Origin."); return; }
+            { Error("Eye height calibration needs a valid tracking offset on the XR rig."); return; }
             calibrated = true;
             if (calibrationConfirmed != null) calibrationConfirmed.isOn = true;
             Error(string.Empty); Refresh();
         }
+
+        internal string CalibrateReviewPosture(bool useSeated)
+        {
+            if (reviewInteractors != null)
+                foreach (var interactor in reviewInteractors)
+                    if (interactor != null && interactor.hasSelection)
+                        foreach (var selectedObject in interactor.interactablesSelected)
+                            if (selectedObject is XRGrabInteractable)
+                                return "Put down the item you are holding before changing the view.";
+
+            var previousPosture = seated;
+            seated = useSeated;
+            if (!ApplyEyeHeight())
+            {
+                seated = previousPosture;
+                return "Eye height calibration needs a valid tracking offset on the XR rig.";
+            }
+
+            postureChosen = calibrated = true;
+            if (calibrationConfirmed != null) calibrationConfirmed.isOn = true;
+            Refresh();
+            return CalibratedPosture + " view calibrated. Your review progress is kept.";
+        }
+
         private bool ApplyEyeHeight()
         {
-            if (xrOrigin == null || xrOrigin.Camera == null) return false;
-            var desired = xrOrigin.Camera.transform.position;
-            desired.y = floorWorldY + desiredEyeHeight;
-            return xrOrigin.MoveCameraToWorldLocation(desired);
+            if (xrOrigin == null || xrOrigin.Origin == null || xrOrigin.Camera == null) return false;
+            var origin = xrOrigin.Origin.transform;
+            var floorOffsetObject = xrOrigin.CameraFloorOffsetObject;
+            var trackingOffset = floorOffsetObject == null ? null : floorOffsetObject.transform;
+            if (trackingOffset == null || trackingOffset == origin || !trackingOffset.IsChildOf(origin) ||
+                !xrOrigin.Camera.transform.IsChildOf(trackingOffset)) return false;
+
+            if (eyeHeightOffset == null)
+            {
+                // Keep XROrigin's floor offset separate so tracking-origin updates and
+                // teleportation do not overwrite the participant's visual calibration.
+                eyeHeightOffset = new GameObject("Review Eye Height Offset").transform;
+                eyeHeightOffset.SetParent(trackingOffset.parent, false);
+                eyeHeightOffset.SetSiblingIndex(trackingOffset.GetSiblingIndex());
+                trackingOffset.SetParent(eyeHeightOffset, false);
+            }
+
+            var shift = DesiredEyeHeight - xrOrigin.CameraInOriginSpaceHeight;
+            eyeHeightOffset.position += origin.TransformVector(Vector3.up * shift);
+            if (origin.TryGetComponent<CharacterController>(out var controller))
+            {
+                // Use the same under-camera capsule convention as XRI's movement manipulator.
+                var head = xrOrigin.CameraInOriginSpacePos;
+                controller.height = Mathf.Max(head.y, 2f * controller.radius);
+                controller.center = new Vector3(head.x, controller.height * .5f + controller.skinWidth, head.z);
+            }
+            if (teleportationProvider is KitchenTeleportationProvider provider) provider.CancelPending();
+            Physics.SyncTransforms();
+            return true;
         }
         private void CompleteSetup()
         {

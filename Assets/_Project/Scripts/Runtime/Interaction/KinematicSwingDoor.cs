@@ -26,12 +26,14 @@ namespace XRApartment.Runtime
 
         private XRSimpleInteractable interactable;
         private bool openTarget;
+        private bool observeRequestedOpening;
         private double progress; // 0 closed .. 1 open
         private HeldPropSweep sweep;
         private HeldPropSweep handleSweep;
 
         public bool IsOpen => openTarget;
         public double Progress => progress;
+        internal Collider OpeningBlocker { get; private set; }
 
         private void Awake()
         {
@@ -65,12 +67,15 @@ namespace XRApartment.Runtime
         {
             // Target flips immediately; Update eases progress toward it, so re-grabbing
             // mid-swing simply reverses direction instead of snapping.
+            if (openTarget != open) OpeningBlocker = null;
             openTarget = open;
+            observeRequestedOpening = open;
         }
 
         public void SetOpenImmediate(bool open)
         {
             openTarget = open;
+            observeRequestedOpening = false;
             progress = open ? 1.0 : 0.0;
             Apply();
         }
@@ -82,14 +87,15 @@ namespace XRApartment.Runtime
 
             var delta = openDurationSeconds <= 0f ? 1.0 : Time.deltaTime / openDurationSeconds;
             progress = MotionKinematics.StepToward(progress, target, delta);
-            Apply();
+            Apply(observeOpening: observeRequestedOpening);
         }
 
-        private void Apply()
+        private void Apply(bool observeOpening = false)
         {
+            OpeningBlocker = null;
             var angle = (float)MotionKinematics.SwingAngle(progress, openAngleDegrees, swingSign);
             var rotation = Quaternion.Euler(0f, angle, 0f);
-            if (sweep == null) { transform.localRotation = rotation; return; }
+            if (sweep == null || !gameObject.activeInHierarchy) { transform.localRotation = rotation; return; }
             var parentRotation = transform.parent == null ? Quaternion.identity : transform.parent.rotation;
             // A thin door close to its frame needs finer angular coverage than
             // a held pot. Subdivide the same conservative sweep, never skip it.
@@ -98,27 +104,37 @@ namespace XRApartment.Runtime
             var skin = collisionProfile.Length("grab_contact_skin");
             var iterations = Mathf.Max(collisionProfile.GrabRotationIterations,
                 Mathf.CeilToInt(openAngleDegrees / step) + 1);
-            var accepted = SweepRotation(sweep, start, parentRotation * rotation, skin, step, iterations);
+            var accepted = SweepRotation(sweep, start, parentRotation * rotation, skin, step, iterations,
+                out var panelBlocker);
             // The pull projects from the far end of the leaf, not from the hinge.
+            Collider handleBlocker = null;
             if (handleSweep != null)
-                accepted = SweepRotation(handleSweep, start, accepted, skin, step, iterations);
+                accepted = SweepRotation(handleSweep, start, accepted, skin, step, iterations, out handleBlocker);
             transform.rotation = accepted;
+            var acceptedAngle = Mathf.DeltaAngle(0, transform.localEulerAngles.y);
+            if (observeOpening && Mathf.Abs(Mathf.DeltaAngle(acceptedAngle, angle)) > .0001f &&
+                !sweep.QuerySaturated && (handleSweep == null || !handleSweep.QuerySaturated))
+                OpeningBlocker = handleBlocker ?? panelBlocker;
             // Keep the timeline when unobstructed. Feeding an eased angle back
             // as linear time would ease twice and stall the door near closed.
             if (Quaternion.Angle(transform.rotation, parentRotation * rotation) > .01f)
             {
-                var acceptedAngle = Mathf.DeltaAngle(0, transform.localEulerAngles.y);
                 progress = MotionKinematics.InverseSmoothStep(acceptedAngle / (openAngleDegrees * swingSign));
             }
         }
 
         private static Quaternion SweepRotation(HeldPropSweep probe, Pose start, Quaternion rotation,
-            float skin, float step, int iterations)
+            float skin, float step, int iterations, out Collider blocker)
         {
             var accepted = probe.Resolve(start, new Pose(start.position, rotation), null, skin, step, iterations);
             // A door has a fixed hinge; overlap recovery must not translate it.
-            return (accepted.position - start.position).sqrMagnitude < .000001f
-                ? accepted.rotation : start.rotation;
+            if ((accepted.position - start.position).sqrMagnitude < .000001f)
+            {
+                blocker = probe.RotationBlocker;
+                return accepted.rotation;
+            }
+            blocker = probe.RecoveryBlocker;
+            return start.rotation;
         }
     }
 }

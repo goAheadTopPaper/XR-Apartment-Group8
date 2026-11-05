@@ -445,9 +445,24 @@ namespace XRApartment.Simulation
         private JourneyResult ObserveSafety(SafetyNotice notice)
         {
             if (notice == null || notice.SessionId != plan.SessionId ||
-                string.IsNullOrWhiteSpace(notice.SafetyEventId))
-                return Reject(JourneyErrorCode.InvalidEvidence, "Safety notice identity is invalid.");
-            if (notice.IsActive) currentSafety = CopySafety(notice);
+                string.IsNullOrWhiteSpace(notice.SafetyEventId) ||
+                !Finite(notice.OccurredAtSessionSeconds) || notice.OccurredAtSessionSeconds < 0f)
+                return Reject(JourneyErrorCode.InvalidEvidence, "Safety notice identity or time is invalid.");
+            if (notice.IsActive)
+            {
+                if (currentSafety?.SafetyEventId == notice.SafetyEventId) return Accept();
+                currentSafety = CopySafety(notice);
+                if (notice.RiskType == "boundary")
+                {
+                    record.totalSeconds = Math.Max(record.totalSeconds, notice.OccurredAtSessionSeconds);
+                    record.comfortOrAbort.Add(new TimedEvent
+                    {
+                        type = "boundary_warning",
+                        combinationId = activeBenchmarkId ?? displayedBenchmarkId,
+                        sessionSeconds = notice.OccurredAtSessionSeconds
+                    });
+                }
+            }
             else if (currentSafety != null && currentSafety.SafetyEventId == notice.SafetyEventId)
                 currentSafety = null;
             return Accept();
@@ -731,6 +746,11 @@ namespace XRApartment.Simulation
             var completed = current == ChallengeStep.TakeOut ? taken.Count
                 : current == ChallengeStep.TemporaryPlacement ? placed.Count
                 : current == ChallengeStep.PutBack ? returned.Count : 0;
+            if (current == ChallengeStep.Reorganise)
+            {
+                total = 1;
+                completed = Math.Min(reorganised.Count, total);
+            }
             return new JourneySnapshot
             {
                 SessionId = plan == null ? null : plan.SessionId,

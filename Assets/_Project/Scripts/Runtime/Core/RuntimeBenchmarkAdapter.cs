@@ -9,6 +9,8 @@ namespace XRApartment.Runtime.Core
     /// <summary>Swaps the benchmark slot while leaving the kitchen, XR rig and UI intact.</summary>
     public sealed class RuntimeBenchmarkAdapter : MonoBehaviour, IReviewScenePort
     {
+        private const float RestClearance = .004f;
+
         [Serializable]
         private sealed class BenchmarkBinding
         {
@@ -22,6 +24,7 @@ namespace XRApartment.Runtime.Core
             public Vector3 Position;
             public Quaternion Rotation;
             public Vector3 Scale;
+            public Bounds? PhysicalBounds;
         }
 
         [SerializeField] private Transform benchmarkSlot;
@@ -42,6 +45,7 @@ namespace XRApartment.Runtime.Core
         public event Action<TaskEvidence> EvidenceObserved;
         public event Action<string> InteractionBlocked;
         public string CurrentBenchmarkId => currentBenchmarkId;
+        internal GameObject CurrentInstance => currentInstance;
 
         private void Awake()
         {
@@ -343,7 +347,6 @@ namespace XRApartment.Runtime.Core
                 return false;
             }
             var step = requestedStep.Value;
-            var items = new List<ItemPose>();
             foreach (var spec in plan.Task.Items)
             {
                 if (!baseline.TryGetValue(spec.ItemId, out var pose) || pose.Identity == null)
@@ -356,7 +359,6 @@ namespace XRApartment.Runtime.Core
                     error = "Release all task items before restoring this step.";
                     return false;
                 }
-                items.Add(pose);
             }
             var access = new List<TaskEvidenceIdentity>();
             foreach (var target in plan.Task.AccessTargets)
@@ -370,35 +372,30 @@ namespace XRApartment.Runtime.Core
                 }
                 access.Add(identity);
             }
-            var destinations = new Dictionary<string, ItemPose>();
-            var existingIndex = 0;
-            var freshIndex = 0;
+            var destinations = new List<ItemPose>();
+            var byZone = new Dictionary<string, List<ItemPose>>(StringComparer.Ordinal);
+            var restoreToStorage = step == ChallengeStep.Close || step == ChallengeStep.Leave;
+            var restoreToCounter = step == ChallengeStep.Reorganise || step == ChallengeStep.PutBack;
             foreach (var spec in plan.Task.Items)
             {
                 var pose = baseline[spec.ItemId];
-                var placement = pose;
-                if (spec.IsExistingItem)
+                if (!restoreToStorage && !(restoreToCounter && spec.IsExistingItem))
                 {
-                    if (step == ChallengeStep.Reorganise || step == ChallengeStep.PutBack)
-                    {
-                        if (!TryZonePose(spec.TemporaryZoneId, pose, existingIndex,
-                            out placement, out error)) return false;
-                    }
-                    else if (step == ChallengeStep.Close || step == ChallengeStep.Leave)
-                    {
-                        if (!TryZonePose(spec.ReturnZoneId, pose, freshIndex++,
-                            out placement, out error)) return false;
-                    }
-                    existingIndex++;
+                    destinations.Add(pose);
+                    continue;
                 }
-                else if (step == ChallengeStep.Close || step == ChallengeStep.Leave)
+                var zoneId = restoreToStorage ? spec.ReturnZoneId : spec.TemporaryZoneId;
+                if (!byZone.TryGetValue(zoneId, out var placements))
                 {
-                    if (!TryZonePose(spec.ReturnZoneId, pose, freshIndex++,
-                        out placement, out error)) return false;
+                    placements = new List<ItemPose>();
+                    byZone.Add(zoneId, placements);
                 }
-                destinations.Add(spec.ItemId, placement);
+                placements.Add(pose);
             }
-            foreach (var pose in destinations.Values) RestorePose(pose);
+            Physics.SyncTransforms();
+            foreach (var zone in byZone)
+                if (!TryPlanZonePlacements(zone.Key, zone.Value, destinations, out error)) return false;
+            foreach (var pose in destinations) RestorePose(pose);
             var shouldOpen = step >= ChallengeStep.TakeOut && step <= ChallengeStep.Close;
             foreach (var identity in access)
             {
@@ -412,27 +409,67 @@ namespace XRApartment.Runtime.Core
             return true;
         }
 
-        private static bool TryZonePose(string zoneId, ItemPose baselinePose, int index,
-            out ItemPose result, out string error)
+        private static bool TryPlanZonePlacements(string zoneId, List<ItemPose> items,
+            List<ItemPose> destinations, out string error)
         {
-            result = null;
             error = null;
             var zone = FindIdentity(zoneId);
-            if (zone == null || zone.Sensor == null)
+            var sensors = new List<Collider>();
+            if (zone != null)
+                foreach (var sensor in zone.GetComponents<Collider>())
+                    if (sensor.enabled && sensor.isTrigger) sensors.Add(sensor);
+            if (sensors.Count == 0)
             {
                 error = "Step recovery zone is missing: " + zoneId;
                 return false;
             }
-            var bounds = zone.Sensor.bounds;
-            var offset = (index % 3 - 1) * Mathf.Min(.07f, bounds.extents.x * .45f);
-            result = new ItemPose
+
+            for (var index = 0; index < items.Count; index++)
             {
-                Identity = baselinePose.Identity,
-                Position = bounds.center + new Vector3(offset, 0f, 0f),
-                Rotation = baselinePose.Rotation,
-                Scale = baselinePose.Scale
-            };
+                var sensorIndex = index % sensors.Count;
+                var slot = index / sensors.Count;
+                var slotCount = (items.Count - 1 - sensorIndex) / sensors.Count + 1;
+                var sensor = sensors[sensorIndex];
+                var volume = sensor.bounds;
+                var source = items[index];
+                var width = volume.size.x / slotCount;
+                var centre = volume.center;
+                centre.x = volume.min.x + width * (slot + .5f);
+                if (!source.PhysicalBounds.HasValue || source.PhysicalBounds.Value.size.x + RestClearance > width ||
+                    source.PhysicalBounds.Value.size.z + RestClearance > volume.size.z ||
+                    !TryFindSupport(centre, volume.min.y, out var supportY))
+                {
+                    error = "No supported recovery position for " + source.Identity.StableId + " in " + zoneId + ".";
+                    return false;
+                }
+
+                var physical = source.PhysicalBounds.Value;
+                centre.y = supportY + physical.extents.y + RestClearance;
+                if (centre.y + physical.extents.y > volume.max.y ||
+                    (sensor.ClosestPoint(centre) - centre).sqrMagnitude > .000001f)
+                {
+                    error = "The recovery position does not fit " + source.Identity.StableId + " in " + zoneId + ".";
+                    return false;
+                }
+                destinations.Add(new ItemPose
+                {
+                    Identity = source.Identity,
+                    Position = source.Position + (centre - physical.center),
+                    Rotation = source.Rotation,
+                    Scale = source.Scale
+                });
+            }
             return true;
+        }
+
+        private static bool TryFindSupport(Vector3 centre, float zoneBottom, out float height)
+        {
+            height = float.NegativeInfinity;
+            foreach (var hit in Physics.RaycastAll(centre, Vector3.down,
+                centre.y - zoneBottom + RestClearance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                if (hit.collider.attachedRigidbody == null && hit.normal.y > .9f)
+                    height = Mathf.Max(height, hit.point.y);
+            return !float.IsNegativeInfinity(height);
         }
 
         private static TaskEvidenceIdentity FindIdentity(string stableId)
@@ -515,12 +552,22 @@ namespace XRApartment.Runtime.Core
 
         private static ItemPose CapturePose(TaskEvidenceIdentity identity)
         {
+            Bounds? physicalBounds = null;
+            if (identity.Grab != null)
+                foreach (var collider in identity.Grab.colliders)
+                    if (collider != null && collider.enabled && !collider.isTrigger)
+                    {
+                        var bounds = physicalBounds ?? collider.bounds;
+                        bounds.Encapsulate(collider.bounds);
+                        physicalBounds = bounds;
+                    }
             return new ItemPose
             {
                 Identity = identity,
                 Position = identity.transform.position,
                 Rotation = identity.transform.rotation,
-                Scale = identity.transform.localScale
+                Scale = identity.transform.localScale,
+                PhysicalBounds = physicalBounds
             };
         }
 
@@ -546,6 +593,7 @@ namespace XRApartment.Runtime.Core
             }
             pose.Identity.transform.SetPositionAndRotation(pose.Position, pose.Rotation);
             pose.Identity.transform.localScale = pose.Scale;
+            if (pose.Identity.Grab != null) pose.Identity.Grab.SetTargetPose(new Pose(pose.Position, pose.Rotation));
         }
 
         private SceneActionResult Failure(JourneyAction action, string message)

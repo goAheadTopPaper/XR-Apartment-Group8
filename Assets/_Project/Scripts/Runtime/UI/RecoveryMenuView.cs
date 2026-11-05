@@ -20,6 +20,8 @@ namespace XRApartment.Runtime.UI
         [SerializeField] private Button replayBenchmark, recenter, retry, skip, safeExit;
         [SerializeField] private Button discomfortReason, blockedReason;
         [SerializeField] private Button confirmExit, cancelExit, close;
+        [SerializeField] private Button useSeatedView, useStandingView;
+        [SerializeField] private TMP_Text postureHint;
         [SerializeField] private Button chooseItem;
         [SerializeField] private TMP_Text selectedItem;
         [SerializeField] private TMP_InputField skipReason;
@@ -31,7 +33,12 @@ namespace XRApartment.Runtime.UI
         private string operationMessage = "";
         private string pendingLabel;
         private IReadOnlyList<string> itemIds;
+        private JourneyWorldSpaceView postureView;
         private int itemIndex;
+
+        public bool IsOpen => open;
+
+        internal void SetPostureView(JourneyWorldSpaceView view) => postureView = view;
 
         private void Awake()
         {
@@ -51,6 +58,8 @@ namespace XRApartment.Runtime.UI
             Wire(confirmExit, ConfirmExit);
             Wire(cancelExit, CancelExit);
             Wire(close, Close);
+            Wire(useSeatedView, () => SelectPosture(true));
+            Wire(useStandingView, () => SelectPosture(false));
             if (skipReason != null) skipReason.onValueChanged.AddListener(_ => RefreshSkipButton());
             toggleAction = new InputAction("Recovery menu", InputActionType.Button);
             toggleAction.AddBinding("<XRController>{RightHand}/secondaryButton");
@@ -145,7 +154,8 @@ namespace XRApartment.Runtime.UI
             if (confirmExit != null) confirmExit.interactable = !ended;
             if (exitConfirmation != null) exitConfirmation.SetActive(exitPending && !ended);
             if (close != null) close.interactable = !paused && !exitPending;
-            Label(status, current.State + (busy ? "  |  Busy: please wait" : ""));
+            RefreshPostureControls();
+            RefreshStatus();
             Label(progress, current.CurrentStep.HasValue
                 ? current.ActiveBenchmarkId + " | Step " + ((int)current.CurrentStep.Value + 1) + "/8 | " +
                   current.CompletedItemCount + "/" + current.TotalItemCount + " items"
@@ -173,12 +183,13 @@ namespace XRApartment.Runtime.UI
         {
             Open();
             exitPending = true;
-            if (exitConfirmation != null) exitConfirmation.SetActive(true);
+            RenderVisibleState();
         }
 
         private void RenderVisibleState()
         {
             if (exitConfirmation != null) exitConfirmation.SetActive(exitPending);
+            RefreshPostureControls();
         }
 
         private void Close()
@@ -197,7 +208,7 @@ namespace XRApartment.Runtime.UI
         private void CancelExit()
         {
             exitPending = false;
-            if (exitConfirmation != null) exitConfirmation.SetActive(false);
+            RenderVisibleState();
         }
 
         private void ConfirmExit()
@@ -245,6 +256,35 @@ namespace XRApartment.Runtime.UI
             if (skipReason != null) skipReason.text = reason;
         }
 
+        private bool PostureAvailable => postureView != null && snapshot != null &&
+            snapshot.State != SessionState.Setup && snapshot.State != SessionState.Finished &&
+            snapshot.State != SessionState.Exited;
+
+        private bool CanSelectPosture => PostureAvailable && !snapshot.IsBusy && !exitPending &&
+            snapshot.CurrentSafety?.IsActive != true;
+
+        private void RefreshPostureControls()
+        {
+            Set(useSeatedView, PostureAvailable, CanSelectPosture);
+            Set(useStandingView, PostureAvailable, CanSelectPosture);
+            if (postureHint != null) postureHint.gameObject.SetActive(PostureAvailable);
+        }
+
+        private void RefreshStatus()
+        {
+            var posture = postureView?.CalibratedPosture;
+            Label(status, snapshot.State + (posture == null ? "" : "  |  " + posture) +
+                (snapshot.IsBusy ? "  |  Busy: please wait" : ""));
+        }
+
+        private void SelectPosture(bool useSeated)
+        {
+            if (!open || !CanSelectPosture) return;
+            operationMessage = postureView.CalibrateReviewPosture(useSeated);
+            Label(operation, operationMessage);
+            RefreshStatus();
+        }
+
         private void Send(JourneyCommandType type)
         {
             if (type == JourneyCommandType.Retry) retryPending = true;
@@ -265,6 +305,8 @@ namespace XRApartment.Runtime.UI
             }
             else if (command.Type == JourneyCommandType.SkipChallenge && skipReason != null)
                 skipReason.text = "";
+            else if (command.Type == JourneyCommandType.Resume && result.Snapshot.Save != SaveStatus.Failed)
+                Close();
         }
 
         private static void Set(Button button, bool visible, bool enabled)

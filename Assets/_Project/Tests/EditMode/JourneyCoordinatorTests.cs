@@ -257,16 +257,25 @@ namespace XRApartment.Tests
                     AssumptionKey = "fridge_clearance", Measurement = 0.2f
                 }));
             Assert.IsFalse(conflict.Snapshot.Conflicts[0].FeedbackRecorded);
-            var safety = core.Submit(Command(JourneyCommandType.SafetyObserved,
-                safety: new SafetyNotice
-                { SafetyEventId = "boundary", SessionId = SessionId, IsActive = true }));
+            var boundary = new SafetyNotice
+            {
+                SafetyEventId = "boundary", SessionId = SessionId, RiskType = "boundary",
+                IsActive = true, OccurredAtSessionSeconds = 20f
+            };
+            var safety = core.Submit(Command(JourneyCommandType.SafetyObserved, safety: boundary));
             Assert.NotNull(safety.Snapshot.CurrentSafety);
             Assert.IsFalse(safety.Snapshot.Conflicts[0].FeedbackRecorded);
+            Assert.IsTrue(core.Submit(Command(JourneyCommandType.SafetyObserved, safety: boundary)).Accepted);
 
             var submitted = core.Submit(Command(JourneyCommandType.SubmitFeedback,
                 feedback: ValidFeedback("B1")));
             Assert.IsTrue(submitted.Snapshot.Conflicts[0].FeedbackRecorded);
             Assert.IsTrue(submitted.Action.Record.conflicts[0].feedbackRecorded);
+            Assert.AreEqual(1, submitted.Action.Record.comfortOrAbort.Count);
+            var safetyEvent = submitted.Action.Record.comfortOrAbort[0];
+            Assert.AreEqual("boundary_warning", safetyEvent.type);
+            Assert.AreEqual("B1", safetyEvent.combinationId);
+            Assert.AreEqual(20f, safetyEvent.sessionSeconds);
             var failed = CompleteSave(core, submitted.Action, false);
             Assert.AreEqual(SessionState.FeedbackPending, failed.Snapshot.State);
             Assert.AreEqual(SaveStatus.Failed, failed.Snapshot.Save);
@@ -337,9 +346,14 @@ namespace XRApartment.Tests
             foreach (var id in new[] { "old-1", "old-2", "old-3" })
                 SubmitEvidence(core, Evidence(core, ChallengeStep.TemporaryPlacement,
                     itemId: id, zoneId: "counter", role: ReviewRole.CounterSurface, released: true));
+            Assert.AreEqual(ChallengeStep.Reorganise, core.Snapshot.CurrentStep);
+            Assert.AreEqual(1, core.Snapshot.TotalItemCount);
+            Assert.AreEqual(0, core.Snapshot.CompletedItemCount);
+            Assert.IsFalse(core.Submit(Command(JourneyCommandType.ConfirmReorganisation)).Accepted);
             SubmitEvidence(core, Evidence(core, ChallengeStep.Reorganise,
                 itemId: "old-1", zoneId: "storage", released: true));
-            core.Submit(Command(JourneyCommandType.ConfirmReorganisation));
+            Assert.AreEqual(1, core.Snapshot.CompletedItemCount);
+            Assert.IsTrue(core.Submit(Command(JourneyCommandType.ConfirmReorganisation)).Accepted);
             Assert.AreEqual(5, core.Snapshot.TotalItemCount);
             SubmitEvidence(core, Evidence(core, ChallengeStep.PutBack,
                 itemId: "old-1", zoneId: "storage", released: true));

@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: 7449685045090408781}
   - component: {fileID: 9110384260132700001}
   - component: {fileID: 1616196166965071928}
+  - component: {fileID: 4609646691955704394}
+  - component: {fileID: 742663849771047931}
   m_Layer: 0
   m_Name: PREF_Core_PlayValidation
   m_TagString: Untagged
@@ -91,8 +93,8 @@ MonoBehaviour:
   feedbackAdapter: {fileID: 3430540248147533412}
   storageAdapter: {fileID: 1616196166965071928}
   viewAdapter: {fileID: 9110384260132700001}
-  conflictSource: {fileID: 0}
-  safetySource: {fileID: 0}
+  conflictSource: {fileID: 4609646691955704394}
+  safetySource: {fileID: 742663849771047931}
   operationTimeoutSeconds: 10
 --- !u!114 &959318340797206689
 MonoBehaviour:
@@ -200,6 +202,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fe899c0b7029ee4cb2d71701528574a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4609646691955704394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753053518246743316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dd7f2b4d4b7e4475b8471e091670427, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  assumptions: {fileID: 11400000, guid: ba118600a64afad4b952bec9baf7e63d, type: 2}
+--- !u!114 &742663849771047931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753053518246743316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b008b4cf81a7749719f7649a02ff43cc, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  warningOverlay: {fileID: 4800000, guid: a02a7d8c237544f1962732b55a9aebf1, type: 3}
+  warnWithinMetres: 0.25
+  clearBeyondMetres: 0.35
 --- !u!1 &867757437601537049
 GameObject:
   m_ObjectHideFlags: 0

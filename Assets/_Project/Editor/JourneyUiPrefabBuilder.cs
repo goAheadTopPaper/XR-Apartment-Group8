@@ -195,7 +195,7 @@ namespace XRApartment.EditorTools
             var hosts = Object.FindObjectsOfType<JourneyRuntimeHost>(true);
             var views = Object.FindObjectsOfType<JourneyWorldSpaceView>(true);
             var origins = Object.FindObjectsOfType<XROrigin>(true);
-            var teleports = Object.FindObjectsOfType<UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation.TeleportationProvider>(true);
+            var teleports = Object.FindObjectsOfType<KitchenTeleportationProvider>(true);
             var grabs = Object.FindObjectsOfType<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>(true);
             if (hosts.Length != 1 || views.Length != 1 || origins.Length != 1 || teleports.Length != 1)
             {
@@ -206,10 +206,18 @@ namespace XRApartment.EditorTools
             foreach (var grab in grabs)
                 if (grab.name == "PREF_Prop_Cup") { cup = grab; break; }
             if (cup == null) { Debug.LogError("Setup/Orientation practice cup is missing."); return; }
+            KitchenTeleportationArea practiceArea = null;
+            foreach (var root in scene.GetRootGameObjects())
+                if (root.name == "PREF_Kitchen_TeleportArea")
+                {
+                    practiceArea = root.GetComponent<KitchenTeleportationArea>();
+                    break;
+                }
+            if (practiceArea == null) { Debug.LogError("Setup/Orientation practice teleport area is missing."); return; }
 
             var view = new SerializedObject(views[0]);
             Set(view, "host", hosts[0]); Set(view, "xrOrigin", origins[0]);
-            Set(view, "teleportationProvider", teleports[0]);
+            WirePracticeTeleport(view, teleports[0], practiceArea);
             Set(view, "practiceGrabTarget", cup);
             view.ApplyModifiedPropertiesWithoutUndo();
             var host = new SerializedObject(hosts[0]);
@@ -217,6 +225,9 @@ namespace XRApartment.EditorTools
             host.ApplyModifiedPropertiesWithoutUndo();
             var canvas = views[0].GetComponent<Canvas>();
             canvas.worldCamera = origins[0].Camera;
+            // SAFE-01 reads physical stage bounds in floor tracking space.
+            origins[0].RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(origins[0]);
             ((RectTransform)views[0].transform).sizeDelta = new Vector2(1200, 800);
             foreach (var legacy in Object.FindObjectsOfType<KitchenMenuController>(true))
             {
@@ -225,6 +236,15 @@ namespace XRApartment.EditorTools
             }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
+        }
+
+        internal static void WirePracticeTeleport(SerializedObject view, KitchenTeleportationProvider provider,
+            KitchenTeleportationArea practiceArea)
+        {
+            Set(view, "teleportationProvider", provider);
+            Set(view, "teleportPracticeArea", practiceArea);
+            practiceArea.teleportationProvider = provider;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(practiceArea);
         }
 
         private static void Set(SerializedObject target, string name, Object value)
