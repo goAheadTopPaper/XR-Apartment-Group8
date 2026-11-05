@@ -191,7 +191,7 @@ namespace XRApartment.Runtime.Core
 
         private static Vector3 SourcePosition(TaskEvidenceIdentity identity)
         {
-            return identity.Body != null ? identity.Body.position : identity.transform.position;
+            return identity.Body != null ? identity.Body.worldCenterOfMass : identity.transform.position;
         }
 
         private void Update()

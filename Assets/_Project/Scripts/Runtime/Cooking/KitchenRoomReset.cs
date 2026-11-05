@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace XRApartment.Runtime
@@ -83,8 +84,14 @@ namespace XRApartment.Runtime
         void ResetRemainder()
         {
             restoreFrame = Time.frameCount + 2;
-            foreach (var grab in grabs) if (grab != null) grab.enabled = false;
+            // Finish an already queued release before restoring the actor's
+            // pose. A disabled interactable will not receive XRI's Late phase.
             foreach (var grab in grabs) if (grab != null) grab.throwOnDetach = false;
+            foreach (var grab in grabs) if (grab != null)
+            {
+                grab.enabled = false;
+                grab.ProcessInteractable(XRInteractionUpdateOrder.UpdatePhase.Late);
+            }
             foreach (var prop in prepared) if (prop != null) prop.ResetProp();
             foreach (var food in ingredients) if (food != null) food.ResetCooking();
             foreach (var egg in eggs) if (egg != null) egg.ResetEgg();

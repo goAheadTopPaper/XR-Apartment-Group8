@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
 
@@ -82,8 +83,15 @@ namespace XRApartment.Runtime
                     if (restoreThrowFrame < 0) resetThrow[i] = grabs[i].throwOnDetach;
                 }
             restoreThrowFrame = Time.frameCount + 2;
-            foreach (var grab in grabs) if (grab != null) grab.enabled = false;
+            // Disabled interactables stop receiving XRI's Late phase. Drain any
+            // pending release while throwing is suppressed, including a release
+            // that occurred earlier in this frame, before restoring the pose.
             foreach (var grab in grabs) if (grab != null) grab.throwOnDetach = false;
+            foreach (var grab in grabs) if (grab != null)
+            {
+                grab.enabled = false;
+                grab.ProcessInteractable(XRInteractionUpdateOrder.UpdatePhase.Late);
+            }
             for (var i = 0; i < bodies.Length; i++)
                 if (bodies[i] != null)
                 {

@@ -164,6 +164,117 @@ namespace XRApartment.Tests
             yield return MoveHeld(right, knife, knife.transform.position + Vector3.up * .16f, upright, 16);
         }
 
+        [UnityTest] public IEnumerator ResetDuringFastHeldMotionLeavesToolsAtRest()
+        {
+            yield return LoadKitchen();
+            var reset = station.GetComponent<KitchenCookingStation>();
+            var targets = new[]
+            {
+                station.GetComponentsInChildren<KitchenFoodVessel>().Single(v => v.name.Contains("FryingPan")).gameObject,
+                station.GetComponentInChildren<KitchenSpatula>().gameObject,
+                scene.GetRootGameObjects().Single(go => go.name.Contains("Cup") && go.GetComponent<LiquidContainer>() != null)
+            };
+            var originalDelta = Time.captureDeltaTime;
+            try
+            {
+                Time.captureDeltaTime = 1f / 90f;
+                foreach (var releaseBeforeReset in new[] { false, true })
+                foreach (var target in targets)
+                {
+                    var rest = target.transform.position;
+                    var body = target.GetComponent<Rigidbody>();
+                    var grab = target.GetComponent<XRGrabInteractable>();
+                    var throws = grab.throwOnDetach;
+                    yield return Pick(left, target);
+                    yield return MoveHeld(left, target, rest + Vector3.up * .4f, target.transform.rotation, 30);
+                    for (var frame = 0; frame < 6; frame++)
+                    {
+                        left.transform.position += Vector3.up * .035f;
+                        yield return null;
+                    }
+                    Assert.IsTrue(grab.isSelected);
+                    if (releaseBeforeReset) Drop(left, target);
+                    reset.ResetStation();
+                    reset.ResetStation();
+                    for (var frame = 0; frame < 12; frame++)
+                    {
+                        yield return null;
+                        yield return new WaitForFixedUpdate();
+                        Assert.That(Vector3.Distance(body.position, rest), Is.LessThan(.075f),
+                            target.name + " moved away from its reset pose.");
+                        Assert.That(body.velocity.magnitude, Is.LessThan(1.5f),
+                            target.name + " retained a throw after reset.");
+                    }
+                    Assert.IsFalse(grab.isSelected);
+                    Assert.AreEqual(throws, grab.throwOnDetach);
+                    yield return Pick(left, target);
+                    yield return MoveHeld(left, target, rest + Vector3.up * .4f, target.transform.rotation, 30);
+                    for (var frame = 0; frame < 6; frame++)
+                    {
+                        left.transform.position += Vector3.up * .035f;
+                        yield return null;
+                    }
+                    Drop(left, target);
+                    yield return null;
+                    yield return new WaitForFixedUpdate();
+                    if (throws)
+                        Assert.That(body.velocity.y, Is.GreaterThan(.3f),
+                            target.name + " must retain normal throwing after reset.");
+                    reset.ResetStation();
+                    yield return null;
+                    yield return null;
+                    yield return null;
+                }
+            }
+            finally { Time.captureDeltaTime = originalDelta; }
+        }
+
+        [UnityTest] public IEnumerator CounterCutDoesNotLaunchPiecesAndRoomResetClearsDetachedFood()
+        {
+            yield return LoadKitchen();
+            var tomato = station.GetComponentsInChildren<CookableIngredient>()
+                .Single(food => food.IngredientKind == KitchenIngredientKind.Tomato).GetComponent<PreparedKitchenProp>();
+            var board = station.transform.Find("PREF_Cooking_ChoppingBoard");
+            var surface = board.GetComponent<Collider>();
+            var body = tomato.GetComponent<Rigidbody>();
+            var centre = surface.bounds.center;
+            tomato.transform.SetPositionAndRotation(
+                new Vector3(centre.x, surface.bounds.max.y + .055f, centre.z) - body.centerOfMass,
+                Quaternion.identity);
+            body.position = tomato.transform.position;
+            body.velocity = body.angularVelocity = Vector3.zero;
+            Physics.SyncTransforms();
+            yield return Frames(40);
+            var knife = station.GetComponentInChildren<PreparedKitchenKnife>().GetComponentInParent<XRGrabInteractable>().gameObject;
+            yield return Pick(right, knife);
+            yield return CutWithKnife(knife, tomato);
+            var peakSpeed = 0f;
+            for (var frame = 0; frame < 100; frame++)
+            {
+                yield return null;
+                yield return new WaitForFixedUpdate();
+                foreach (var piece in tomato.Pieces)
+                {
+                    peakSpeed = Mathf.Max(peakSpeed, piece.velocity.magnitude);
+                    Assert.That(Vector3.Distance(piece.worldCenterOfMass, centre), Is.LessThan(.65f),
+                        piece.name + " escaped the chopping area after a cut.");
+                    Assert.That(piece.velocity.magnitude, Is.LessThan(2f),
+                        piece.name + " was launched by a normal cut.");
+                }
+            }
+            Debug.Log("CUT_STABILITY peak=" + peakSpeed);
+            station.GetComponent<KitchenCookingStation>().ResetStation();
+            yield return null;
+            yield return null;
+            yield return null;
+            Assert.IsFalse(tomato.IsSplit);
+            foreach (var piece in tomato.Pieces)
+            {
+                Assert.IsFalse(piece.gameObject.activeInHierarchy);
+                Assert.IsTrue(piece.isKinematic);
+            }
+        }
+
         [UnityTest] public IEnumerator ClosedFridgeBlocksSelectionAndOpenDoorAllowsRetrieval()
         {
             yield return LoadKitchen(); var fridge = station.GetComponentInChildren<KitchenFridge>();

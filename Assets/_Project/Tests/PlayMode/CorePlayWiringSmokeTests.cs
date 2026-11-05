@@ -365,6 +365,84 @@ public class CorePlayWiringSmokeTests
     }
 
     [UnityTest]
+    public IEnumerator UnheldSourceFoodAndImmediateStepRestoreDoNotAdvanceTheTask()
+    {
+        SceneManager.LoadScene("SCN_Kitchen_Review");
+        yield return null;
+        var host = Object.FindObjectOfType<JourneyRuntimeHost>();
+        Assert.IsTrue(host.Submit(new JourneyCommand
+        { Type = JourneyCommandType.CompleteSetup, PrerequisitesMet = true }).Accepted);
+        Assert.IsTrue(host.Submit(new JourneyCommand
+        { Type = JourneyCommandType.AcknowledgeOrientation, PrerequisitesMet = true }).Accepted);
+        var manager = Object.FindObjectOfType<UnityEngine.XR.Interaction.Toolkit.XRInteractionManager>();
+        var originalDelta = Time.captureDeltaTime;
+        try
+        {
+            Time.captureDeltaTime = 1f / 90f;
+            foreach (var benchmark in new[] { "B1", "B2" })
+            {
+                MoveHead(-3f, 1.08f);
+                Assert.IsTrue(host.Submit(new JourneyCommand
+                { Type = JourneyCommandType.StartChallenge, BenchmarkId = benchmark }).Accepted);
+                MoveHead(-1.90f, 1.05f);
+                yield return null;
+                Identity("ACCESS_FridgeDoor").GetComponent<KinematicSwingDoor>().SetOpenImmediate(true);
+                yield return null;
+                Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
+                for (var frame = 0; frame < 30; frame++)
+                {
+                    yield return null;
+                    yield return new WaitForFixedUpdate();
+                    Assert.AreEqual(0, host.Core.Snapshot.CompletedItemCount,
+                        benchmark + " resting food must stay in its source zone without a grab.");
+                }
+                var item = Identity("ITEM_Tomato");
+                var hand = CreateTestInteractor(manager, item.transform.position);
+                item.Body.useGravity = false;
+                try
+                {
+                    yield return null;
+                    hand.StartManualInteraction((IXRSelectInteractable)item.Grab);
+                    Assert.IsTrue(item.Grab.isSelected);
+                    for (var frame = 0; frame < 12; frame++)
+                    {
+                        hand.transform.position += Vector3.back * .035f;
+                        yield return null;
+                    }
+                    hand.EndManualInteraction();
+                    var run = host.Core.Snapshot.ActiveRunId;
+                    Assert.IsTrue(host.Submit(new JourneyCommand
+                    { Type = JourneyCommandType.RestoreCurrentStep }).Accepted);
+                    var restored = item.transform.position;
+                    for (var frame = 0; frame < 8; frame++)
+                    {
+                        yield return null;
+                        yield return new WaitForFixedUpdate();
+                        Assert.That(Vector3.Distance(item.transform.position, restored), Is.LessThan(.02f),
+                            benchmark + " step restoration replayed an old throw.");
+                        Assert.That(item.Body.velocity.magnitude, Is.LessThan(.1f));
+                    }
+                    Assert.AreEqual(run, host.Core.Snapshot.ActiveRunId);
+                    Assert.AreEqual(ChallengeStep.TakeOut, host.Core.Snapshot.CurrentStep);
+                    Assert.AreEqual(0, host.Core.Snapshot.CompletedItemCount);
+                }
+                finally
+                {
+                    if (hand.hasSelection) hand.EndManualInteraction();
+                    Object.Destroy(hand.gameObject);
+                    item.Body.useGravity = true;
+                }
+                Assert.IsTrue(host.Submit(new JourneyCommand
+                { Type = JourneyCommandType.SkipChallenge, Reason = "Release timing regression" }).Accepted);
+                Assert.IsTrue(host.SubmitFeedback(new FeedbackDraft
+                { SkipReason = "Release timing regression" }).Accepted);
+                yield return null;
+            }
+        }
+        finally { Time.captureDeltaTime = originalDelta; }
+    }
+
+    [UnityTest]
     public IEnumerator SeatedControllerRayCanTakeOutAndReturnAFridgeItemInBothBenchmarks()
     {
         SceneManager.LoadScene("SCN_Kitchen_Review");
