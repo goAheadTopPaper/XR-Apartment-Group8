@@ -219,7 +219,9 @@ namespace XRApartment.Runtime
             var ingredient = NeededIngredient(beefRecipe, tomatoStep, beefStep);
             var blocker = recentFridgeBlocker;
             var blockedForRecipe = ingredient != null && blocker != null;
-            var recovery = blocker == null ? null : "Check the swing path before opening the door again.";
+            var recovery = blocker == null ? null : blocker.GetComponentInParent<KitchenLayoutLab>() != null
+                ? "Try compact fridge in Layout Lab (right B / F9)."
+                : "Check the swing path before opening the door again.";
             const string blockedAction = "The fridge door is blocked.";
             var action = beefRecipe ? BeefHints[step] : Hints[step];
             if (beefRecipe && ingredient != null) action = "Take " + ingredient + " from the fridge.";

@@ -180,6 +180,37 @@ namespace XRApartment.Tests
             Assert.IsFalse(tomato.GetComponent<KitchenStoredIngredient>().WasRetrieved);
         }
 
+        [UnityTest] public IEnumerator ChangingFridgeModelRebindsRecipeAndStock()
+        {
+            yield return LoadKitchen();
+            var lab = scene.GetRootGameObjects().Select(root => root.GetComponent<KitchenLayoutLab>()).Single(item => item != null);
+            var workbench = station.GetComponent<KitchenCookingStation>();
+            var recipe = station.GetComponent<KitchenRecipeController>().Recipe;
+            var tomato = station.GetComponentsInChildren<CookableIngredient>().Single(food => food.IngredientKind == KitchenIngredientKind.Tomato);
+            var grab = tomato.GetComponent<XRGrabInteractable>(); grab.interactionManager = manager;
+            var oldFridge = workbench.ActiveFridge;
+            Assert.IsTrue(lab.TrySelectFridge(true, out var status), status);
+            yield return Frames(32);
+            var compact = workbench.ActiveFridge;
+            Assert.AreNotSame(oldFridge, compact);
+            foreach (var stock in station.GetComponentsInChildren<KitchenStoredIngredient>()) AssertOnKitchenSupport(stock.transform);
+            Assert.AreEqual(TomatoEggStep.OpenFridge, recipe.Step);
+            Assert.IsFalse(manager.IsSelectPossible(left, grab), "The compact door must guard the same stock.");
+            yield return ToggleDoor(compact);
+            Assert.IsTrue(compact.Accessible);
+            Assert.AreEqual(TomatoEggStep.TakeTomato, recipe.Step);
+            yield return Retrieve(left, tomato.gameObject, compact);
+            Assert.AreEqual(TomatoEggStep.SliceTomato, recipe.Step);
+
+            workbench.ResetStation();
+            yield return Frames(10);
+            Assert.AreSame(compact, workbench.ActiveFridge);
+            Assert.IsTrue(compact.Contains(tomato.transform.position));
+            Assert.IsFalse(grab.isSelected);
+            Assert.IsFalse(manager.IsSelectPossible(left, grab));
+            Assert.AreEqual(TomatoEggStep.OpenFridge, recipe.Step);
+        }
+
         [UnityTest] public IEnumerator CookingRoomSupportsCookwareAndGasFlameFollowsSwitch()
         {
             yield return LoadKitchen();

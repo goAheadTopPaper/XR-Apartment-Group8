@@ -15,12 +15,13 @@ namespace XRApartment.Runtime.UI
         [SerializeField] TMP_Text current, instructions;
         [SerializeField] Button teleport, smooth, close;
         [SerializeField] Button enterReview;
+        [SerializeField] KitchenLayoutMenu layout;
         [SerializeField] Image blink;
         [SerializeField, Min(.1f)] float headDistance = .8f;
         [SerializeField, Min(.02f)] float blinkSeconds = .12f;
-        InputAction toggle;
+        InputAction toggle, layoutToggle;
         float blinkRemaining;
-        public bool IsOpen => panel != null && panel.activeSelf;
+        public bool IsOpen => panel.activeSelf || (layout != null && layout.gameObject.activeSelf);
         const string CookingScene = "SCN_Kitchen_Cooking";
         const string ReviewScene = "SCN_Kitchen_Review";
 
@@ -41,6 +42,14 @@ namespace XRApartment.Runtime.UI
             toggle.AddBinding("<Keyboard>/f8");
             toggle.performed += OnToggle;
             panel.SetActive(false);
+            if (layout != null)
+            {
+                layoutToggle = new InputAction("Layout experiments", InputActionType.Button);
+                layoutToggle.AddBinding("<XRController>{RightHand}/secondaryButton");
+                layoutToggle.AddBinding("<Keyboard>/f9");
+                layoutToggle.performed += OnLayoutToggle;
+                layout.gameObject.SetActive(false);
+            }
             if (blink != null) blink.gameObject.SetActive(false);
         }
 
@@ -49,12 +58,14 @@ namespace XRApartment.Runtime.UI
             settings.Changed += Refresh;
             settings.TeleportProvider.locomotionStarted += OnTeleport;
             toggle.Enable();
+            layoutToggle?.Enable();
             Refresh();
         }
 
         void OnDisable()
         {
             toggle.Disable();
+            layoutToggle?.Disable();
             settings.Changed -= Refresh;
             settings.TeleportProvider.locomotionStarted -= OnTeleport;
             Close();
@@ -66,6 +77,11 @@ namespace XRApartment.Runtime.UI
         {
             toggle.performed -= OnToggle;
             toggle.Dispose();
+            if (layoutToggle != null)
+            {
+                layoutToggle.performed -= OnLayoutToggle;
+                layoutToggle.Dispose();
+            }
             teleport.onClick.RemoveListener(ChooseTeleport);
             smooth.onClick.RemoveListener(ChooseSmooth);
             close.onClick.RemoveListener(Close);
@@ -75,6 +91,17 @@ namespace XRApartment.Runtime.UI
         void ChooseTeleport() => settings.SelectTeleport();
         void ChooseSmooth() => settings.SelectSmooth();
         void OnToggle(InputAction.CallbackContext _) { if (IsOpen) Close(); else Open(); }
+        void OnLayoutToggle(InputAction.CallbackContext _)
+        {
+            if (layout.gameObject.activeSelf) Close();
+            else
+            {
+                panel.SetActive(false);
+                PlaceInView(layout.transform);
+                layout.gameObject.SetActive(true);
+                settings.SetMenuOpen(true);
+            }
+        }
 
         void EnterReview()
         {
@@ -86,10 +113,8 @@ namespace XRApartment.Runtime.UI
 
         public void Open()
         {
-            var camera = settings.Origin.Camera.transform;
-            var forward = Vector3.ProjectOnPlane(camera.forward, Vector3.up).normalized;
-            if (forward.sqrMagnitude < .01f) forward = Vector3.forward;
-            panel.transform.SetPositionAndRotation(camera.position + forward * headDistance, Quaternion.LookRotation(forward));
+            if (layout != null) layout.gameObject.SetActive(false);
+            PlaceInView(panel.transform);
             panel.SetActive(true);
             settings.SetMenuOpen(true);
             Refresh();
@@ -98,7 +123,16 @@ namespace XRApartment.Runtime.UI
         public void Close()
         {
             panel.SetActive(false);
+            if (layout != null) layout.gameObject.SetActive(false);
             settings.SetMenuOpen(false);
+        }
+
+        void PlaceInView(Transform target)
+        {
+            var camera = settings.Origin.Camera.transform;
+            var forward = Vector3.ProjectOnPlane(camera.forward, Vector3.up).normalized;
+            if (forward.sqrMagnitude < .01f) forward = Vector3.forward;
+            target.SetPositionAndRotation(camera.position + forward * headDistance, Quaternion.LookRotation(forward));
         }
 
         void Refresh()
@@ -109,6 +143,7 @@ namespace XRApartment.Runtime.UI
             instructions.text = continuous
                 ? "Left stick: walk where you look.\nRight stick: snap turn / teleport."
                 : "Push either stick forward to aim.\nRelease to teleport. Right stick: snap turn.";
+            if (layout != null) instructions.text += "\nLayout lab: Right B / F9";
             teleport.interactable = continuous;
             smooth.interactable = !continuous;
         }

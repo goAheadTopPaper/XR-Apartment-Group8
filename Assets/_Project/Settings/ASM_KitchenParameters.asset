@@ -866,6 +866,60 @@ MonoBehaviour:
     owner: D/E
     status: Prototype assumption
     verification: Unity prototype geometry; client validation pending.
+  - key: layout_forward_fridge_z
+    valueMetres: 1.82
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_pantry_x
+    valueMetres: -1.73
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_pantry_z
+    valueMetres: 1.15
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_pantry_width
+    valueMetres: 0.25
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_pantry_height
+    valueMetres: 1.82
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_pantry_depth
+    valueMetres: 0.26
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_compact_fridge_width
+    valueMetres: 0.61200005
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_compact_fridge_height
+    valueMetres: 1.5385
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_compact_fridge_closed_depth
+    valueMetres: 0.68170005
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
   - key: cooking_beef_stock_width
     valueMetres: 0.144
     source: Optional cooking sandbox authored asset geometry; not a client dimension.

@@ -294,6 +294,7 @@ namespace XRApartment.EditorTools
                 var slices = tomato.transform.Find("DerivedPieces").Cast<Transform>().Select(t => t.GetComponent<PreparedKitchenProp>()).ToArray();
                 flow.Configure(profile, fridge, tomato, slices, eggs, bowl, pan, stove);
                 var station = root.AddComponent<KitchenCookingStation>(); station.Configure(targets.ToArray(), reset, bowl, pan, stove, null); station.ConfigureRecipe(flow, fridge);
+                EnsureCompactFridge(root);
                 ConfigureBeefOnionWorkbench(root);
                 ConfigureRecipeGuides(root);
                 PrefabUtility.SaveAsPrefabAsset(root, StationPath);

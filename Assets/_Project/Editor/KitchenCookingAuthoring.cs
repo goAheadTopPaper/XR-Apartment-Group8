@@ -77,6 +77,7 @@ namespace XRApartment.EditorTools
             recipeRig.transform.SetPositionAndRotation(new Vector3(-3.15f, 0, 1.12f), Quaternion.identity);
             PrefabUtility.RecordPrefabInstancePropertyModifications(recipeRig.transform);
             ConfigureCookingRoom(cookingScene);
+            ConfigureLayoutLab(cookingScene);
             KitchenAuthoring.SaveScene(cookingScene);
             AssetDatabase.SaveAssets();
             Debug.Log("COOKING_AUTHORING_READY " + ScenePath);
