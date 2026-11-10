@@ -1,3 +1,4 @@
+using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
@@ -58,6 +59,11 @@ namespace XRApartment.Runtime
             ghostHide = profile.Length("hand_ghost_hide_distance");
             teleportDistance = profile.Length("hand_teleport_reset_distance");
             solidRenderers = solidRoot.GetComponentsInChildren<Renderer>(true);
+            // Sample the space occupied by the player when a rendered hand reaches across a wall.
+            var camera = GetComponentInParent<XROrigin>()?.Camera;
+            if (camera != null)
+                foreach (var renderer in solidRenderers)
+                    if (renderer.probeAnchor == null) renderer.probeAnchor = camera.transform;
             ghostRenderers = ghostRoot.GetComponentsInChildren<Renderer>(true);
             properties = new MaterialPropertyBlock();
             solver = new KinematicPalmSolver(contactProbe, rigRoot, profile.ContactLayers);

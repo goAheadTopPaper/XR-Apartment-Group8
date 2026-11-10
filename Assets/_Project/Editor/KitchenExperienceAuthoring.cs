@@ -46,7 +46,7 @@ namespace XRApartment.EditorTools
                     .Select(cue => KitchenAuthoring.LoadRequired<AudioClip>(Art + "SFX_" + cue + ".wav")).ToArray());
             });
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Kitchen_Environment.prefab", ConfigureRoomEnvelope);
-            KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Lighting_KitchenDaylight.prefab", ConfigureFloorProbes);
+            KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Lighting_KitchenDaylight.prefab", ConfigureDaylightLighting);
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Fridge_F2.prefab",
                 root => ConfigurePull(root, "Handle"));
             KitchenAuthoring.EditPrefab(RecipePrefabs + "PREF_Cooking_Fridge.prefab",
@@ -147,7 +147,7 @@ namespace XRApartment.EditorTools
             }
         }
 
-        static void ConfigureFloorProbes(GameObject root)
+        static void ConfigureDaylightLighting(GameObject root)
         {
             var group = root.GetComponentInChildren<LightProbeGroup>();
             var positions = new List<Vector3>(group.probePositions);
@@ -161,7 +161,31 @@ namespace XRApartment.EditorTools
                     foreach (var z in new[] { -.32f, -1.45f, -2.6f, -3.75f, -4.9f, -6.1f, -7.3f })
                         positions.Add(group.transform.InverseTransformPoint(new Vector3(x, y, z)));
             }
+            // The passage and its return to the kitchen extend beyond the original probe volume.
+            foreach (var y in new[] { .10f, 1.05f, 1.65f, 2.35f })
+                foreach (var x in new[] { -.75f, -.36f, .01f })
+                    foreach (var z in new[] { -7.60f, -6.65f, -5.75f, -4.70f, -3.65f, -2.60f,
+                        -1.55f, -.55f, .35f, 1.30f, 2.16f })
+                        positions.Add(group.transform.InverseTransformPoint(new Vector3(x, y, z)));
             group.probePositions = positions.Distinct().ToArray();
+
+            PassageFill("Entry passage fill", -4.85f, .9f);
+            PassageFill("Kitchen passage fill", .4f, .75f);
+
+            void PassageFill(string name, float z, float intensity)
+            {
+                var lamp = root.transform.Find(name) ?? Child(root.transform, name);
+                lamp.localPosition = new Vector3(-.37f, 2.52f, z);
+                lamp.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                var light = GetOrAdd<Light>(lamp.gameObject);
+                light.type = LightType.Rectangle;
+                light.lightmapBakeType = LightmapBakeType.Baked;
+                light.areaSize = new Vector2(.64f, 3.4f);
+                light.intensity = intensity;
+                light.range = 4.6f;
+                light.color = new Color(.94f, .97f, 1f);
+                light.shadows = LightShadows.Soft;
+            }
         }
 
         static void ConfigureCookingFill(Scene scene)

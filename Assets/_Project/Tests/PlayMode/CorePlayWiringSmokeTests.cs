@@ -14,6 +14,7 @@ using Unity.XR.CoreUtils;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR.Interaction.Toolkit.Attachment;
 using UnityEngine.XR.Interaction.Toolkit.Filtering;
+using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
@@ -107,6 +108,40 @@ public class CorePlayWiringSmokeTests
             Assert.That(Vector3.Distance(player.position, safePosition), Is.LessThan(.05f), name);
             var envelope = Object.FindObjectOfType<KitchenRoomBounds>();
             Assert.AreEqual(5, envelope.GetComponentsInChildren<BoxCollider>().Length);
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator HandsKeepIndirectLightInTheEntryPassage()
+    {
+        var directions = new[] { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
+        var samples = new Color[directions.Length];
+        foreach (var scene in new[] { "SCN_Kitchen_Cooking", "SCN_Kitchen_Review" })
+        {
+            SceneManager.LoadScene(scene);
+            yield return null;
+            var origin = Object.FindObjectOfType<XROrigin>();
+            // The fixture supplies poses without a tracked controller device.
+            origin.GetComponentInChildren<XRInputModalityManager>(true).enabled = false;
+            var hands = origin.GetComponentsInChildren<ControllerHandPresentation>(true);
+            Assert.AreEqual(2, hands.Length);
+            foreach (var hand in hands)
+            {
+                for (var node = hand.transform; node != origin.transform; node = node.parent)
+                    node.gameObject.SetActive(true);
+                var renderer = hand.transform.Find("Solid Palm").GetComponentInChildren<SkinnedMeshRenderer>();
+                Assert.AreSame(origin.Camera.transform, renderer.probeAnchor, scene + " " + hand.name);
+            }
+
+            foreach (var y in new[] { 1.2f, 1.65f })
+                foreach (var z in new[] { -6.55f, -4.70f, -2.70f, -.70f, 1.80f })
+                {
+                    var point = new Vector3(-.42f, y, z);
+                    LightProbes.GetInterpolatedProbe(point, null, out SphericalHarmonicsL2 light);
+                    light.Evaluate(directions, samples);
+                    Assert.That(samples.Average(colour => colour.grayscale), Is.GreaterThan(.08f),
+                        scene + " has a dark gap at " + point.ToString("F2"));
+                }
         }
     }
 
