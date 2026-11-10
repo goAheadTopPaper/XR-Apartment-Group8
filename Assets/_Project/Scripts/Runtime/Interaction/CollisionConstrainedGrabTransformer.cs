@@ -1,5 +1,6 @@
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Transformers;
@@ -21,6 +22,9 @@ namespace XRApartment.Runtime
         bool restoreThrow;
         bool previousThrow;
         float skin;
+        Rigidbody body;
+        Transform lightSample;
+        bool searchedLightRenderers;
 
         public bool IsBlocked { get; private set; }
         public bool QuerySaturated => sweep != null && sweep.QuerySaturated;
@@ -31,6 +35,7 @@ namespace XRApartment.Runtime
         public override void OnLink(XRGrabInteractable grabInteractable)
         {
             base.OnLink(grabInteractable);
+            body = grabInteractable.GetComponent<Rigidbody>();
             sweep = new HeldPropSweep(sweepProbe, transform, profile.ContactLayers);
             skin = profile.Length("grab_contact_skin");
         }
@@ -79,7 +84,6 @@ namespace XRApartment.Runtime
             previousThrow = grabInteractable.throwOnDetach;
             restoreThrow = true;
             grabInteractable.throwOnDetach = false;
-            var body = grabInteractable.GetComponent<Rigidbody>();
             if (!body.isKinematic)
             {
                 body.velocity = Vector3.zero;
@@ -91,6 +95,32 @@ namespace XRApartment.Runtime
         {
             RestoreThrow(grabInteractable);
             base.OnUnlink(grabInteractable);
+        }
+
+        void LateUpdate()
+        {
+            if (body == null || !KitchenRoomBounds.TryGet(gameObject.scene, out var room)) return;
+            var centre = body.worldCenterOfMass;
+            // A thin prop can rest close enough to the floor that its sample falls inside the bake's shadow bias.
+            var sampleHeight = room.FloorHeight + .14f;
+            if (!searchedLightRenderers && centre.y < sampleHeight)
+            {
+                searchedLightRenderers = true;
+                foreach (var renderer in GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    if (renderer.probeAnchor != null || renderer.lightProbeUsage != LightProbeUsage.BlendProbes ||
+                        renderer.GetComponentInParent<Rigidbody>(true) != body) continue;
+                    if (lightSample == null)
+                    {
+                        lightSample = new GameObject("Prop light sample").transform;
+                        lightSample.SetParent(transform, false);
+                    }
+                    renderer.probeAnchor = lightSample;
+                }
+            }
+            if (lightSample == null) return;
+            centre.y = Mathf.Max(centre.y, sampleHeight);
+            if (lightSample.position != centre) lightSample.position = centre;
         }
 
         void RestoreThrow(XRGrabInteractable grabInteractable)

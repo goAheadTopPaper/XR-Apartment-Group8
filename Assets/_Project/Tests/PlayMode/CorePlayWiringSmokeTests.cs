@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -72,6 +73,41 @@ public class CorePlayWiringSmokeTests
         reviewMenu.Open();
         Assert.IsFalse(reviewMenu.transform.Find("Panel/EnterReview").gameObject.activeInHierarchy);
         reviewMenu.Close();
+    }
+
+    [UnityTest]
+    public IEnumerator LowProbesLightTheFloorAndVirtualRigRecoversInsideTheRoom()
+    {
+        foreach (var name in new[] { "SCN_Kitchen_Cooking", "SCN_Kitchen_Review" })
+        {
+            SceneManager.LoadScene(name);
+            yield return null;
+            yield return null;
+            var light = new Color[1];
+            var prop = GameObject.Find(name == "SCN_Kitchen_Cooking" ? "PREF_Cooking_FryingPan" : "PREF_Prop_Pot");
+            Assert.IsNotNull(prop);
+            var body = prop.GetComponent<Rigidbody>();
+            body.position = new Vector3(-3.95f, .19f, 1.2f);
+            body.rotation = Quaternion.identity;
+            body.velocity = body.angularVelocity = Vector3.zero;
+            Physics.SyncTransforms();
+            yield return new WaitForSeconds(.55f);
+            Assert.That(body.worldCenterOfMass.y, Is.LessThan(.12f), name + " prop must reach the floor.");
+            var renderer = prop.GetComponentsInChildren<MeshRenderer>().FirstOrDefault(item => item.probeAnchor != null);
+            Assert.IsNotNull(renderer, name + " prop must sample indirect light above the floor.");
+            LightProbes.GetInterpolatedProbe(renderer.probeAnchor.position, renderer, out SphericalHarmonicsL2 probe);
+            probe.Evaluate(new[] { Vector3.up }, light);
+            Assert.That(light[0].grayscale, Is.GreaterThan(.025f), name + " dropped prop lacks indirect light.");
+            var settings = Object.FindObjectOfType<KitchenLocomotionSettings>();
+            var player = settings.Origin.Origin.transform;
+            var safePosition = player.position;
+            player.position += Vector3.down * 2f;
+            yield return null;
+            yield return null;
+            Assert.That(Vector3.Distance(player.position, safePosition), Is.LessThan(.05f), name);
+            var envelope = Object.FindObjectOfType<KitchenRoomBounds>();
+            Assert.AreEqual(5, envelope.GetComponentsInChildren<BoxCollider>().Length);
+        }
     }
 
     [UnityTest]

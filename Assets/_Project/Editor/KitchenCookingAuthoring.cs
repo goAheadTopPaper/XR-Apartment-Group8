@@ -79,6 +79,7 @@ namespace XRApartment.EditorTools
             ConfigureCookingRoom(cookingScene);
             ConfigureLayoutLab(cookingScene);
             ConfigureSharedExperience();
+            ConfigureCookingFill(cookingScene);
             KitchenAuthoring.SaveScene(cookingScene);
             AssetDatabase.SaveAssets();
             Debug.Log("COOKING_AUTHORING_READY " + ScenePath);
