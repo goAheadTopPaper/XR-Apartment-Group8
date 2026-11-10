@@ -15,7 +15,9 @@ namespace XRApartment.EditorTools
     public static partial class KitchenCookingAuthoring
     {
         const string CookingFill = Prefabs + "PREF_Lighting_CookingFill.prefab";
+        const string TomatoCutModel = FoodArt + "tomato_cut_stages.fbx";
         const string RoomEnvelope = "COL_KitchenEnvelope";
+        internal const string TomatoRemainder = "RemainingSlices";
 
         [MenuItem("XR Apartment/Cooking/Apply Physical Interaction and Lighting")]
         public static void ApplyExperienceMenu()
@@ -26,6 +28,8 @@ namespace XRApartment.EditorTools
         public static void ApplyExperienceBatch()
         {
             KitchenAuthoring.RequireEditMode();
+            if (AssetImporter.GetAtPath(TomatoCutModel) is ModelImporter importer && !importer.isReadable)
+                KitchenPreparedAssetImporter.ConfigureModel(TomatoCutModel);
             ConfigureSharedExperience();
             var scene = EditorSceneManager.OpenScene(ScenePath);
             ConfigureCookingFill(scene);
@@ -47,6 +51,7 @@ namespace XRApartment.EditorTools
                 root => ConfigurePull(root, "Handle"));
             KitchenAuthoring.EditPrefab(RecipePrefabs + "PREF_Cooking_Fridge.prefab",
                 root => ConfigurePull(root, "VIS_FridgeHandle"));
+            KitchenAuthoring.EditPrefab(RecipeTomato, ConfigureProgressiveTomato);
         }
 
         static void ConfigurePull(GameObject root, string handleName)
@@ -61,6 +66,52 @@ namespace XRApartment.EditorTools
                 throw new InvalidOperationException("No physical handle collider on " + root.name);
             target.colliders.Clear();
             target.colliders.AddRange(colliders);
+        }
+
+        static void ConfigureProgressiveTomato(GameObject root)
+        {
+            var previous = root.transform.Find(TomatoRemainder);
+            if (previous != null) Object.DestroyImmediate(previous.gameObject);
+            var preview = Child(root.transform, TomatoRemainder);
+            var prop = root.GetComponent<PreparedKitchenProp>();
+            var intact = root.transform.Find("Intact");
+            var skin = intact.GetComponentsInChildren<MeshRenderer>()
+                .Single(renderer => renderer.name.StartsWith("VIS_", StringComparison.Ordinal)).sharedMaterial;
+            var flesh = KitchenAuthoring.LoadRequired<Material>(FoodArt + "MAT_Food_TomatoFleshDetailed.mat");
+            var model = KitchenAuthoring.LoadRequired<GameObject>(TomatoCutModel);
+            var meshes = model.GetComponentsInChildren<MeshFilter>().ToDictionary(mesh => mesh.name);
+            foreach (var slice in prop.Pieces)
+            {
+                var visual = slice.transform.Find("Intact").GetComponentsInChildren<MeshFilter>()
+                    .Single(mesh => mesh.name.StartsWith("VIS_", StringComparison.Ordinal));
+                var source = meshes[visual.name.Replace("(Clone)", "")];
+                visual.sharedMesh = source.sharedMesh;
+                ApplyCutMaterials(visual.GetComponent<MeshRenderer>(), source.GetComponent<MeshRenderer>());
+            }
+
+            var stages = new Transform[prop.Pieces.Count - 2];
+            for (var i = 0; i < stages.Length; i++)
+            {
+                var suffix = (i + 1).ToString("00");
+                var stage = stages[i] = Child(preview, "AfterCut_" + suffix);
+                KitchenPreparedAssetImporter.CopyMesh(model, "VIS_Remainder_" + suffix, stage);
+                var visual = stage.GetComponentInChildren<MeshRenderer>();
+                ApplyCutMaterials(visual, visual);
+                KitchenPreparedAssetImporter.CopyMesh(model, "COL_Remainder_" + suffix, stage);
+                var hull = stage.GetComponentsInChildren<MeshFilter>().Single(mesh => mesh.name.StartsWith("COL_", StringComparison.Ordinal));
+                var collider = hull.gameObject.AddComponent<MeshCollider>();
+                collider.sharedMesh = hull.sharedMesh;
+                collider.convex = true;
+                collider.sharedMaterial = intact.GetComponentInChildren<Collider>().sharedMaterial;
+                Object.DestroyImmediate(hull.GetComponent<MeshRenderer>());
+                Object.DestroyImmediate(hull);
+                stage.gameObject.SetActive(false);
+            }
+            prop.ConfigureProgressiveCuts(stages);
+
+            void ApplyCutMaterials(MeshRenderer target, MeshRenderer source) =>
+                target.sharedMaterials = source.sharedMaterials.Select(material =>
+                    material.name.StartsWith("MAT_Interior_", StringComparison.Ordinal) ? flesh : skin).ToArray();
         }
 
         static void ConfigureRoomEnvelope(GameObject root)

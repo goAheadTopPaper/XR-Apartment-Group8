@@ -9,8 +9,8 @@ import json
 import sys
 from pathlib import Path
 
-import bmesh
 import bpy
+import bmesh
 from mathutils import Matrix, Vector
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -27,6 +27,10 @@ def clear():
 
 def source(name):
     path = ROOT / f"ArtSource/KitchenAssets/{name}/v001/prepared/{name}_game.glb"
+    return source_mesh(path)
+
+
+def source_mesh(path):
     meshes = core.load_source(path)
     visual = next(m for m in meshes if m.name.startswith("VIS_"))
     for mesh in meshes:
@@ -133,6 +137,44 @@ def egg_visuals():
     return {"lod0": core.mesh_stats(curd), "lod1": core.mesh_stats(coarse)}
 
 
+def tomato_cut_stages():
+    clear()
+    input_path = ROOT / "Assets/_Project/Art/Generated/tomato_v002/tomato_game.fbx"
+    tomato = source_mesh(input_path)
+    mark_materials(tomato, "MAT_Food_TomatoSkin")
+    bounds_min, bounds_max = core.bounds([tomato])
+    slices, volume_error = core.make_pieces(tomato, {
+        "kind": "slice", "pieces": 4, "cut_axis": "x", "interior": "TomatoFleshDetailed",
+    }, 271029, .08)
+    parts = []
+    for index, piece in enumerate(slices):
+        piece.name = f"VIS_Slice_{index:02d}"
+        textured_cut_faces(piece)
+        parts.append(piece)
+    cap = core.interior_material("TomatoFleshDetailed")
+    for index in (1, 2):
+        remainder = core.duplicate(tomato, f"VIS_Remainder_{index:02d}")
+        remainder.data.materials.append(cap)
+        cut_x = bounds_min.x + (bounds_max.x - bounds_min.x) * index / len(slices)
+        assert core.cap_clip(remainder, Vector((cut_x, 0, 0)), Vector((-1, 0, 0)),
+                             len(remainder.data.materials) - 1, .08)
+        textured_cut_faces(remainder)
+        stats = core.mesh_stats(remainder)
+        assert stats["closed"]
+        expected_volume = sum(core.mesh_stats(piece)["volume_m3"] for piece in slices[index:])
+        assert abs(stats["volume_m3"] - expected_volume) / expected_volume < .02
+        hull, _ = core.make_hull(remainder, f"COL_Remainder_{index:02d}")
+        parts.extend((remainder, hull))
+    output = ROOT / "Assets/_Project/Art/Cooking/FoodVisuals/tomato_cut_stages.fbx"
+    core.export_fbx(output, parts)
+    print("TOMATO_CUT_STAGES", json.dumps({
+        "blender": bpy.app.version_string, "slice_volume_relative_error": volume_error,
+        "input_sha256": hashlib.sha256(input_path.read_bytes()).hexdigest(),
+        "meshes": {part.name: core.mesh_stats(part) for part in parts},
+        "output_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+    }))
+
+
 def main():
     if OUTPUT.exists() and any(OUTPUT.iterdir()):
         raise ValueError("Keep existing source versions; use a new output revision")
@@ -148,4 +190,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if "--tomato-cut-stages" in sys.argv:
+        tomato_cut_stages()
+    else:
+        main()

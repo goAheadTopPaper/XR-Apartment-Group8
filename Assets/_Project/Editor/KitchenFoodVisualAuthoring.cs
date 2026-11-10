@@ -109,6 +109,7 @@ namespace XRApartment.EditorTools
                 // The project's FBX bridge mirrors Blender X into Unity -X.
                 food.ConfigurePresentationUp(Vector3.left);
             }
+            ConfigureProgressiveTomato(root);
         });
 
         static Transform[] CreateGeneratedEggCurds(Transform parent)

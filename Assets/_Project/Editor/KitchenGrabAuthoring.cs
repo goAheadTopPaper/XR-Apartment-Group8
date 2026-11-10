@@ -48,8 +48,10 @@ public static class KitchenGrabAuthoring
             EditorUtility.SetDirty(profile.Assumptions);
         }
         var body = root.GetComponent<Rigidbody>();
+        var remainder = root.transform.Find(KitchenCookingAuthoring.TomatoRemainder);
         var physical = root.GetComponentsInChildren<Collider>(true)
             .Where(c => c.enabled && !c.isTrigger && c.name != "COL_GrabSweepProbe" &&
+                (remainder == null || !c.transform.IsChildOf(remainder)) &&
                 c.GetComponentInParent<Rigidbody>(true) == body).ToArray();
         if (physical.Length == 0) throw new InvalidOperationException("No physical colliders on " + root.name);
         var bounds = LocalBounds(root.transform, physical);

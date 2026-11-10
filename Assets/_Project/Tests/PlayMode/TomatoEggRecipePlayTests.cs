@@ -169,6 +169,13 @@ namespace XRApartment.Tests
         }
         IEnumerator CutWithKnife(GameObject knife, PreparedKitchenProp food, float bladeOffset = .055f)
         {
+            for (var cut = food.CutCount; cut < food.RequiredCuts; cut++)
+                yield return CutOnceWithKnife(knife, food, bladeOffset);
+        }
+
+        IEnumerator CutOnceWithKnife(GameObject knife, PreparedKitchenProp food, float bladeOffset = .055f)
+        {
+            var cuts = food.CutCount;
             var body = food.GetComponent<Rigidbody>();
             var upright = Quaternion.Euler(90, 0, 0);
             var stroke = body.worldCenterOfMass + Vector3.right * bladeOffset + Vector3.up * .18f;
@@ -176,7 +183,7 @@ namespace XRApartment.Tests
             var attach = knife.GetComponent<XRGrabInteractable>().GetAttachTransform(right);
             var grip = knife.transform.InverseTransformPoint(attach.position);
             var gripOffset = upright * Vector3.Scale(grip, knife.transform.lossyScale);
-            for (var i = 0; i < 65 && !food.IsSplit; i++)
+            for (var i = 0; i < 65 && food.CutCount == cuts; i++)
             {
                 // Anchor each input sample to the food. Accumulating correction from
                 // the stopped solid blade can steer the tracked wrist off the board.
@@ -186,7 +193,7 @@ namespace XRApartment.Tests
                 yield return null;
                 yield return new WaitForFixedUpdate();
             }
-            Assert.IsTrue(food.IsSplit, "Held blade failed to cut " + food.name + "; knife=" + knife.transform.position +
+            Assert.AreEqual(cuts + 1, food.CutCount, "Held blade failed to cut " + food.name + "; knife=" + knife.transform.position +
                 ", actual target=" + food.GetComponent<Rigidbody>().worldCenterOfMass + ", requested=" + knife.GetComponent<CollisionConstrainedGrabTransformer>().RequestedPose.position);
             yield return MoveHeld(right, knife, knife.transform.position + Vector3.up * .16f, upright, 16);
         }
@@ -274,7 +281,13 @@ namespace XRApartment.Tests
             yield return Frames(40);
             var knife = station.GetComponentInChildren<PreparedKitchenKnife>().GetComponentInParent<XRGrabInteractable>().gameObject;
             yield return Pick(right, knife);
-            yield return CutWithKnife(knife, tomato);
+            yield return CutOnceWithKnife(knife, tomato);
+            Assert.AreEqual(1, tomato.Pieces.Count(piece => piece.gameObject.activeInHierarchy));
+            Assert.IsFalse(tomato.IsSplit);
+            var remainder = tomato.transform.Find("RemainingSlices");
+            var firstRemainder = remainder.GetComponentsInChildren<MeshRenderer>().Single();
+            Assert.AreEqual("VIS_Remainder_01", firstRemainder.GetComponent<MeshFilter>().sharedMesh.name);
+            Assert.IsTrue(firstRemainder.sharedMaterials.Any(material => material.name.Contains("TomatoFleshDetailed")));
             var peakSpeed = 0f;
             for (var frame = 0; frame < 100; frame++)
             {
@@ -282,6 +295,7 @@ namespace XRApartment.Tests
                 yield return new WaitForFixedUpdate();
                 foreach (var piece in tomato.Pieces)
                 {
+                    if (!piece.gameObject.activeInHierarchy) continue;
                     peakSpeed = Mathf.Max(peakSpeed, piece.velocity.magnitude);
                     Assert.That(Vector3.Distance(piece.worldCenterOfMass, centre), Is.LessThan(.65f),
                         piece.name + " escaped the chopping area after a cut.");
@@ -289,6 +303,14 @@ namespace XRApartment.Tests
                         piece.name + " was launched by a normal cut.");
                 }
             }
+            Assert.AreEqual(1, tomato.CutCount, "Holding the knife in place must not cut a second slice.");
+            yield return CutOnceWithKnife(knife, tomato);
+            Assert.AreEqual(2, tomato.Pieces.Count(piece => piece.gameObject.activeInHierarchy));
+            Assert.AreEqual("VIS_Remainder_02", remainder.GetComponentsInChildren<MeshFilter>().Single().sharedMesh.name);
+            yield return CutOnceWithKnife(knife, tomato);
+            Assert.AreEqual(3, tomato.CutCount);
+            Assert.AreEqual(4, tomato.Pieces.Count(piece => piece.gameObject.activeInHierarchy));
+            Assert.IsEmpty(remainder.GetComponentsInChildren<MeshRenderer>());
             Debug.Log("CUT_STABILITY peak=" + peakSpeed);
             station.GetComponent<KitchenCookingStation>().ResetStation();
             yield return null;

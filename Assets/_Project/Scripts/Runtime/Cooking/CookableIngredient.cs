@@ -64,8 +64,12 @@ namespace XRApartment.Runtime
         void OnDisable() { if (prepared != null) prepared.Split -= InheritCooking; }
         void InheritCooking(PreparedKitchenProp prop)
         {
-            if (pieces == null || progress == null) return;
+            if (pieces == null || progress == null || prop.HasProgressiveCuts) return;
             foreach (var piece in pieces) piece.Restore(progress.Dose);
+        }
+        internal void TransferCookingTo(CookableIngredient piece)
+        {
+            if (piece != null && progress != null) piece.Restore(progress.Dose);
         }
         public void Heat(float intensity, float seconds)
         {

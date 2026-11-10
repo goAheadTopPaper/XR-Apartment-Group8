@@ -19,6 +19,7 @@ namespace XRApartment.Runtime
         [SerializeField] Rigidbody[] pieces = Array.Empty<Rigidbody>();
         [SerializeField] ParticleSystem splitParticles;
         [SerializeField] AudioSource splitAudio;
+        [SerializeField] Transform[] remainingCuts = Array.Empty<Transform>();
 
         Rigidbody body;
         XRGrabInteractable grab;
@@ -27,6 +28,8 @@ namespace XRApartment.Runtime
         Vector3[] restPositions;
         Quaternion[] restRotations;
         XRGrabInteractable[] pieceGrabs;
+        Collider[] originalGrabColliders;
+        int releasedSlices;
         bool initialized;
         bool originalKinematic;
         bool originalGravity;
@@ -35,6 +38,9 @@ namespace XRApartment.Runtime
         public bool IsSplit { get; private set; }
         public PreparedPropKind Kind => kind;
         public IReadOnlyList<Rigidbody> Pieces => pieces;
+        public int CutCount => HasProgressiveCuts ? Mathf.Min(releasedSlices, RequiredCuts) : IsSplit ? 1 : 0;
+        public int RequiredCuts => HasProgressiveCuts ? pieces.Length - 1 : 1;
+        internal bool HasProgressiveCuts => remainingCuts.Length > 0 && remainingCuts.Length == pieces.Length - 2;
         public event Action<PreparedKitchenProp> Split;
 
         public void Configure(PreparedPropSettings profile, PreparedPropKind mode, Transform intact,
@@ -49,6 +55,8 @@ namespace XRApartment.Runtime
             if (Application.isPlaying) Initialize();
         }
 
+        public void ConfigureProgressiveCuts(Transform[] stages) => remainingCuts = stages;
+
         void Awake()
         {
             if (settings != null && intactRoot != null && piecesRoot != null && pieces.Length >= 2) Initialize();
@@ -61,6 +69,7 @@ namespace XRApartment.Runtime
                 throw new InvalidOperationException("Prepared prop is missing its profile or derived pieces.");
             body = GetComponent<Rigidbody>();
             grab = GetComponent<XRGrabInteractable>();
+            if (grab != null && HasProgressiveCuts) originalGrabColliders = grab.colliders.ToArray();
             originalKinematic = body.isKinematic;
             originalGravity = body.useGravity;
             intactColliders = intactRoot.GetComponentsInChildren<Collider>(true);
@@ -92,7 +101,71 @@ namespace XRApartment.Runtime
         {
             if (kind != PreparedPropKind.Slice || !Finite(speed) || settings == null || speed < settings.knifeSpeed)
                 return false;
-            return SplitNow();
+            return TryPressCut();
+        }
+
+        internal bool TryPressCut()
+        {
+            if (kind != PreparedPropKind.Slice || settings == null || IsSplit) return false;
+            if (!HasProgressiveCuts) return SplitNow();
+            Initialize();
+            if (grab != null && grab.isSelected) return false;
+
+            if (grab != null) grab.enabled = false;
+            if (releasedSlices == 0)
+            {
+                foreach (var piece in pieces) piece.gameObject.SetActive(false);
+                piecesRoot.SetParent(null, true);
+                piecesRoot.gameObject.SetActive(true);
+                intactRoot.gameObject.SetActive(false);
+            }
+            else remainingCuts[releasedSlices - 1].gameObject.SetActive(false);
+
+            ReleaseSlice(releasedSlices++);
+            if (releasedSlices == RequiredCuts)
+            {
+                ReleaseSlice(releasedSlices++);
+                IsSplit = true;
+                body.isKinematic = true;
+                body.useGravity = false;
+                recycleAt = float.PositiveInfinity;
+                Split?.Invoke(this);
+            }
+            else
+            {
+                var remainder = remainingCuts[releasedSlices - 1];
+                remainder.gameObject.SetActive(true);
+                if (grab != null)
+                {
+                    grab.colliders.Clear();
+                    grab.colliders.AddRange(remainder.GetComponentsInChildren<Collider>());
+                    grab.enabled = true;
+                }
+            }
+            if (splitParticles != null) splitParticles.Play();
+            return true;
+        }
+
+        void ReleaseSlice(int index)
+        {
+            var piece = pieces[index];
+            // The prepared cuts release from the positive X edge, except for the final cap.
+            var direction = index == pieces.Length - 1 ? -transform.right : transform.right;
+            var pose = new Pose(transform.TransformPoint(restPositions[index]) + direction * .004f,
+                transform.rotation * restRotations[index]);
+            piece.transform.SetPositionAndRotation(pose.position, pose.rotation);
+            var pieceGrab = pieceGrabs[index];
+            if (pieceGrab != null && grab != null) pieceGrab.interactionManager = grab.interactionManager;
+            piece.gameObject.SetActive(true);
+            piece.position = pose.position;
+            piece.rotation = pose.rotation;
+            if (pieceGrab != null) pieceGrab.SetTargetPose(pose);
+            piece.isKinematic = false;
+            piece.useGravity = true;
+            piece.velocity = direction * Mathf.Min(.09f, settings.separationSpeed);
+            piece.angularVelocity = Vector3.zero;
+            if (TryGetComponent<CookableIngredient>(out var food))
+                food.TransferCookingTo(piece.GetComponent<CookableIngredient>());
         }
 
         // An egg receiver can call this after validating a held egg's crack gesture.
@@ -151,6 +224,18 @@ namespace XRApartment.Runtime
             piecesRoot.localPosition = Vector3.zero;
             piecesRoot.localRotation = Quaternion.identity;
             piecesRoot.localScale = Vector3.one;
+            if (HasProgressiveCuts)
+            {
+                if (grab != null)
+                {
+                    grab.enabled = false;
+                    grab.colliders.Clear();
+                    grab.colliders.AddRange(originalGrabColliders);
+                }
+                foreach (var stage in remainingCuts) stage.gameObject.SetActive(false);
+                foreach (var piece in pieces) piece.gameObject.SetActive(true);
+                releasedSlices = 0;
+            }
             for (var i = 0; i < pieces.Length; i++)
             {
                 var piece = pieces[i];

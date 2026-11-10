@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 
 namespace XRApartment.Runtime
 {
@@ -9,7 +10,9 @@ namespace XRApartment.Runtime
         [SerializeField] XRGrabInteractable grab;
         [SerializeField] Transform tip;
         Vector3 previous;
-        float speed;
+        float downward, pressure, lastContact;
+        PreparedKitchenProp contact;
+        float nextBoardSound;
         CollisionConstrainedGrabTransformer guard;
         Vector3 tipLocal;
         Vector3 previousActual;
@@ -26,16 +29,27 @@ namespace XRApartment.Runtime
             if (grab != null && tip != null) tipLocal = grab.transform.InverseTransformPoint(tip.position);
         }
 
-        void OnEnable() { if (tip != null) previousActual = previous = tip.position; speed = 0f; wasHeld = false; }
+        void OnEnable()
+        {
+            if (tip != null) previousActual = previous = tip.position;
+            downward = pressure = 0f;
+            contact = null;
+            wasHeld = strokeUsed = false;
+        }
 
         void FixedUpdate()
         {
             if (tip == null) return;
             var held = grab != null && grab.isSelected;
             var requested = held && guard != null ? guard.RequestedPose.position + guard.RequestedPose.rotation * tipLocal : tip.position;
-            speed = held && wasHeld ? Mathf.Max(0f, Mathf.Max(previous.y - requested.y,
-                previousActual.y - tip.position.y)) / Time.fixedDeltaTime : 0f;
-            if (!held || (strokeUsed && tip.position.y >= cutHeight + liftToRearm)) strokeUsed = false;
+            downward = held && wasHeld ? Mathf.Clamp(Mathf.Max(previous.y - requested.y,
+                previousActual.y - tip.position.y), 0f, .016f) : 0f;
+            if (!held || (strokeUsed && tip.position.y >= cutHeight + liftToRearm))
+            {
+                strokeUsed = false;
+                pressure = 0f;
+                contact = null;
+            }
             previous = requested; previousActual = tip.position; wasHeld = held;
         }
 
@@ -44,12 +58,36 @@ namespace XRApartment.Runtime
 
         void Cut(Collider other)
         {
-            if (grab == null || !grab.isSelected || strokeUsed || other.attachedRigidbody == null) return;
-            // Intent supplies cutting speed when the solid blade is stopped at
-            // contact. The accepted blade trigger must still touch the food;
-            // the tracked ghost can never cut a remote item.
+            if (grab == null || !grab.isSelected || strokeUsed || downward < .00015f ||
+                other.attachedRigidbody == null) return;
             var prop = other.attachedRigidbody.GetComponent<PreparedKitchenProp>();
-            if (prop != null && prop.TryCut(speed)) { strokeUsed = true; cutHeight = tip.position.y; }
+            if (prop == null)
+            {
+                if (Time.fixedTime >= nextBoardSound && other.attachedRigidbody.GetComponent<KitchenPrepTray>() != null)
+                {
+                    nextBoardSound = Time.fixedTime + .22f;
+                    KitchenAudio.Play(gameObject.scene, KitchenCue.Board, tip.position, .38f);
+                }
+                return;
+            }
+            if (prop.Kind != PreparedPropKind.Slice || prop.IsSplit || lastContact == Time.fixedTime) return;
+            var hand = grab.interactorsSelecting[0].transform.GetComponentInParent<HapticImpulsePlayer>();
+            if (contact != prop || Time.fixedTime - lastContact > Time.fixedDeltaTime * 1.5f)
+            {
+                pressure = 0f;
+                contact = prop;
+                hand?.SendHapticImpulse(.07f, .025f);
+            }
+            lastContact = Time.fixedTime;
+            // The accepted blade must touch the food while the hand advances.
+            // The small compression distance lets a slow, steady press cut too.
+            pressure += downward;
+            if (pressure < .007f || !prop.TryPressCut()) return;
+            strokeUsed = true;
+            cutHeight = tip.position.y;
+            pressure = 0f;
+            KitchenAudio.Play(gameObject.scene, KitchenCue.Cut, tip.position, .75f);
+            hand?.SendHapticImpulse(.23f, .043f);
         }
     }
 }

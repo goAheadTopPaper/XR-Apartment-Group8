@@ -260,6 +260,8 @@ namespace XRApartment.Runtime
 
         string TomatoProgress(TomatoEggStep step)
         {
+            if (step == TomatoEggStep.SliceTomato)
+                return $"Cuts {tomato.CutCount} / {tomato.RequiredCuts}  /  Lift the blade between cuts";
             if (step == TomatoEggStep.DiceTomato)
             {
                 var diced = 0;
