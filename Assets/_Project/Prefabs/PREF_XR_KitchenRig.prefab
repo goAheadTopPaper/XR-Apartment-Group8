@@ -7147,6 +7147,7 @@ GameObject:
   - component: {fileID: 9016476214128180397}
   - component: {fileID: 4549017767874399483}
   - component: {fileID: 793712404386271509}
+  - component: {fileID: 2652515965712667019}
   m_Layer: 2
   m_Name: PREF_XR_KitchenRig
   m_TagString: Untagged
@@ -7334,6 +7335,29 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2652515965712667019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8251201445580245058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25c258d625d7943b59021c8ac9d71ed1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  clips:
+  - {fileID: 8300000, guid: 14406b88153124d829210ee054d1841e, type: 3}
+  - {fileID: 8300000, guid: 10e4a914f1b8a490192d4ea4b691b401, type: 3}
+  - {fileID: 8300000, guid: c6006a6fb06df4db8a9fd266f544072c, type: 3}
+  - {fileID: 8300000, guid: bdc6df03c609d43f7bcd17e1abd42889, type: 3}
+  - {fileID: 8300000, guid: 4f3332737c2e14a438bac5b0078f1ed0, type: 3}
+  - {fileID: 8300000, guid: 8a1bcb50c0b6d49bf8f196177eaba786, type: 3}
+  - {fileID: 8300000, guid: 06c1a3f7ab7b74a1ebededc9aa2edc52, type: 3}
+  - {fileID: 8300000, guid: f3a1df6fb61c04a9489c1a6e66995387, type: 3}
+  - {fileID: 8300000, guid: 78b1d2b33948040049e4a65b840483a8, type: 3}
+  - {fileID: 8300000, guid: 74c0722edad524bd5a75c51cc176bf88, type: 3}
 --- !u!1 &8322776466977453563
 GameObject:
   m_ObjectHideFlags: 0

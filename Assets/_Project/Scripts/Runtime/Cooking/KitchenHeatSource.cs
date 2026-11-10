@@ -33,7 +33,11 @@ namespace XRApartment.Runtime
         public void ConfigureFlame(KitchenBurnerFlame flame) { burnerFlame = flame; if (burnerFlame != null) burnerFlame.SetLit(IsOn); }
         void OnEnable() { if (switchButton != null) switchButton.selectEntered.AddListener(Toggle); }
         void OnDisable() { if (switchButton != null) switchButton.selectEntered.RemoveListener(Toggle); vessels.Clear(); foods.Clear(); SetOn(false); }
-        void Toggle(UnityEngine.XR.Interaction.Toolkit.SelectEnterEventArgs args) => SetOn(!IsOn);
+        void Toggle(UnityEngine.XR.Interaction.Toolkit.SelectEnterEventArgs args)
+        {
+            SetOn(!IsOn);
+            KitchenAudio.Play(gameObject.scene, KitchenCue.Stove, transform.position, .7f);
+        }
         public void SetOn(bool on)
         {
             IsOn = on;

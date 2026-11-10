@@ -22,6 +22,8 @@ namespace XRApartment.Runtime
         bool restoreThrow;
         bool previousThrow;
         float skin;
+        float nextImpact;
+        int gripSoundFrame = -1;
         Rigidbody body;
         Transform lightSample;
         bool searchedLightRenderers;
@@ -48,6 +50,11 @@ namespace XRApartment.Runtime
             RequestedPose = accepted;
             rig = grabInteractable.interactorsSelecting[0].transform.root;
             IsBlocked = false;
+            if (gripSoundFrame != Time.frameCount)
+            {
+                gripSoundFrame = Time.frameCount;
+                KitchenAudio.Play(gameObject.scene, KitchenCue.Grip, transform.position, .5f);
+            }
         }
 
         public override void Process(XRGrabInteractable grabInteractable,
@@ -95,6 +102,16 @@ namespace XRApartment.Runtime
         {
             RestoreThrow(grabInteractable);
             base.OnUnlink(grabInteractable);
+        }
+
+        void OnCollisionEnter(Collision collision)
+        {
+            var speed = collision.relativeVelocity.magnitude;
+            if (speed < .65f || Time.unscaledTime < nextImpact || collision.contactCount == 0) return;
+            nextImpact = Time.unscaledTime + .13f;
+            var cue = GetComponent<CookableIngredient>() != null ? KitchenCue.SoftImpact : KitchenCue.Impact;
+            KitchenAudio.Play(gameObject.scene, cue, collision.GetContact(0).point,
+                Mathf.Lerp(.16f, .75f, Mathf.InverseLerp(.65f, 3f, speed)));
         }
 
         void LateUpdate()

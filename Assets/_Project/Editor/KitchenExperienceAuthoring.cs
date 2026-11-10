@@ -34,6 +34,12 @@ namespace XRApartment.EditorTools
 
         static void ConfigureSharedExperience()
         {
+            KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_XR_KitchenRig.prefab", root =>
+            {
+                var audio = GetOrAdd<KitchenAudio>(root);
+                audio.Configure(Enum.GetNames(typeof(KitchenCue))
+                    .Select(cue => KitchenAuthoring.LoadRequired<AudioClip>(Art + "SFX_" + cue + ".wav")).ToArray());
+            });
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Kitchen_Environment.prefab", ConfigureRoomEnvelope);
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Lighting_KitchenDaylight.prefab", ConfigureFloorProbes);
         }
