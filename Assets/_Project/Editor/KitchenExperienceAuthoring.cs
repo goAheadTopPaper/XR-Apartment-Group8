@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Runtime;
 using Object = UnityEngine.Object;
 
@@ -42,6 +43,24 @@ namespace XRApartment.EditorTools
             });
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Kitchen_Environment.prefab", ConfigureRoomEnvelope);
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Lighting_KitchenDaylight.prefab", ConfigureFloorProbes);
+            KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Fridge_F2.prefab",
+                root => ConfigurePull(root, "Handle"));
+            KitchenAuthoring.EditPrefab(RecipePrefabs + "PREF_Cooking_Fridge.prefab",
+                root => ConfigurePull(root, "VIS_FridgeHandle"));
+        }
+
+        static void ConfigurePull(GameObject root, string handleName)
+        {
+            var door = root.GetComponentInChildren<KinematicSwingDoor>(true);
+            var handle = door.GetComponentsInChildren<Transform>(true).Single(t => t.name == handleName);
+            door.ConfigurePullHandle(handle);
+            var target = door.GetComponent<XRSimpleInteractable>();
+            // Keep the panel registered so XRI's far caster treats it as an occluding target.
+            var colliders = door.GetComponentsInChildren<Collider>(true).Where(c => c.enabled && !c.isTrigger).ToArray();
+            if (!colliders.Any(c => c.transform.IsChildOf(handle)))
+                throw new InvalidOperationException("No physical handle collider on " + root.name);
+            target.colliders.Clear();
+            target.colliders.AddRange(colliders);
         }
 
         static void ConfigureRoomEnvelope(GameObject root)

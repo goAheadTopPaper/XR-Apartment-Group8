@@ -800,6 +800,7 @@ MonoBehaviour:
   handleSweepProbe: {fileID: 6685990794700447323}
   collisionProfile: {fileID: 11400000, guid: 64e6dfe25dd824351a3c33f0dd15618f, type: 2}
   sweepStepDegrees: 0.5
+  pullHandle: {fileID: 7151109667505725879}
 --- !u!114 &2622826826248767936
 MonoBehaviour:
   m_ObjectHideFlags: 0

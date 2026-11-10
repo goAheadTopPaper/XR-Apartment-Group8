@@ -71,7 +71,7 @@ namespace XRApartment.Runtime
             }
         }
         static readonly string[] Hints = {
-            "Open the fridge using its handle.", "Take a tomato out of the fridge.",
+            "Grip and pull the fridge handle.", "Take a tomato out of the fridge.",
             "Hold the knife and slice the tomato on the board.", "Cut each slice again; move chunks into the prep bowl.",
             "Open the fridge and take an egg.", "Pick up the mixing bowl from the table.",
             "Hold the egg above the bowl; tap the rim or press trigger.",
@@ -234,8 +234,8 @@ namespace XRApartment.Runtime
             var fridgeAction = blocker != null ? blockedAction :
                 ingredient == null ? "Continue at the worktop." :
                 fridge.Accessible ? "Grip to take " + ingredient + "." :
-                fridge.Door.IsOpen ? "Wait for the door to open." :
-                "Select the handle to open the door.";
+                fridge.Door.IsOpen ? "Pull the handle farther." :
+                "Grip and pull the fridge handle.";
             var fridgeDetail = recovery ?? (ingredient == null ? "RESET ROOM restocks the fridge." :
                 "For this recipe: " + ingredient + ".");
             fridgeGuide?.Show("FRIDGE  /  " + dish, fridgeAction, fridgeDetail, blocker != null ? Attention : Guidance);

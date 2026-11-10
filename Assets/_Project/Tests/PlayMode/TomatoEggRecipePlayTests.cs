@@ -124,9 +124,36 @@ namespace XRApartment.Tests
         }
         IEnumerator ToggleDoor(KitchenFridge fridge)
         {
-            var door = fridge.Door.GetComponent<XRSimpleInteractable>(); door.interactionManager = manager;
-            manager.SelectEnter((IXRSelectInteractor)right, door); manager.SelectExit((IXRSelectInteractor)right, door);
-            yield return Frames(55);
+            var angle = Mathf.DeltaAngle(0f, fridge.Door.transform.localEulerAngles.y);
+            yield return PullDoor(fridge.Door, fridge.Accessible ? -angle : 105f - angle);
+        }
+
+        IEnumerator PullDoor(KinematicSwingDoor hinge, float degrees)
+        {
+            var door = hinge.GetComponent<XRSimpleInteractable>();
+            door.interactionManager = manager;
+            var hand = right.hasSelection ? left : right;
+            var pivot = hinge.transform.position;
+            var radial = hinge.PullHandle.position - pivot;
+            hand.transform.position = hinge.PullHandle.position;
+            var originalDelta = Time.captureDeltaTime;
+            Time.captureDeltaTime = 1f / 90f;
+            try
+            {
+                manager.SelectEnter((IXRSelectInteractor)hand, door);
+                Assert.IsTrue(door.isSelected);
+                var before = hinge.Progress;
+                yield return null;
+                Assert.That(hinge.Progress, Is.EqualTo(before).Within(.002), "Selection by itself must leave the door in place.");
+                for (var frame = 1; frame <= 48; frame++)
+                {
+                    hand.transform.position = pivot + Quaternion.AngleAxis(degrees * frame / 48f, hinge.transform.parent.up) * radial;
+                    yield return null;
+                }
+                manager.SelectExit((IXRSelectInteractor)hand, door);
+                yield return Frames(6);
+            }
+            finally { Time.captureDeltaTime = originalDelta; }
         }
         IEnumerator Retrieve(DrivenGrabInteractor hand, GameObject item, KitchenFridge fridge)
         {
@@ -273,6 +300,19 @@ namespace XRApartment.Tests
                 Assert.IsFalse(piece.gameObject.activeInHierarchy);
                 Assert.IsTrue(piece.isKinematic);
             }
+        }
+
+        [UnityTest] public IEnumerator PullingTheFridgeHandleKeepsPartialOpening()
+        {
+            yield return LoadKitchen();
+            var hinge = station.GetComponentInChildren<KitchenFridge>().Door;
+            yield return PullDoor(hinge, 32f);
+            var angle = Mathf.DeltaAngle(0f, hinge.transform.localEulerAngles.y);
+            Assert.That(angle, Is.EqualTo(32f).Within(2f));
+            yield return Frames(40);
+            Assert.That(Mathf.DeltaAngle(0f, hinge.transform.localEulerAngles.y), Is.EqualTo(angle).Within(.1f));
+            yield return PullDoor(hinge, -angle);
+            Assert.That(hinge.Progress, Is.LessThan(.03));
         }
 
         [UnityTest] public IEnumerator ClosedFridgeBlocksSelectionAndOpenDoorAllowsRetrieval()

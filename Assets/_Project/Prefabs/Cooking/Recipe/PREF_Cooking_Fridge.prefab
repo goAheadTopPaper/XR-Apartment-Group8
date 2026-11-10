@@ -642,8 +642,10 @@ MonoBehaviour:
   openDurationSeconds: 0.8
   startOpen: 0
   sweepProbe: {fileID: 5338264427942233358}
+  handleSweepProbe: {fileID: 0}
   collisionProfile: {fileID: 11400000, guid: 64e6dfe25dd824351a3c33f0dd15618f, type: 2}
   sweepStepDegrees: 0.5
+  pullHandle: {fileID: 1605867587829013932}
 --- !u!1 &922912815986913608
 GameObject:
   m_ObjectHideFlags: 0

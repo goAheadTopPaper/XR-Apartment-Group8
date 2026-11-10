@@ -1,16 +1,14 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using XRApartment.Simulation;
 using XRApartment.Data;
 
 namespace XRApartment.Runtime
 {
-    /// Kinematic fridge door (FR-04): selecting the door/handle toggles between closed and a
-    /// fixed open angle. Motion is a transform rotation driven by MotionKinematics —
-    /// deliberately not HingeJoint physics, so all three benchmarks see the same reproducible
-    /// motion and the later sweep/clearance checks (FR-04) can evaluate deterministic poses.
-    /// Attach to the hinge pivot; the door panel (mesh + collider + handle) hangs below it.
+    /// Moves a fixed hinge through the same collision sweep for hand pulls and authored poses.
+    /// Unconfigured doors retain their select-to-toggle behavior.
     [RequireComponent(typeof(XRSimpleInteractable))]
     public class KinematicSwingDoor : MonoBehaviour
     {
@@ -23,6 +21,7 @@ namespace XRApartment.Runtime
         [SerializeField] private BoxCollider handleSweepProbe;
         [SerializeField] private HandInteractionProfile collisionProfile;
         [SerializeField, Range(.1f, 5f)] private float sweepStepDegrees = .5f;
+        [SerializeField] private Transform pullHandle;
 
         private XRSimpleInteractable interactable;
         private bool openTarget;
@@ -30,9 +29,15 @@ namespace XRApartment.Runtime
         private double progress; // 0 closed .. 1 open
         private HeldPropSweep sweep;
         private HeldPropSweep handleSweep;
+        private Transform pullHand;
+        private HapticImpulsePlayer pullHaptics;
+        private Vector3 handOffset, initialRadial;
+        private float initialAngle, nextContactFeedback;
+        private bool keepPulledAngle;
 
         public bool IsOpen => openTarget;
         public double Progress => progress;
+        public Transform PullHandle => pullHandle;
         internal Collider OpeningBlocker { get; private set; }
 
         private void Awake()
@@ -52,14 +57,72 @@ namespace XRApartment.Runtime
         private void OnEnable()
         {
             interactable.selectEntered.AddListener(OnSelected);
+            interactable.selectExited.AddListener(OnReleased);
         }
 
         private void OnDisable()
         {
             interactable.selectEntered.RemoveListener(OnSelected);
+            interactable.selectExited.RemoveListener(OnReleased);
+            pullHand = null;
+            pullHaptics = null;
         }
 
-        private void OnSelected(SelectEnterEventArgs _) => Toggle();
+        public void ConfigurePullHandle(Transform handle) => pullHandle = handle;
+
+        private void OnSelected(SelectEnterEventArgs args)
+        {
+            if (pullHandle == null) { Toggle(); return; }
+            pullHand = args.interactorObject.GetAttachTransform(interactable);
+            if (pullHand == null) return;
+            pullHaptics = args.interactorObject.transform.GetComponentInParent<HapticImpulsePlayer>();
+            handOffset = pullHand.InverseTransformPoint(pullHandle.position);
+            initialRadial = Radial(pullHandle.position);
+            initialAngle = Angle;
+            keepPulledAngle = true;
+        }
+
+        private void OnReleased(SelectExitEventArgs args)
+        {
+            if (pullHand == null) return;
+            pullHand = null;
+            pullHaptics = null;
+            if (!args.isCanceled && Angle > 0f && Angle < 2.5f) SetOpen(false);
+        }
+
+        private float Angle => Mathf.Abs(Mathf.DeltaAngle(0f, transform.localEulerAngles.y));
+        private Vector3 Radial(Vector3 worldPoint) => Vector3.ProjectOnPlane(worldPoint - transform.position,
+            transform.parent == null ? Vector3.up : transform.parent.up);
+
+        private void FollowPull()
+        {
+            if (Time.deltaTime <= 0f) return;
+            var direction = Radial(pullHand.TransformPoint(handOffset));
+            if (direction.sqrMagnitude < .0004f) return;
+            var up = transform.parent == null ? Vector3.up : transform.parent.up;
+            var desired = Mathf.Clamp(initialAngle + Vector3.SignedAngle(initialRadial, direction, up) * swingSign,
+                0f, openAngleDegrees);
+            var before = Angle;
+            if (Mathf.Abs(desired - before) < .01f) return;
+            var opening = desired > before;
+            openTarget = desired > .01f;
+            var speed = 2f * openAngleDegrees / Mathf.Max(.05f, openDurationSeconds);
+            var next = Mathf.MoveTowards(before, desired, speed * Time.deltaTime);
+            progress = MotionKinematics.InverseSmoothStep(next / openAngleDegrees);
+            Apply(observeOpening: opening);
+            var after = Angle;
+            if ((before <= .5f && after > .5f) || (before > .5f && after <= .5f))
+            {
+                KitchenAudio.Play(gameObject.scene, after > .5f ? KitchenCue.Unlatch : KitchenCue.Close, pullHandle.position);
+                pullHaptics?.SendHapticImpulse(.18f, .05f);
+            }
+            else if (Mathf.Abs(after - next) > .4f && Time.unscaledTime >= nextContactFeedback)
+            {
+                nextContactFeedback = Time.unscaledTime + .24f;
+                KitchenAudio.Play(gameObject.scene, KitchenCue.Impact, pullHandle.position, .35f);
+                pullHaptics?.SendHapticImpulse(.24f, .04f);
+            }
+        }
 
         public void Toggle() => SetOpen(!openTarget);
 
@@ -68,12 +131,16 @@ namespace XRApartment.Runtime
             // Target flips immediately; Update eases progress toward it, so re-grabbing
             // mid-swing simply reverses direction instead of snapping.
             if (openTarget != open) OpeningBlocker = null;
+            pullHand = null;
+            keepPulledAngle = false;
             openTarget = open;
             observeRequestedOpening = open;
         }
 
         public void SetOpenImmediate(bool open)
         {
+            pullHand = null;
+            keepPulledAngle = false;
             openTarget = open;
             observeRequestedOpening = false;
             progress = open ? 1.0 : 0.0;
@@ -82,6 +149,8 @@ namespace XRApartment.Runtime
 
         private void Update()
         {
+            if (pullHand != null) { FollowPull(); return; }
+            if (keepPulledAngle) return;
             var target = openTarget ? 1.0 : 0.0;
             if (progress == target) return;
 
