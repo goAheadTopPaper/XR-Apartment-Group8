@@ -182,6 +182,7 @@ namespace XRApartment.EditorTools
                 Set(data, "teleport", teleport); Set(data, "smooth", smooth); Set(data, "close", close);
                 Set(data, "enterReview", enterReview);
                 data.ApplyModifiedPropertiesWithoutUndo();
+                KitchenLocaleAuthoring.ConfigureMenu(root);
                 PrefabUtility.SaveAsPrefabAsset(root, MenuPath);
             }
             finally { Object.DestroyImmediate(root); }

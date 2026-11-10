@@ -737,11 +737,11 @@ namespace XRApartment.Runtime.UI
             }
             if (previousButton != null) previousButton.interactable = page > 0;
             if (nextButton != null) nextButton.interactable = page < last && PageComplete();
-            Label(compactTitle, pageTitle != null ? pageTitle.text : "");
-            Label(compactInstruction, pageBody != null ? pageBody.text : "");
+            Label(compactTitle, KitchenLocale.Source(pageTitle));
+            Label(compactInstruction, KitchenLocale.Source(pageBody));
             Label(compactStatus, Orientation ? "Teleport " + Mark(teleported) + "  Select " + Mark(selected) +
                 "  Grab " + Mark(grabbed) + "  Reset " + Mark(reset) + "  Exit " + Mark(exitUnderstood) :
-                (pageBody != null ? pageBody.text : ""));
+                KitchenLocale.Source(pageBody));
             Show(standingButton, Setup && page == 2); Show(seatedButton, Setup && page == 2);
             Show(lowerEyeButton, Setup && page == 2); Show(raiseEyeButton, Setup && page == 2);
             Show(calibrateButton, Setup && page == 2); Show(completeSetupButton, Setup && page == 2);
@@ -945,7 +945,7 @@ namespace XRApartment.Runtime.UI
             if (errorText != null) errorText.gameObject.SetActive(!string.IsNullOrEmpty(message));
         }
         private static string Mark(bool done) => done ? "[done]" : "[ ]";
-        private static void Label(TMP_Text text, string value) { if (text != null) text.text = value; }
+        private static void Label(TMP_Text text, string value) { if (text != null) KitchenLocale.Set(text, value); }
         private static void Show(Button button, bool visible)
         { if (button != null) button.gameObject.SetActive(visible); }
         private static void Wire(Button button, UnityEngine.Events.UnityAction action)

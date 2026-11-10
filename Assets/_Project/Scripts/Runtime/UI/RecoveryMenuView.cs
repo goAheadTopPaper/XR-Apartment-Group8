@@ -316,7 +316,7 @@ namespace XRApartment.Runtime.UI
             button.interactable = enabled;
         }
         private static void Label(TMP_Text label, string value)
-        { if (label != null) label.text = value; }
+        { if (label != null) KitchenLocale.Set(label, value); }
         private static void Wire(Button button, UnityEngine.Events.UnityAction action)
         { if (button != null) button.onClick.AddListener(action); }
     }

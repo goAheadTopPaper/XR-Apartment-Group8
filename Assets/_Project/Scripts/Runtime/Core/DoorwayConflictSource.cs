@@ -164,8 +164,8 @@ namespace XRApartment.Runtime.Core
             var bounds = obstacle.bounds;
             caption.transform.position = new Vector3(bounds.center.x, bounds.max.y + .12f, bounds.center.z);
             caption.color = colour;
-            caption.text = "! " + notice.Message +
-                (notice.FeedbackRecorded ? "\nFeedback recorded" : "\nDesign conflict");
+            KitchenLocale.Set(caption, "! " + notice.Message +
+                (notice.FeedbackRecorded ? "\nFeedback recorded" : "\nDesign conflict"));
             marker.SetActive(true);
             FaceCaption();
         }

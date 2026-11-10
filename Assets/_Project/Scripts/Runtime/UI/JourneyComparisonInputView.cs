@@ -55,7 +55,7 @@ namespace XRApartment.Runtime.UI
             tradeOffRect.anchoredPosition = new Vector2(skipped == null ? 0f : -100f, -26f);
             tradeOffRect.sizeDelta = new Vector2(skipped == null ? 760f : 560f, 54f);
             viewportRect.sizeDelta = new Vector2(skipped == null ? 730f : 530f, 48f);
-            error.text = string.Empty;
+            KitchenLocale.Set(error, string.Empty);
             RefreshSelection();
         }
 
@@ -72,7 +72,7 @@ namespace XRApartment.Runtime.UI
         public void ShowError(string message)
         {
             BuildIfNeeded();
-            error.text = message ?? string.Empty;
+            KitchenLocale.Set(error, message ?? string.Empty);
         }
 
         private void OnDisable() => CloseKeyboard();
@@ -129,7 +129,7 @@ namespace XRApartment.Runtime.UI
                 if (skipped == null || preferred == null) return;
                 tradeOff.text = preferred + " was assessed; " + skipped +
                     " was skipped, so a direct comparison is limited.";
-                error.text = string.Empty;
+                KitchenLocale.Set(error, string.Empty);
             });
             skipContextButton.GetComponentInChildren<TMP_Text>().fontSize = 17;
             skipContextButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(310f, -26f);
@@ -149,7 +149,7 @@ namespace XRApartment.Runtime.UI
             comparisonGroup.interactable = false;
             comparisonGroup.blocksRaycasts = false;
             keyboard.gameObject.SetActive(true);
-            error.text = string.Empty;
+            KitchenLocale.Set(error, string.Empty);
         }
 
         internal void CloseKeyboard()
@@ -224,9 +224,10 @@ namespace XRApartment.Runtime.UI
 
         private void RefreshKeyboard()
         {
-            keyboardPreview.text = tradeOff.text.Length == 0 ? "Your note appears here." : tradeOff.text;
+            if (tradeOff.text.Length == 0) KitchenLocale.Set(keyboardPreview, "Your note appears here.");
+            else KitchenLocale.SetVerbatim(keyboardPreview, tradeOff.text);
             keyboardCount.text = $"{tradeOff.text.Length} / {tradeOff.characterLimit}";
-            shiftLabel.text = shift ? "Shift on" : "Shift";
+            KitchenLocale.Set(shiftLabel, shift ? "Shift on" : "Shift");
         }
 
         private Button Key(string name, string title, float x, float y, float width, TMP_FontAsset font,
@@ -271,7 +272,7 @@ namespace XRApartment.Runtime.UI
             label.rectTransform.offsetMax = new Vector2(-8f, -2f);
             label.font = font;
             label.fontSize = size;
-            label.text = value;
+            KitchenLocale.Set(label, value);
             label.color = Color.white;
             label.alignment = TextAlignmentOptions.Center;
             label.raycastTarget = false;

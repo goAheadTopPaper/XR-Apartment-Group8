@@ -111,6 +111,46 @@ public class CorePlayWiringSmokeTests
     }
 
     [UnityTest]
+    public IEnumerator LanguageMenuUpdatesCookingAndCarriesChineseIntoReview()
+    {
+        var saved = PlayerPrefs.GetInt(KitchenLocale.Preference, -1);
+        PlayerPrefs.DeleteKey(KitchenLocale.Preference);
+        try
+        {
+            SceneManager.LoadScene("SCN_Kitchen_Cooking");
+            yield return null;
+            var menu = Object.FindObjectOfType<LocomotionSettingsView>();
+            menu.Open();
+            yield return null;
+            var button = menu.transform.Find("Panel/Language");
+            ClickTrackedButton(menu.GetComponent<TrackedDeviceGraphicRaycaster>(), button);
+            Assert.IsTrue(KitchenLocale.Chinese);
+            var title = menu.transform.Find("Panel/Title").GetComponent<TMP_Text>();
+            Assert.AreEqual("移动设置", title.text);
+            title.ForceMeshUpdate();
+            Assert.AreEqual('移', title.textInfo.characterInfo[0].character);
+            var workbench = GameObject.Find("PREF_Cooking_Workbench");
+            var hint = workbench.transform.Find("UI_FridgeInstructions/Action").GetComponent<TMP_Text>();
+            StringAssert.Contains("把手", hint.text);
+            SceneManager.LoadScene("SCN_Kitchen_Review");
+            yield return null;
+            var reviewMenu = Object.FindObjectOfType<LocomotionSettingsView>();
+            reviewMenu.Open();
+            yield return null;
+            Assert.AreEqual("移动设置", reviewMenu.transform.Find("Panel/Title").GetComponent<TMP_Text>().text);
+            ClickTrackedButton(reviewMenu.GetComponent<TrackedDeviceGraphicRaycaster>(), reviewMenu.transform.Find("Panel/Language"));
+            Assert.AreEqual("MOVEMENT", reviewMenu.transform.Find("Panel/Title").GetComponent<TMP_Text>().text);
+            reviewMenu.Close();
+        }
+        finally
+        {
+            if (KitchenLocale.Chinese) KitchenLocale.Toggle();
+            if (saved < 0) PlayerPrefs.DeleteKey(KitchenLocale.Preference);
+            else PlayerPrefs.SetInt(KitchenLocale.Preference, saved);
+        }
+    }
+
+    [UnityTest]
     public IEnumerator KitchenAndDiningWindowsFillTheOpeningsInBothScenes()
     {
         foreach (var scene in new[] { "SCN_Kitchen_Review", "SCN_Kitchen_Cooking" })

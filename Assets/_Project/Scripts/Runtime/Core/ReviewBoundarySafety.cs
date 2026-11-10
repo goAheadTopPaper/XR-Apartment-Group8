@@ -152,7 +152,7 @@ namespace XRApartment.Runtime.Core
                 banner.alignment = TextAlignmentOptions.Center;
                 banner.fontSize = 4f;
                 banner.color = new Color(1f, .39f, .41f);
-                banner.text = "<mark=#170608ee>!  SAFETY  •  " + Warning + "\n" + Action + "</mark>";
+                KitchenLocale.Set(banner, "<mark=#170608ee>!  SAFETY  •  " + Warning + "\n" + Action + "</mark>");
                 if (warningOverlay != null && banner.fontSharedMaterial != null)
                 {
                     bannerMaterial = new Material(banner.fontSharedMaterial) { shader = warningOverlay };

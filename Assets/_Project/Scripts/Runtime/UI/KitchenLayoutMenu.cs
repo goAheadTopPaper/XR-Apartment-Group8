@@ -69,8 +69,8 @@ namespace XRApartment.Runtime.UI
 
         private void Refresh(string message)
         {
-            status.text = lab.Label(lab.ActivePresetIndex) + "\n" + message;
-            observedSwing.text = "Door swing   |   Full " + lab.ObservedSwing(false) + "   ·   Compact " + lab.ObservedSwing(true);
+            KitchenLocale.Set(status, lab.Label(lab.ActivePresetIndex) + "\n" + message);
+            KitchenLocale.Set(observedSwing, "Door swing   |   Full " + lab.ObservedSwing(false) + "   ·   Compact " + lab.ObservedSwing(true));
             standard.interactable = lab.CompactSelected;
             compact.interactable = !lab.CompactSelected;
             for (var index = 0; index < presets.Length; index++)
@@ -81,7 +81,7 @@ namespace XRApartment.Runtime.UI
         private void RefreshFinish()
         {
             if (selectedFinish == null || lab.FinishCount == 0) return;
-            selectedFinish.text = "Finish   |   " + lab.FinishLabel(lab.ActiveFinishIndex);
+            KitchenLocale.Set(selectedFinish, "Finish   |   " + lab.FinishLabel(lab.ActiveFinishIndex));
             for (var index = 0; index < finishes.Length; index++)
                 finishes[index].interactable = index != lab.ActiveFinishIndex;
         }

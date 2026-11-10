@@ -407,7 +407,7 @@ namespace XRApartment.Runtime.UI
         }
 
         private static void Label(TMP_Text target, string value)
-        { if (target != null) target.text = value ?? ""; }
+        { if (target != null) KitchenLocale.Set(target, value ?? ""); }
         private static void SetActive(Component target, bool active)
         { if (target != null) target.gameObject.SetActive(active); }
         private static void SetActive(GameObject target, bool active)

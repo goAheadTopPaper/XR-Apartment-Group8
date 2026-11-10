@@ -1,0 +1,382 @@
+MOVEMENT	移动设置
+TELEPORT	瞬移
+CONTINUOUS	连续移动
+Current: Teleport	当前：瞬移
+Current: Continuous	当前：连续移动
+START DESIGN REVIEW	开始设计评审
+CLOSE	关闭
+Close	关闭
+Left Y / Menu  |  Keyboard F8	左手 Y / 菜单键 · 键盘 F8
+Left stick: walk where you look.	左摇杆沿视线方向移动。
+Right stick: snap turn / teleport.	右摇杆分段转向或瞬移。
+Push either stick forward to aim.	向前推摇杆瞄准落点。
+Release to teleport. Right stick: snap turn.	松开后瞬移，右摇杆可分段转向。
+Layout lab: Right B / F9	布局实验：右手 B / F9
+LAYOUT LAB	布局实验
+Right B / F9	右手 B / F9
+A  ·  ORIGINAL KITCHEN	A · 原始厨房
+B  ·  FORWARD DOCK	B · 冰箱前移
+C  ·  PANTRY RETURN	C · 窄柜布局
+A  |  Original kitchen	A · 原始厨房
+B  |  Forward dock	B · 冰箱前移
+C  |  Pantry return	C · 窄柜布局
+FULL SIZE  ·  72 CM	全尺寸 · 72 厘米
+COMPACT  ·  61 CM	紧凑款 · 61 厘米
+Layout or size changes reset the room and meal.	更换布局或尺寸会复位物品与菜谱。
+WARM IVORY	暖白
+SAGE	鼠尾草绿
+GRAPHITE	石墨灰
+Warm Ivory	暖白
+Sage	鼠尾草绿
+Graphite	石墨灰
+Finish	配色
+Layout unavailable.	布局不可用。
+The kitchen is resetting. Try again in a moment.	厨房正在复位，请稍后再试。
+Move yourself and any loose items away from the new layout.	请离开新布局占用的位置，并移走附近物品。
+Not measured	未测量
+Original dock and clear access.	原始冰箱位置。
+Original kitchen	原始厨房
+Forward dock	冰箱前移
+Pantry return	窄柜布局
+BEEF & ONION	洋葱炒牛肉
+TOMATO & EGG	西红柿炒蛋
+FRIDGE	冰箱
+READY	完成
+SERVED	已装盘
+BURNT	已烧焦
+Grip and pull the fridge handle.	握住把手，拉开冰箱门。
+Pull the handle farther.	继续拉开冰箱门。
+Take a tomato out of the fridge.	从冰箱取出一个西红柿。
+Hold the knife and slice the tomato on the board.	把西红柿放在砧板上，握刀向下切。
+Cut each slice again; move chunks into the prep bowl.	把每片切成小块，再放入备料碗。
+Open the fridge and take an egg.	拉开冰箱门，取出一个鸡蛋。
+Pick up the mixing bowl from the table.	拿起台面上的搅拌碗。
+Hold the egg above the bowl; tap the rim or press trigger.	把鸡蛋拿到碗上方，轻碰碗沿或按扳机。
+Move the whisk through the egg until evenly mixed.	用打蛋器搅拌蛋液，直到混合均匀。
+Select STOVE to turn on the heat.	选择炉灶按钮点火。
+Place the frying pan flat on the burner.	把煎锅平放在炉头上。
+Tilt the bowl and pour the beaten egg into the pan.	倾斜碗，把打匀的蛋液倒入锅里。
+Let the egg set, then use the spatula to scramble it.	等蛋液凝固，再用锅铲炒散。
+Tip diced tomato from the board or prep bowl into the pan.	将切好的西红柿从砧板或备料碗倒入锅里。
+Keep heating and fold tomato and egg with the spatula.	继续加热，用锅铲翻炒西红柿与鸡蛋。
+Tomato and egg is ready. Turn off the stove!	西红柿炒蛋已完成，请关火。
+Food burnt. Select RESET ROOM to try again.	食物烧焦了，选择重置房间重试。
+Open the fridge and take out beef and an onion.	拉开冰箱门，取出牛肉和洋葱。
+Cut the beef and onion on the board.	在砧板上切牛肉和洋葱。
+Put the cut beef and onion into the pan.	把切好的牛肉和洋葱放入锅里。
+Set the pan on the lit burner and stir both ingredients.	把锅放到点燃的炉头上，翻炒两种食材。
+Turn off the stove before serving.	装盘前请关火。
+Hold the pan and tip its edge over the serving plate.	握住锅，将锅沿对准餐盘并倾斜。
+Beef and onion served. Select RESET ROOM to cook again.	洋葱炒牛肉已装盘，选择重置房间再做一次。
+Tomato and egg is ready. Select RESET ROOM to cook again.	西红柿炒蛋已完成，选择重置房间再做一次。
+Try compact fridge in Layout Lab (right B / F9).	试试布局实验里的紧凑冰箱（右手 B / F9）。
+Check the swing path before opening the door again.	移开门扇路径中的物品，再拉开冰箱门。
+The fridge door is blocked.	冰箱门受阻。
+Continue at the worktop.	请到台面继续。
+RESET ROOM restocks the fridge.	重置房间会补齐冰箱食材。
+a tomato	西红柿
+an egg	鸡蛋
+an onion	洋葱
+beef	牛肉
+beef and an onion	牛肉和洋葱
+Grip to hold	握持键拿取
+Trigger to use	扳机使用
+RECIPE to switch	菜谱键切换
+Lift the blade between cuts	每刀之后先抬刀
+Grip the plate to carry your dish.	握住盘子端走成品。
+Stove on	已点火
+Stove off	已关火
+Raw	生
+Cooked	熟
+Burnt	烧焦
+Empty	空
+Beaten	已打匀
+Kitchen design review	厨房设计评审
+Journey unavailable	评审不可用
+Waiting for journey state.	等待评审状态。
+Choose a design to preview	请选择方案预览
+Choose B1 or B2	选择 B1 或 B2
+No design loaded	尚未加载方案
+Both designs use the same large single-door F2 fridge. Preview the cabinet arrangements, then try the same eight kitchen actions in each design.	两套方案共用同一台大型单门 F2 冰箱。先预览柜体布局，再分别完成相同的八步操作。
+Start Explore to open the design choices.	选择开始探索，打开方案预览。
+Look around first. Start Explore to open the design choices.	先观察厨房，再选择开始探索查看方案。
+Loading design. Please wait.	正在加载方案，请稍候。
+Retry load	重试加载
+Explore	探索
+Start Explore	开始探索
+Challenge	任务
+Start Challenge	开始任务
+Preview B1	预览 B1
+Preview B2	预览 B2
+Both Challenges are complete.	两套任务均已完成。
+Choose B1 or B2. Both previews use the same F2 fridge.	选择 B1 或 B2。两个预览共用 F2 冰箱。
+Select Challenge to begin.	选择任务开始体验。
+Proud	突出式
+Flush	齐平式
+Approach	接近冰箱
+Open	开门
+Take out	取出食材
+Place on counter	放到台面
+TemporaryPlacement	临时放置
+Reorganise	整理储物
+Put back	放回食材
+PutBack	放回食材
+Leave	离开
+Task: not started	任务尚未开始
+Move your headset into the GREEN approach zone.	将头显移动到绿色接近区。
+Fully open the fridge door.	握住把手，将冰箱门完全拉开。
+Remove TOMATO and ONION from the upper source shelf.	从上层取出西红柿和洋葱。
+Release TOMATO and ONION on the PURPLE counter highlight.	把西红柿和洋葱放到台面上的紫色区域并松手。
+Move TOMATO or ONION from the purple counter to a lower fridge shelf. Release it, then confirm.	从紫色台面区取一个西红柿或洋葱，放入冰箱下层，松手后确认。
+Release all THREE items onto ANY lower shelf. Include the CEREAL BOX.	把三件物品放入冰箱下层并松手，包括谷物盒。
+Fully close the fridge door.	握住把手，将冰箱门完全推关。
+Exit GREEN, then move your headset into the BLUE zone.	离开绿色区域，将头显移动到蓝色区域。
+Follow the target guide.	按目标标记操作。
+Follow the green guide.	按绿色标记操作。
+Move and release an existing item in the marked storage zone.	将一件已有食材放入标记的储物区并松手。
+Item moved. Select Confirm to continue.	物品已放好，选择确认继续。
+Item moved. Confirm your reorganisation.	物品已放好，请确认整理。
+Progress advances after the real interaction is accepted.	完成实际操作后推进任务。
+Updating scene...	正在更新场景……
+Setup	设置
+Orientation	操作教学
+ChallengeActive	任务进行中
+FeedbackPending	等待反馈
+ComparisonSummary	最终比较
+Paused	已暂停
+Finished	已完成
+Exited	已退出
+Current state	当前状态
+Current progress	当前进度
+Menu	菜单
+Recovery Menu	恢复菜单
+Pause	暂停
+Resume	继续
+Restore step	恢复本步
+Reset task	重置任务
+Replay benchmark	重试本方案
+Return to tray	放回准备区
+Recenter	重新定位
+Reset view	重置视角
+Retry	重试
+Retry save	重试保存
+Safe exit	安全退出
+End session	结束会话
+End this session? Progress is kept in memory until a save is verified.	结束本次评审？确认本地保存前，进度保留在本次会话中。
+Continue	继续
+Confirm	确认
+Confirm move	确认整理
+Cancel	取消
+Expand	展开
+Compact	精简显示
+Next	下一步
+Back	上一步
+Exit	退出
+Stay	留下
+Skip task	跳过任务
+Skip Challenge	跳过任务
+Skip this Challenge	跳过本次任务
+Discomfort	身体不适
+Interaction blocked	操作受阻
+Discomfort during the task	任务过程中感到不适
+Unable to complete an interaction	无法完成操作
+Choose a reason or enter one before skipping.	跳过前请选择或输入原因。
+Reason for skipping	跳过原因
+Reason to skip this Challenge	跳过本次任务的原因
+Save skip and continue	保存跳过原因并继续
+Continue to Explore	继续探索
+Open feedback	打开反馈
+Close draft	关闭草稿
+Submit feedback	提交反馈
+Confirm comparison	确认比较
+Final comparison	最终比较
+Final comparison | B1 and B2	B1 与 B2 的最终比较
+Review complete	评审完成
+New session	新会话
+No task item	没有任务物品
+Next item	下一件物品
+Current progress remains in this session.	本次会话保留当前进度。
+Restore step keeps earlier progress. Reset task starts at step 1. Replay reloads this design.	恢复本步会保留前序进度。重置任务从第 1 步开始。重试方案会重新加载布局。
+Session paused. Resume to continue.	评审已暂停，选择继续恢复。
+Session paused. Resume to continue the previous stage.	评审已暂停，选择继续返回上一阶段。
+Session paused. Resume before retrying the failed operation.	评审已暂停，继续后可重试上次操作。
+Session finished. Start a new session.	评审已完成，可以开始新会话。
+Session finished. Start a new session to return to Setup.	评审已完成，新会话将从设置开始。
+Session finished. Waiting for the final save.	评审已完成，等待最终保存。
+Session exited. Start a new session to return to Setup.	已退出评审，新会话将从设置开始。
+Session exited. Final save is still pending.	已退出评审，等待最终保存。
+Session exited. Final save has not been verified.	已退出评审，最终保存尚未核验。
+Session exited. Final save verified. Start a new session to return to Setup.	已退出评审并核验最终保存，新会话将从设置开始。
+Session exited. Final save was not verified. Start a new session only if you accept that risk.	已退出评审，最终保存尚未核验。确认能接受后再开始新会话。
+Local save failed. Progress remains in memory. Use Retry or Safe Exit; exit does not prove a save.	本地保存失败。进度仍在本次会话中，请重试或安全退出。
+Retry completed. Continue from the current state.	重试完成，可以从当前状态继续。
+Task complete. Feedback is pending.	任务已完成，等待提交反馈。
+1 / 3  Kitchen design review	1 / 3  厨房设计评审
+2 / 3  Design boundaries	2 / 3  设计边界
+3 / 3  Posture and eye height	3 / 3  姿势与视点高度
+Choose a posture and press Calibrate.	选择姿势，然后校准。
+Choose posture	选择姿势
+Seated	坐姿
+Standing	站姿
+Calibrate	校准
+Calibrate seated	校准坐姿
+Calibrate standing	校准站姿
+Sit or stand first, then calibrate that view.	先坐好或站稳，再校准视点。
+Choose standing or seated, then calibrate your virtual eye height. Keep your feet or chair inside the play area. Recalibrate if the view feels wrong.	先选择坐姿或站姿，再校准虚拟视点高度。请确保双脚或座椅处在实体活动区内。视角不合适时可以重新校准。
+Choose a posture and calibrate eye height first.	请先选择姿势并校准视点高度。
+Choose standing or seated before calibration.	校准前请选择站姿或坐姿。
+Put down the item you are holding before changing the view.	更改视角前请先放下手里的物品。
+1 / 5  Teleport	1 / 5  瞬移
+2 / 5  Controller selection	2 / 5  手柄选择
+3 / 5  Grab	3 / 5  抓取
+4 / 5  Reset view	4 / 5  重置视角
+5 / 5  Exit and confirm	5 / 5  退出与确认
+Teleport now	现在瞬移
+Select practice	选择练习
+I understand / Explore	我已了解，开始探索
+Aim the controller ray at Select practice and press the UI trigger. Use the same ray to choose review controls.	将射线对准选择练习，按下 UI 扳机。评审中的菜单也用同一射线操作。
+Aim the ray and hold grip to grab a distant object. Tilt that hand's stick back to pull or forward to push. Release an object on the counter to finish practice.	将射线对准远处物品，按住握持键。向后拨摇杆拉近，向前拨推远。把物品放在台面上并松手即可完成练习。
+Press Reset view to recenter through the journey scene adapter. Recheck your physical play area after reset.	选择重置视角重新定位。完成后检查你的实体活动区。
+Safe exit is available throughout the guide. It ends this session. Use it if unsafe or unwell. Confirm this before entering Explore.	教学中随时可以安全退出并结束评审。感到不适或不安全时请使用该按钮。确认后进入探索。
+Complete Teleport, Select, Grab and Reset practice first.	请先完成瞬移、选择、抓取和重置练习。
+Feedback	反馈
+Kitchen design feedback	厨房设计反馈
+Choose the response that best reflects your experience.	请选择最符合你体验的回答。
+Task completed. Share your assessment of this design.	任务已完成，请评价此方案。
+Task outcome is not available.	暂无任务结果。
+Task skipped. The stored reason is unavailable; submission is blocked.	任务已跳过，缺少已记录的原因。
+No rating fields are required for a skipped task. Submit its recorded reason to continue.	跳过的任务只需提交已记录的原因。
+Main category	主要类别
+Experience tags · select any that apply	体验标签 · 可多选
+Everyday impact (optional)	日常影响（选填）
+Share any additional thoughts verbally with the facilitator.	如有其他想法，可以口头告诉主持人。
+STEP 1 OF 2 · OVERALL JUDGEMENT	第 1 步，共 2 步 · 总体判断
+STEP 2 OF 2 · EXPERIENCE	第 2 步，共 2 步 · 体验
+Decision	决策
+Category	类别
+Importance	重要程度
+Accept	接受
+Adjust	需要调整
+Reject	不接受
+Minor	轻微
+Moderate	中等
+Major	重大
+High	高
+Medium	中
+Low	低
+Door clearance	门扇净空
+Storage use	储物使用
+Working space	工作空间
+Door blocked	门扇受阻
+Step back	需要后退
+Tight temp space	临时摆放空间紧张
+Hard to reach	难以够到
+Hard to turn	难以转身
+Takes longer	耗时更长
+Blocks circulation	影响通行
+Cannot complete	无法完成
+Short explanation	简短说明
+Everyday impact	日常影响
+Task outcome	任务结果
+Outcome reason	结果原因
+Request identity	请求标识
+Saving feedback...	正在保存反馈……
+Feedback was not accepted.	反馈未被接受。
+Feedback was not accepted. Review the required fields.	反馈未被接受，请检查必填项。
+Completed	已完成
+Skipped	已跳过
+Aborted	已中止
+Incomplete	未完成
+Pending	待处理
+Verified	已核验
+Failed	失败
+None	无
+Write in VR	在 VR 中输入
+Your note appears here.	取舍说明会显示在这里。
+Shift on	大写已开启
+Shift	大写
+Space	空格
+Delete	删除
+Done	完成
+Clear	清空
+Choose a design, then use Write in VR or type the main trade-off before confirming.	先选择方案，再通过 VR 键盘或电脑键盘填写主要取舍，然后确认。
+Choose a completed design and enter the main trade-off before confirming.	请选择已完成的方案并输入主要取舍，再确认。
+Both tasks were skipped; leave preference empty.	两项任务均已跳过，请将偏好留空。
+Saving final comparison; Finished is locked until read back verification.	正在保存最终比较，读回核验后完成。
+Open feedback to review or edit this design's draft.	打开反馈查看或编辑本方案的草稿。
+Feedback submitted. Waiting for local read back verification.	反馈已提交，等待本地读回核验。
+Skip feedback submitted. Waiting for local read back verification.	跳过反馈已提交，等待本地读回核验。
+Near the physical play-area boundary.	已接近实体活动区边界。
+Stop and move back toward the centre.	请停下，并向活动区中央移动。
+Design conflict	设计冲突
+Design issue feedback recorded	已记录设计问题反馈
+^STEP ([0-9]+) / ([0-9]+)$	第 $1 / $2 步
+^Cuts ([0-9]+) / ([0-9]+)$	已切 $1 / $2 刀
+^([0-9]+) / ([0-9]+) slices diced$	已切丁 $1 / $2 片
+^Items ([0-9]+) / ([0-9]+)$	物品 $1 / $2
+^Next Challenge  \|  (B[12])\. (.*)$	下一项任务 · $1。$2
+^Preview (B[12]) to begin\.$	预览 $1 开始。
+^Preview (B[12])$	预览 $1
+^Design: (B[12])$	方案：$1
+^Current design  \|  (B[12])$	当前方案 · $1
+^Challenge  \|  (B[12])$	任务 · $1
+^(B[12])  \|  Step ([0-9]+)/([0-9]+) (.*)$	$1 · 第 $2 / $3 步 · $4
+^STEP ([0-9]+) / ([0-9]+)  (.*)$	第 $1 / $2 步 · $3
+^Kitchen design feedback · (B[12])$	厨房设计反馈 · $1
+^Task skipped · Reason recorded: (.*)$	已跳过 · 已记录原因：$1
+^Choose: (.*)\.$	请选择：$1。
+^Complete required fields: (.*)\.$	请填写必填项：$1。
+^Please review: (.*)$	请检查：$1
+^Current: (.*)$	当前：$1
+^Journey: (.*)$	流程：$1
+^Item: (.*)$	物品：$1
+^Local save: (.*)$	本地保存：$1
+^Finish   \|   (.*)$	配色 · $1
+^Door swing   \|   Full (.*)   ·   Compact (.*)$	开门角度 · 全尺寸 $1 · 紧凑款 $2
+^Opening blocked at (.*)° by (.*)\.$	门扇转到 $1° 时受到阻挡（$2）。
+^Mixing bowl  ([0-9]+) mL egg$	搅拌碗 $1 毫升蛋液
+^Pan  ([0-9]+) mL egg$	锅内 $1 毫升蛋液
+^([0-9]+) g tomato$	$1 克西红柿
+^([0-9]+%) mixed$	搅拌进度 $1
+^Beef  ([0-9]+) g  (.*)$	牛肉 $1 克 · $2
+^Onion  ([0-9]+) g  (.*)$	洋葱 $1 克 · $2
+^Grip to take (.*)\.$	握持取出$1。
+^Take (.*) from the fridge\.$	从冰箱取出$1。
+^For this recipe: (.*)\.$	本步所需：$1。
+Explore one representative kitchen. Compare B1 Proud and B2 Flush refrigerator layouts through the same everyday task. This is a prototype, not a finished home or compliance assessment. Stay inside your physical play area. Stop if uncomfortable.	在同一间厨房用相同的日常任务比较 B1 突出式和 B2 齐平式冰箱布局。体验用于设计评审。请留在实体活动区内，感到不适时停下。
+Fixed: layouts and tasks are preset. Reviewable: judge access and everyday use, then give feedback. Simplified: objects and interactions cover a limited kitchen. Assumption: dimensions and clearances are prototype assumptions, not verified client facts. No free editing or real weight feedback.	布局和任务均为预设。请体验冰箱取放与日常使用，再提交判断。场景尺寸和净空采用原型假设，重量反馈也经过简化。
+Aim a controller at the open floor ahead. In the PC simulator, hold I for the right thumbstick (Shift+I for the left), point the teleport arc at the floor, then release I to land. Keep your physical play area clear.	瞄准前方空地。电脑模拟器中，按住 I 模拟右摇杆，Shift+I 模拟左摇杆。将弧线对准地面，松开 I 完成瞬移。请保持实体活动区畅通。
+Aim at the open floor ahead. Push a controller thumbstick forward to show the teleport arc, then release it to land. Check your physical play area before moving.	将手柄对准前方空地，向前推摇杆显示瞬移弧线，松开后落地。移动前请检查实体活动区。
+Open the fridge and use the prep counter in the original layout.	在原始布局中拉开冰箱门并使用备料台面。
+The fridge sits forward. Try the opening and the route to the worktop.	冰箱已前移，体验开门和通往台面的路径。
+Try opening the fridge with a pantry cabinet beside its doorway.	试着拉开冰箱门，观察门旁窄柜的影响。
+Revise	需修改
+Circulation	通行
+Other	其他
+Inconvenient	不方便
+Feedback recorded	反馈已记录
+verified	已核验
+Ready	已就绪
+Busy: please wait	处理中，请稍候
+Design: None	方案：无
+Item: none	物品：无
+Unknown design	未知方案
+Proud + F2	突出式 + F2
+Flush + F2	齐平式 + F2
+^<mark=(.*?)>!  SAFETY  •  (.*)$	<mark=$1>! 安全 · $2
+^(.*)</mark>$	$1</mark>
+^! (.*)$	! $1
+^SAFETY: (.*)$	安全：$1
+^RED \| SAFETY \| (.*)$	红色 · 安全提示 · $1
+^YELLOW \| Design geometry notice\. (.*)$	黄色 · 设计几何提示 · $1
+^AMBER \| Design issue feedback recorded in this session; issue unresolved\. (.*)$	琥珀色 · 本次已记录反馈 · $1
+^Eye ([0-9.]+) m$	视点 $1 米
+^Task result: (.*)$	任务结果：$1
+^Task: (.*)$	任务：$1
+^reason: (.*)$	原因：$1
+^\(?(B[12])\)? task complete\. Feedback is pending for this design\.$	$1 任务已完成，请提交本方案的反馈。
+^\(?(B[12])\)? Challenge skipped\. Save the recorded reason to continue\.$	已跳过 $1 任务，请保存原因后继续。
+^Teleport (\[.\])  Select (\[.\])  Grab (\[.\])  Reset (\[.\])  Exit (\[.\])$	瞬移 $1  选择 $2  抓取 $3  重置 $4  退出 $5
+^Explore lets you preview B1 and B2 freely\..*$	探索时可以自由预览 B1 与 B2，然后完成正式任务。
+^Explore  \|  Explore the kitchen$	探索 · 观察厨房
+^not measured$	未测量

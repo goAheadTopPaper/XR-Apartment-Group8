@@ -20,10 +20,10 @@ namespace XRApartment.Runtime
             internal void Show(string title, string nextAction, string progress, Color accent)
             {
                 if (!IsBound) return;
-                heading.text = title;
+                KitchenLocale.Set(heading, title);
                 heading.color = accent;
-                action.text = nextAction;
-                detail.text = progress;
+                KitchenLocale.Set(action, nextAction);
+                KitchenLocale.Set(detail, progress);
             }
         }
 

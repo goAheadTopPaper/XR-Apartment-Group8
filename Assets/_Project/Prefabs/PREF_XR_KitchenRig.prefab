@@ -7148,6 +7148,7 @@ GameObject:
   - component: {fileID: 4549017767874399483}
   - component: {fileID: 793712404386271509}
   - component: {fileID: 2652515965712667019}
+  - component: {fileID: 7913636934248806625}
   m_Layer: 2
   m_Name: PREF_XR_KitchenRig
   m_TagString: Untagged
@@ -7358,6 +7359,20 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f3a1df6fb61c04a9489c1a6e66995387, type: 3}
   - {fileID: 8300000, guid: 78b1d2b33948040049e4a65b840483a8, type: 3}
   - {fileID: 8300000, guid: 74c0722edad524bd5a75c51cc176bf88, type: 3}
+--- !u!114 &7913636934248806625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8251201445580245058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587659a303971411f883ecea2a9cb2de, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  table: {fileID: 4900000, guid: 05910cad9e79a456b8e38f8da3950764, type: 3}
+  hanzi: {fileID: 11400000, guid: 3ee8b34df148b46b2816b0855db586b3, type: 2}
 --- !u!1 &8322776466977453563
 GameObject:
   m_ObjectHideFlags: 0

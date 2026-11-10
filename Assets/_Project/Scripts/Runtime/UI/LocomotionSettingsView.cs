@@ -15,6 +15,7 @@ namespace XRApartment.Runtime.UI
         [SerializeField] TMP_Text current, instructions;
         [SerializeField] Button teleport, smooth, close;
         [SerializeField] Button enterReview;
+        [SerializeField] Button language;
         [SerializeField] KitchenLayoutMenu layout;
         [SerializeField] Image blink;
         [SerializeField, Min(.1f)] float headDistance = .8f;
@@ -27,6 +28,7 @@ namespace XRApartment.Runtime.UI
 
         void Awake()
         {
+            if (language != null) language.onClick.AddListener(KitchenLocale.Toggle);
             teleport.onClick.AddListener(ChooseTeleport);
             smooth.onClick.AddListener(ChooseSmooth);
             close.onClick.AddListener(Close);
@@ -75,6 +77,7 @@ namespace XRApartment.Runtime.UI
 
         void OnDestroy()
         {
+            if (language != null) language.onClick.RemoveListener(KitchenLocale.Toggle);
             toggle.performed -= OnToggle;
             toggle.Dispose();
             if (layoutToggle != null)
@@ -139,11 +142,12 @@ namespace XRApartment.Runtime.UI
         {
             if (current == null) return;
             var continuous = settings.Mode == KitchenMovementMode.Smooth;
-            current.text = continuous ? "Current: Continuous" : "Current: Teleport";
-            instructions.text = continuous
+            KitchenLocale.Set(current, continuous ? "Current: Continuous" : "Current: Teleport");
+            var help = continuous
                 ? "Left stick: walk where you look.\nRight stick: snap turn / teleport."
                 : "Push either stick forward to aim.\nRelease to teleport. Right stick: snap turn.";
-            if (layout != null) instructions.text += "\nLayout lab: Right B / F9";
+            if (layout != null) help += "\nLayout lab: Right B / F9";
+            KitchenLocale.Set(instructions, help);
             teleport.interactable = continuous;
             smooth.interactable = !continuous;
         }
