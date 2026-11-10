@@ -164,11 +164,7 @@ namespace XRApartment.EditorTools
                             var material = Material("PendantBulb", new Color(1, .9f, .69f), 0, .3f);
                             material.EnableKeyword("_EMISSION"); material.SetColor("_EmissionColor", new Color(1, .83f, .57f) * 1.3f);
                             bulb.GetComponent<Renderer>().sharedMaterial = material;
-                            var light = Child(root.transform, "LGT_DiningWarm").gameObject.AddComponent<Light>();
-                            light.transform.localPosition = new Vector3(0, .075f, 0); light.transform.localRotation = Quaternion.Euler(90, 0, 0);
-                            light.type = LightType.Spot; light.range = 3.3f; light.spotAngle = 85;
-                            light.intensity = 1.35f; light.color = new Color(1, .86f, .69f);
-                            light.lightmapBakeType = LightmapBakeType.Baked; light.shadows = LightShadows.Soft;
+                            ConfigurePendantLight(root);
                         }
                     }
                     PrefabUtility.SaveAsPrefabAsset(root, FurniturePrefabs + root.name + ".prefab");
@@ -177,6 +173,25 @@ namespace XRApartment.EditorTools
             }
             KitchenAuthoring.EditPrefab(RecipePrefabs + "PREF_Cooking_Fridge.prefab", ConfigureFurnitureFridge);
             RegisterFurnitureAssumptionsBatch();
+        }
+
+        static void ConfigurePendantLight(GameObject root)
+        {
+            var bulb = root.transform.Find("VIS_OpalBulb");
+            var emitter = root.transform.Find("LGT_DiningWarm") ?? Child(root.transform, "LGT_DiningWarm");
+            // Start the cone just below the opal bulb so the visible geometry cannot block it.
+            emitter.localPosition = bulb.localPosition - Vector3.up * (bulb.localScale.y * .5f + .006f);
+            emitter.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            var light = GetOrAdd<Light>(emitter.gameObject);
+            light.type = LightType.Spot;
+            light.range = 3.3f;
+            light.spotAngle = 96f;
+            light.innerSpotAngle = 62f;
+            light.intensity = 1.7f;
+            light.color = new Color(1f, .93f, .84f);
+            light.lightmapBakeType = LightmapBakeType.Baked;
+            light.shadows = LightShadows.Soft;
+            light.shadowRadius = .075f;
         }
 
         internal static void ConfigureFurnitureFridge(GameObject root)

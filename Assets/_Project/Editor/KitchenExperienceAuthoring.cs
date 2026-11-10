@@ -193,31 +193,42 @@ namespace XRApartment.EditorTools
             var sun = RenderSettings.sun;
             sun.intensity = 3.2f;
             PrefabUtility.RecordPrefabInstancePropertyModifications(sun);
-            if (!File.Exists(CookingFill))
+            var workbench = scene.GetRootGameObjects().Single(root => root.name == "PREF_Cooking_Workbench").transform;
+            var board = workbench.Find("PREF_Cooking_ChoppingBoard").position;
+            var burner = workbench.Find("LOC_BurnerSurface").position;
+            var centre = (board + burner) * .5f;
+            KitchenAuthoring.EditPrefab(FurniturePrefabs + "PREF_Furniture_Pendant.prefab", ConfigurePendantLight);
+
+            if (File.Exists(CookingFill)) KitchenAuthoring.EditPrefab(CookingFill, ConfigureTaskLight);
+            else
             {
                 var root = new GameObject("PREF_Lighting_CookingFill");
                 try
                 {
-                    Add("Kitchen ceiling fill", new Vector3(-3.39f, 2.57f, 1.44f), 1.7f, 5.1f);
-                    Add("Dining fill", new Vector3(-3.02f, 2.45f, -1.42f), 1.05f, 5.7f);
+                    ConfigureTaskLight(root);
                     PrefabUtility.SaveAsPrefabAsset(root, CookingFill);
                 }
                 finally { Object.DestroyImmediate(root); }
-
-                void Add(string name, Vector3 position, float intensity, float range)
-                {
-                    var light = Child(root.transform, name).gameObject.AddComponent<Light>();
-                    light.transform.localPosition = position;
-                    light.type = LightType.Point;
-                    light.lightmapBakeType = LightmapBakeType.Baked;
-                    light.intensity = intensity;
-                    light.range = range;
-                    light.color = new Color(1f, .92f, .82f);
-                    light.shadows = LightShadows.Soft;
-                }
             }
             if (scene.GetRootGameObjects().All(root => root.name != "PREF_Lighting_CookingFill"))
                 PrefabUtility.InstantiatePrefab(KitchenAuthoring.LoadRequired<GameObject>(CookingFill), scene);
+
+            void ConfigureTaskLight(GameObject root)
+            {
+                var diningFill = root.transform.Find("Dining fill");
+                if (diningFill != null) Object.DestroyImmediate(diningFill.gameObject);
+
+                var emitter = root.transform.Find("Kitchen ceiling fill") ?? Child(root.transform, "Kitchen ceiling fill");
+                emitter.localPosition = new Vector3(centre.x, 2.53f, centre.z);
+                emitter.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                var light = GetOrAdd<Light>(emitter.gameObject);
+                light.type = LightType.Rectangle;
+                light.lightmapBakeType = LightmapBakeType.Baked;
+                light.areaSize = new Vector2(Mathf.Abs(board.x - burner.x) + 1.10f, .56f);
+                light.intensity = 1.35f;
+                light.color = new Color(1f, .95f, .88f);
+                light.shadows = LightShadows.Soft;
+            }
         }
 
         public static void BakeExperienceBatch()

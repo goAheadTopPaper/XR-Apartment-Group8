@@ -774,7 +774,7 @@ Transform:
   m_GameObject: {fileID: 6196129168401769795}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.075, z: 0}
+  m_LocalPosition: {x: 0, y: 0.031499997, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -791,11 +791,11 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 0.86, b: 0.69, a: 1}
-  m_Intensity: 1.35
+  m_Color: {r: 1, g: 0.93, b: 0.84, a: 1}
+  m_Intensity: 1.7
   m_Range: 3.3
-  m_SpotAngle: 85
-  m_InnerSpotAngle: 21.80208
+  m_SpotAngle: 96
+  m_InnerSpotAngle: 62
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2
@@ -840,7 +840,7 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
-  m_ShadowRadius: 0
+  m_ShadowRadius: 0.075
   m_ShadowAngle: 0
 --- !u!1 &6943775229009871844
 GameObject:

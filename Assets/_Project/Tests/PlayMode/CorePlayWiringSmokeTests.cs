@@ -112,6 +112,35 @@ public class CorePlayWiringSmokeTests
     }
 
     [UnityTest]
+    public IEnumerator CookingLightsFollowThePendantAndWorkbench()
+    {
+        SceneManager.LoadScene("SCN_Kitchen_Cooking");
+        yield return null;
+        var dining = GameObject.Find("PREF_Furniture_DiningSet").transform;
+        var pendant = dining.Find("PREF_Furniture_Pendant");
+        var bulb = pendant.Find("VIS_OpalBulb").GetComponent<Renderer>();
+        var lamp = pendant.Find("LGT_DiningWarm").GetComponent<Light>();
+        var emitter = lamp.transform.position;
+        var beneathBulb = bulb.bounds.min.y - emitter.y;
+        Assert.That(beneathBulb, Is.InRange(.001f, .02f));
+        Assert.That(Vector3.ProjectOnPlane(emitter - bulb.bounds.center, Vector3.up).magnitude, Is.LessThan(.01f));
+        Assert.That(Vector3.ProjectOnPlane(emitter - dining.Find("PREF_Furniture_DiningTable").position,
+            Vector3.up).magnitude, Is.LessThan(.01f));
+        Assert.That(Vector3.Dot(lamp.transform.forward, Vector3.down), Is.GreaterThan(.99f));
+
+        var fill = GameObject.Find("PREF_Lighting_CookingFill").transform;
+        var taskLight = fill.GetComponentsInChildren<Light>().Single();
+        var workbench = GameObject.Find("PREF_Cooking_Workbench").transform;
+        var centre = (workbench.Find("PREF_Cooking_ChoppingBoard").position +
+                      workbench.Find("LOC_BurnerSurface").position) * .5f;
+        Assert.AreEqual(LightType.Rectangle, taskLight.type);
+        Assert.That(Vector3.Dot(taskLight.transform.forward, Vector3.down), Is.GreaterThan(.99f));
+        Assert.That(Vector3.ProjectOnPlane(taskLight.transform.position - centre, Vector3.up).magnitude,
+            Is.LessThan(.01f));
+        Assert.IsTrue(lamp.bakingOutput.isBaked && taskLight.bakingOutput.isBaked);
+    }
+
+    [UnityTest]
     public IEnumerator HandsKeepIndirectLightInTheEntryPassage()
     {
         var directions = new[] { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
