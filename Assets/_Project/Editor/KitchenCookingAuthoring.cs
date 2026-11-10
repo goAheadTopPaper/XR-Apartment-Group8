@@ -78,6 +78,7 @@ namespace XRApartment.EditorTools
             PrefabUtility.RecordPrefabInstancePropertyModifications(recipeRig.transform);
             ConfigureCookingRoom(cookingScene);
             ConfigureLayoutLab(cookingScene);
+            ConfigureSharedExperience();
             KitchenAuthoring.SaveScene(cookingScene);
             AssetDatabase.SaveAssets();
             Debug.Log("COOKING_AUTHORING_READY " + ScenePath);

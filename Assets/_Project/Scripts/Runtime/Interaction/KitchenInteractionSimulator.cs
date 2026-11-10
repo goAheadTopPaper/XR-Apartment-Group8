@@ -22,7 +22,7 @@ namespace XRApartment.Runtime
 
         protected override void ProcessPoseInput()
         {
-            if (!manipulatingFPS || Time.time <= 1f)
+            if (!manipulatingFPS)
             {
                 base.ProcessPoseInput();
                 return;
@@ -39,7 +39,7 @@ namespace XRApartment.Runtime
             }
 
             var speeds = new Vector3(translateXSpeed, translateYSpeed, translateZSpeed);
-            var axes = new Vector3(translateXInput.ReadValue(), translateYInput.ReadValue(), translateZInput.ReadValue());
+            var axes = new Vector3(translateXInput.ReadValue(), 0f, translateZInput.ReadValue());
             if (toggleMouseInput.ReadIsPerformed())
             {
                 // XRI 3.5 on Unity 2022 uses platform-specific scroll deltas (20 on Mac, 120 on Windows).

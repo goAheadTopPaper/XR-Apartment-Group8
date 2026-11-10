@@ -26,6 +26,8 @@ namespace XRApartment.Runtime
         [SerializeField] UnityEvent<bool> rightSmoothInput = new UnityEvent<bool>();
 
         bool started;
+        KitchenRoomBounds room;
+        Vector3 lastFloorPosition;
         public XROrigin Origin { get; private set; }
         public CharacterController Character { get; private set; }
         public KitchenMovementMode Mode { get; private set; }
@@ -42,11 +44,29 @@ namespace XRApartment.Runtime
 
         void Start()
         {
+            KitchenRoomBounds.TryGet(gameObject.scene, out room);
+            lastFloorPosition = Origin.Origin.transform.position;
             started = true;
             ReloadPreference();
         }
 
         void OnEnable() { if (started) Apply(); }
+
+        void LateUpdate()
+        {
+            if (room == null || Character == null || !Character.enabled) return;
+            var body = Origin.Origin.transform;
+            if (room.Contains(body.position))
+            {
+                if (room.AtFloor(body.position)) lastFloorPosition = body.position;
+                return;
+            }
+            CancelAim();
+            Character.enabled = false;
+            body.position = lastFloorPosition;
+            Character.enabled = true;
+            Physics.SyncTransforms();
+        }
 
         public void ReloadPreference()
         {
