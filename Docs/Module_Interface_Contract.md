@@ -413,6 +413,8 @@ Core 在 Unity 主线程按序处理命令。可预期拒绝不抛异常、不�
 
 ## 6. UI、反馈与冲突接口
 
+移动菜单可切换简体中文和 English。本机语言偏好只影响显示，已录入的自由文本、B1/B2 标识、比较选项的枚举值和 CSV 字段沿用现有契约。两套 F2 共用抓住把手并随手转动的操作，Core 继续读取门体实际到达的开合程度。
+
 2026-10-18 用户明确确认：当前 Feedback **只保存选择项，取消文字说明必填要求**。完成方案必填 Decision、Category、Importance；Experience、Everyday impact 等仍为可选。`ShortExplanation` / `shortExplanation` 字段为兼容既有记录而保留，但可空，不自动生成文字、不把口述伪装成文字或录音。本次按用户确认覆盖原 Short explanation 必填规则；这属于相对 PRD Final FR-07 四项必填的明确偏差，不代表原 FR-07 已完整验收。最终比较的 trade-off 与跳过原因规则保持原契约。
 
 UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反馈、比较、暂停及错误；只通过命令提交意图。按钮是否可用由快照决定，但 Core 仍验证每条命令。UI 不直接设置 `SessionState`、方案 ID 或保存成功标志。临时 Debug UI 只用于 Play 测试，采用同一命令和反馈接口，正式 UI 可替换它。
