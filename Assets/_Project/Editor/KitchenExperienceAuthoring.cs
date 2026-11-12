@@ -171,6 +171,7 @@ namespace XRApartment.EditorTools
 
             PassageFill("Entry passage fill", -4.85f, .9f);
             PassageFill("Kitchen passage fill", .4f, .75f);
+            ConfigureApartmentLights(root);
 
             void PassageFill(string name, float z, float intensity)
             {

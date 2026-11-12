@@ -1544,3 +1544,87 @@ MonoBehaviour:
     status: Prototype assumption
     verification: Editor-authored vessel dimensions and station coordinates; Quest
       Link interaction pending.
+  - key: apartment_exterior_east_entry_x
+    valueMetres: 0.215
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_entry_z
+    valueMetres: -7.145
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_entry_width
+    valueMetres: 0.945
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_dining_x
+    valueMetres: 0.215
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_dining_z
+    valueMetres: -0.38
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_dining_width
+    valueMetres: 1.275
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_kitchen_x
+    valueMetres: 0.215
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_kitchen_z
+    valueMetres: 1.73
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_east_kitchen_width
+    valueMetres: 1.38
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_south_end_x
+    valueMetres: -0.365
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_south_end_z
+    valueMetres: -7.79
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_south_end_width
+    valueMetres: 0.99
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_door_height
+    valueMetres: 2.7
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: apartment_exterior_door_depth
+    valueMetres: 0.15
+    source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.

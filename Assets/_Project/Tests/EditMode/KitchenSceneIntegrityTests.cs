@@ -92,7 +92,9 @@ namespace XRApartment.Tests
         {
             var environment = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Environment");
             var windows = environment.transform.Find("PREF_Kitchen_Windows");
+            var exteriorDoors = environment.transform.Find("ApartmentExteriorDoors");
             Assert.IsNotNull(windows);
+            Assert.IsNotNull(exteriorDoors);
             var filters = environment.GetComponentsInChildren<MeshFilter>();
             Assert.IsNotEmpty(filters);
             foreach (var filter in filters)
@@ -105,6 +107,17 @@ namespace XRApartment.Tests
                     Assert.IsTrue(collider.enabled && !collider.isTrigger, filter.name);
                     Assert.AreEqual(filter.sharedMesh.bounds, new Bounds(collider.center, collider.size),
                         filter.name);
+                }
+                else if (filter.transform.IsChildOf(exteriorDoors))
+                {
+                    var collider = filter.GetComponentInParent<BoxCollider>();
+                    Assert.IsNotNull(collider, filter.name);
+                    Assert.AreSame(exteriorDoors, collider.transform.parent);
+                    Assert.IsTrue(collider.enabled && !collider.isTrigger, filter.name);
+                    var bounds = collider.bounds;
+                    bounds.Expand(.002f);
+                    var visual = filter.GetComponent<Renderer>().bounds;
+                    Assert.IsTrue(bounds.Contains(visual.min) && bounds.Contains(visual.max), filter.name);
                 }
                 else
                 {

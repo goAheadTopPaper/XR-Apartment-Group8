@@ -81,6 +81,7 @@ namespace XRApartment.EditorTools
             ConfigureLayoutLab(cookingScene);
             ConfigureSharedExperience();
             ConfigureCookingFill(cookingScene);
+            ConfigureApartmentDressing(cookingScene);
             ConfigureKitchenActivities(cookingScene);
             KitchenAuthoring.SaveScene(cookingScene);
             AssetDatabase.SaveAssets();
@@ -367,10 +368,10 @@ namespace XRApartment.EditorTools
             material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha); material.SetInt("_ZWrite", 0);
             material.EnableKeyword("_ALPHABLEND_ON"); material.renderQueue = 3000; return material;
         }
-        static void Parameter(string key, float value)
+        static void Parameter(string key, float value, string source = null)
         {
             KitchenAuthoring.Assumptions.Upsert(new AssumptionParameter { key = key, valueMetres = value, owner = "Hzc", status = "Prototype assumption",
-                source = "Optional cooking sandbox authored asset geometry; not a client dimension.", verification = "Editor bounds and interaction tests; VR handling pending." });
+                source = source ?? "Optional cooking sandbox authored asset geometry; not a client dimension.", verification = "Editor bounds and interaction tests; VR handling pending." });
             EditorUtility.SetDirty(KitchenAuthoring.Assumptions);
         }
     }
