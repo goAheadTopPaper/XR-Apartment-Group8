@@ -4,6 +4,16 @@
 
 截至 2026-10-30，实际 Cloud 任务累计 24 次。最新桌椅、吊灯与烹饪冰箱的生成结果、硬表面修整和 Unity 验证见 [KitchenFurniture.md](KitchenFurniture.md)；本页下方的早期批次验证保留其当时状态。
 
+## 外墙门、吸顶灯与装饰
+
+2026-11-12 通过 Comfy Cloud 的 Z-Image-Turbo 生成四张参考图，再用混元 3D 3.1 生成橡木外门、吸顶灯、香草盆栽和木框浅浮雕。Unity 使用降采样贴图和保留生成拓扑的 OBJ。任务编号、输入和导入数据记录在 [资产来源](../ArtSource/KitchenAssets/Apartment/v001/provenance.json)。
+
+两个场景共用东侧三处、南端一处的常闭外门。独立盒体碰撞按模型门洞拟合，宽度、位置与高度登记在 `ASM_KitchenParameters`。门体可见网格与碰撞分离，保留原过道和室内门。五盏吸顶灯各自对准烘焙光源，城市厨房另摆放餐桌盆栽和过道墙饰。
+
+作者入口为 `XR Apartment > Apartment > Apply Exterior Doors and Fixtures`。应用后使用 `KitchenCookingAuthoring.BakeExperienceBatch` 更新两个场景的光照与反射数据。
+
+Mac Unity 验证通过 EditMode 153/153、PlayMode 82/82。两个场景均用实际角色胶囊与瞬移 Provider 检查四处门洞，并复测过道、餐区与间接光。
+
 ## 打开和使用
 
 - Unity 菜单 `XR Apartment/Cooking/Open Cooking Kitchen` 打开 `Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity`，进入 Play。

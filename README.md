@@ -29,7 +29,7 @@ The product scope and acceptance criteria are defined in the [Lean PRD v0.3 Fina
 | Item | Configuration |
 | --- | --- |
 | Unity | **2022.3.62f3**; do not upgrade the engine |
-| Rendering | Built-in Render Pipeline, Linear Color Space |
+| Rendering | HDRP 14.0.12, Linear Color Space, Direct3D 12 on Windows with Direct3D 11 fallback |
 | Input | New Input System only (`activeInputHandler: 1`) |
 | XR | OpenXR + XR Interaction Toolkit 3.5.0 |
 | Target experience | Windows PC build, used with **Quest 3 + Quest Link** |
@@ -50,7 +50,11 @@ Open the repository root in Unity Hub and select **2022.3.62f3**. After UPM fini
 
 The city kitchen starts with the guide. Calibrate a standing or seated view, practice teleporting and releasing a tool, make tomato and egg, and compare both fridge sizes in the same layout. Place a feedback note on an object, save it, and select **Start free play**. Saved notes are added to `KitchenFeedback/feedback.txt` under the local Unity persistent data folder.
 
-Hold the Quest left controller's **Menu** button or keyboard **F8** for about half a second to open the floating pause menu. Use a controller ray to select **Resume**, **Kitchen Guide**, **Layout Lab**, **Feedback note**, or **Options** as the guide advances. The kitchen freezes while the menu is open. Head and controller tracking continue.
+Hold the Quest left controller's **Menu** button or keyboard **F8** for about half a second to open the floating pause menu. Use a controller ray to select **Resume**, **Kitchen Guide**, **Layout Lab**, **Feedback note**, **Options**, or **Graphics** as the guide advances. The kitchen freezes while the menu is open. Head and controller tracking continue.
+
+**Graphics** applies the chosen preset immediately and saves it on the PC. **Performance** reduces texture and shadow resolution and uses baked reflection probes. **Standard** is the default and adds screen-space reflections and ambient occlusion. **High (ray tracing)** increases shadow resolution and enables real-time opaque reflections on a Windows Direct3D 12 GPU with DXR support. High uses rasterized reflections when DXR is unavailable and reports that state in the menu.
+
+Build the DXR-enabled Windows player from the Windows Unity Editor. The macOS Editor can run the raster presets and the High fallback.
 
 In free play, **Options → Start Design Review** opens the formal B1/B2 review at Setup. In the Editor, **XR Apartment → Open Kitchen Review Scene** opens that scene directly and clears the Play override.
 

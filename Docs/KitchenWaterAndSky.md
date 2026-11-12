@@ -1,16 +1,16 @@
 # 厨房天空与倒水交互
 
-使用 Unity 2022.3.62f3 / Built-in / Linear / XRI 3.5；构建目标仍为 StandaloneWindows64。
+使用 Unity 2022.3.62f3 / HDRP 14.0.12 / Linear / XRI 3.5；构建目标仍为 StandaloneWindows64。
 
 ## 资源选择
 
-- AllSky Free 1.2.0，商店产品 146014，rpgwhitelock：从账号已拥有的资源经 Unity Package Manager 下载。只取 `Cold Sunset Equirect.png` 和其导入 GUID；未导入其他九种天空、演示场景或脚本。该图是蓝天、薄云和低角度暖日光，适合当前固定日间厨房。`MAT_Sky_KitchenDaylight` 使用 Built-in `Skybox/Cubemap`。太阳、曝光和 benchmark 的公共光照设置保留。
+- AllSky Free 1.2.0，商店产品 146014，rpgwhitelock：从账号已拥有的资源经 Unity Package Manager 下载。只取 `Cold Sunset Equirect.png` 和其导入 GUID；未导入其他九种天空、演示场景或脚本。该图是蓝天、薄云和低角度暖日光，适合当前固定日间厨房。`VOL_KitchenReview` 的 HDRI Sky 使用同一 Cubemap。太阳、曝光与烘焙光照由 B1/B2 共用。
 - NVJOB Water Shaders V2.0：从作者 MIT 仓库的固定提交 `34f30d75568b2a6828f769f20ee007eb6700fc98` 取着色器、法线贴图和材质面板依赖。保留 GUID、贴图和 C# 源码；着色器有小范围 PC VR 适配：用 `UNITY_DECLARE_DEPTH_TEXTURE` 声明双眼深度纹理，并以 shader model 3.5 支持纹理数组。详见 `Assets/ThirdParty/NVJOBWaterV2/PROVENANCE.txt` 和许可证文件；仍需头显验证。
-- `SET_WaterInteraction` 引用默认 `MAT_Water_Kitchen`，使用 NVJOB Water Specular。厨房的厘米级水深使用较快的深度淡化；关闭海岸泡沫、视差与额外平面反射相机，使用已有室内烘焙反射。项目系统统一驱动波纹；供应商的 `NVWaterShaders` 类型只供其材质编辑器引用，未挂到场景。
+- `SET_WaterInteraction` 引用透明 HDRP Lit 材质 `MAT_Water_Kitchen`，使用 NVJOB 法线图和厨房的 HDRP 烘焙反射探针。液面、流动水与水花沿用项目脚本。
 
 ## 用户选定的水交互范围
 
-容器可以接水、倾倒。水面按重力保持水平，移动后有受限晃动，落水有水花。液面是重力平面与容器内腔的截面，水流沿用重力抛物线与有限水量分段。NVJOB 负责水面着色。
+容器可以接水、倾倒。水面按重力保持水平，移动后有受限晃动，落水有水花。液面是重力平面与容器内腔的截面，水流沿用重力抛物线与有限水量分段。HDRP Lit 负责液面与水流的透明着色。
 
 - 城市厨房的水杯、汤锅、搅拌碗、番茄备料碗、平底锅、汤勺与可碎餐盘可接水和倾倒。正式评审的水杯、锅和马克杯可接水与倾倒，固定的碗、浅盘可承接其他容器倒入的水。
 - 换用陶瓷模型后，旧的等宽圆柱会让低水位液面穿过弧形碗壁，偏心杯身和锅底也可能露出旧液面。拟合按可见模型的局部内腔截面确定，内腔中心、容器底、口沿高度及两轴开口半径登记在 `ASM_KitchenParameters` 的 `water_*` 参数中，Prefab 保存沿高度的截面比例。容量、低侧溢出口和液面网格共用该内腔。

@@ -19,9 +19,9 @@ Unity 的 Play 起始场景覆盖只属于当前编辑器会话。项目会在�
 
 使用 Poly Haven 的 [Joburg Central Sunset](https://polyhaven.com/a/sunset_jhbcentral)。摄影为 Dimitrios Savva，处理为 Greg Zaal；资产为 [CC0](https://polyhaven.com/license)。使用官方 4K OpenEXR 原文件，保存在 `Assets/ThirdParty/PolyHaven/JoburgCentralSunset/`，附 `SOURCE.json`、下载地址、哈希与授权说明。
 
-`MAT_Sky_CookingCity` 使用 Built-in 的 `Skybox/Panoramic`，固定旋转 120°，让厨房窗户朝向楼群和附近高楼。该素材从屋顶高度拍摄，可作为公寓某层室内的窗外背景。它是静态全景照片，不提供近景视差或可进入街区；不能用于判定实际楼层高度或邻楼间距。
+`VOL_KitchenCooking` 的 HDRI Sky 使用城市全景的 Cubemap，固定旋转 120°，让厨房窗户朝向楼群和附近高楼。该素材从屋顶高度拍摄，可作为公寓某层室内的窗外背景。它是静态全景照片，不提供近景视差或可进入街区；不能用于判定实际楼层高度或邻楼间距。
 
-仅应用于独立烹饪场景。原正式评审的环境、AllSky 材质、场景和烘焙结果保留，B1/B2 的环境保持一致。
+城市全景用于烹饪场景。正式评审使用 AllSky HDRI，两场景分别保存烘焙贴图与 HDRP 反射探针。B1/B2 共用正式评审的光照。
 
 ## 制作与检查
 
