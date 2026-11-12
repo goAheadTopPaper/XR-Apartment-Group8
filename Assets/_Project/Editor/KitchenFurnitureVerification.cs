@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.PostProcessing;
 using XRApartment.Runtime;
 
 namespace XRApartment.EditorTools
@@ -136,7 +135,8 @@ namespace XRApartment.EditorTools
                 fridge.transform.localPosition = new Vector3(1.2f, 0, 0);
                 foreach (var l in root.GetComponentsInChildren<Light>()) l.enabled = false;
                 var floor = GameObject.CreatePrimitive(PrimitiveType.Plane); floor.transform.SetParent(root.transform, false); floor.transform.localScale = Vector3.one * 2;
-                var floorMaterial = new Material(Shader.Find("Standard")); floorMaterial.color = new Color(.3f, .3f, .3f); floorMaterial.SetFloat("_Glossiness", .14f);
+                var floorMaterial = new Material(Shader.Find("HDRP/Lit")); floorMaterial.color = new Color(.3f, .3f, .3f); floorMaterial.SetFloat("_Smoothness", .14f);
+                KitchenHdrpMaterials.Validate(floorMaterial);
                 floor.GetComponent<Renderer>().sharedMaterial = floorMaterial;
                 try
                 {
@@ -174,8 +174,7 @@ namespace XRApartment.EditorTools
                 var camera = go.AddComponent<Camera>(); camera.transform.position = position; camera.transform.LookAt(target);
                 camera.fieldOfView = fov; camera.nearClipPlane = .02f; camera.farClipPlane = 60; camera.allowHDR = true; camera.cullingMask = mask;
                 if (mask != -1) { camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = new Color(.2f, .2f, .2f); }
-                var source = UnityEngine.Object.FindObjectsOfType<PostProcessLayer>().FirstOrDefault();
-                if (source != null) { var layer = go.AddComponent<PostProcessLayer>(); EditorUtility.CopySerialized(source, layer); layer.volumeTrigger = camera.transform; }
+                KitchenHdrpAuthoring.ConfigureCamera(camera);
                 camera.targetTexture = texture; camera.Render(); RenderTexture.active = texture;
                 pixels.ReadPixels(new Rect(0, 0, 1600, 1100), 0, 0); pixels.Apply(); File.WriteAllBytes(path, pixels.EncodeToPNG());
             }

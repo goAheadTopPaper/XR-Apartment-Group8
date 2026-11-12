@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
 using XRApartment.Runtime;
@@ -88,7 +90,7 @@ namespace XRApartment.Tests
         }
 
         [Test]
-        public void EnvironmentGeometry_HasMeshesCollidersAndBuiltInMaterials()
+        public void EnvironmentGeometry_HasMeshesCollidersAndHdrpMaterials()
         {
             var environment = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Environment");
             var windows = environment.transform.Find("PREF_Kitchen_Windows");
@@ -129,7 +131,7 @@ namespace XRApartment.Tests
                 {
                     Assert.IsNotNull(material, filter.name);
                     Assert.IsNotNull(material.shader, material.name);
-                    Assert.AreEqual("Standard", material.shader.name, material.name);
+                    Assert.AreEqual("HDRP/Lit", material.shader.name, material.name);
                 }
             }
         }
@@ -163,7 +165,7 @@ namespace XRApartment.Tests
                     foreach (var material in renderers.SelectMany(renderer => renderer.sharedMaterials))
                     {
                         Assert.IsNotNull(material, path);
-                        Assert.AreEqual("Standard", material.shader.name, path);
+                        Assert.AreEqual("HDRP/Lit", material.shader.name, path);
                     }
                     var grab = prop.GetComponent<XRGrabInteractable>();
                     if (grab == null) continue;
@@ -233,21 +235,17 @@ namespace XRApartment.Tests
                 Assert.That(profile.Length(prefix + "_height"), Is.GreaterThan(0));
                 Assert.IsNotNull(data.FindProperty("surface").objectReferenceValue);
                 Assert.IsNotNull(data.FindProperty("stream").objectReferenceValue);
-                Assert.That(profile.SurfaceMaterial.shader.name, Is.EqualTo("#NVJOB/Water Shaders V2/Water Specular"));
-                Assert.IsFalse(profile.SurfaceMaterial.IsKeywordEnabled("EFFECT_MIRROR"));
+                Assert.That(profile.SurfaceMaterial.shader.name, Is.EqualTo("HDRP/Lit"));
+                Assert.AreEqual(1f, profile.SurfaceMaterial.GetFloat("_SurfaceType"));
+                Assert.That(AssetDatabase.GetAssetPath(profile.SurfaceMaterial.GetTexture("_NormalMap")),
+                    Does.StartWith("Assets/ThirdParty/NVJOBWaterV2/"));
             }
-            // The test runner can make its own scratch scene active; RenderSettings
-            // are scene-specific, unlike the explicitly scoped component queries.
-            var previous = SceneManager.GetActiveScene();
-            try
-            {
-                SceneManager.SetActiveScene(scene);
-                Assert.That(RenderSettings.skybox.shader.name, Is.EqualTo("Skybox/Cubemap"));
-                Assert.IsNotNull(RenderSettings.skybox.GetTexture("_Tex"));
-                Assert.That(AssetDatabase.GetAssetPath(RenderSettings.skybox.GetTexture("_Tex")),
-                    Does.StartWith("Assets/ThirdParty/AllSkyFree/"));
-            }
-            finally { SceneManager.SetActiveScene(previous); }
+            var volume = Components<Volume>().Single(value => value.sharedProfile != null &&
+                value.sharedProfile.name == "VOL_KitchenReview");
+            Assert.IsTrue(volume.sharedProfile.TryGet(out HDRISky sky));
+            Assert.IsNotNull(sky.hdriSky.value);
+            Assert.That(AssetDatabase.GetAssetPath(sky.hdriSky.value), Does.StartWith("Assets/ThirdParty/AllSkyFree/"));
+            Assert.That(Components<HDAdditionalReflectionData>().Count(probe => probe.texture != null), Is.EqualTo(2));
         }
 
         [Test]

@@ -216,7 +216,7 @@ namespace XRApartment.Runtime
                 curds[i].localPosition = new Vector3(Mathf.Cos(angle) * radius, vessel.InnerBottom + .004f + lift, Mathf.Sin(angle) * radius);
                 curds[i].localRotation = Quaternion.Euler(fold > 0 ? Mathf.Sin(foldPhase + i) * 35 : 0, angle * Mathf.Rad2Deg, 0);
                 curds[i].localScale = curdScales[i] * Mathf.Lerp(.08f, 1, coagulated);
-                curdTint.SetColor("_Color", vessel.Stage == CookingStage.Burnt ? profile.burntTint :
+                curdTint.SetColor("_BaseColor", vessel.Stage == CookingStage.Burnt ? profile.burntTint :
                     texturedEggCurds ? Color.white : profile.cookedEgg);
                 foreach (var renderer in curdRenderers[i]) renderer.SetPropertyBlock(curdTint);
             }

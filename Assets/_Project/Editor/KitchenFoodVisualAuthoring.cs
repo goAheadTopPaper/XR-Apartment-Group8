@@ -62,14 +62,18 @@ namespace XRApartment.EditorTools
             interior.color = Color.white;
             interior.mainTexture = KitchenAuthoring.LoadRequired<Texture2D>(FoodArt + "Textures/tomato_flesh.png");
             interior.SetFloat("_Metallic", 0); interior.SetFloat("_Glossiness", .44f);
-            EditorUtility.SetDirty(interior);
+            KitchenHdrpMaterials.UpgradeStandard(interior);
         }
 
         static Material StableFoodMaterial(string name)
         {
             var path = FoodArt + "MAT_Food_" + name + ".mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (material != null) return material;
+            if (material != null)
+            {
+                material.shader = Shader.Find("Standard");
+                return material;
+            }
             material = new Material(Shader.Find("Standard")) { name = "MAT_Food_" + name };
             AssetDatabase.CreateAsset(material, path);
             return material;
@@ -86,7 +90,7 @@ namespace XRApartment.EditorTools
             KitchenPreparedAssetImporter.SetMap(material, "_OcclusionMap", "ao.png", folder);
             material.SetFloat("_GlossMapScale", 1); material.SetFloat("_BumpScale", .7f);
             material.EnableKeyword("_METALLICGLOSSMAP"); material.EnableKeyword("_NORMALMAP");
-            EditorUtility.SetDirty(material);
+            KitchenHdrpMaterials.UpgradeStandard(material);
             return material;
         }
 

@@ -249,6 +249,7 @@ namespace XRApartment.EditorTools
                         }
                         var path = AssetDatabase.GenerateUniqueAssetPath(folder + "/MAT_" + cache.Count.ToString("00") + ".mat");
                         AssetDatabase.CreateAsset(material, path);
+                        KitchenHdrpMaterials.UpgradeStandard(material);
                         cache.Add(original, material);
                     }
                     values[i] = material;

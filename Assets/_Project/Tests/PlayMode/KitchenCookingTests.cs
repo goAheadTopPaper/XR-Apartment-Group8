@@ -176,6 +176,7 @@ namespace XRApartment.Tests
                 foreach (var root in SceneManager.GetSceneAt(i).GetRootGameObjects())
                     if (root.activeSelf && (root.GetComponentInChildren<Renderer>(true) != null ||
                                             root.GetComponentInChildren<Collider>(true) != null ||
+                        root.GetComponentInChildren<Light>(true) != null ||
                                             root.GetComponentInChildren<UnityEngine.EventSystems.EventSystem>(true) != null))
                     { hiddenSceneRoots.Add(root); root.SetActive(false); }
             cookingScene = EditorSceneManager.LoadSceneInPlayMode("Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity", new LoadSceneParameters(LoadSceneMode.Additive));
@@ -247,8 +248,6 @@ namespace XRApartment.Tests
             manager.transform.position = target;
             var camera = go.AddComponent<Camera>(); camera.CopyFrom(source); camera.stereoTargetEye = StereoTargetEyeMask.None;
             camera.transform.position = new Vector3(-2.6f, 2.1f, -.1f); camera.transform.LookAt(target);
-            var sourcePost = source.GetComponent("PostProcessLayer");
-            if (sourcePost != null) EditorUtility.CopySerialized(sourcePost, go.AddComponent(sourcePost.GetType()));
             var targetTexture = new RenderTexture(1200, 900, 24);
             var texture = new Texture2D(1200, 900, TextureFormat.RGB24, false);
             var previous = RenderTexture.active;

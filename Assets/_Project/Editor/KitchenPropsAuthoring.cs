@@ -196,6 +196,7 @@ public static class KitchenPropsAuthoring
         material.SetFloat("_Glossiness", ceramic ? .46f : metal ? .52f : source.name.StartsWith("Tomato") ? .32f : .18f);
         if (ceramic) material.color = new Color(.88f, .90f, .88f);
         AssetDatabase.CreateAsset(material, path);
+        KitchenHdrpMaterials.UpgradeStandard(material);
         return material;
     }
 

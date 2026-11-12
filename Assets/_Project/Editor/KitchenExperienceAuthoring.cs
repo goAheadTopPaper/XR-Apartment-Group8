@@ -186,6 +186,7 @@ namespace XRApartment.EditorTools
                 light.range = 4.6f;
                 light.color = new Color(.94f, .97f, 1f);
                 light.shadows = LightShadows.Soft;
+                KitchenHdrpAuthoring.ConfigureLight(light);
             }
         }
 
@@ -193,6 +194,7 @@ namespace XRApartment.EditorTools
         {
             var sun = RenderSettings.sun;
             sun.intensity = 3.2f;
+            KitchenHdrpAuthoring.ConfigureLight(sun);
             PrefabUtility.RecordPrefabInstancePropertyModifications(sun);
             var workbench = scene.GetRootGameObjects().Single(root => root.name == "PREF_Cooking_Workbench").transform;
             var board = workbench.Find("PREF_Cooking_ChoppingBoard").position;
@@ -229,6 +231,7 @@ namespace XRApartment.EditorTools
                 light.intensity = 1.35f;
                 light.color = new Color(1f, .95f, .88f);
                 light.shadows = LightShadows.Soft;
+                KitchenHdrpAuthoring.ConfigureLight(light);
             }
         }
 
@@ -237,6 +240,7 @@ namespace XRApartment.EditorTools
             BakeLightingBatch();
             var review = EditorSceneManager.OpenScene("Assets/_Project/Scenes/SCN_Kitchen_Review.unity");
             if (!Lightmapping.Bake()) throw new InvalidOperationException("Review probe bake failed.");
+            KitchenHdrpAuthoring.BakeReflections(review);
             KitchenAuthoring.SaveScene(review);
             AssetDatabase.SaveAssets();
             Debug.Log("KITCHEN_EXPERIENCE_BAKED probes=" + LightmapSettings.lightProbes.count);

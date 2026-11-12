@@ -110,7 +110,9 @@ namespace XRApartment.EditorTools
                 var guide = root.gameObject.AddComponent<KitchenActivityGuide>();
                 var notes = root.gameObject.AddComponent<KitchenFeedbackNotes>();
                 var pause = root.gameObject.AddComponent<KitchenPauseMenu>();
-                BuildPauseMenu(root, pause, guide, notes);
+                var graphics = root.gameObject.AddComponent<KitchenGraphicsMenu>();
+                BuildPauseMenu(root, pause, guide, notes, graphics);
+                BuildGraphicsMenu(root, graphics);
                 var panel = ActivityPanel("Guide", root, 710, 480, .0008f);
                 var title = KitchenLocomotionAuthoring.Label("Title", panel, 0, 187, 646, 52, 34, "Calibrate your view");
                 var instruction = KitchenLocomotionAuthoring.Label("Instruction", panel, 0, 104, 646, 99, 27, "");
@@ -181,7 +183,7 @@ namespace XRApartment.EditorTools
             finally { Object.DestroyImmediate(root.gameObject); }
         }
 
-        static void BuildPauseMenu(RectTransform root, KitchenPauseMenu pause, KitchenActivityGuide guide, KitchenFeedbackNotes notes)
+        static void BuildPauseMenu(RectTransform root, KitchenPauseMenu pause, KitchenActivityGuide guide, KitchenFeedbackNotes notes, KitchenGraphicsMenu graphics)
         {
             var panel = KitchenLocomotionAuthoring.Rect("PauseMenu", root, 0, 0, 920, 520);
             panel.localScale = Vector3.one * .00083f;
@@ -197,6 +199,7 @@ namespace XRApartment.EditorTools
             var layout = Row("LayoutLab", 2, "Layout Lab");
             var feedback = Row("FeedbackNote", -64, "Feedback note");
             var options = Row("Options", -130, "Options");
+            var graphicsButton = Row("Graphics", -196, "Graphics");
             var stage = KitchenLocomotionAuthoring.Label("Stage", context, 0, 123, 442, 98, 43, "Calibrate your view");
             stage.alignment = TextAlignmentOptions.MidlineLeft;
             var instructions = KitchenLocomotionAuthoring.Label("Instruction", context, 0, -16, 442, 155, 27, "");
@@ -209,7 +212,7 @@ namespace XRApartment.EditorTools
             panel.gameObject.SetActive(false);
             Wire(pause, ("guide", guide), ("notes", notes), ("panel", panel.gameObject),
                 ("resume", resume), ("kitchenGuide", guideButton), ("layout", layout), ("feedback", feedback),
-                ("options", options), ("resumeLabel", resume.GetComponentInChildren<TMP_Text>()),
+                ("options", options), ("graphics", graphicsButton), ("graphicsMenu", graphics), ("resumeLabel", resume.GetComponentInChildren<TMP_Text>()),
                 ("stageTitle", stage), ("stageInstruction", instructions));
 
             RectTransform Surface(string name, float x, float width)
@@ -239,6 +242,23 @@ namespace XRApartment.EditorTools
                 text.margin = new Vector4(15, 0, 8, 0);
                 return button;
             }
+        }
+
+        static void BuildGraphicsMenu(RectTransform root, KitchenGraphicsMenu graphics)
+        {
+            var panel = ActivityPanel("GraphicsQuality", root, 740, 460, .0008f);
+            KitchenLocomotionAuthoring.Label("Title", panel, 0, 176, 670, 50, 34, "Graphics quality");
+            var performance = KitchenLocomotionAuthoring.Button("Performance", panel, 0, 103, 658, 56,
+                "Performance");
+            var standard = KitchenLocomotionAuthoring.Button("Standard", panel, 0, 38, 658, 56, "Standard");
+            var rayTracing = KitchenLocomotionAuthoring.Button("RayTracing", panel, 0, -27, 658, 56,
+                "High (ray tracing)");
+            var status = KitchenLocomotionAuthoring.Label("Status", panel, 0, -107, 666, 72, 24, "");
+            var back = KitchenLocomotionAuthoring.Button("Back", panel, 233, -182, 192, 52, "Back");
+            ApplyActivityMaterials(panel);
+            panel.gameObject.SetActive(false);
+            Wire(graphics, ("panel", panel.gameObject), ("performance", performance), ("standard", standard),
+                ("rayTracing", rayTracing), ("status", status), ("back", back));
         }
 
         static RectTransform ActivityPanel(string name, Transform parent, float width, float height, float scale)

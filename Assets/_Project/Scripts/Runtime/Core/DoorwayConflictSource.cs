@@ -182,11 +182,12 @@ namespace XRApartment.Runtime.Core
         private void EnsureMarker()
         {
             if (marker != null) return;
-            var shader = Shader.Find("Sprites/Default");
+            var shader = Shader.Find("XR Apartment/Water Droplet");
             if (shader == null) return;
             marker = new GameObject("ReviewDesignConflict");
             marker.transform.SetParent(transform, false);
-            lineMaterial = new Material(shader);
+            lineMaterial = new Material(shader) { color = Color.white };
+            lineMaterial.SetFloat("_ShapeMask", 0);
             outline = marker.AddComponent<LineRenderer>();
             outline.sharedMaterial = lineMaterial;
             outline.shadowCastingMode = ShadowCastingMode.Off;

@@ -90,7 +90,7 @@ namespace XRApartment.Runtime
                         var original = originalColours[i][j];
                         var result = ingredientKind == KitchenIngredientKind.Beef && progress.Stage == CookingStage.Cooked
                             ? Color.Lerp(original, new Color(.30f, .17f, .105f), .85f) : original * colour;
-                        tint.SetColor("_Color", result);
+                        tint.SetColor("_BaseColor", result);
                         visuals[i].SetPropertyBlock(tint, j);
                     }
         }

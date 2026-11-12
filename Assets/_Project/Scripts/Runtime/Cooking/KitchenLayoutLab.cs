@@ -23,7 +23,7 @@ namespace XRApartment.Runtime
             public Color enamel;
         }
 
-        private static readonly int Colour = Shader.PropertyToID("_Color");
+        private static readonly int Colour = Shader.PropertyToID("_BaseColor");
         [SerializeField] private KitchenCookingStation station;
         [SerializeField] private KitchenFridge fridge;
         [SerializeField] private KitchenFridge compactFridge;

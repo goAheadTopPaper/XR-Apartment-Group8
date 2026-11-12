@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
 using UnityEngine.TestTools;
@@ -137,7 +138,7 @@ public class CorePlayWiringSmokeTests
         var workbench = GameObject.Find("PREF_Cooking_Workbench").transform;
         var centre = (workbench.Find("PREF_Cooking_ChoppingBoard").position +
                       workbench.Find("LOC_BurnerSurface").position) * .5f;
-        Assert.AreEqual(LightType.Rectangle, taskLight.type);
+        Assert.AreEqual(HDLightTypeAndShape.RectangleArea, taskLight.GetComponent<HDAdditionalLightData>().GetLightTypeAndShape());
         Assert.That(Vector3.Dot(taskLight.transform.forward, Vector3.down), Is.GreaterThan(.99f));
         Assert.That(Vector3.ProjectOnPlane(taskLight.transform.position - centre, Vector3.up).magnitude,
             Is.LessThan(.01f));

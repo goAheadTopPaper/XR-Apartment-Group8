@@ -41,37 +41,19 @@ public static partial class KitchenWaterAuthoring
 
         var profile = AssetDatabase.LoadAssetAtPath<WaterInteractionProfile>(ProfilePath);
         if (profile == null) { profile = ScriptableObject.CreateInstance<WaterInteractionProfile>(); AssetDatabase.CreateAsset(profile, ProfilePath); }
-        var surface = Material("MAT_Water_Kitchen", "#NVJOB/Water Shaders V2/Water Specular");
-        surface.SetColor("_AlbedoColor", new Color(0.025f, 0.075f, 0.085f, 0.68f));
-        surface.SetFloat("_AlbedoContrast", 1f);
-        surface.SetFloat("_Shininess", 0.85f);
-        surface.SetColor("_SpecColor", new Color(0.35f, 0.35f, 0.35f));
-        surface.SetFloat("_SoftFactor", 120f); // Kitchen water depths are centimetres, not an ocean.
-        surface.SetFloat("_NormalMap1Strength", 0.13f);
-        surface.SetTexture("_NormalMap1", AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/ThirdParty/NVJOBWaterV2/Textures/Water N 0.png"));
-        surface.SetTextureScale("_NormalMap1", Vector2.one * 0.4f);
-        surface.DisableKeyword("EFFECT_MIRROR");
-        surface.DisableKeyword("EFFECT_PARALLAX");
-        surface.DisableKeyword("EFFECT_FOAM");
-        var probe = UnityEngine.Object.FindFirstObjectByType<ReflectionProbe>();
-        if (probe != null && probe.bakedTexture != null)
-        {
-            surface.EnableKeyword("EFFECT_REFLECTION");
-            surface.SetTexture("_ReflectionCube", probe.bakedTexture);
-            surface.SetFloat("_ReflectionStrength", 0.12f);
-            surface.SetColor("_ReflectionColor", Color.white);
-        }
-        var stream = Material("MAT_Water_Stream", "Standard");
-        stream.color = new Color(0.12f, 0.27f, 0.30f, 0.75f);
-        stream.SetFloat("_Glossiness", 0.95f);
-        stream.SetFloat("_Metallic", 0.05f);
-        stream.SetFloat("_Mode", 2);
-        stream.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-        stream.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-        stream.SetInt("_ZWrite", 0);
-        stream.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-        stream.EnableKeyword("_ALPHABLEND_ON");
-        stream.renderQueue = 3000;
+        var surface = Material("MAT_Water_Kitchen", "HDRP/Lit");
+        surface.color = new Color(.10f, .23f, .26f, .48f);
+        surface.SetFloat("_Smoothness", .9f);
+        surface.SetFloat("_NormalScale", .13f);
+        surface.SetTexture("_NormalMap", KitchenAuthoring.LoadRequired<Texture2D>(
+            "Assets/ThirdParty/NVJOBWaterV2/Textures/Water N 0.png"));
+        surface.SetTextureScale("_BaseColorMap", Vector2.one * .4f);
+        KitchenHdrpMaterials.ConfigureTransparent(surface, preserveSpecular: true);
+        var stream = Material("MAT_Water_Stream", "HDRP/Lit");
+        stream.color = new Color(.12f, .27f, .30f, .75f);
+        stream.SetFloat("_Smoothness", .95f);
+        stream.SetFloat("_Metallic", .05f);
+        KitchenHdrpMaterials.ConfigureTransparent(stream, preserveSpecular: false);
         var splash = Material("MAT_Water_Splash", "XR Apartment/Water Droplet");
         splash.color = new Color(0.65f, 0.84f, 0.9f, 0.65f);
         var profileData = new SerializedObject(profile);
@@ -89,7 +71,7 @@ public static partial class KitchenWaterAuthoring
         EditorUtility.SetDirty(stream);
         EditorUtility.SetDirty(splash);
         KitchenAuthoring.SaveScene(scene);
-        Debug.Log("Kitchen water configured: open vessels, NVJOB surfaces, conserved volume parcels, tap and drain.");
+        Debug.Log("Kitchen water configured: open vessels, HDRP surfaces, conserved volume parcels, tap and drain.");
     }
 
     static void Register(ModelAssumptions assumptions, string prefix, float radius, float bottom, float height, float thickness)
@@ -190,10 +172,10 @@ public static partial class KitchenWaterAuthoring
         var root = new GameObject("PREF_Water_KitchenStation");
         try
         {
-            var chrome = Material("MAT_WaterStation_Chrome", "Standard");
+            var chrome = Material("MAT_WaterStation_Chrome", "HDRP/Lit");
             chrome.color = new Color(0.55f, 0.57f, 0.58f);
-            chrome.SetFloat("_Metallic", 0.9f); chrome.SetFloat("_Glossiness", 0.8f);
-            EditorUtility.SetDirty(chrome);
+            chrome.SetFloat("_Metallic", 0.9f); chrome.SetFloat("_Smoothness", 0.8f);
+            KitchenHdrpMaterials.Validate(chrome);
             var basin = Child(root.transform, "BASIN_Collect");
             var body = Child(basin, "BODY_Basin");
             body.gameObject.AddComponent<MeshFilter>();

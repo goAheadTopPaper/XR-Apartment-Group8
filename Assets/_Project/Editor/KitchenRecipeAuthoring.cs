@@ -167,6 +167,7 @@ namespace XRApartment.EditorTools
                         {
                             material = new Material(original) { shader = Shader.Find("Standard"), name = name };
                             AssetDatabase.CreateAsset(material, path);
+                            KitchenHdrpMaterials.UpgradeStandard(material);
                         }
                         RecipeMaterials.Add(original, material);
                     }
@@ -199,6 +200,7 @@ namespace XRApartment.EditorTools
                 data.ApplyModifiedPropertiesWithoutUndo();
                 var lamp = Child(root.transform, "LGT_FridgeInterior"); lamp.localPosition = new Vector3(0, 1.68f, .10f);
                 var light = lamp.gameObject.AddComponent<Light>(); light.type = LightType.Point; light.range = 1.5f; light.intensity = .55f;
+                KitchenHdrpAuthoring.ConfigureLight(light);
                 light.color = new Color(1, .94f, .8f); light.shadows = LightShadows.None;
                 var fridge = root.AddComponent<KitchenFridge>(); fridge.Configure(door, profile,
                     new Bounds(new Vector3(0, .94f, 0), new Vector3(.66f, 1.7f, .69f))); fridge.ConfigureLight(light);

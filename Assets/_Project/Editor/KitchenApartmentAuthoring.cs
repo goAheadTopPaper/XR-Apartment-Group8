@@ -131,6 +131,7 @@ namespace XRApartment.EditorTools
                 light.range = 4.6f;
                 light.color = new Color(1f, .95f, .87f);
                 light.shadows = LightShadows.Soft;
+                KitchenHdrpAuthoring.ConfigureLight(light);
                 var visual = AddApartmentModel(fixtures, name + " fixture", "corridor_ceiling_light",
                     new Vector3(-.37f, CeilingHeight - FixtureThickness * .5f, z), new Vector3(.29f, FixtureThickness, length));
                 visual.shadowCastingMode = ShadowCastingMode.Off;
@@ -196,11 +197,13 @@ namespace XRApartment.EditorTools
         {
             var path = ApartmentArt + "MAT_" + asset + ".mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var standard = Shader.Find("Standard");
             if (material == null)
             {
-                material = new Material(Shader.Find("Standard"));
+                material = new Material(standard);
                 AssetDatabase.CreateAsset(material, path);
             }
+            material.shader = standard;
             material.color = Color.white;
             material.SetTexture("_MainTex", KitchenAuthoring.LoadRequired<Texture2D>(ApartmentArt + asset + "_albedo.png"));
             var normal = ApartmentTexture(asset, "_normal", TextureImporterType.NormalMap);
@@ -218,7 +221,7 @@ namespace XRApartment.EditorTools
                 material.EnableKeyword("_EMISSION");
                 material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
             }
-            EditorUtility.SetDirty(material);
+            KitchenHdrpMaterials.UpgradeStandard(material);
             return material;
         }
 

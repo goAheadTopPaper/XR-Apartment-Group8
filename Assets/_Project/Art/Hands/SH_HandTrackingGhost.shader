@@ -2,25 +2,27 @@ Shader "XR Apartment/Hand Tracking Ghost"
 {
     Properties
     {
-        _Color ("Tracking tint", Color) = (0.25, 0.65, 0.85, 0.24)
+        [MainColor] _BaseColor ("Tracking tint", Color) = (0.25, 0.65, 0.85, 0.24)
+        [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("Depth test", Float) = 8
     }
     SubShader
     {
         Tags { "Queue"="Transparent+100" "RenderType"="Transparent" "IgnoreProjector"="True" }
         // A displaced tracked hand must remain readable behind the blocking surface.
         ZWrite Off
-        ZTest Always
+        ZTest [_ZTest]
         Blend SrcAlpha OneMinusSrcAlpha
         Cull Back
         Pass
         {
+            Tags { "LightMode"="SRPDefaultUnlit" }
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_instancing
             #include "UnityCG.cginc"
 
-            fixed4 _Color;
+            fixed4 _BaseColor;
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -49,7 +51,7 @@ Shader "XR Apartment/Hand Tracking Ghost"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 float rim = 1.0 - abs(dot(normalize(input.normal), normalize(input.view)));
-                return fixed4(_Color.rgb, _Color.a * lerp(0.5, 1.0, rim * rim));
+                return fixed4(_BaseColor.rgb, _BaseColor.a * lerp(0.5, 1.0, rim * rim));
             }
             ENDCG
         }

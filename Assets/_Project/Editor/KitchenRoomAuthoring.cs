@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using XRApartment.Runtime;
 
@@ -14,7 +13,6 @@ namespace XRApartment.EditorTools
     public static partial class KitchenCookingAuthoring
     {
         const string CityTexture = "Assets/ThirdParty/PolyHaven/JoburgCentralSunset/sunset_jhbcentral_4k.exr";
-        const string CitySky = Art + "MAT_Sky_CookingCity.mat";
         const string RoomResetPrefab = Prefabs + "PREF_Cooking_RoomReset.prefab";
         const string MainPlaySessionKey = "XRApartment.MainKitchenPlayInitialized";
         const string SuspendedPlaySceneKey = "XRApartment.SuspendedPlayScene";
@@ -86,7 +84,9 @@ namespace XRApartment.EditorTools
                 AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene) != ScenePath)
                 throw new InvalidOperationException("The city kitchen is not configured as the build and Editor Play entry.");
             var main = EditorSceneManager.OpenScene(ScenePath);
-            if (RenderSettings.skybox != KitchenAuthoring.LoadRequired<Material>(CitySky))
+            var sky = KitchenHdrpAuthoring.Sky(main);
+            if (sky.hdriSky.value != KitchenAuthoring.LoadRequired<Cubemap>(CityTexture) ||
+                !Mathf.Approximately(sky.rotation.value, 120f))
                 throw new InvalidOperationException("The main kitchen must use the city panorama sky.");
             var missing = main.GetRootGameObjects().SelectMany(root => root.GetComponentsInChildren<Transform>(true))
                 .Sum(t => GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject));
@@ -94,7 +94,7 @@ namespace XRApartment.EditorTools
             AssetDatabase.SaveAssets();
             Debug.Log("KITCHEN_MAIN_SCENE_READY main=" + main.path + " editorPlay=" +
                 AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene) + " sky=" +
-                AssetDatabase.GetAssetPath(RenderSettings.skybox) + " scenes=" + EditorBuildSettings.scenes.Length +
+                AssetDatabase.GetAssetPath(sky.hdriSky.value) + " scenes=" + EditorBuildSettings.scenes.Length +
                 " missingScripts=" + missing + " target=" + EditorUserBuildSettings.activeBuildTarget);
         }
 
@@ -135,16 +135,11 @@ namespace XRApartment.EditorTools
             label.text = "RESET ROOM"; EditorUtility.SetDirty(label); PrefabUtility.RecordPrefabInstancePropertyModifications(label);
             var importer = (TextureImporter)AssetImporter.GetAtPath(CityTexture);
             if (importer == null) throw new FileNotFoundException("Download the licensed city EXR first", CityTexture);
-            importer.textureShape = TextureImporterShape.Texture2D; importer.sRGBTexture = false;
+            importer.textureShape = TextureImporterShape.TextureCube; importer.sRGBTexture = false;
+            importer.generateCubemap = TextureImporterGenerateCubemap.Cylindrical;
             importer.maxTextureSize = 4096; importer.mipmapEnabled = true;
             importer.wrapModeU = TextureWrapMode.Repeat; importer.wrapModeV = TextureWrapMode.Clamp; importer.SaveAndReimport();
-            var sky = AssetDatabase.LoadAssetAtPath<Material>(CitySky);
-            if (sky == null) { sky = new Material(Shader.Find("Skybox/Panoramic")); AssetDatabase.CreateAsset(sky, CitySky); }
-            sky.SetTexture("_MainTex", KitchenAuthoring.LoadRequired<Texture2D>(CityTexture));
-            sky.SetColor("_Tint", new Color(.5f, .5f, .5f)); sky.SetFloat("_Exposure", 1f);
-            sky.SetFloat("_Rotation", 120); sky.SetFloat("_Mapping", 1); sky.SetFloat("_ImageType", 0);
-            RenderSettings.skybox = sky; RenderSettings.defaultReflectionMode = DefaultReflectionMode.Skybox; RenderSettings.customReflection = null;
-            RenderSettings.ambientMode = AmbientMode.Skybox; EditorUtility.SetDirty(sky); DynamicGI.UpdateEnvironment();
+            KitchenHdrpAuthoring.ConfigureEnvironment(scene, KitchenAuthoring.LoadRequired<Cubemap>(CityTexture), 120f);
         }
 
         [Serializable] sealed class WindowInfo { public string path, material, shader; public Bounds bounds; public Color colour; public float mode; }
@@ -152,11 +147,11 @@ namespace XRApartment.EditorTools
         public static void InspectRoomBatch()
         {
             var scene = EditorSceneManager.OpenScene(ScenePath); var roots = scene.GetRootGameObjects();
-            var room = new RoomInfo { scene = scene.path, sky = AssetDatabase.GetAssetPath(RenderSettings.skybox),
+            var room = new RoomInfo { scene = scene.path, sky = AssetDatabase.GetAssetPath(KitchenHdrpAuthoring.Sky(scene).hdriSky.value),
                 windows = roots.Single(r => r.name == "PREF_Kitchen_Environment").GetComponentsInChildren<Renderer>(true)
                     .Where(r => r.name.IndexOf("window", StringComparison.OrdinalIgnoreCase) >= 0 || r.sharedMaterials.Any(m => m != null && m.name.IndexOf("glass", StringComparison.OrdinalIgnoreCase) >= 0))
                     .SelectMany(r => r.sharedMaterials.Where(m => m != null).Select(m => new WindowInfo { path = r.name, material = AssetDatabase.GetAssetPath(m),
-                        shader = m.shader.name, bounds = r.bounds, colour = m.color, mode = m.HasProperty("_Mode") ? m.GetFloat("_Mode") : -1 })).ToArray() };
+                        shader = m.shader.name, bounds = r.bounds, colour = m.color, mode = m.HasProperty("_SurfaceType") ? m.GetFloat("_SurfaceType") : -1 })).ToArray() };
             foreach (var t in roots.SelectMany(r => r.GetComponentsInChildren<Transform>(true)))
                 room.missingScripts += GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject);
             Directory.CreateDirectory("Logs/RoomResetAndCity");
@@ -175,8 +170,7 @@ namespace XRApartment.EditorTools
             {
                 var camera = go.AddComponent<Camera>(); camera.transform.position = position; camera.transform.LookAt(target);
                 camera.fieldOfView = fov; camera.nearClipPlane = .02f; camera.farClipPlane = 80; camera.allowHDR = true;
-                var source = UnityEngine.Object.FindObjectsOfType<PostProcessLayer>(true).FirstOrDefault();
-                if (source != null) { var layer = go.AddComponent<PostProcessLayer>(); EditorUtility.CopySerialized(source, layer); layer.volumeTrigger = camera.transform; }
+                KitchenHdrpAuthoring.ConfigureCamera(camera);
                 camera.targetTexture = texture; camera.Render(); RenderTexture.active = texture;
                 image.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0); image.Apply();
                 File.WriteAllBytes("Logs/RoomResetAndCity/" + filename, image.EncodeToPNG());

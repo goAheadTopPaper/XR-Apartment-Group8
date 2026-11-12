@@ -45,8 +45,8 @@ namespace XRApartment.Runtime
             if (!on) StopFeedback();
             if (indicator == null) return;
             if (tint == null) tint = new MaterialPropertyBlock();
-            tint.SetColor("_Color", on ? new Color(1, .16f, .025f) : new Color(.12f, .08f, .07f));
-            tint.SetColor("_EmissionColor", on ? new Color(2, .12f, .01f) : Color.black);
+            tint.SetColor("_BaseColor", on ? new Color(1, .16f, .025f) : new Color(.12f, .08f, .07f));
+            tint.SetColor("_EmissiveColor", on ? new Color(2, .12f, .01f) : Color.black);
             indicator.SetPropertyBlock(tint);
         }
         void OnTriggerEnter(Collider other)

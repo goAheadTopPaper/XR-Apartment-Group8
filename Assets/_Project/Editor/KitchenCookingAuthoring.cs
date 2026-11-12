@@ -146,6 +146,7 @@ namespace XRApartment.EditorTools
             Lightmapping.lightingDataAsset = null;
             KitchenAuthoring.SaveScene(scene);
             if (!Lightmapping.Bake()) throw new InvalidOperationException("Cooking lighting bake failed");
+            KitchenHdrpAuthoring.BakeReflections(scene);
             var output = AssetDatabase.GetAssetPath(Lightmapping.lightingDataAsset);
             if (string.IsNullOrEmpty(output) || !output.Contains("SCN_Kitchen_Cooking/"))
                 throw new InvalidOperationException("Cooking bake did not produce an independent lighting data asset: " + output);
@@ -352,21 +353,24 @@ namespace XRApartment.EditorTools
             if (existing == null) { mesh.name = name; AssetDatabase.CreateAsset(mesh, path); return mesh; }
             EditorUtility.CopySerialized(mesh, existing); UnityEngine.Object.DestroyImmediate(mesh); return existing;
         }
-        static Material Material(string name, Color colour, float metallic, float smoothness, bool emissive = false)
+        static Material Material(string name, Color colour, float metallic, float smoothness)
         {
-            var path = Art + "MAT_Cooking_" + name + ".mat"; var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var path = Art + "MAT_Cooking_" + name + ".mat";
+            var material = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (material != null) return material;
-            material = new Material(Shader.Find("Standard")) { name = "MAT_Cooking_" + name, color = colour };
-            material.SetFloat("_Metallic", metallic); material.SetFloat("_Glossiness", smoothness);
-            if (emissive) material.EnableKeyword("_EMISSION");
-            AssetDatabase.CreateAsset(material, path); return material;
+            material = new Material(Shader.Find("HDRP/Lit")) { name = "MAT_Cooking_" + name, color = colour };
+            material.SetFloat("_Metallic", metallic);
+            material.SetFloat("_Smoothness", smoothness);
+            AssetDatabase.CreateAsset(material, path);
+            KitchenHdrpMaterials.Validate(material);
+            return material;
         }
+
         static Material LiquidMaterial()
         {
             var material = Material("EggLiquid", Color.white, 0, .7f);
-            material.SetFloat("_Mode", 2); material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha); material.SetInt("_ZWrite", 0);
-            material.EnableKeyword("_ALPHABLEND_ON"); material.renderQueue = 3000; return material;
+            KitchenHdrpMaterials.ConfigureTransparent(material, preserveSpecular: false);
+            return material;
         }
         static void Parameter(string key, float value, string source = null)
         {

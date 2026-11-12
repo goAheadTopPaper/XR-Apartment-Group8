@@ -461,3 +461,13 @@ Free play	自由活动
 Start free play	开始自由活动
 Return to free play	返回自由活动
 Explore the kitchen at your own pace.	自由探索厨房，试用不同布局或留下反馈。
+Graphics	画质
+Graphics quality	画质设置
+Performance	性能
+Standard	标准
+High (ray tracing)	高画质（光追）
+Performance selected. Ray tracing off.	当前：性能。光追已关闭。
+Standard selected. Ray tracing off.	当前：标准。光追已关闭。
+High quality. Ray tracing requires a DirectX 12 ray tracing GPU.	当前：高画质。光追需要支持 DXR 的 DirectX 12 显卡。
+High quality. Ray-traced reflections enabled.	当前：高画质。光线追踪反射已开启。
+High quality. Preparing ray-traced reflections.	当前：高画质。正在加载光线追踪反射。

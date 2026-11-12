@@ -94,8 +94,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d91d40e0b9688486dab5096d30dffb99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &2224830060243470873
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,8 +483,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc800364ea34042209e3f0c1ce6f0f20, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &4508642026844320553
 GameObject:
   m_ObjectHideFlags: 0
@@ -615,8 +615,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ad34abafad169848a38072baa96cdb2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_Colliders:
   - {fileID: 6164763022953839233}
@@ -764,14 +764,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f092fb68a02349dba5fc120806030ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   profile: {fileID: 11400000, guid: 65ad5483f5f2945618c51517de4487d1, type: 2}
   parameterPrefix: water_cup
   initialFill: 0.6
   drain: 0
   surface: {fileID: 8510986483314228729}
   stream: {fileID: 6453180211082840591}
+  fittedCavity: 0
+  sections: []
+  spillWhenDisabled: 0
 --- !u!114 &6448890367876573449
 MonoBehaviour:
   m_ObjectHideFlags: 0

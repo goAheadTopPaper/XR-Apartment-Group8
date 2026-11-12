@@ -31,7 +31,8 @@ namespace XRApartment.Runtime.Core
             material = arrowMaterial;
             if (material == null)
             {
-                material = new Material(Shader.Find("Unlit/Color"));
+                material = new Material(Shader.Find("XR Apartment/Water Droplet"));
+                material.SetFloat("_ShapeMask", 0);
                 material.color = colour;
                 ownsMaterial = true;
             }

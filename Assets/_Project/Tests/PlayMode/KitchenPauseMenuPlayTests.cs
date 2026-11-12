@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
@@ -211,6 +213,96 @@ namespace XRApartment.Tests
                 InputSystem.RemoveDevice(controller);
                 InputSystem.settings.backgroundBehavior = background;
                 InputSystem.settings.editorInputBehaviorInPlayMode = focus;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator GraphicsQualitySwitchesTheRenderPipelineWhilePaused()
+        {
+            var oldQuality = QualitySettings.GetQualityLevel();
+            var oldPreference = PlayerPrefs.GetInt(KitchenGraphicsMenu.Preference, -1);
+            LocomotionSettingsView menu = null;
+            using (var keyboard = new KitchenMenuKeyboard())
+            {
+                try
+                {
+                    QualitySettings.SetQualityLevel(KitchenGraphicsMenu.Standard, true);
+                    SceneManager.LoadScene(0);
+                    yield return null;
+                    yield return null;
+                    menu = Object.FindObjectOfType<LocomotionSettingsView>();
+                    var graphics = menu.GetComponentInChildren<KitchenGraphicsMenu>(true);
+                    var pause = menu.GetComponentInChildren<KitchenPauseMenu>(true);
+                    var navigation = pause.transform.Find("PauseMenu/Navigation");
+                    var panel = graphics.transform.Find("GraphicsQuality");
+                    var status = panel.Find("Status").GetComponent<TMP_Text>();
+                    var camera = menu.GetComponent<Canvas>().worldCamera;
+                    var cameraData = camera.GetComponent<HDAdditionalCameraData>();
+                    Assert.IsTrue(cameraData.renderingPathCustomFrameSettings.IsEnabled(FrameSettingsField.RayTracing));
+                    var volume = Object.FindObjectsOfType<Volume>().Single(value => value.sharedProfile.name == "VOL_KitchenCooking");
+                    Assert.IsTrue(volume.sharedProfile.TryGet(out ScreenSpaceReflection reflection));
+                    Assert.AreEqual(RayCastingMode.RayTracing, reflection.tracing.value);
+                    Assert.IsTrue(reflection.enabled.value);
+
+                    yield return keyboard.Hold();
+                    KitchenSceneTestSetup.Click(menu, navigation.Find("Graphics"));
+                    yield return null;
+                    Assert.IsTrue(panel.gameObject.activeInHierarchy && pause.IsPaused);
+                    Assert.AreEqual(0f, Time.timeScale);
+                    Assert.IsFalse(panel.Find("Standard").GetComponent<Button>().interactable);
+
+                    foreach (var selection in new[]
+                    {
+                        (button: "Performance", quality: KitchenGraphicsMenu.Performance),
+                        (button: "RayTracing", quality: KitchenGraphicsMenu.RayTracing),
+                        (button: "Standard", quality: KitchenGraphicsMenu.Standard)
+                    })
+                    {
+                        KitchenSceneTestSetup.Click(menu, panel.Find(selection.button));
+                        yield return null;
+                        yield return null;
+                        Assert.AreEqual(selection.quality, QualitySettings.GetQualityLevel());
+                        Assert.AreEqual(selection.quality, PlayerPrefs.GetInt(KitchenGraphicsMenu.Preference));
+                        Assert.IsFalse(panel.Find(selection.button).GetComponent<Button>().interactable);
+                        Assert.IsTrue(pause.IsPaused && panel.gameObject.activeInHierarchy);
+                        Assert.AreEqual(0f, Time.timeScale);
+
+                        var asset = (HDRenderPipelineAsset)QualitySettings.renderPipeline;
+                        Assert.AreEqual(selection.quality == KitchenGraphicsMenu.RayTracing,
+                            asset.currentPlatformRenderPipelineSettings.supportRayTracing);
+                        Assert.AreEqual(selection.quality != KitchenGraphicsMenu.Performance,
+                            asset.currentPlatformRenderPipelineSettings.supportSSR);
+                        if (selection.quality == KitchenGraphicsMenu.RayTracing &&
+                            (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Direct3D12 || !SystemInfo.supportsRayTracing))
+                        {
+                            Assert.AreEqual("High quality. Ray tracing requires a DirectX 12 ray tracing GPU.", KitchenLocale.Source(status));
+                            var target = RenderTexture.GetTemporary(256, 256, 24);
+                            var previous = camera.targetTexture;
+                            try
+                            {
+                                camera.targetTexture = target;
+                                camera.Render();
+                                Assert.That(RenderPipelineManager.currentPipeline, Is.TypeOf<HDRenderPipeline>());
+                                Assert.IsFalse(((HDRenderPipeline)RenderPipelineManager.currentPipeline).rayTracingSupported);
+                            }
+                            finally
+                            {
+                                camera.targetTexture = previous;
+                                RenderTexture.ReleaseTemporary(target);
+                            }
+                        }
+                    }
+                    KitchenSceneTestSetup.Click(menu, panel.Find("Back"));
+                    Assert.IsTrue(navigation.gameObject.activeInHierarchy && pause.IsPaused);
+                }
+                finally
+                {
+                    if (menu != null) menu.Close();
+                    QualitySettings.SetQualityLevel(oldQuality, true);
+                    if (oldPreference >= 0) PlayerPrefs.SetInt(KitchenGraphicsMenu.Preference, oldPreference);
+                    else PlayerPrefs.DeleteKey(KitchenGraphicsMenu.Preference);
+                    PlayerPrefs.Save();
+                }
             }
         }
 

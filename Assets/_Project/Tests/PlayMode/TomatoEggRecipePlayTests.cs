@@ -67,7 +67,8 @@ namespace XRApartment.Tests
             for (var i = 0; i < SceneManager.sceneCount; i++)
                 foreach (var root in SceneManager.GetSceneAt(i).GetRootGameObjects())
                     if (!owned.Contains(root) && root.activeSelf && (root.GetComponentInChildren<Renderer>(true) != null ||
-                        root.GetComponentInChildren<Collider>(true) != null || root.GetComponentInChildren<UnityEngine.EventSystems.EventSystem>(true) != null))
+                        root.GetComponentInChildren<Collider>(true) != null ||
+                        root.GetComponentInChildren<Light>(true) != null || root.GetComponentInChildren<UnityEngine.EventSystems.EventSystem>(true) != null))
                     { hidden.Add(root); root.SetActive(false); }
             scene = EditorSceneManager.LoadSceneInPlayMode(ScenePath, new LoadSceneParameters(LoadSceneMode.Additive));
             for (var i = 0; i < 300 && !scene.isLoaded; i++) yield return null;
@@ -1186,7 +1187,6 @@ namespace XRApartment.Tests
             camera.CopyFrom(sourceCamera); camera.stereoTargetEye = StereoTargetEyeMask.None;
             camera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(target - position));
             camera.nearClipPlane = .025f;
-            var post = sourceCamera.GetComponent("PostProcessLayer"); if (post != null) EditorUtility.CopySerialized(post, go.AddComponent(post.GetType()));
             var rt = new RenderTexture(1200, 900, 24); var image = new Texture2D(1200, 900, TextureFormat.RGB24, false);
             var before = RenderTexture.active;
             try

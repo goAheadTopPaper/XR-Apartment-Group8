@@ -14,7 +14,7 @@ namespace XRApartment.Runtime
     {
         static readonly int GripId = Animator.StringToHash("Grip");
         static readonly int TriggerId = Animator.StringToHash("Trigger");
-        static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
+        static readonly int EmissionId = Shader.PropertyToID("_EmissiveColor");
 
         [SerializeField] HandInteractionProfile profile;
         [SerializeField] NearFarInteractor interactor;

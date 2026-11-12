@@ -17,7 +17,8 @@ namespace XRApartment.Runtime.UI
         [SerializeField] KitchenActivityGuide guide;
         [SerializeField] KitchenFeedbackNotes notes;
         [SerializeField] GameObject panel;
-        [SerializeField] Button resume, kitchenGuide, layout, feedback, options;
+        [SerializeField] Button resume, kitchenGuide, layout, feedback, options, graphics;
+        [SerializeField] KitchenGraphicsMenu graphicsMenu;
         [SerializeField] TMP_Text resumeLabel, stageTitle, stageInstruction;
         [SerializeField] Canvas[] recipeCards = Array.Empty<Canvas>();
         XRBaseInteractor[] interactors;
@@ -46,6 +47,8 @@ namespace XRApartment.Runtime.UI
             layout.onClick.AddListener(() => menu.OpenLayout(fromPauseMenu: true));
             feedback.onClick.AddListener(notes.OpenOrSpawn);
             options.onClick.AddListener(menu.Open);
+            graphicsMenu.Bind(this);
+            graphics.onClick.AddListener(() => graphicsMenu.Open(menu));
         }
 
         void OnEnable()

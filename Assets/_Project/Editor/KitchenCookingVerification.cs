@@ -6,7 +6,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.PostProcessing;
 using XRApartment.Runtime;
 
 namespace XRApartment.EditorTools
@@ -81,12 +80,7 @@ namespace XRApartment.EditorTools
             {
                 var camera = cameraObject.AddComponent<Camera>(); camera.transform.position = position; camera.transform.LookAt(target);
                 camera.fieldOfView = fov; camera.nearClipPlane = .02f; camera.farClipPlane = 60; camera.allowHDR = true;
-                var source = UnityEngine.Object.FindObjectsByType<PostProcessLayer>(FindObjectsSortMode.None).FirstOrDefault();
-                if (source != null)
-                {
-                    var layer = cameraObject.AddComponent<PostProcessLayer>();
-                    EditorUtility.CopySerialized(source, layer); layer.volumeTrigger = camera.transform;
-                }
+                KitchenHdrpAuthoring.ConfigureCamera(camera);
                 camera.targetTexture = texture; camera.Render(); RenderTexture.active = texture;
                 pixels.ReadPixels(new Rect(0, 0, 1400, 1000), 0, 0); pixels.Apply(); File.WriteAllBytes(Folder + filename, pixels.EncodeToPNG());
             }

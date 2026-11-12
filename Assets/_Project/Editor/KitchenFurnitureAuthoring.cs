@@ -67,11 +67,13 @@ namespace XRApartment.EditorTools
             var name = source.name.Replace("(Instance)", "").Trim();
             var path = FurnitureArt + name + ".mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var standard = Shader.Find("Standard");
             if (material == null)
             {
-                material = new Material(Shader.Find("Standard")) { name = name };
+                material = new Material(standard) { name = name };
                 AssetDatabase.CreateAsset(material, path);
             }
+            material.shader = standard;
             material.enableInstancing = true;
             if (name.StartsWith("MAT_Furniture_Cloud_", StringComparison.Ordinal))
             {
@@ -107,7 +109,8 @@ namespace XRApartment.EditorTools
                 }
                 material.color = colour; material.SetFloat("_Metallic", metal); material.SetFloat("_Glossiness", smooth);
             }
-            EditorUtility.SetDirty(material); return material;
+            KitchenHdrpMaterials.UpgradeStandard(material);
+            return material;
         }
 
         static GameObject FurnitureVisual(Transform parent, string name, bool fixedFurniture)
@@ -162,7 +165,8 @@ namespace XRApartment.EditorTools
                             bulb.transform.localScale = new Vector3(.055f, .085f, .055f);
                             UnityEngine.Object.DestroyImmediate(bulb.GetComponent<Collider>());
                             var material = Material("PendantBulb", new Color(1, .9f, .69f), 0, .3f);
-                            material.EnableKeyword("_EMISSION"); material.SetColor("_EmissionColor", new Color(1, .83f, .57f) * 1.3f);
+                            material.SetColor("_EmissiveColor", new Color(1, .83f, .57f) * 1.3f);
+                            KitchenHdrpMaterials.Validate(material);
                             bulb.GetComponent<Renderer>().sharedMaterial = material;
                             ConfigurePendantLight(root);
                         }
@@ -188,6 +192,7 @@ namespace XRApartment.EditorTools
             light.spotAngle = 96f;
             light.innerSpotAngle = 62f;
             light.intensity = 1.7f;
+            KitchenHdrpAuthoring.ConfigureLight(light);
             light.color = new Color(1f, .93f, .84f);
             light.lightmapBakeType = LightmapBakeType.Baked;
             light.shadows = LightShadows.Soft;

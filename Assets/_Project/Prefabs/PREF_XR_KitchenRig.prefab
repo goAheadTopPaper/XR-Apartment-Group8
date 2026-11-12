@@ -43,8 +43,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64d299502104b064388841ec2adf6def, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Target: {fileID: 3269712551628301805}
   m_AimTargetObject: {fileID: 0}
   m_UseLocalSpace: 1
@@ -102,7 +102,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f5ccd52dc494e054fbe7d7161dcabe25, type: 2}
+  - {fileID: 2100000, guid: c7ac0735d23884eca855de557cd69633, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -178,8 +178,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a5f76f9ea8c80547973ab01877f9567, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_ThumbstickTransform: {fileID: 6128326063256404961}
   m_StickRotationRange: {x: 30, y: 30}
   m_StickInput:
@@ -189,8 +189,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 8a80d2d1-54ab-40f3-ae58-acd679e9f63f
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -8666952849799569744, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -205,8 +205,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 594965ae-7ab6-4c16-889f-f371fa785459
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 7904272356298805229, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -221,8 +221,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 615b1144-610d-48ff-a7ed-4f4447f2ed86
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -1758520528963094988, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -271,8 +271,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64d299502104b064388841ec2adf6def, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Target: {fileID: 2869685822111769226}
   m_AimTargetObject: {fileID: 8124718332598264256}
   m_UseLocalSpace: 0
@@ -339,7 +339,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -404,8 +404,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3c5f6c9defa4ae9ad41bcc3f8754f86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 4294967295
@@ -451,8 +451,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e766f86cb7d2461683eb37d8a971fb14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_ClimbTeleportInteractor: {fileID: 1720846628073701041}
   m_PointerPrefab: {fileID: 5212361887338514247, guid: ae1968658b9687b47976fe86c062168f, type: 3}
   m_PointerDistance: 0.3
@@ -517,7 +517,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -631,7 +631,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -770,8 +770,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c83f12c537584f51b92c01f10d7090c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TransitionDuration: 0.125
   m_InteractorSource: {fileID: 387554258069819154}
   m_IgnoreHoverEvents: 0
@@ -820,8 +820,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1410cbaaadf84a7aaa6459d37ad21b3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Renderer: {fileID: 5903320821263118760}
   m_MaterialIndex: 0
 --- !u!114 &7232007142956906409
@@ -834,8 +834,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f86d13fca2ec430d870c0f7765ad0dde, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_AffordanceStateProvider: {fileID: 8924126837817926487}
   m_ReplaceIdleStateValueWithInitialValue: 0
   m_AffordanceThemeDatum:
@@ -1028,7 +1028,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1094,8 +1094,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c83f12c537584f51b92c01f10d7090c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TransitionDuration: 0.125
   m_InteractorSource: {fileID: 1431890234424065946}
   m_IgnoreHoverEvents: 0
@@ -1144,8 +1144,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1410cbaaadf84a7aaa6459d37ad21b3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Renderer: {fileID: 7209076101985788953}
   m_MaterialIndex: 0
 --- !u!114 &6342381536671037412
@@ -1158,8 +1158,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f86d13fca2ec430d870c0f7765ad0dde, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_AffordanceStateProvider: {fileID: 6004062979782839479}
   m_ReplaceIdleStateValueWithInitialValue: 0
   m_AffordanceThemeDatum:
@@ -1283,7 +1283,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1347,8 +1347,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3cd49dc1a38aff4fa00676ddd64cf4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_DisableGravityDuringJump: 0
@@ -1365,10 +1365,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Jump
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 51323902-0a19-4bca-8e4c-cf66efe83803
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -1376,8 +1376,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 45c0fbf7-4a52-45dc-9eb6-d00046973e1b
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: -3875704489234743591, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -1495,8 +1495,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 496880615cd240be960d436c1c8ae570, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_ProvidersToDisable:
@@ -1571,7 +1571,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1637,8 +1637,8 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b94c4c83dec6a94fbaebf543478259e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_EnableFreeXMovement: 1
@@ -1654,10 +1654,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Grab Move
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 2e9a23ce-d949-4c67-9b12-7a9a35510733
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -1665,8 +1665,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 3680a95b-119c-4eba-b8fe-7e0a362e460b
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: -3742484312079769484, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -1684,10 +1684,10 @@ MonoBehaviour:
     m_Action:
       m_Name: Grab Move
       m_Type: 0
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 3d33edcf-0043-45cb-95a7-008204badf83
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
@@ -1701,8 +1701,8 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b94c4c83dec6a94fbaebf543478259e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_EnableFreeXMovement: 1
@@ -1718,10 +1718,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Grab Move
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 67220c99-f046-4e98-aa6f-d84114cad173
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -1729,8 +1729,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: ed114d26-3fbf-41fc-80fa-9675240038c5
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 15759602096507913, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -1748,10 +1748,10 @@ MonoBehaviour:
     m_Action:
       m_Name: Grab Move
       m_Type: 0
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: de56d195-bf90-4347-9982-6bf8ffa3420c
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
@@ -1765,8 +1765,8 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 760ff70c1c91bdd45907d0ff0cdcaf7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_EnableFreeXMovement: 1
@@ -1829,8 +1829,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6803edce0201f574f923fd9d10e5b30a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 2147483648
@@ -1861,10 +1861,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Select
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 36843f28-4fd5-4729-b5a6-afe92ef11597
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -1872,8 +1872,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 1a51c331-470d-4462-b8e1-2522a24bd40c
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 1263111715868034790, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -1891,10 +1891,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Activate
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 0ace7244-e61f-4e60-8d0b-2ef8c3ae51af
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -1902,8 +1902,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: bdf06a24-21b3-4f27-a8a3-72086e6c7f00
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: -5982496924579745919, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -2006,10 +2006,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: UI Press
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 54867c8e-3650-4605-a53c-ee8ffb351dcf
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -2017,8 +2017,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 257d8673-0295-4ff5-b278-e63d20cd918b
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -2038,8 +2038,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 8c6b1aac-a242-4bf4-a5b3-bfad6e83b638
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -2052,8 +2052,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 0f9fd0ee-650d-41a6-ab30-2a036c425c21
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -2066,8 +2066,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: cadca2d2-f642-4efc-a222-c1827be3e896
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -7363382999065477798, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -2080,8 +2080,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 472cbca3-7add-47a9-a5fc-73d3d10107aa
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -8811388872089202044, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -2092,10 +2092,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Scale Toggle
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 692a9304-a2fd-4dbd-9e2f-2fb4b6154f1c
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -2103,8 +2103,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: d0cf082b-f2d7-4100-b069-651cf2820425
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -2124,8 +2124,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 6f835f0d-f1c2-461c-b8bc-edc587e89149
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -2138,8 +2138,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 9140e1d5-f197-46d4-88c2-a02441edeac5
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -2166,7 +2166,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 45694be3d6f1e46a5a008ea0ab4f3f09, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2266,8 +2266,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e988983f96fe1dd48800bcdfc82f23e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_LineWidth: 0.01
   m_OverrideInteractorLineLength: 0
   m_LineLength: 10
@@ -2395,8 +2395,8 @@ MonoBehaviour:
   m_SmoothMovement: 0
   m_FollowTightness: 10
   m_SnapThresholdDistance: 10
-  m_Reticle: {fileID: 8748868027195207512, guid: 893219773891c784ab469a39151879b4, type: 3}
-  m_BlockedReticle: {fileID: 3177232254315139758, guid: a3fde713df4d99042a0403c4be9eea32, type: 3}
+  m_Reticle: {fileID: 8748868027195207512, guid: 35078b8b3f8f941efa9ca5e3720ee962, type: 3}
+  m_BlockedReticle: {fileID: 3177232254315139758, guid: bf70bfc27aaf14d45a26371c2dbcd986, type: 3}
   m_StopLineAtFirstRaycastHit: 1
   m_StopLineAtSelection: 0
   m_SnapEndpointIfAvailable: 1
@@ -2428,8 +2428,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd0b9921bce4eeb49bd05815b1135ac2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractorSourceObject: {fileID: 4324458665525279842}
   m_HapticImpulsePlayer: {fileID: 5202773240339300113}
   m_PlaySelectEntered: 1
@@ -2507,8 +2507,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c83f12c537584f51b92c01f10d7090c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TransitionDuration: 0.125
   m_InteractorSource: {fileID: 5592446408240182703}
   m_IgnoreHoverEvents: 0
@@ -2557,8 +2557,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1410cbaaadf84a7aaa6459d37ad21b3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Renderer: {fileID: 5903320821263118760}
   m_MaterialIndex: 0
 --- !u!114 &1153204328675281899
@@ -2571,8 +2571,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f86d13fca2ec430d870c0f7765ad0dde, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_AffordanceStateProvider: {fileID: 7111909296699639654}
   m_ReplaceIdleStateValueWithInitialValue: 0
   m_AffordanceThemeDatum:
@@ -2761,7 +2761,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2825,8 +2825,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 87827d2c95d4249f69b6f81ee812128d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 20
   m_DelayTime: 0
@@ -2891,7 +2891,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f12d299d16099343a3c5c0d7285822a, type: 2}
+  - {fileID: 2100000, guid: a8d07263a020b4d62aa60874e600a683, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2963,8 +2963,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6fa7b4195685c3846be746c74f0ab2f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &7383574790604924743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2975,8 +2975,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a26c941eb8a46f7b6d00416227ab8c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_XROrigin: {fileID: 1783439191619421500}
   m_BodyPositionEvaluatorObject: {fileID: 0}
   m_ConstrainedBodyManipulatorObject: {fileID: 0}
@@ -3024,8 +3024,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a5f76f9ea8c80547973ab01877f9567, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_ThumbstickTransform: {fileID: 2204169887509498850}
   m_StickRotationRange: {x: 30, y: -30}
   m_StickInput:
@@ -3035,8 +3035,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 2f424cdc-fe47-4989-a9c2-6fa97f609e70
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -60998027439631388, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -3051,8 +3051,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: adbe6783-3cbb-48f7-8ad5-0b09a32b9943
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -4289430672226363583, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -3067,8 +3067,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 7ddc77c6-8f81-4889-aaca-964286dbe1ea
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 6558622148059887818, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -3116,8 +3116,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b46d3c2f9f9a9849840e47b9ddef1b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 10
   m_UseGravity: 1
@@ -3266,7 +3266,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3334,8 +3334,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6803edce0201f574f923fd9d10e5b30a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 2147483648
@@ -3366,10 +3366,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Select
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 36843f28-4fd5-4729-b5a6-afe92ef11597
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -3377,8 +3377,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 1a51c331-470d-4462-b8e1-2522a24bd40c
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: -8061240218431744966, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -3396,10 +3396,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Activate
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 0ace7244-e61f-4e60-8d0b-2ef8c3ae51af
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -3407,8 +3407,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: bdf06a24-21b3-4f27-a8a3-72086e6c7f00
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -3511,10 +3511,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: UI Press
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 54867c8e-3650-4605-a53c-ee8ffb351dcf
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -3522,8 +3522,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 257d8673-0295-4ff5-b278-e63d20cd918b
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -3543,8 +3543,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 8c6b1aac-a242-4bf4-a5b3-bfad6e83b638
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -3557,8 +3557,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 0f9fd0ee-650d-41a6-ab30-2a036c425c21
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -3571,8 +3571,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: cadca2d2-f642-4efc-a222-c1827be3e896
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -5913262927076077117, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -3585,8 +3585,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 472cbca3-7add-47a9-a5fc-73d3d10107aa
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -440298646266941818, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -3597,10 +3597,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Scale Toggle
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 692a9304-a2fd-4dbd-9e2f-2fb4b6154f1c
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -3608,8 +3608,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: d0cf082b-f2d7-4100-b069-651cf2820425
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -3629,8 +3629,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 6f835f0d-f1c2-461c-b8bc-edc587e89149
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -3643,8 +3643,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 9140e1d5-f197-46d4-88c2-a02441edeac5
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -3671,7 +3671,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 45694be3d6f1e46a5a008ea0ab4f3f09, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3771,8 +3771,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e988983f96fe1dd48800bcdfc82f23e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_LineWidth: 0.01
   m_OverrideInteractorLineLength: 0
   m_LineLength: 10
@@ -3900,8 +3900,8 @@ MonoBehaviour:
   m_SmoothMovement: 0
   m_FollowTightness: 10
   m_SnapThresholdDistance: 10
-  m_Reticle: {fileID: 8748868027195207512, guid: 893219773891c784ab469a39151879b4, type: 3}
-  m_BlockedReticle: {fileID: 3177232254315139758, guid: a3fde713df4d99042a0403c4be9eea32, type: 3}
+  m_Reticle: {fileID: 8748868027195207512, guid: 35078b8b3f8f941efa9ca5e3720ee962, type: 3}
+  m_BlockedReticle: {fileID: 3177232254315139758, guid: bf70bfc27aaf14d45a26371c2dbcd986, type: 3}
   m_StopLineAtFirstRaycastHit: 1
   m_StopLineAtSelection: 0
   m_SnapEndpointIfAvailable: 1
@@ -3933,8 +3933,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd0b9921bce4eeb49bd05815b1135ac2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractorSourceObject: {fileID: 8124718332598264256}
   m_HapticImpulsePlayer: {fileID: 7004807819304899939}
   m_PlaySelectEntered: 1
@@ -4029,7 +4029,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4098,8 +4098,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25a07ef133a37d140a87cdf1f1c75fdf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 1
@@ -4130,10 +4130,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Select
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 2491b664-3d4e-4f20-a7ae-ee1861d845f2
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -4141,8 +4141,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: fc42dacc-33eb-41ec-9c17-d242ac6b0c5b
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 187161793506945269, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4160,10 +4160,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Activate
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 77660b9e-6bbe-4740-b80f-1fea8d0f59e1
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -4171,8 +4171,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 94568f52-c27a-47fc-a190-5e3b17572929
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4243,10 +4243,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: UI Press
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: ded1ccb2-ff18-46c7-ade9-b80985fe2825
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -4254,8 +4254,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: d762660e-30e0-4a4d-8e2a-e6b553e03f11
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 3279264004350380116, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4275,8 +4275,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: ef5cc4a5-b968-432c-9ae7-45e494178db0
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -6756787485274679044, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4292,8 +4292,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 792f6c7eaa1a4b82abf8351559ac97eb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TransformToFollow: {fileID: 8143831810068615409}
   m_MotionStabilizationMode: 1
   m_PositionStabilization: 0.25
@@ -4317,8 +4317,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 9914e1e2-77ba-43ae-8266-fd33d44c8a24
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -440298646266941818, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4341,8 +4341,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48139a683d3b4ac3a37cd5d24f71acf1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_CastOrigin: {fileID: 8143831810068615409}
   m_EnableStabilization: 0
   m_PositionStabilization: 0.25
@@ -4363,8 +4363,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ef20135915079454985abea5a2ec8967, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_CastOrigin: {fileID: 8143831810068615409}
   m_EnableStabilization: 1
   m_PositionStabilization: 0.25
@@ -4392,8 +4392,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd0b9921bce4eeb49bd05815b1135ac2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractorSourceObject: {fileID: 1431890234424065946}
   m_HapticImpulsePlayer: {fileID: 0}
   m_PlaySelectEntered: 1
@@ -4439,7 +4439,7 @@ GameObject:
   - component: {fileID: 4306329568102375281}
   - component: {fileID: 4765968208473328065}
   - component: {fileID: 4505053147799486990}
-  - component: {fileID: 566257462753071869}
+  - component: {fileID: 5289814497760744262}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -4507,8 +4507,8 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
@@ -4532,8 +4532,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2fadf230d1919748a9aa21d40f74619, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TrackingType: 0
   m_UpdateType: 0
   m_IgnoreTrackingState: 0
@@ -4542,17 +4542,17 @@ MonoBehaviour:
     m_Action:
       m_Name: Position
       m_Type: 0
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 0bacfa51-7938-4a88-adae-9e8ba6c59d23
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings:
-      - m_Name: 
+      - m_Name:
         m_Id: f5efb008-b167-4d0f-b9e0-49a2350a85b3
         m_Path: <XRHMD>/centerEyePosition
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
+        m_Interactions:
+        m_Processors:
+        m_Groups:
         m_Action: Position
         m_Flags: 0
       m_Flags: 0
@@ -4562,17 +4562,17 @@ MonoBehaviour:
     m_Action:
       m_Name: Rotation
       m_Type: 0
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 5439f14e-c9da-4bd1-ad3f-7121a75c10d9
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings:
-      - m_Name: 
+      - m_Name:
         m_Id: f984a7fd-f7e2-45ef-b21d-699a5d160f29
         m_Path: <XRHMD>/centerEyeRotation
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
+        m_Interactions:
+        m_Processors:
+        m_Groups:
         m_Action: Rotation
         m_Flags: 0
       m_Flags: 0
@@ -4584,46 +4584,46 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Integer
       m_Id: be9cc21d-5595-4ea6-aa72-e48652a11968
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 1031966339891076899, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_PositionAction:
     m_Name: Position
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: 0bacfa51-7938-4a88-adae-9e8ba6c59d23
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings:
-    - m_Name: 
+    - m_Name:
       m_Id: f5efb008-b167-4d0f-b9e0-49a2350a85b3
       m_Path: <XRHMD>/centerEyePosition
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
+      m_Interactions:
+      m_Processors:
+      m_Groups:
       m_Action: Position
       m_Flags: 0
     m_Flags: 0
   m_RotationAction:
     m_Name: Rotation
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: 5439f14e-c9da-4bd1-ad3f-7121a75c10d9
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings:
-    - m_Name: 
+    - m_Name:
       m_Id: f984a7fd-f7e2-45ef-b21d-699a5d160f29
       m_Path: <XRHMD>/centerEyeRotation
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
+      m_Interactions:
+      m_Processors:
+      m_Groups:
       m_Action: Rotation
       m_Flags: 0
     m_Flags: 0
---- !u!114 &566257462753071869
+--- !u!114 &5289814497760744262
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4632,57 +4632,126 @@ MonoBehaviour:
   m_GameObject: {fileID: 5518029583735500755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  volumeTrigger: {fileID: 4547434645164576494}
-  volumeLayer:
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  clearColorMode: 0
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
-  stopNaNPropagation: 1
-  finalBlitToCameraTarget: 0
-  antialiasingMode: 0
-  temporalAntialiasing:
-    jitterSpread: 0.75
-    sharpness: 0.25
-    stationaryBlending: 0.95
-    motionBlending: 0.85
-  subpixelMorphologicalAntialiasing:
-    quality: 2
-  fastApproximateAntialiasing:
-    fastMode: 0
-    keepAlpha: 0
-  fog:
-    enabled: 1
-    excludeSkybox: 1
-  debugLayer:
-    lightMeter:
-      width: 512
-      height: 256
-      showCurves: 1
-    histogram:
-      width: 512
-      height: 256
-      channel: 3
-    waveform:
-      exposure: 0.12
-      height: 256
-    vectorscope:
-      size: 256
-      exposure: 0.12
-    overlaySettings:
-      linearDepth: 0
-      motionColorIntensity: 4
-      motionGridSize: 64
-      colorBlindnessType: 0
-      colorBlindnessStrength: 1
-  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
-  m_ShowToolkit: 0
-  m_ShowCustomSorter: 0
-  breakBeforeColorGrading: 0
-  m_BeforeTransparentBundles: []
-  m_BeforeStackBundles: []
-  m_AfterStackBundles: []
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 1
+  SMAAQuality: 2
+  dithering: 0
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 1
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 1
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 140666587840333
+      data2: 13763000512783810584
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 8388608
+      data2: 268435456
+  defaultFrameSettings: 0
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
 --- !u!1 &5584017195141292609
 GameObject:
   m_ObjectHideFlags: 0
@@ -4744,7 +4813,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4816,8 +4885,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9ac216f0eb04754b1d938aac6380b31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_RayInteractor: {fileID: 0}
   m_NearFarInteractor: {fileID: 1431890234424065946}
   m_TeleportInteractor: {fileID: 8124718332598264256}
@@ -4844,8 +4913,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4a50d88b55b45648927679791f472de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_GroupName: Right
   m_InteractionManager: {fileID: 0}
   m_StartingGroupMembers:
@@ -4865,17 +4934,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b734f2bd29eeddd4d85afb0c266228c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_HapticOutput:
     m_InputSourceMode: 2
     m_InputAction:
       m_Name: Haptic
       m_Type: 2
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: b71b5bb4-1b09-415f-a4df-1476771fcae6
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -8222252007134549311, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4891,8 +4960,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2fadf230d1919748a9aa21d40f74619, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TrackingType: 0
   m_UpdateType: 0
   m_IgnoreTrackingState: 0
@@ -4903,8 +4972,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector3
       m_Id: c21ad7d3-c46f-48ad-99da-097df39312cc
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -3326005586356538449, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4915,8 +4984,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Quaternion
       m_Id: 69f091ba-e646-4189-9296-d68870a4d922
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 5101698808175986029, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -4927,27 +4996,27 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Integer
       m_Id: 05873c58-6d6f-4aea-8e06-78c4544c58dc
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -1277054153949319361, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_PositionAction:
-    m_Name: 
+    m_Name:
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: e0c62bbd-29f9-48af-967b-21babef9a6a4
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings: []
     m_Flags: 0
   m_RotationAction:
-    m_Name: 
+    m_Name:
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: 303ef588-e0d6-494e-9ceb-2d2edc0eb8e5
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings: []
     m_Flags: 0
 --- !u!1 &6098822490852044447
@@ -5011,7 +5080,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5094,7 +5163,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5158,8 +5227,8 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b1e8c997df241c1a67045eeac79b41b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_MoveSpeed: 1.5
@@ -5174,8 +5243,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 16c2fabb-fb1c-4a11-94d0-0b1d894b8593
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 6972639530819350904, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -5188,8 +5257,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: af2e3d83-024e-4a1f-8bc1-f97f0b4ae1d5
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -8198699208435500284, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -5280,8 +5349,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 0
@@ -5381,8 +5450,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80e353695beb436ab39a90d9ecefaee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_LineRenderer: {fileID: 1613602809772167018}
   m_CurveVisualObject: {fileID: 1431890234424065946}
   m_OverrideLineOrigin: 1
@@ -5628,7 +5697,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 45694be3d6f1e46a5a008ea0ab4f3f09, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5764,8 +5833,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64d299502104b064388841ec2adf6def, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Target: {fileID: 5408701714602512001}
   m_AimTargetObject: {fileID: 4324458665525279842}
   m_UseLocalSpace: 0
@@ -5832,7 +5901,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5915,7 +5984,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5981,8 +6050,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80e353695beb436ab39a90d9ecefaee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_LineRenderer: {fileID: 230593170814460950}
   m_CurveVisualObject: {fileID: 5592446408240182703}
   m_OverrideLineOrigin: 1
@@ -6228,7 +6297,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 45694be3d6f1e46a5a008ea0ab4f3f09, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6382,7 +6451,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f12d299d16099343a3c5c0d7285822a, type: 2}
+  - {fileID: 2100000, guid: a8d07263a020b4d62aa60874e600a683, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6451,8 +6520,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25a07ef133a37d140a87cdf1f1c75fdf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 1
@@ -6483,10 +6552,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Select
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 2491b664-3d4e-4f20-a7ae-ee1861d845f2
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -6494,8 +6563,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: fc42dacc-33eb-41ec-9c17-d242ac6b0c5b
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: -6131295136447488360, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6513,10 +6582,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Activate
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 77660b9e-6bbe-4740-b80f-1fea8d0f59e1
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -6524,8 +6593,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 94568f52-c27a-47fc-a190-5e3b17572929
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: -5982496924579745919, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6596,10 +6665,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: UI Press
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: ded1ccb2-ff18-46c7-ade9-b80985fe2825
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -6607,8 +6676,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: d762660e-30e0-4a4d-8e2a-e6b553e03f11
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: -6395602842196007441, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6628,8 +6697,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: ef5cc4a5-b968-432c-9ae7-45e494178db0
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 2464016903823916871, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6645,8 +6714,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 792f6c7eaa1a4b82abf8351559ac97eb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TransformToFollow: {fileID: 5253992662093580760}
   m_MotionStabilizationMode: 1
   m_PositionStabilization: 0.25
@@ -6670,8 +6739,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 9914e1e2-77ba-43ae-8266-fd33d44c8a24
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -8811388872089202044, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6694,8 +6763,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48139a683d3b4ac3a37cd5d24f71acf1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_CastOrigin: {fileID: 5253992662093580760}
   m_EnableStabilization: 0
   m_PositionStabilization: 0.25
@@ -6716,8 +6785,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ef20135915079454985abea5a2ec8967, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_CastOrigin: {fileID: 5253992662093580760}
   m_EnableStabilization: 1
   m_PositionStabilization: 0.25
@@ -6745,8 +6814,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd0b9921bce4eeb49bd05815b1135ac2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractorSourceObject: {fileID: 5592446408240182703}
   m_HapticImpulsePlayer: {fileID: 0}
   m_PlaySelectEntered: 1
@@ -6830,8 +6899,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9ac216f0eb04754b1d938aac6380b31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_RayInteractor: {fileID: 0}
   m_NearFarInteractor: {fileID: 5592446408240182703}
   m_TeleportInteractor: {fileID: 4324458665525279842}
@@ -6858,8 +6927,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4a50d88b55b45648927679791f472de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_GroupName: Left
   m_InteractionManager: {fileID: 0}
   m_StartingGroupMembers:
@@ -6879,17 +6948,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b734f2bd29eeddd4d85afb0c266228c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_HapticOutput:
     m_InputSourceMode: 2
     m_InputAction:
       m_Name: Haptic
       m_Type: 2
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: a67d36a7-d7d4-428e-877d-0cad8d4a162f
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -8785819595477538065, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6905,8 +6974,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2fadf230d1919748a9aa21d40f74619, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TrackingType: 0
   m_UpdateType: 0
   m_IgnoreTrackingState: 0
@@ -6917,8 +6986,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector3
       m_Id: cd22b81e-c39a-4170-bdbf-33b5a06ea86f
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -2024308242397127297, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6929,8 +6998,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Quaternion
       m_Id: 04fa80c1-7876-441c-8416-c5ea3caea5c4
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 8248158260566104461, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -6941,27 +7010,27 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Integer
       m_Id: fdcc0d62-5cd0-4fcc-8c3a-c07cf6230b7d
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 684395432459739428, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_PositionAction:
-    m_Name: 
+    m_Name:
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: ddb05e9d-4218-401c-a7a8-003424f4b4fa
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings: []
     m_Flags: 0
   m_RotationAction:
-    m_Name: 
+    m_Name:
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: de98cdb6-b2c4-4d67-af3c-9c8bd60b295a
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings: []
     m_Flags: 0
 --- !u!1 &8083947916019615042
@@ -7016,7 +7085,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f5ccd52dc494e054fbe7d7161dcabe25, type: 2}
+  - {fileID: 2100000, guid: c7ac0735d23884eca855de557cd69633, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7110,7 +7179,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7184,8 +7253,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Camera: {fileID: 4306329568102375281}
   m_OriginBaseGameObject: {fileID: 8251201445580245058}
   m_CameraFloorOffsetObject: {fileID: 1830906717589504865}
@@ -7227,8 +7296,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 017c5e3933235514c9520e1dace2a4b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_ActionAssets:
   - {fileID: -944628639613478452, guid: c348712bda248c246b8c49b3db54643f, type: 3}
 --- !u!114 &9016476214128180397
@@ -7241,8 +7310,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82bc72d2ecc8add47b2fe00d40318500, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_LeftHand: {fileID: 0}
   m_RightHand: {fileID: 0}
   m_LeftController: {fileID: 8062734480530910224}
@@ -7269,8 +7338,8 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9b3d17eeb2e6bc47ada81d8f7f638d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_GazeInteractor: {fileID: 5479312705986075836}
   m_FallbackDivergence: 60
   m_HideCursorWithNoActiveRays: 1
@@ -7297,8 +7366,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c201442d497c3410bb61189c6482ba42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   moveProvider: {fileID: 7836231147301220184}
   teleportProvider: {fileID: 4145328099324571129}
   snapTurnProvider: {fileID: 6891292669280151561}
@@ -7314,10 +7383,10 @@ MonoBehaviour:
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName:
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument:
           m_BoolArgument: 0
         m_CallState: 2
   rightSmoothInput:
@@ -7330,10 +7399,10 @@ MonoBehaviour:
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName:
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument:
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2652515965712667019
@@ -7416,8 +7485,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9f365cf844c03449bc8973eead2c3c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_TurnAmount: 45
@@ -7432,8 +7501,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 536e141d-ee23-4272-b0fd-3984d1655f02
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -7374733323251553461, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -7446,8 +7515,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: b17ca378-4740-48c7-abe1-7f35bce317e9
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -8525429354371678379, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -7463,8 +7532,8 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 75b29b6c6428c984a8a73ffc2d58063b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Mediator: {fileID: 6190792299302080923}
   m_TransformationPriority: 0
   m_TurnSpeed: 60
@@ -7477,8 +7546,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 3610965d-108d-4451-a143-a78d1ee8f9b8
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 1010738217276881514, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -7491,8 +7560,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: eeb82678-2af4-4b6c-87fc-621bb707edc5
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: -6493913391331992944, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -7543,8 +7612,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0924bcaa9eb50df458a783ae0e2b59f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 1
@@ -7602,8 +7671,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd0b9921bce4eeb49bd05815b1135ac2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractorSourceObject: {fileID: 4239294485152511379}
   m_HapticImpulsePlayer: {fileID: 7004807819304899939}
   m_PlaySelectEntered: 1
@@ -7681,8 +7750,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c83f12c537584f51b92c01f10d7090c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TransitionDuration: 0.125
   m_InteractorSource: {fileID: 4239294485152511379}
   m_IgnoreHoverEvents: 0
@@ -7731,8 +7800,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1410cbaaadf84a7aaa6459d37ad21b3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Renderer: {fileID: 7209076101985788953}
   m_MaterialIndex: 0
 --- !u!114 &726416796022792680
@@ -7745,8 +7814,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f86d13fca2ec430d870c0f7765ad0dde, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_AffordanceStateProvider: {fileID: 5317097590221523907}
   m_ReplaceIdleStateValueWithInitialValue: 0
   m_AffordanceThemeDatum:
@@ -7854,8 +7923,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0924bcaa9eb50df458a783ae0e2b59f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 1
@@ -7913,8 +7982,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd0b9921bce4eeb49bd05815b1135ac2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractorSourceObject: {fileID: 387554258069819154}
   m_HapticImpulsePlayer: {fileID: 5202773240339300113}
   m_PlaySelectEntered: 1
@@ -7992,8 +8061,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c416f1a5c494e224fb5564fd1362b50d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_InteractionManager: {fileID: 0}
   m_InteractionLayers:
     m_Bits: 1
@@ -8024,10 +8093,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Select
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 26dcb486-2cd5-4bf0-83a4-8252a6419ca1
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -8035,8 +8104,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: d589f510-c88e-41dc-89ee-4accd74ded87
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -8054,10 +8123,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Activate
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 1b75ac5e-63d2-4c5c-9b86-0fe382e6b137
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -8065,8 +8134,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: fde38f1d-c7ff-4233-b8ba-2548488943d7
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -8169,10 +8238,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: UI Press
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 8e16e22c-3195-4e76-b0d2-9ec60d8bfc8e
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -8180,8 +8249,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: f2af0d9f-965a-4778-accc-36828a6e40b8
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -8201,8 +8270,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 83ec219e-cbbd-4b69-9013-f330cea06247
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -8215,8 +8284,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 78fd2d8b-06b9-4583-8d46-a896cee22152
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -8229,8 +8298,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 2941b9e4-5f6c-48d5-9338-136ff3a60e62
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -8243,8 +8312,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: 4decd4bd-22c4-4e97-af9b-f22d09a3ea8e
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -8255,10 +8324,10 @@ MonoBehaviour:
     m_InputActionPerformed:
       m_Name: Scale Toggle
       m_Type: 1
-      m_ExpectedControlType: 
+      m_ExpectedControlType:
       m_Id: 4e7a5ca5-86e4-4d9d-9678-01fb7083e39b
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionValue:
@@ -8266,8 +8335,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 0c82215d-82dc-4f94-a5a2-cd3a7186171a
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReferencePerformed: {fileID: 0}
@@ -8287,8 +8356,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector2
       m_Id: ec6d1bcc-90c1-4e80-98a9-7de37426ef90
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -8301,8 +8370,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Axis
       m_Id: 7e170bb1-3339-4b96-bbd9-61c01cb414db
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_InputActionReference: {fileID: 0}
@@ -8325,8 +8394,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ef0e4723b64c884699a375196c13ac0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_FallbackIfEyeTrackingUnavailable: 1
 --- !u!114 &6907475271257775890
 MonoBehaviour:
@@ -8338,8 +8407,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2fadf230d1919748a9aa21d40f74619, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_TrackingType: 0
   m_UpdateType: 0
   m_IgnoreTrackingState: 0
@@ -8350,8 +8419,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Vector3
       m_Id: e0974d43-a211-4251-882f-3f0b4749db16
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 3220680263695665919, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -8362,8 +8431,8 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Quaternion
       m_Id: 0a88b07c-2048-460b-b52d-880dd98ceb35
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -5930349909990434036, guid: c348712bda248c246b8c49b3db54643f, type: 3}
@@ -8374,27 +8443,27 @@ MonoBehaviour:
       m_Type: 0
       m_ExpectedControlType: Integer
       m_Id: ca2485cb-f4d4-4bef-84e6-b085e080175c
-      m_Processors: 
-      m_Interactions: 
+      m_Processors:
+      m_Interactions:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 2069149553511882089, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_PositionAction:
-    m_Name: 
+    m_Name:
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: b902054d-edbb-440a-a455-68558ef17b58
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings: []
     m_Flags: 0
   m_RotationAction:
-    m_Name: 
+    m_Name:
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType:
     m_Id: 629180f1-a17a-4e47-a583-481808df540f
-    m_Processors: 
-    m_Interactions: 
+    m_Processors:
+    m_Interactions:
     m_SingletonActionBindings: []
     m_Flags: 0
 --- !u!1 &9014798848405509751
@@ -8458,7 +8527,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99685157b02e4d446bbecb015645e5e8, type: 2}
+  - {fileID: 2100000, guid: 9053fdbb995d642d69d35a20d0b89770, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8490,7 +8559,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3445447076820922851, guid: 3d5359169d7834729a41fb5123604872, type: 3}
       propertyPath: interactor
-      value: 
+      value:
       objectReference: {fileID: 5592446408240182703}
     - target: {fileID: 5338983060794119216, guid: 3d5359169d7834729a41fb5123604872, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8560,7 +8629,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3435253610515974727, guid: 607737485646640ccaaee552f6f8532b, type: 3}
       propertyPath: interactor
-      value: 
+      value:
       objectReference: {fileID: 1431890234424065946}
     - target: {fileID: 7613969107031344624, guid: 607737485646640ccaaee552f6f8532b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8702,15 +8771,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5783469136157896098, guid: b97fa656ae0b64e79a667508aa98541a, type: 3}
       propertyPath: blink
-      value: 
+      value:
       objectReference: {fileID: 2469750627631727079}
     - target: {fileID: 5783469136157896098, guid: b97fa656ae0b64e79a667508aa98541a, type: 3}
       propertyPath: settings
-      value: 
+      value:
       objectReference: {fileID: 793712404386271509}
     - target: {fileID: 7937327113869405628, guid: b97fa656ae0b64e79a667508aa98541a, type: 3}
       propertyPath: m_Camera
-      value: 
+      value:
       objectReference: {fileID: 4306329568102375281}
     - target: {fileID: 8233815610600797930, guid: b97fa656ae0b64e79a667508aa98541a, type: 3}
       propertyPath: m_Name

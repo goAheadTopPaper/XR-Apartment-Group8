@@ -50,11 +50,13 @@ namespace XRApartment.EditorTools
             var name = sourceName.Replace("(Instance)", "").Trim();
             var path = CookwareArt + name + ".mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var standard = Shader.Find("Standard");
             if (material == null)
             {
-                material = new Material(Shader.Find("Standard")) { name = name };
+                material = new Material(standard) { name = name };
                 AssetDatabase.CreateAsset(material, path);
             }
+            material.shader = standard;
             if (name.StartsWith("MAT_Cookware_", StringComparison.Ordinal))
             {
                 var asset = name.Substring("MAT_Cookware_".Length);
@@ -82,7 +84,8 @@ namespace XRApartment.EditorTools
                 material.SetFloat("_Glossiness", name.Contains("Shelf") ? .72f : .4f);
                 material.SetFloat("_Metallic", name.Contains("Chrome") ? .9f : name.Contains("SinkSteel") ? .8f : name.Contains("VentSteel") ? .7f : name.Contains("Enamel") ? .12f : 0);
             }
-            EditorUtility.SetDirty(material); return material;
+            KitchenHdrpMaterials.UpgradeStandard(material);
+            return material;
         }
 
         static GameObject CookwareModel(Transform parent, string name)
@@ -154,7 +157,7 @@ namespace XRApartment.EditorTools
             {
                 var material = CookwareMaterial("MAT_BoardBeech"); material.color = Color.white;
                 material.mainTexture = KitchenAuthoring.LoadRequired<Texture2D>(CookwareArt+"TEX_BoardWood.png");
-                material.SetFloat("_Glossiness",.25f); EditorUtility.SetDirty(material);
+                material.SetFloat("_Smoothness", .25f); KitchenHdrpMaterials.Validate(material);
                 foreach (var renderer in root.GetComponentsInChildren<MeshRenderer>()) renderer.sharedMaterial = material;
             });
             BuildLadle(); BuildCookingWaterVariants();
@@ -260,7 +263,7 @@ namespace XRApartment.EditorTools
             knob.gameObject.AddComponent<BoxCollider>().size = new Vector3(.062f, .045f, .055f);
             var button = knob.gameObject.AddComponent<XRSimpleInteractable>();
             var glow = Cube(parent, "VIS_GasIndicator", position + new Vector3(.055f, .035f, -.13f), Vector3.one * .007f,
-                Material("BurnerGlow", new Color(.12f, .08f, .07f), 0, .2f, true));
+                Material("BurnerGlow", new Color(.12f, .08f, .07f), 0, .2f));
             UnityEngine.Object.DestroyImmediate(glow.GetComponent<Collider>());
             var surface = Child(parent, "LOC_BurnerSurface"); surface.position = position + Vector3.up * .055f;
             var heat = Child(parent, "ACT_HeatZone"); heat.position = position + Vector3.up * .105f;
@@ -290,13 +293,20 @@ namespace XRApartment.EditorTools
             renderer.shadowCastingMode = ShadowCastingMode.Off; renderer.receiveShadows = false;
             var path = CookwareArt + "MAT_GasFlame.mat";
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (material == null) { material = new Material(Shader.Find("Particles/Standard Unlit")) { name = "MAT_GasFlame" }; AssetDatabase.CreateAsset(material, path); }
+            if (material == null)
+            {
+                material = new Material(Shader.Find("XR Apartment/Water Droplet")) { name = "MAT_GasFlame" };
+                AssetDatabase.CreateAsset(material, path);
+            }
             material.mainTexture = KitchenAuthoring.LoadRequired<Texture2D>(CookwareArt + "TEX_GasFlame.png");
-            material.SetFloat("_Mode", 4); material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha); material.SetInt("_DstBlend", (int)BlendMode.One);
-            material.SetInt("_ZWrite",0); material.SetColor("_Color", new Color(1.1f,1.1f,1.1f,1)); material.renderQueue = 3000; EditorUtility.SetDirty(material);
+            material.SetFloat("_ShapeMask", 0);
+            material.SetFloat("_DstBlend", (float)BlendMode.One);
+            material.color = Color.white;
+            EditorUtility.SetDirty(material);
             renderer.sharedMaterial = material;
             var lamp = Child(root, "LGT_GasBlue").gameObject.AddComponent<Light>(); lamp.type = LightType.Point;
             lamp.color = new Color(.18f,.4f,1); lamp.range = .35f; lamp.intensity = .18f; lamp.shadows = LightShadows.None;
+            KitchenHdrpAuthoring.ConfigureLight(lamp);
             var flame = root.gameObject.AddComponent<KitchenBurnerFlame>(); flame.Configure(ps,lamp); return flame;
         }
     }

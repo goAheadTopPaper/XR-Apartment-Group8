@@ -198,7 +198,7 @@ namespace XRApartment.Runtime
             var coagulated = Mathf.InverseLerp(profile.cookedSeconds * profile.coagulationStartsAt,
                 profile.cookedSeconds, batch.Cooking.Dose);
             var tint = batch.Stage == CookingStage.Burnt ? profile.burntTint : Color.Lerp(rawTint, profile.cookedEgg, coagulated);
-            colour.SetColor("_Color", tint);
+            colour.SetColor("_BaseColor", tint);
             if (surfaceRenderer != null) surfaceRenderer.SetPropertyBlock(colour);
             if (yolks != null)
                 for (var i = 0; i < yolks.Length; i++)

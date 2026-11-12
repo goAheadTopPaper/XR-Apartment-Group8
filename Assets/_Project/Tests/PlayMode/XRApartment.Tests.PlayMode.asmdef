@@ -8,7 +8,9 @@
     "Unity.XR.CoreUtils",
     "Unity.InputSystem",
     "UnityEngine.UI",
-    "Unity.TextMeshPro"
+    "Unity.TextMeshPro",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.HighDefinition.Runtime"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"

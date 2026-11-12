@@ -217,7 +217,7 @@ namespace XRApartment.Tests
             var properties = new MaterialPropertyBlock();
             renderer.GetPropertyBlock(properties);
             Assert.IsFalse(properties.isEmpty, renderer.name + " must receive the current finish.");
-            return properties.GetColor("_Color");
+            return properties.GetColor("_BaseColor");
         }
 
         private static IEnumerator OpenLayoutMenu(Keyboard keyboard, LocomotionSettingsView movement)

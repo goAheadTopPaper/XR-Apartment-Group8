@@ -8,7 +8,8 @@
     "Unity.XR.CoreUtils",
     "UnityEngine.UI",
     "Unity.TextMeshPro",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.RenderPipelines.HighDefinition.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

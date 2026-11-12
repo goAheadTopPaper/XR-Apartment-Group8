@@ -8,7 +8,9 @@
     "Unity.XR.Interaction.Toolkit",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner",
-    "Unity.TextMeshPro"
+    "Unity.TextMeshPro",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.HighDefinition.Runtime"
   ],
   "includePlatforms": [
     "Editor"
