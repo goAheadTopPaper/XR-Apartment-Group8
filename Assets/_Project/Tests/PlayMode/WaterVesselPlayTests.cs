@@ -99,6 +99,8 @@ namespace XRApartment.Tests
         public IEnumerator WaterAndEggUseTheSameTaperedBowlAndWaterStaysLevelWhenTilted()
         {
             var root = Instantiate(Recipe + "MixingBowl");
+            // This fixture assigns poses directly. Keep Rigidbody interpolation from replaying the prior pose.
+            root.GetComponent<Rigidbody>().interpolation = RigidbodyInterpolation.None;
             root.transform.position = Origin + Vector3.right;
             var vessel = Water(root);
             var food = root.GetComponent<KitchenFoodVessel>();
@@ -111,7 +113,10 @@ namespace XRApartment.Tests
             var dryPoseRadius = SurfaceRadius(water);
             Assert.That(dryPoseRadius, Is.InRange(.038f, .057f), "A fixed 75 mm disk projects through the tapered ceramic.");
             root.transform.rotation = Quaternion.Euler(0f, 0f, 18f);
+            Physics.SyncTransforms();
             yield return null;
+            yield return null;
+            Assert.That(Vector3.Angle(root.transform.up, Vector3.up), Is.EqualTo(18f).Within(.01f));
             var mesh = water.GetComponent<MeshFilter>().sharedMesh;
             var heights = mesh.vertices.Select(p => water.TransformPoint(p).y).ToArray();
             Assert.That(heights.Max() - heights.Min(), Is.LessThan(.0001f));
