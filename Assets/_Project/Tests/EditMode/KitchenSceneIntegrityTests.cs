@@ -136,7 +136,9 @@ namespace XRApartment.Tests
                 try
                 {
                     Assert.AreEqual(Vector3.one, prop.transform.localScale, path);
-                    var renderers = prop.GetComponentsInChildren<Renderer>();
+                    var renderers = prop.GetComponentsInChildren<Renderer>().Where(renderer =>
+                        renderer.GetComponent<LiquidSurface>() == null && renderer.GetComponent<LiquidStream>() == null).ToArray();
+                    Assert.IsNotEmpty(renderers, path);
                     var bounds = renderers[0].bounds;
                     foreach (var renderer in renderers.Skip(1)) bounds.Encapsulate(renderer.bounds);
                     string key = "prop_" + prop.name.Replace("PREF_Prop_", "").ToLowerInvariant();
@@ -200,8 +202,15 @@ namespace XRApartment.Tests
         {
             Assert.AreEqual(1, Components<KitchenWaterSystem>().Length);
             Assert.AreEqual(1, Components<WaterTap>().Length);
-            Assert.AreEqual(3, Components<LiquidContainer>().Length);
-            foreach (var container in Components<LiquidContainer>())
+            var containers = Components<LiquidContainer>();
+            var prefixes = containers.Select(container => new SerializedObject(container).FindProperty("parameterPrefix").stringValue);
+            CollectionAssert.AreEquivalent(new[]
+            {
+                "water_basin", "water_cup", "water_pot", "water_dressing_mug",
+                "water_dressing_bowl", "water_dressing_bowl", "water_dressing_small_bowl", "water_dressing_small_bowl",
+                "water_dressing_plate", "water_dressing_plate", "water_dressing_plate", "water_dressing_plate", "water_dressing_plate"
+            }, prefixes);
+            foreach (var container in containers)
             {
                 var data = new SerializedObject(container);
                 var profile = (WaterInteractionProfile)data.FindProperty("profile").objectReferenceValue;

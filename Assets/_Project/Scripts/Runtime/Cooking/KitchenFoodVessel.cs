@@ -20,6 +20,10 @@ namespace XRApartment.Runtime
         readonly Vector3[] arc = new Vector3[25];
         MeshRenderer surfaceRenderer;
         EggBatch batch;
+        LiquidContainer waterVessel;
+        VesselLiquidGeometry cavity;
+        Vector3 interiorOrigin;
+        float renderCapacity;
         float lastHeat = -10f;
         Vector3 previousPosition;
         KitchenPanContents panContents;
@@ -32,6 +36,9 @@ namespace XRApartment.Runtime
         public float InnerBottom => bottom;
         public float InnerHeight => height;
         public KitchenPanContents PanContents => panContents;
+        internal bool HasEgg => batch != null && batch.Millilitres > LiquidContainer.VisibleMillilitres;
+        bool AcceptsEgg => batch != null && batch.IsPourable &&
+            (waterVessel == null || waterVessel.Millilitres <= LiquidContainer.VisibleMillilitres);
         public void ShowSolidEgg(bool show) => solidEggVisible = show;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -48,6 +55,13 @@ namespace XRApartment.Runtime
         void Initialize()
         {
             if (batch != null || profile == null) return;
+            waterVessel = GetComponent<LiquidContainer>();
+            cavity = waterVessel != null ? waterVessel.Geometry : null;
+            interiorOrigin = cavity == null ? Vector3.up * bottom : waterVessel.InteriorOrigin;
+            cavity = cavity ?? new VesselLiquidGeometry(radius, radius, height);
+            renderCapacity = waterVessel != null ? waterVessel.CapacityMillilitres : cavity.CapacityMillilitres;
+            if (renderCapacity <= 0f) renderCapacity = cavity.CapacityMillilitres;
+            // The recipe's transfer and stir thresholds use the existing interaction proxy.
             batch = new EggBatch(Mathf.PI * radius * radius * height * 1000000f,
                 profile.cookedSeconds, profile.burntSeconds);
             colour = new MaterialPropertyBlock();
@@ -63,7 +77,7 @@ namespace XRApartment.Runtime
         public float ReceiveEgg(float amount)
         {
             Initialize();
-            var accepted = batch == null ? 0 : batch.AddRaw(amount);
+            var accepted = AcceptsEgg ? batch.AddRaw(amount) : 0;
             SpilledMillilitres += Mathf.Max(0, amount - accepted);
             return accepted;
         }
@@ -100,7 +114,7 @@ namespace XRApartment.Runtime
             foreach (var vessel in Active)
             {
                 vessel.Initialize();
-                if (vessel.batch == null || !vessel.batch.IsPourable ||
+                if (!vessel.AcceptsEgg ||
                     Vector3.Dot(vessel.transform.up, Vector3.up) < .7f) continue;
                 var local = vessel.transform.InverseTransformPoint(egg);
                 var drop = local.y - vessel.bottom - vessel.height;
@@ -163,8 +177,9 @@ namespace XRApartment.Runtime
         bool CrossesMouth(Vector3 from, Vector3 to, out float fraction)
         {
             Initialize(); fraction = 0;
-            if (batch == null || !batch.IsPourable || Vector3.Dot(transform.up, Vector3.up) <= 0) return false;
-            var a = transform.InverseTransformPoint(from); var b = transform.InverseTransformPoint(to);
+            if (!AcceptsEgg || Vector3.Dot(transform.up, Vector3.up) <= 0f) return false;
+            var a = transform.InverseTransformPoint(from);
+            var b = transform.InverseTransformPoint(to);
             var rim = bottom + height;
             if (a.y < rim || b.y > rim || a.y <= b.y) return false;
             fraction = (a.y - rim) / (a.y - b.y);
@@ -176,9 +191,9 @@ namespace XRApartment.Runtime
         {
             Initialize();
             if (batch == null || surface == null) return;
-            var normal = batch.IsPourable ? transform.InverseTransformDirection(Vector3.up) : Vector3.up;
-            var offset = CylindricalLiquid.SurfaceOffset(radius, height, normal.x, normal.y, normal.z, batch.Millilitres / batch.Capacity);
-            surface.SetPlane(radius, height, normal, offset, batch.Millilitres > .01f && !solidEggVisible);
+            var normal = batch.IsPourable ? LiquidContainer.LocalGravityNormal(transform) : Vector3.up;
+            var offset = cavity.SurfaceOffset(normal.x, normal.y, normal.z, batch.Millilitres / renderCapacity);
+            surface.SetPlane(cavity, normal, offset, batch.Millilitres > .01f && !solidEggVisible);
             var rawTint = Color.Lerp(profile.rawAlbumen, profile.beatenEgg, batch.MixedFraction);
             var coagulated = Mathf.InverseLerp(profile.cookedSeconds * profile.coagulationStartsAt,
                 profile.cookedSeconds, batch.Cooking.Dose);
@@ -193,8 +208,10 @@ namespace XRApartment.Runtime
                     yolks[i].gameObject.SetActive(visible);
                     if (!visible) continue;
                     var angle = i * 2.4f;
-                    yolks[i].localPosition = new Vector3(Mathf.Cos(angle) * radius * .3f,
-                        bottom + offset / Mathf.Max(.1f, normal.y) + .001f, Mathf.Sin(angle) * radius * .3f);
+                    var x = Mathf.Cos(angle) * cavity.RadiusX * .3f;
+                    var z = Mathf.Sin(angle) * cavity.RadiusZ * .3f;
+                    var level = (offset - normal.x * x - normal.z * z) / normal.y;
+                    yolks[i].localPosition = interiorOrigin + new Vector3(x, level + .001f, z);
                     var scale = Mathf.Lerp(1, .05f, batch.MixedFraction);
                     yolks[i].localScale = new Vector3(.023f, .007f, .023f) * scale;
                 }

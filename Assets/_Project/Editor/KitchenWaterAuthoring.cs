@@ -8,7 +8,7 @@ using XRApartment.EditorTools;
 using XRApartment.Runtime;
 
 /// Edits only the water station and existing prop prefabs; never rebuilds the authored room.
-public static class KitchenWaterAuthoring
+public static partial class KitchenWaterAuthoring
 {
     const string Root = KitchenAuthoring.Root;
     const string WaterArt = Root + "Art/Water/";
@@ -20,7 +20,7 @@ public static class KitchenWaterAuthoring
     {
         if (!EditorApplication.isPlaying) return;
         foreach (var tap in UnityEngine.Object.FindObjectsByType<WaterTap>(FindObjectsSortMode.None)) tap.SetRunning(false);
-        if (KitchenWaterSystem.Instance != null) KitchenWaterSystem.Instance.ResetWater();
+        foreach (var world in UnityEngine.Object.FindObjectsByType<KitchenWaterSystem>(FindObjectsSortMode.None)) world.ResetWater();
     }
 
     [MenuItem("XR Apartment/Water/Configure Kitchen Water")]

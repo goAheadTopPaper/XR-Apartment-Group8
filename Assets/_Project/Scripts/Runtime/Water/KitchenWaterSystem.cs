@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace XRApartment.Runtime
 {
@@ -7,6 +9,7 @@ namespace XRApartment.Runtime
     public sealed class KitchenWaterSystem : MonoBehaviour
     {
         const int ParcelCapacity = 256;
+        static readonly List<KitchenWaterSystem> Active = new List<KitchenWaterSystem>();
         [SerializeField] ParticleSystem splashes;
         struct Parcel
         {
@@ -17,7 +20,7 @@ namespace XRApartment.Runtime
         }
         readonly Parcel[] parcels = new Parcel[ParcelCapacity];
         readonly RaycastHit[] hits = new RaycastHit[64];
-        public static KitchenWaterSystem Instance { get; private set; }
+        public static KitchenWaterSystem Instance => Active.Count == 0 ? null : Active[Active.Count - 1];
         public float InjectedMillilitres { get; private set; }
         public float DrainedMillilitres { get; private set; }
         public float SpilledMillilitres { get; private set; }
@@ -28,16 +31,23 @@ namespace XRApartment.Runtime
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ClearInstance() => Instance = null;
+        static void ClearInstances() => Active.Clear();
+
+        internal static KitchenWaterSystem InScene(Scene scene)
+        {
+            for (var i = Active.Count - 1; i >= 0; i--)
+                if (Active[i].gameObject.scene == scene) return Active[i];
+            return null;
+        }
 
         void Awake()
         {
-            Instance = this;
             var camera = Camera.main;
             if (camera != null) camera.depthTextureMode |= DepthTextureMode.Depth;
         }
 
-        void OnDestroy() { if (Instance == this) Instance = null; }
+        void OnEnable() => Active.Add(this);
+        void OnDisable() => Active.Remove(this);
 
         public bool Emit(Vector3 position, Vector3 velocity, float millilitres, LiquidContainer source)
         {
@@ -54,11 +64,13 @@ namespace XRApartment.Runtime
         }
 
         public void RecordDrain(float millilitres) => DrainedMillilitres += millilitres;
+        internal void RecordSpill(float millilitres) => SpilledMillilitres += millilitres;
 
         public void ResetWater()
         {
             ClearFlow();
-            foreach (var container in LiquidContainer.Active) if (container != null) container.ResetWater();
+            foreach (var container in LiquidContainer.Active)
+                if (container != null && container.gameObject.scene == gameObject.scene) container.ResetWater();
         }
 
         public void ClearFlow()
@@ -112,9 +124,12 @@ namespace XRApartment.Runtime
             for (int i = 0; i < count; i++)
             {
                 var hit = hits[i];
+                if (hit.collider.gameObject.scene != gameObject.scene) continue;
                 if (source != null && hit.transform.IsChildOf(source.transform)) continue;
                 float t = hit.distance / length;
                 if (t >= closest) continue;
+                var vessel = hit.collider.GetComponentInParent<LiquidContainer>();
+                if (vessel != null && vessel.ApproachesOpening(from, to)) continue;
                 closest = t;
                 point = hit.point;
                 normal = hit.normal;
@@ -123,7 +138,8 @@ namespace XRApartment.Runtime
             for (int i = 0; i < LiquidContainer.Active.Count; i++)
             {
                 var container = LiquidContainer.Active[i];
-                if (container == null || container == source || !container.CrossesMouth(from, to, out var t) || t >= closest) continue;
+                if (container == null || container == source || container.gameObject.scene != gameObject.scene ||
+                    !container.CrossesMouth(from, to, out var t) || t >= closest) continue;
                 closest = t;
                 point = Vector3.Lerp(from, to, t);
                 normal = container.transform.up;

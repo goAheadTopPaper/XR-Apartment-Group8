@@ -1,20 +1,26 @@
 using UnityEngine;
+using XRApartment.Simulation;
 
 namespace XRApartment.Runtime
 {
-    /// Plane/cylinder intersection, rebuilt without managed allocations or shader clipping.
+    /// Plane/cavity intersection, rebuilt without managed allocations or shader clipping.
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public sealed class LiquidSurface : MonoBehaviour
     {
         const int Sides = 40;
-        readonly Vector3[] points = new Vector3[Sides * 3];
-        readonly Vector3[] normals = new Vector3[Sides * 3];
-        readonly Vector4[] tangents = new Vector4[Sides * 3];
-        readonly Vector2[] uv = new Vector2[Sides * 3];
-        readonly float[] angles = new float[Sides * 3];
-        readonly int[] indices = new int[(Sides * 3 - 2) * 3];
+        const int MaximumEdges = Sides * (VesselLiquidGeometry.MaximumSections * 2 - 1);
+        readonly Vector3[] points = new Vector3[MaximumEdges];
+        readonly Vector3[] normals = new Vector3[MaximumEdges];
+        readonly Vector4[] tangents = new Vector4[MaximumEdges];
+        readonly Vector2[] uv = new Vector2[MaximumEdges];
+        readonly float[] angles = new float[MaximumEdges];
+        readonly int[] indices = new int[(MaximumEdges - 2) * 3];
+        readonly Vector3[] hull = new Vector3[Sides * VesselLiquidGeometry.MaximumSections];
         Mesh mesh;
         MeshRenderer surfaceRenderer;
+        VesselLiquidGeometry previousGeometry;
+        Vector3 previousNormal;
+        float previousOffset;
         int count;
 
         void Awake()
@@ -23,7 +29,7 @@ namespace XRApartment.Runtime
             mesh.MarkDynamic();
             GetComponent<MeshFilter>().sharedMesh = mesh;
             surfaceRenderer = GetComponent<MeshRenderer>();
-            for (int i = 0; i < Sides * 3 - 2; i++)
+            for (int i = 0; i < MaximumEdges - 2; i++)
             {
                 indices[i * 3] = 0;
                 indices[i * 3 + 1] = i + 1;
@@ -31,25 +37,28 @@ namespace XRApartment.Runtime
             }
         }
 
-        public void SetPlane(float radius, float height, Vector3 normal, float offset, bool visible)
+        public void SetPlane(VesselLiquidGeometry geometry, Vector3 normal, float offset, bool visible)
         {
             if (mesh == null) return;
-            surfaceRenderer.enabled = visible;
-            if (!visible) return;
+            if (!visible) { surfaceRenderer.enabled = false; return; }
+            if (geometry == previousGeometry && normal == previousNormal && offset == previousOffset && surfaceRenderer.enabled) return;
+            if (geometry != previousGeometry) BuildHull(geometry);
+            previousGeometry = geometry;
+            previousNormal = normal;
+            previousOffset = offset;
             count = 0;
-            Vector3 first = new Vector3(radius, 0, 0);
-            Vector3 previous = first;
-            for (int i = 1; i <= Sides; i++)
+            for (var ring = 0; ring < geometry.SectionCount; ring++)
             {
-                float angle = 2f * Mathf.PI * i / Sides;
-                var next = new Vector3(Mathf.Cos(angle) * radius, 0, Mathf.Sin(angle) * radius);
-                var top = Vector3.up * height;
-                Edge(previous, next, normal, offset);
-                Edge(previous + top, next + top, normal, offset);
-                Edge(previous, previous + top, normal, offset);
-                previous = next;
+                var start = ring * Sides;
+                for (var i = 0; i < Sides; i++)
+                {
+                    var vertex = hull[start + i];
+                    Edge(vertex, hull[start + (i + 1) % Sides], normal, offset);
+                    if (ring > 0) Edge(hull[start + i - Sides], vertex, normal, offset);
+                }
             }
-            if (count < 3) { surfaceRenderer.enabled = false; return; }
+            surfaceRenderer.enabled = count >= 3;
+            if (count < 3) return;
             Vector3 center = Vector3.zero;
             for (int i = 0; i < count; i++) center += points[i];
             center /= count;
@@ -66,13 +75,14 @@ namespace XRApartment.Runtime
                 points[j] = value;
                 angles[j] = angle;
             }
+            var tangent = Vector3.ProjectOnPlane(Vector3.right, normal).normalized;
+            if (tangent.sqrMagnitude < 0.1f) tangent = Vector3.ProjectOnPlane(Vector3.forward, normal).normalized;
+            var tangentVector = new Vector4(tangent.x, tangent.y, tangent.z,
+                Vector3.Dot(Vector3.Cross(normal, tangent), Vector3.forward) >= 0 ? 1 : -1);
             for (int i = 0; i < count; i++)
             {
                 normals[i] = normal;
-                var tangent = Vector3.ProjectOnPlane(Vector3.right, normal).normalized;
-                if (tangent.sqrMagnitude < 0.1f) tangent = Vector3.ProjectOnPlane(Vector3.forward, normal).normalized;
-                tangents[i] = new Vector4(tangent.x, tangent.y, tangent.z,
-                    Vector3.Dot(Vector3.Cross(normal, tangent), Vector3.forward) >= 0 ? 1 : -1);
+                tangents[i] = tangentVector;
                 uv[i] = new Vector2(points[i].x, points[i].z) * 5f;
             }
             mesh.Clear(false);
@@ -81,7 +91,24 @@ namespace XRApartment.Runtime
             mesh.SetTangents(tangents, 0, count);
             mesh.SetUVs(0, uv, 0, count);
             mesh.SetTriangles(indices, 0, (count - 2) * 3, 0, false);
-            mesh.bounds = new Bounds(Vector3.up * height * 0.5f, new Vector3(radius * 2, height, radius * 2));
+            mesh.bounds = new Bounds(Vector3.up * geometry.Height * 0.5f,
+                new Vector3(geometry.RadiusX * 2f, geometry.Height, geometry.RadiusZ * 2f));
+        }
+
+        void BuildHull(VesselLiquidGeometry geometry)
+        {
+            for (var ring = 0; ring < geometry.SectionCount; ring++)
+            {
+                var section = geometry.SectionAt(ring);
+                for (var i = 0; i < Sides; i++)
+                {
+                    var angle = 2f * Mathf.PI * i / Sides;
+                    hull[ring * Sides + i] = new Vector3(
+                        Mathf.Cos(angle) * geometry.RadiusX * section.radiusFraction,
+                        geometry.Height * section.heightFraction,
+                        Mathf.Sin(angle) * geometry.RadiusZ * section.radiusFraction);
+                }
+            }
         }
 
         void Edge(Vector3 a, Vector3 b, Vector3 normal, float offset)

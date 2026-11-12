@@ -106,4 +106,38 @@ namespace XRApartment.Tests
             Assert.That(actual, Is.EqualTo(fill).Within(0.0002f));
         }
     }
+
+    public class VesselLiquidGeometryTests
+    {
+        static VesselLiquidGeometry TaperedBowl() => new VesselLiquidGeometry(.075f, .05f, .06f, new[]
+        {
+            new VesselLiquidGeometry.Section(0f, 0f),
+            new VesselLiquidGeometry.Section(1f, 1f),
+        });
+
+        [Test]
+        public void TaperedCavity_UsesItsCrossSectionsForCapacityAndFillHeight()
+        {
+            var bowl = TaperedBowl();
+            Assert.That(bowl.CapacityMillilitres, Is.EqualTo(Math.PI * .075 * .05 * .06 * 1e6 / 3).Within(.001));
+            Assert.That(bowl.SurfaceOffset(0, 1, 0, .125f), Is.EqualTo(.03f).Within(.00001f));
+            Assert.That(bowl.ContainsMouth(.06f, 0f), Is.True);
+            Assert.That(bowl.ContainsMouth(0f, .06f), Is.False);
+        }
+
+        [Test]
+        public void TiltedEllipticalBowl_RetainsVolumeBelowItsLowestRim()
+        {
+            var bowl = TaperedBowl();
+            const float tilt = .4f;
+            var up = (float)Math.Sqrt(1 - tilt * tilt);
+            var alongWideAxis = bowl.RetainedFraction(tilt, up, 0);
+            var alongNarrowAxis = bowl.RetainedFraction(0, up, tilt);
+            Assert.That(alongWideAxis, Is.InRange(.1f, .7f));
+            Assert.That(alongNarrowAxis, Is.GreaterThan(alongWideAxis));
+            Assert.That(bowl.SurfaceOffset(tilt, up, 0, alongWideAxis),
+                Is.EqualTo(up * bowl.Height - tilt * bowl.RadiusX).Within(.00001f));
+            Assert.That(bowl.RetainedFraction(1, 0, 0), Is.Zero);
+        }
+    }
 }

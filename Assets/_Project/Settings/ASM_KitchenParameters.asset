@@ -968,3 +968,579 @@ MonoBehaviour:
     owner: Hzc
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
+  - key: water_cooking_cup_inner_radius
+    valueMetres: 0.0294
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_cup_depth_radius
+    valueMetres: 0.0356
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_cup_height
+    valueMetres: 0.098000005
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_cup_bottom_y
+    valueMetres: -0.044000003
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_cup_center_x
+    valueMetres: -0.0065500005
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_cup_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_stockpot_inner_radius
+    valueMetres: 0.076000005
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_stockpot_depth_radius
+    valueMetres: 0.076000005
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_stockpot_height
+    valueMetres: 0.097
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_stockpot_bottom_y
+    valueMetres: -0.039
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_stockpot_center_x
+    valueMetres: 0.002
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_stockpot_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_sink_inner_radius
+    valueMetres: 0.17880002
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_sink_depth_radius
+    valueMetres: 0.17880002
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_sink_height
+    valueMetres: 0.07300001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_sink_bottom_y
+    valueMetres: 0.010000001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_sink_center_x
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_cooking_sink_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_mixing_bowl_inner_radius
+    valueMetres: 0.0728
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_mixing_bowl_depth_radius
+    valueMetres: 0.0728
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_mixing_bowl_height
+    valueMetres: 0.055000003
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_mixing_bowl_bottom_y
+    valueMetres: 0.0045000003
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_mixing_bowl_center_x
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_mixing_bowl_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_frying_pan_inner_radius
+    valueMetres: 0.09200001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_frying_pan_depth_radius
+    valueMetres: 0.09200001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_frying_pan_height
+    valueMetres: 0.0153
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_frying_pan_bottom_y
+    valueMetres: 0.010500001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_frying_pan_center_x
+    valueMetres: 0.002
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_frying_pan_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_prep_bowl_inner_radius
+    valueMetres: 0.086500004
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_prep_bowl_depth_radius
+    valueMetres: 0.086500004
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_prep_bowl_height
+    valueMetres: 0.0682
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_prep_bowl_bottom_y
+    valueMetres: 0.0058000004
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_prep_bowl_center_x
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_prep_bowl_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_ladle_inner_radius
+    valueMetres: 0.029000001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_ladle_depth_radius
+    valueMetres: 0.022000002
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_ladle_height
+    valueMetres: 0.011600001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_ladle_bottom_y
+    valueMetres: 0.0042
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_ladle_center_x
+    valueMetres: 0.001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_ladle_center_z
+    valueMetres: 0.0185
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_serving_plate_inner_radius
+    valueMetres: 0.11840001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_serving_plate_depth_radius
+    valueMetres: 0.11840001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_serving_plate_height
+    valueMetres: 0.0145000005
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_serving_plate_bottom_y
+    valueMetres: 0.014
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_serving_plate_center_x
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_serving_plate_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_mug_inner_radius
+    valueMetres: 0.0418
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_mug_depth_radius
+    valueMetres: 0.0418
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_mug_height
+    valueMetres: 0.0925
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_mug_bottom_y
+    valueMetres: 0.0055000004
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_mug_center_x
+    valueMetres: -0.0204
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_mug_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_bowl_inner_radius
+    valueMetres: 0.0876
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_bowl_depth_radius
+    valueMetres: 0.0876
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_bowl_height
+    valueMetres: 0.08380001
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_bowl_bottom_y
+    valueMetres: 0.0062
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_bowl_center_x
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_bowl_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_small_bowl_inner_radius
+    valueMetres: 0.045400005
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_small_bowl_depth_radius
+    valueMetres: 0.045400005
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_small_bowl_height
+    valueMetres: 0.043500002
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_small_bowl_bottom_y
+    valueMetres: 0.0035
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_small_bowl_center_x
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_small_bowl_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_plate_inner_radius
+    valueMetres: 0.097
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_plate_depth_radius
+    valueMetres: 0.097
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_plate_height
+    valueMetres: 0.0163
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_plate_bottom_y
+    valueMetres: 0.0165
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_plate_center_x
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.
+  - key: water_dressing_plate_center_z
+    valueMetres: 0
+    source: Water interaction prototype geometry in the existing authored kitchen;
+      not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor-authored vessel dimensions and station coordinates; Quest
+      Link interaction pending.

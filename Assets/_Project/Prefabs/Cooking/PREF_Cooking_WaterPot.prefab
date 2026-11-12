@@ -498,11 +498,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 65ad5483f5f2945618c51517de4487d1, type: 2}
-  parameterPrefix: water_pot
+  parameterPrefix: water_cooking_stockpot
   initialFill: 0.15
   drain: 0
   surface: {fileID: 3575493514246147492}
   stream: {fileID: 4639445793333782685}
+  fittedCavity: 1
+  sections:
+  - heightFraction: 0
+    radiusFraction: 0.3026316
+  - heightFraction: 0.036082473
+    radiusFraction: 1
+  - heightFraction: 1
+    radiusFraction: 1
+  spillWhenDisabled: 0
 --- !u!114 &52040160499193052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -851,7 +860,7 @@ Transform:
   m_GameObject: {fileID: 4684482919456453732}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: -0.052, z: -0}
+  m_LocalPosition: {x: 0.002, y: -0.039, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -864,7 +873,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4684482919456453732}
-  m_Mesh: {fileID: 4300000, guid: 29c7452ccde1e4634b4d676d90e3b355, type: 2}
+  m_Mesh: {fileID: 0}
 --- !u!23 &5305146108520088838
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -872,7 +881,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4684482919456453732}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

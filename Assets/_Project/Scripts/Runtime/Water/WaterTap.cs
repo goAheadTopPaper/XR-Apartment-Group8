@@ -31,7 +31,7 @@ namespace XRApartment.Runtime
 
         void FixedUpdate()
         {
-            var world = KitchenWaterSystem.Instance;
+            var world = KitchenWaterSystem.InScene(gameObject.scene);
             if (!running || world == null || profile == null || stream == null || outlet == null) return;
             stream.Emit(world, outlet.position, Vector3.down * 0.45f, profile.TapMillilitresPerSecond * Time.fixedDeltaTime, null);
         }

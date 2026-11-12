@@ -65,6 +65,7 @@ namespace XRApartment.EditorTools
             BuildRecipeAssets();
             PrepareCookwareVisuals();
             ConfigureCookwareProps();
+            KitchenWaterAuthoring.ConfigureCookingVessels();
             PrepareFurnitureVisuals();
             BuildFurniturePrefabs();
             BuildRecipeWorkbench();

@@ -42,6 +42,7 @@ public static class KitchenPropsAuthoring
         BuildProp("CerealBox", Food + "Prefabs/CerealBox.prefab", "CerealBox_Mid", .28f, true, true, assumptions);
         BuildProp("BlackPepper", Food + "Prefabs/BlackPepper.prefab", "BlackPepper_Mid", .065f, false, false, assumptions);
         BuildProp("Oregano", Food + "Prefabs/OreganoPowder.prefab", "OreganoPowder_Mid", .065f, false, false, assumptions);
+        KitchenWaterAuthoring.ConfigureDressingVessels();
 
         // This shared root stays outside SLOT_Fridge, so all benchmarks see the same props.
         var root = new GameObject("PREF_Kitchen_Dressing");
