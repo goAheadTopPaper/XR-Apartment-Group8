@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
+using XRApartment.Runtime.UI;
 using Object = UnityEngine.Object;
 
 namespace XRApartment.Tests
@@ -55,6 +56,7 @@ namespace XRApartment.Tests
             Assert.IsTrue(scene.isLoaded);
             SceneManager.SetActiveScene(scene);
             rig = scene.GetRootGameObjects().Single(g => g.name == "PREF_XR_KitchenRig").transform;
+            KitchenSceneTestSetup.DisableStartupGuide(rig.GetComponentInChildren<LocomotionSettingsView>());
             head = rig.GetComponentInChildren<Camera>().transform;
             simulator = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(SimulatorPath))
                 .GetComponent<XRInteractionSimulator>();

@@ -9,14 +9,19 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 using Unity.Profiling;
 using XRApartment.Data;
 using XRApartment.Runtime;
+using XRApartment.Runtime.UI;
 using Object = UnityEngine.Object;
 
 namespace XRApartment.Tests
@@ -29,6 +34,7 @@ namespace XRApartment.Tests
         readonly List<GameObject> hidden = new List<GameObject>();
         XRInteractionManager manager;
         DrivenGrabInteractor left, right;
+        KitchenMenuKeyboard menuKeyboard;
         Scene scene, previous;
         GameObject station;
         Camera sourceCamera;
@@ -45,6 +51,8 @@ namespace XRApartment.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
+            menuKeyboard?.Dispose();
+            menuKeyboard = null;
             if (scene.IsValid() && scene.isLoaded)
             {
                 if (previous.IsValid() && previous.isLoaded) SceneManager.SetActiveScene(previous);
@@ -122,13 +130,13 @@ namespace XRApartment.Tests
             }
             finally { Time.captureDeltaTime = originalDelta; }
         }
-        IEnumerator ToggleDoor(KitchenFridge fridge)
+        IEnumerator ToggleDoor(KitchenFridge fridge, bool mayPause = false)
         {
             var angle = Mathf.DeltaAngle(0f, fridge.Door.transform.localEulerAngles.y);
-            yield return PullDoor(fridge.Door, fridge.Accessible ? -angle : 105f - angle);
+            yield return PullDoor(fridge.Door, fridge.Accessible ? -angle : 105f - angle, mayPause);
         }
 
-        IEnumerator PullDoor(KinematicSwingDoor hinge, float degrees)
+        IEnumerator PullDoor(KinematicSwingDoor hinge, float degrees, bool mayPause = false)
         {
             var door = hinge.GetComponent<XRSimpleInteractable>();
             door.interactionManager = manager;
@@ -151,7 +159,9 @@ namespace XRApartment.Tests
                     yield return null;
                 }
                 manager.SelectExit((IXRSelectInteractor)hand, door);
-                yield return Frames(6);
+                if (mayPause)
+                    for (var frame = 0; frame < 6; frame++) yield return null;
+                else yield return Frames(6);
             }
             finally { Time.captureDeltaTime = originalDelta; }
         }
@@ -684,6 +694,7 @@ namespace XRApartment.Tests
         [UnityTest] public IEnumerator CompleteRecipeUsesFridgeKnifeEggPourAndSpatulaAndCanReset()
         {
             yield return LoadKitchen();
+            yield return StartGuidedRecipe();
             var fridge = station.GetComponentInChildren<KitchenFridge>();
             var flow = station.GetComponent<KitchenRecipeController>();
             var tomato = station.GetComponentsInChildren<CookableIngredient>().Single(f => f.IngredientKind == KitchenIngredientKind.Tomato).GetComponent<PreparedKitchenProp>();
@@ -852,6 +863,16 @@ namespace XRApartment.Tests
             var detail = station.transform.Find("UI_CookingInstructions/Detail").GetComponent<TMP_Text>();
             Assert.That(heading.text, Does.Contain("READY"));
             Assert.That(detail.text, Does.Contain("50 mL egg").And.Contain($"{contents.TomatoGrams:0} g tomato"));
+            var menu = EnableKitchenMenu();
+            var guide = menu.transform.Find("PREF_UI_KitchenActivities/Guide");
+            yield return null;
+            yield return null;
+            Assert.IsTrue(guide.gameObject.activeInHierarchy, "A finished meal with the stove off should open the next guide step.");
+            Assert.AreEqual("Preview fridges", ButtonText(guide.Find("Continue")));
+            yield return Click(menu, guide.Find("Continue"));
+            Assert.AreEqual("Compare the fridges", guide.Find("Title").GetComponent<TMP_Text>().text);
+            menu.Close();
+            SetKitchenRigActive(false);
             File.WriteAllText("Logs/TomatoEggRecipe/recipe-scenario.json", JsonUtility.ToJson(new RecipeReport {
                 actions = flow.Recipe.Actions.ToString(), completed = flow.Recipe.Ready, eggMl = pan.Batch.Millilitres,
                 tomatoGrams = contents.TomatoGrams, scrambledMetres = contents.EggScrambleDistance,
@@ -866,7 +887,281 @@ namespace XRApartment.Tests
             foreach (var prop in station.GetComponentsInChildren<PreparedKitchenProp>(true)) Assert.IsFalse(prop.IsSplit);
             foreach (var item in station.GetComponentsInChildren<KitchenStoredIngredient>())
             { Assert.IsTrue(fridge.Contains(item.transform.position)); Assert.IsFalse(item.WasRetrieved); }
+            yield return PreviewFridgesInGuide();
+            yield return SaveGuidedFeedbackAndStartFreePlay();
         }
+
+        IEnumerator StartGuidedRecipe()
+        {
+            menuKeyboard = new KitchenMenuKeyboard();
+            var menu = EnableKitchenMenu();
+            var movement = menu.GetComponentInParent<KitchenLocomotionSettings>();
+            var guide = menu.transform.Find("PREF_UI_KitchenActivities/Guide");
+            yield return null;
+            yield return null;
+            Assert.IsTrue(guide.gameObject.activeInHierarchy);
+            Assert.AreEqual(0f, Time.timeScale);
+            var startScene = SceneManager.GetActiveScene();
+            var startPosition = movement.Origin.Origin.transform.position;
+            yield return Click(menu, guide.Find("Posture/Seated"));
+            yield return Click(menu, guide.Find("Posture/Raise"));
+            yield return Click(menu, guide.Find("Continue"));
+            Assert.That(movement.Origin.CameraInOriginSpaceHeight, Is.EqualTo(1.25f).Within(.015f));
+            Assert.AreEqual(startPosition, movement.Origin.Origin.transform.position);
+            Capture("guide-calibration", sourceCamera.transform.position, guide.position);
+            yield return Click(menu, guide.Find("Continue"));
+            Assert.IsFalse(menu.IsOpen);
+            Assert.AreEqual("Practice controls", guide.Find("Title").GetComponent<TMP_Text>().text);
+            Assert.IsFalse(guide.Find("Continue").GetComponent<Button>().interactable);
+
+            var landing = new Vector3(-3.5f, .004f, 1.12f);
+            Assert.IsTrue(movement.TeleportProvider.QueueTeleportRequest(new TeleportRequest
+            {
+                destinationPosition = landing,
+                matchOrientation = MatchOrientation.None,
+                requestTime = Time.time
+            }));
+            for (var frame = 0; frame < 30 && Vector3.Distance(movement.Origin.Origin.transform.position, landing) > .03f; frame++)
+                yield return null;
+            Assert.That(Vector3.Distance(movement.Origin.Origin.transform.position, landing), Is.LessThan(.03f));
+            Assert.IsFalse(guide.Find("Continue").GetComponent<Button>().interactable);
+
+            var cup = scene.GetRootGameObjects().Single(root => root.name == "PREF_Prop_Cup");
+            yield return Pick(left, cup);
+            yield return MoveHeld(left, cup, cup.transform.position + Vector3.up * .12f, cup.transform.rotation, 15);
+            yield return PlaceAndRelease(left, cup);
+            Assert.IsTrue(guide.gameObject.activeInHierarchy);
+            yield return Click(menu, guide.Find("Continue"));
+            Assert.AreEqual("Cook tomato and egg", guide.Find("Title").GetComponent<TMP_Text>().text);
+            Assert.IsFalse(guide.Find("Continue").GetComponent<Button>().interactable);
+            Assert.AreEqual(startScene, SceneManager.GetActiveScene());
+            station.GetComponent<KitchenCookingStation>().ResetStation();
+            yield return Frames(8);
+            SetKitchenRigActive(false);
+        }
+
+        IEnumerator PreviewFridgesInGuide()
+        {
+            var menu = EnableKitchenMenu();
+            yield return OpenGuide(menu);
+            var guide = menu.transform.Find("PREF_UI_KitchenActivities/Guide");
+            yield return Click(menu, guide.Find("Continue"));
+            var labMenu = menu.GetComponentInChildren<KitchenLayoutMenu>().transform;
+            yield return Click(menu, labMenu.Find("PantryReturn"));
+            yield return Click(menu, labMenu.Find("CloseLayoutLab"));
+            yield return Frames(5);
+            var kitchen = station.GetComponent<KitchenCookingStation>();
+            yield return ToggleDoor(kitchen.ActiveFridge);
+            yield return OpenGuide(menu);
+            Assert.That(guide.Find("Instruction").GetComponent<TMP_Text>().text, Does.Contain("Choose Compact"));
+            yield return Click(menu, guide.Find("Continue"));
+            yield return Click(menu, labMenu.Find("CompactFridge"));
+            yield return Click(menu, labMenu.Find("CloseLayoutLab"));
+            yield return Frames(5);
+            yield return ToggleDoor(kitchen.ActiveFridge, mayPause: true);
+            Assert.IsTrue(guide.gameObject.activeInHierarchy);
+            Assert.AreEqual("Leave feedback", ButtonText(guide.Find("Continue")));
+            Assert.That(guide.Find("Detail").GetComponent<TMP_Text>().text, Does.Contain("°").And.Not.Contain("try opening"));
+            yield return Click(menu, guide.Find("Continue"));
+            Assert.AreEqual("Feedback note", ButtonText(guide.Find("Continue")));
+        }
+
+        IEnumerator SaveGuidedFeedbackAndStartFreePlay()
+        {
+            var menu = EnableKitchenMenu();
+            var guide = menu.GetComponentInChildren<KitchenActivityGuide>();
+            var panel = guide.transform.Find("Guide");
+            Assert.IsFalse(guide.IsFreePlay);
+            yield return Click(menu, panel.Find("Continue"));
+            var note = LooseNote();
+            var counter = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Environment")
+                .transform.Find("SM_KitchenTable").GetComponent<MeshCollider>();
+            var above = new Vector3(-1.87f, 1.6f, 1.98f);
+            Assert.IsTrue(counter.Raycast(new Ray(above, Vector3.down), out var surface, 1f));
+            yield return PinNote(note, above, surface);
+            var form = guide.transform.Find("FeedbackEditor/Form");
+            form.Find("FeedbackText").GetComponent<TMP_InputField>().text = "The counter is easy to reach.";
+            var path = KitchenFeedbackNotes.DocumentPath;
+            var backup = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            try
+            {
+                yield return Click(menu, form.Find("SaveFeedback"));
+                Assert.That(File.ReadAllText(path), Does.Contain("The counter is easy to reach."));
+                Assert.IsTrue(panel.gameObject.activeInHierarchy);
+                Assert.AreEqual("Start free play", ButtonText(panel.Find("Continue")));
+                Assert.AreEqual(0f, Time.timeScale);
+                yield return Click(menu, panel.Find("Continue"));
+                Assert.IsTrue(guide.IsFreePlay);
+                Assert.IsFalse(menu.IsOpen);
+                Assert.AreEqual(1f, Time.timeScale);
+                yield return menuKeyboard.Hold();
+                var pause = guide.transform.Find("PauseMenu");
+                Assert.IsTrue(pause.gameObject.activeInHierarchy);
+                Assert.IsTrue(pause.Find("Navigation/LayoutLab").GetComponent<Button>().interactable);
+                Assert.IsTrue(pause.Find("Navigation/FeedbackNote").GetComponent<Button>().interactable);
+                Capture("pause-free-play", sourceCamera.transform.position, pause.position);
+                yield return Click(menu, pause.Find("Navigation/Resume"));
+                Assert.IsFalse(menu.IsOpen);
+            }
+            finally
+            {
+                if (backup != null) File.WriteAllBytes(path, backup);
+                else if (File.Exists(path)) File.Delete(path);
+            }
+        }
+
+        [UnityTest] public IEnumerator FeedbackNotesFollowTheirObjectsAndAppendUnicodeTextToTheDocument()
+        {
+            yield return LoadKitchen();
+            menuKeyboard = new KitchenMenuKeyboard();
+            var menu = EnableKitchenMenu();
+            KitchenSceneTestSetup.DisableStartupGuide(menu);
+            var kitchen = station.GetComponent<KitchenCookingStation>();
+            var lab = scene.GetRootGameObjects().Select(root => root.GetComponent<KitchenLayoutLab>()).Single(item => item != null);
+            Assert.IsTrue(lab.TrySelectFridge(true, out var status), status);
+            yield return Frames(6);
+            var fridge = kitchen.ActiveFridge;
+            var editor = menu.transform.Find("PREF_UI_KitchenActivities/FeedbackEditor");
+            var form = editor.Find("Form");
+            var field = form.Find("FeedbackText").GetComponent<TMP_InputField>();
+            var file = KitchenFeedbackNotes.DocumentPath;
+            var backup = File.Exists(file) ? File.ReadAllBytes(file) : null;
+            var originalLength = backup == null ? 0 : File.ReadAllText(file).Length;
+            const string text = "门把手需要更好握住。\n试开后仍容易拿到食材。";
+            try
+            {
+                yield return SpawnFeedbackNote(menu);
+                var note = LooseNote();
+                yield return Pick(left, note.gameObject);
+                Drop(left, note.gameObject);
+                yield return null;
+                Assert.IsFalse(editor.gameObject.activeSelf, "Releasing in mid-air must not open a note editor.");
+                yield return SpawnFeedbackNote(menu);
+                Assert.AreSame(note, LooseNote(), "Reopening a loose draft should recall the same note.");
+
+                var outside = fridge.transform.TransformPoint(new Vector3(0f, 1.25f, 1f));
+                var ray = new Ray(outside, -fridge.transform.forward);
+                var face = fridge.Door.GetComponentsInChildren<Collider>()
+                    .Select(collider => collider.enabled && !collider.isTrigger && collider.Raycast(ray, out var hit, 2f)
+                        ? hit : default)
+                    .Where(hit => hit.collider != null).OrderBy(hit => hit.distance).First();
+                yield return PinNote(note, outside, face);
+                Assert.IsTrue(editor.gameObject.activeSelf);
+                Assert.That(form.Find("Target").GetComponent<TMP_Text>().text, Is.EqualTo("Compact fridge door"));
+                Assert.IsFalse(form.Find("SaveFeedback").GetComponent<Button>().interactable);
+                yield return Click(menu, form.Find("WriteInVR"));
+                var keyboard = editor.Find("FeedbackKeyboard");
+                yield return Click(menu, keyboard.Find("Key O"));
+                yield return Click(menu, keyboard.Find("Key K"));
+                yield return Click(menu, keyboard.Find("Done"));
+                Assert.AreEqual("ok", field.text);
+                field.text = text;
+                Capture("feedback-note-editor", sourceCamera.transform.position, editor.position);
+                yield return Click(menu, form.Find("CloseFeedback"));
+                yield return SpawnFeedbackNote(menu);
+                Assert.AreEqual(text, field.text, "Closing the editor must keep the note draft.");
+                yield return Click(menu, form.Find("SaveFeedback"));
+                Assert.That(form.Find("SaveStatus").GetComponent<TMP_Text>().text, Does.Contain("Saved"));
+                yield return Click(menu, form.Find("CloseFeedback"));
+                var onDoor = note.transform.localPosition;
+                yield return ToggleDoor(fridge);
+                Assert.That(fridge.Door.Progress, Is.GreaterThan(.9f));
+                Assert.IsTrue(note.transform.IsChildOf(fridge.Door.transform));
+                Assert.AreEqual(onDoor, note.transform.localPosition);
+
+                var counter = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Environment")
+                    .transform.Find("SM_KitchenTable").GetComponent<MeshCollider>();
+                var above = new Vector3(-1.87f, 1.6f, 1.98f);
+                Assert.IsTrue(counter.Raycast(new Ray(above, Vector3.down), out var worktop, 1f));
+                yield return SpawnFeedbackNote(menu);
+                var second = LooseNote();
+                yield return PinNote(second, above, worktop);
+                Assert.AreEqual("Kitchen counter", form.Find("Target").GetComponent<TMP_Text>().text);
+                field.text = "The work surface is easy to reach.";
+                yield return Click(menu, form.Find("SaveFeedback"));
+                var saved = File.ReadAllText(file).Substring(originalLength);
+                Assert.That(saved, Does.Contain("Compact fridge door (fridge-compact-door)").And.Contain(text)
+                    .And.Contain("Kitchen counter (counter)").And.Contain(field.text)
+                    .And.Contain("Fridge: Compact fridge").And.Contain("Opposite the sink"));
+                Directory.CreateDirectory("Logs/GuidedKitchen");
+                File.WriteAllText("Logs/GuidedKitchen/feedback-test.txt", saved);
+                yield return Click(menu, form.Find("CloseFeedback"));
+                kitchen.ResetStation();
+                yield return Frames(8);
+                Assert.IsTrue(note.transform.IsChildOf(fridge.Door.transform));
+                Assert.IsTrue(second.transform.IsChildOf(counter.transform));
+            }
+            finally
+            {
+                if (backup != null) File.WriteAllBytes(file, backup);
+                else if (File.Exists(file)) File.Delete(file);
+            }
+        }
+
+        LocomotionSettingsView EnableKitchenMenu()
+        {
+            SetKitchenRigActive(true);
+            return sourceCamera.transform.root.GetComponentInChildren<LocomotionSettingsView>();
+        }
+
+        void SetKitchenRigActive(bool active)
+        {
+            var fallbackListener = manager.GetComponent<AudioListener>();
+            if (fallbackListener != null) fallbackListener.enabled = !active;
+            sourceCamera.transform.root.gameObject.SetActive(active);
+        }
+
+        IEnumerator OpenGuide(LocomotionSettingsView menu)
+        {
+            yield return menuKeyboard.Hold();
+            yield return Click(menu, menu.transform.Find("PREF_UI_KitchenActivities/PauseMenu/Navigation/KitchenGuide"));
+        }
+
+        IEnumerator SpawnFeedbackNote(LocomotionSettingsView menu)
+        {
+            yield return menuKeyboard.Hold();
+            yield return Click(menu, menu.transform.Find("PREF_UI_KitchenActivities/PauseMenu/Navigation/FeedbackNote"));
+        }
+
+        KitchenFeedbackNote LooseNote() => scene.GetRootGameObjects()
+            .Select(root => root.GetComponent<KitchenFeedbackNote>()).Single(note => note != null);
+
+        IEnumerator PinNote(KitchenFeedbackNote note, Vector3 approach, RaycastHit surface)
+        {
+            yield return Pick(left, note.gameObject);
+            var up = Mathf.Abs(Vector3.Dot(surface.normal, Vector3.up)) > .95f ? Vector3.forward : Vector3.up;
+            var rotation = Quaternion.LookRotation(-surface.normal, up);
+            yield return MoveHeld(left, note.gameObject, approach, rotation, 45);
+            yield return MoveHeld(left, note.gameObject, surface.point + surface.normal * .026f, rotation, 35);
+            Drop(left, note.gameObject);
+            yield return null;
+            yield return null;
+            Assert.IsFalse(note.GetComponent<XRGrabInteractable>().enabled, $"Note failed to attach at {note.transform.position} near {surface.point}.");
+        }
+
+        static string ButtonText(Transform button) => button.GetComponentInChildren<TMP_Text>().text;
+
+        IEnumerator Click(LocomotionSettingsView menu, Transform button)
+        {
+            yield return null;
+            Assert.IsNotNull(button);
+            Assert.IsTrue(button.GetComponent<Button>().interactable, button.name);
+            Canvas.ForceUpdateCanvases();
+            var origin = sourceCamera.transform.position;
+            var aim = button.position;
+            var pointer = new TrackedDeviceEventData(EventSystem.current)
+            {
+                button = PointerEventData.InputButton.Left,
+                layerMask = -1,
+                rayPoints = new List<Vector3> { origin, aim + (aim - origin).normalized * .2f }
+            };
+            var hits = new List<RaycastResult>();
+            menu.GetComponent<TrackedDeviceGraphicRaycaster>().Raycast(pointer, hits);
+            Assert.IsTrue(hits.Any(hit => hit.gameObject == button.gameObject), button.name + " must be reachable by tracked rays. Graphic depth " +
+                button.GetComponent<Image>().depth + ", hits " + string.Join(", ", hits.Select(hit => hit.gameObject.name)));
+            ExecuteEvents.Execute<IPointerClickHandler>(button.gameObject, pointer, ExecuteEvents.pointerClickHandler);
+        }
+
         IEnumerator StirWithSpatula(KitchenSpatula spatula, KitchenFoodVessel pan, int frames)
         {
             var rotation = Quaternion.Euler(-55, 0, 0);

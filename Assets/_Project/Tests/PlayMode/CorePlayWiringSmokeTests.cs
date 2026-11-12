@@ -26,6 +26,7 @@ using XRApartment.Runtime.Storage;
 using XRApartment.Runtime.UI;
 using XRApartment.Data;
 using XRApartment.Simulation;
+using XRApartment.Tests;
 
 public class CorePlayWiringSmokeTests
 {
@@ -39,6 +40,7 @@ public class CorePlayWiringSmokeTests
             Assert.AreEqual(XROrigin.TrackingOriginMode.NotSpecified,
                 Object.FindObjectOfType<XROrigin>().RequestedTrackingOriginMode);
         var view = Object.FindObjectOfType<LocomotionSettingsView>();
+        KitchenSceneTestSetup.DisableStartupGuide(view);
         view.Open();
         yield return null;
         Canvas.ForceUpdateCanvases();
@@ -84,6 +86,8 @@ public class CorePlayWiringSmokeTests
             SceneManager.LoadScene(name);
             yield return null;
             yield return null;
+            if (name == "SCN_Kitchen_Cooking")
+                KitchenSceneTestSetup.DisableStartupGuide(Object.FindObjectOfType<LocomotionSettingsView>());
             var light = new Color[1];
             var prop = GameObject.Find(name == "SCN_Kitchen_Cooking" ? "PREF_Cooking_FryingPan" : "PREF_Prop_Pot");
             Assert.IsNotNull(prop);

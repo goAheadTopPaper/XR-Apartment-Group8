@@ -7,7 +7,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
@@ -30,7 +29,6 @@ namespace XRApartment.Tests
         Scene previous, scene;
         KitchenLocomotionSettings settings;
         XRInteractionSimulator simulator;
-        Keyboard keyboard;
         bool restoreSimulator, hadPreference;
         int preference;
         float timeScale;
@@ -63,6 +61,7 @@ namespace XRApartment.Tests
             for (var i = 0; i < 300 && !scene.isLoaded; i++) yield return null;
             Assert.IsTrue(scene.isLoaded); SceneManager.SetActiveScene(scene);
             settings = scene.GetRootGameObjects().Select(g => g.GetComponent<KitchenLocomotionSettings>()).Single(s => s != null);
+            KitchenSceneTestSetup.DisableStartupGuide(settings.GetComponentInChildren<LocomotionSettingsView>());
             simulator = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(SimulatorPath)).GetComponent<XRInteractionSimulator>();
             while (Time.time < 1.1f) yield return null;
             for (var i = 0; i < 4; i++) yield return null;
@@ -71,7 +70,6 @@ namespace XRApartment.Tests
 
         [UnityTearDown] public IEnumerator Cleanup()
         {
-            if (keyboard != null) InputSystem.RemoveDevice(keyboard);
             if (simulator != null) Object.Destroy(simulator.gameObject);
             yield return null;
             if (scene.IsValid() && scene.isLoaded)
@@ -201,15 +199,16 @@ namespace XRApartment.Tests
             Assert.IsFalse(ActionEnabled("Left", "m_TeleportMode"));
         }
 
-        [UnityTest] public IEnumerator KeyboardMenuAndRealButtonsSavePreferenceWithoutChangingRoomOrTime()
+        [UnityTest] public IEnumerator KeyboardHoldOpensPausedOptionsAndSavesPreferenceWithoutMovingTheRig()
         {
             var view = settings.GetComponentInChildren<LocomotionSettingsView>(true);
             var before = settings.transform.position;
-            keyboard = InputSystem.AddDevice<Keyboard>();
-            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F8));
-            for (var i = 0; i < 3; i++) yield return null;
-            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
-            Assert.IsTrue(view.IsOpen, "F8 must open the actual runtime settings view.");
+            using (var keyboard = new KitchenMenuKeyboard()) yield return keyboard.Hold();
+            var navigation = view.transform.Find("PREF_UI_KitchenActivities/PauseMenu/Navigation");
+            Assert.IsTrue(navigation.gameObject.activeInHierarchy);
+            Assert.AreEqual(0f, Time.timeScale);
+            KitchenSceneTestSetup.Click(view, navigation.Find("Options"));
+            yield return null;
             Assert.IsTrue(settings.MenuOpen); Assert.IsFalse(settings.TeleportProvider.enabled);
             Canvas.ForceUpdateCanvases();
             var smoothButton = view.transform.Find("Panel/Smooth").GetComponent<Button>();
@@ -228,6 +227,9 @@ namespace XRApartment.Tests
             Assert.AreEqual((int)KitchenMovementMode.Smooth, PlayerPrefs.GetInt(KitchenLocomotionSettings.PreferenceKey));
             Assert.IsFalse(settings.MoveProvider.enabled, "The open menu must block walking even after selecting Smooth.");
             view.transform.Find("Panel/Close").GetComponent<Button>().onClick.Invoke();
+            yield return null;
+            Assert.AreEqual(0f, Time.timeScale);
+            KitchenSceneTestSetup.Click(view, navigation.Find("Resume"));
             Assert.IsFalse(view.IsOpen); Assert.IsTrue(settings.MoveProvider.enabled);
             settings.SetMode(KitchenMovementMode.Teleport, false);
             settings.ReloadPreference();

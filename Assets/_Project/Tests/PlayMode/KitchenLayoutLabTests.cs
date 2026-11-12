@@ -28,6 +28,7 @@ namespace XRApartment.Tests
             var fridge = Object.FindObjectOfType<KitchenFridge>();
             var station = Object.FindObjectOfType<KitchenCookingStation>();
             var movement = Object.FindObjectOfType<LocomotionSettingsView>();
+            KitchenSceneTestSetup.DisableStartupGuide(movement);
             Assert.NotNull(lab);
             Assert.NotNull(movement.GetComponentInChildren<KitchenLayoutMenu>(true));
             Assert.AreEqual(3, lab.PresetCount);
