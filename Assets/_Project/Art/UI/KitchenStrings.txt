@@ -14,10 +14,10 @@ Release to teleport. Right stick: snap turn.	松开后瞬移，右摇杆可分�
 Layout lab: Right B / F9	布局实验：右手 B / F9
 LAYOUT LAB	布局实验
 Right B / F9	右手 B / F9
-A  ·  ORIGINAL KITCHEN	A · 原始厨房
+A  ·  OPPOSITE THE SINK	A · 水槽对面
 B  ·  FORWARD DOCK	B · 冰箱前移
 C  ·  PANTRY RETURN	C · 窄柜布局
-A  |  Original kitchen	A · 原始厨房
+A  |  Opposite the sink	A · 水槽对面
 B  |  Forward dock	B · 冰箱前移
 C  |  Pantry return	C · 窄柜布局
 FULL SIZE  ·  72 CM	全尺寸 · 72 厘米
@@ -45,6 +45,7 @@ READY	完成
 SERVED	已装盘
 BURNT	已烧焦
 Grip and pull the fridge handle.	握住把手，拉开冰箱门。
+Pull the handle on the fridge opposite the sink.	拉开水槽对面的冰箱。
 Pull the handle farther.	继续拉开冰箱门。
 Take a tomato out of the fridge.	从冰箱取出一个西红柿。
 Hold the knife and slice the tomato on the board.	把西红柿放在砧板上，握刀向下切。
@@ -341,14 +342,14 @@ Design issue feedback recorded	已记录设计问题反馈
 ^Beef  ([0-9]+) g  (.*)$	牛肉 $1 克 · $2
 ^Onion  ([0-9]+) g  (.*)$	洋葱 $1 克 · $2
 ^Grip to take (.*)\.$	握持取出$1。
-^Take (.*) from the fridge\.$	从冰箱取出$1。
+^Take (.*) from the fridge opposite the sink\.$	从水槽对面的冰箱取出$1。
 ^For this recipe: (.*)\.$	本步所需：$1。
 Explore one representative kitchen. Compare B1 Proud and B2 Flush refrigerator layouts through the same everyday task. This is a prototype, not a finished home or compliance assessment. Stay inside your physical play area. Stop if uncomfortable.	在同一间厨房用相同的日常任务比较 B1 突出式和 B2 齐平式冰箱布局。体验用于设计评审。请留在实体活动区内，感到不适时停下。
 Fixed: layouts and tasks are preset. Reviewable: judge access and everyday use, then give feedback. Simplified: objects and interactions cover a limited kitchen. Assumption: dimensions and clearances are prototype assumptions, not verified client facts. No free editing or real weight feedback.	布局和任务均为预设。请体验冰箱取放与日常使用，再提交判断。场景尺寸和净空采用原型假设，重量反馈也经过简化。
 Aim a controller at the open floor ahead. In the PC simulator, hold I for the right thumbstick (Shift+I for the left), point the teleport arc at the floor, then release I to land. Keep your physical play area clear.	瞄准前方空地。电脑模拟器中，按住 I 模拟右摇杆，Shift+I 模拟左摇杆。将弧线对准地面，松开 I 完成瞬移。请保持实体活动区畅通。
 Aim at the open floor ahead. Push a controller thumbstick forward to show the teleport arc, then release it to land. Check your physical play area before moving.	将手柄对准前方空地，向前推摇杆显示瞬移弧线，松开后落地。移动前请检查实体活动区。
-Open the fridge and use the prep counter in the original layout.	在原始布局中拉开冰箱门并使用备料台面。
-The fridge sits forward. Try the opening and the route to the worktop.	冰箱已前移，体验开门和通往台面的路径。
+The fridge is across from the sink. Try opening it and walking to the worktop.	冰箱在水槽对面。试着打开冰箱，再走到备料台。
+The fridge sits closer to the sink. Try the opening and the route to the worktop.	冰箱向水槽前移。试着打开冰箱，再走到备料台。
 Try opening the fridge with a pantry cabinet beside its doorway.	试着拉开冰箱门，观察门旁窄柜的影响。
 Revise	需修改
 Circulation	通行

@@ -71,7 +71,7 @@ namespace XRApartment.Runtime
             }
         }
         static readonly string[] Hints = {
-            "Grip and pull the fridge handle.", "Take a tomato out of the fridge.",
+            "Pull the handle on the fridge opposite the sink.", "Take a tomato out of the fridge.",
             "Hold the knife and slice the tomato on the board.", "Cut each slice again; move chunks into the prep bowl.",
             "Open the fridge and take an egg.", "Pick up the mixing bowl from the table.",
             "Hold the egg above the bowl; tap the rim or press trigger.",
@@ -224,7 +224,7 @@ namespace XRApartment.Runtime
                 : "Check the swing path before opening the door again.";
             const string blockedAction = "The fridge door is blocked.";
             var action = beefRecipe ? BeefHints[step] : Hints[step];
-            if (beefRecipe && ingredient != null) action = "Take " + ingredient + " from the fridge.";
+            if (beefRecipe && ingredient != null) action = "Take " + ingredient + " from the fridge opposite the sink.";
             if (done && !beefRecipe && !stove.IsOn)
                 action = "Tomato and egg is ready. Select RESET ROOM to cook again.";
             var detail = blockedForRecipe ? recovery : beefRecipe ? BeefProgress(beefStep) : TomatoProgress(tomatoStep);

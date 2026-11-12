@@ -278,8 +278,7 @@ namespace XRApartment.EditorTools
                 var steam = Particles(heat, "FX_FoodSteam", 12, .7f, .035f); var emission = steam.emission; emission.enabled = false;
                 stove.ConfigureFeedback(sound, steam);
                 var fridgeObject = (GameObject)PrefabUtility.InstantiatePrefab(KitchenAuthoring.LoadRequired<GameObject>(RecipePrefabs + "PREF_Cooking_Fridge.prefab"), root.transform);
-                fridgeObject.transform.position = new Vector3(-1.87f, 0, 1.98f); fridgeObject.transform.rotation = Quaternion.Euler(0, 180, 0);
-                Parameter("cooking_fridge_center_x", -1.87f); Parameter("cooking_fridge_center_z", 1.98f);
+                fridgeObject.transform.SetPositionAndRotation(CookingFridgeDock, CookingFridgeRotation);
                 var fridge = fridgeObject.GetComponent<KitchenFridge>();
                 var tomato = Stock(root.transform, fridge, RecipeTomato, KitchenStoredFood.Tomato, new Vector3(-.18f, 1.014f, .02f), targets).GetComponent<PreparedKitchenProp>();
                 Stock(root.transform, fridge, Generated("carrot"), KitchenStoredFood.Other, new Vector3(.11f, 1.014f, .02f), targets);
@@ -314,11 +313,18 @@ namespace XRApartment.EditorTools
             workbench.transform.Find("ACT_RESET/Label").localRotation = CounterLabelRotation;
             workbench.transform.Find("ACT_RECIPE/Label").localRotation = CounterLabelRotation;
             controller.SetFridgeHint(null);
-            controller.ConfigureGuides(
-                BuildRecipeGuide(workbench.transform, "UI_CookingInstructions",
-                    new Vector3(-3.60f, 1.57f, 2.20f), 740f),
-                BuildRecipeGuide(workbench.transform, "UI_FridgeInstructions",
-                    new Vector3(-2.16f, 2.02f, 1.42f), 660f));
+            var worktopGuide = BuildRecipeGuide(workbench.transform, "UI_CookingInstructions",
+                new Vector3(-3.60f, 1.57f, 2.20f), 740f);
+            var fridge = workbench.GetComponent<KitchenCookingStation>().ActiveFridge.transform;
+            var fridgeGuide = BuildRecipeGuide(workbench.transform, "UI_FridgeInstructions", fridge.position, 660f);
+            PlaceFridgeGuide(fridgeGuide.heading.transform.parent, fridge);
+            controller.ConfigureGuides(worktopGuide, fridgeGuide);
+        }
+
+        private static void PlaceFridgeGuide(Transform guide, Transform fridge)
+        {
+            guide.SetPositionAndRotation(fridge.TransformPoint(new Vector3(0f, 2.02f, .42f)),
+                fridge.rotation * Quaternion.Euler(0f, 180f, 0f));
         }
 
         private static KitchenRecipeController.Guide BuildRecipeGuide(

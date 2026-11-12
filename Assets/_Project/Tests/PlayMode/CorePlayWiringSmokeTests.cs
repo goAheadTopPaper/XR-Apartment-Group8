@@ -184,8 +184,16 @@ public class CorePlayWiringSmokeTests
             SceneManager.LoadScene("SCN_Kitchen_Cooking");
             yield return null;
             var menu = Object.FindObjectOfType<LocomotionSettingsView>();
+            var lab = menu.GetComponentInChildren<KitchenLayoutMenu>(true);
+            lab.gameObject.SetActive(true);
+            var layoutStatus = lab.transform.Find("Status").GetComponent<TMP_Text>();
+            var workbench = GameObject.Find("PREF_Cooking_Workbench");
+            var worktopHint = workbench.transform.Find("UI_CookingInstructions/Action").GetComponent<TMP_Text>();
+            StringAssert.Contains("Opposite the sink", layoutStatus.text);
+
             menu.Open();
             yield return null;
+            StringAssert.Contains("opposite the sink", worktopHint.text);
             var button = menu.transform.Find("Panel/Language");
             ClickTrackedButton(menu.GetComponent<TrackedDeviceGraphicRaycaster>(), button);
             Assert.IsTrue(KitchenLocale.Chinese);
@@ -193,9 +201,13 @@ public class CorePlayWiringSmokeTests
             Assert.AreEqual("移动设置", title.text);
             title.ForceMeshUpdate();
             Assert.AreEqual('移', title.textInfo.characterInfo[0].character);
-            var workbench = GameObject.Find("PREF_Cooking_Workbench");
             var hint = workbench.transform.Find("UI_FridgeInstructions/Action").GetComponent<TMP_Text>();
             StringAssert.Contains("把手", hint.text);
+            StringAssert.Contains("水槽对面", worktopHint.text);
+            StringAssert.Contains("冰箱在水槽对面", layoutStatus.text);
+            worktopHint.ForceMeshUpdate();
+            Assert.IsTrue(worktopHint.textInfo.characterInfo.Take(worktopHint.textInfo.characterCount)
+                .Any(character => character.character == '槽'));
             SceneManager.LoadScene("SCN_Kitchen_Review");
             yield return null;
             var reviewMenu = Object.FindObjectOfType<LocomotionSettingsView>();

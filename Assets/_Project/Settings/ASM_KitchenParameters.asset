@@ -567,13 +567,13 @@ MonoBehaviour:
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
   - key: cooking_fridge_center_x
-    valueMetres: -1.87
+    valueMetres: -1.81
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
   - key: cooking_fridge_center_z
-    valueMetres: 1.98
+    valueMetres: 1.055
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption
@@ -867,19 +867,19 @@ MonoBehaviour:
     status: Prototype assumption
     verification: Unity prototype geometry; client validation pending.
   - key: layout_forward_fridge_z
-    valueMetres: 1.82
+    valueMetres: 1.055
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
   - key: layout_pantry_x
-    valueMetres: -1.73
+    valueMetres: -2.6399999
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
   - key: layout_pantry_z
-    valueMetres: 1.15
+    valueMetres: 0.9549998
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption
@@ -915,7 +915,7 @@ MonoBehaviour:
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
   - key: layout_compact_fridge_closed_depth
-    valueMetres: 0.68170005
+    valueMetres: 0.68170017
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption
@@ -958,6 +958,12 @@ MonoBehaviour:
     verification: Editor bounds and interaction tests; VR handling pending.
   - key: kitchen_virtual_edge_thickness
     valueMetres: 0.08
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_forward_fridge_x
+    valueMetres: -1.9699999
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption

@@ -90,7 +90,9 @@ namespace XRApartment.Runtime
             if (!args.isCanceled && Angle > 0f && Angle < 2.5f) SetOpen(false);
         }
 
-        private float Angle => Mathf.Abs(Mathf.DeltaAngle(0f, transform.localEulerAngles.y));
+        internal float Angle => Mathf.Abs(Mathf.DeltaAngle(0f, transform.localEulerAngles.y));
+        // The layout comparison displays whole degrees.
+        internal bool ReachedOpenAngle => OpeningBlocker == null && openAngleDegrees - Angle < .5f;
         private Vector3 Radial(Vector3 worldPoint) => Vector3.ProjectOnPlane(worldPoint - transform.position,
             transform.parent == null ? Vector3.up : transform.parent.up);
 

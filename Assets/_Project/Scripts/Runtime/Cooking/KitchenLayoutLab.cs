@@ -162,11 +162,12 @@ namespace XRApartment.Runtime
         {
             var active = station == null ? null : station.ActiveFridge;
             if (active == null || !active.Door.IsOpen) return;
-            var hitPantry = returnPanel != null && active.Door.OpeningBlocker == returnPanel;
-            if (!hitPantry && active.Door.Progress < .999) return;
+            var door = active.Door;
+            var hitPantry = returnPanel != null && door.OpeningBlocker == returnPanel;
+            if (!hitPantry && !door.ReachedOpenAngle) return;
             openings[OpeningIndex(ActivePresetIndex, CompactSelected)] = new OpeningResult
             {
-                angle = Mathf.Abs(Mathf.DeltaAngle(0f, active.Door.transform.localEulerAngles.y)),
+                angle = door.Angle,
                 hitPantry = hitPantry
             };
         }

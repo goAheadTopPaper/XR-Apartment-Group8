@@ -345,7 +345,8 @@ namespace XRApartment.Tests
             Assert.IsTrue(fridge.Contains(tomato.transform.position));
             Assert.IsFalse(manager.IsSelectPossible(left, grab), "A tracked hand inside a closed fridge cannot bypass the door.");
             yield return ToggleDoor(fridge); Assert.That(fridge.Door.Progress, Is.GreaterThan(.9));
-            Capture("fridge-open", new Vector3(-1.87f, 1.6f, .50f), fridge.transform.position + Vector3.up * .95f);
+            var fridgeView = fridge.transform.TransformPoint(new Vector3(-.23f, 1.65f, 1.95f));
+            Capture("fridge-open", fridgeView, fridge.transform.position + Vector3.up * 1.22f);
             yield return Retrieve(left, tomato.gameObject, fridge);
             Drop(left, tomato.gameObject);
             station.GetComponent<KitchenCookingStation>().ResetStation(); yield return Frames(3);

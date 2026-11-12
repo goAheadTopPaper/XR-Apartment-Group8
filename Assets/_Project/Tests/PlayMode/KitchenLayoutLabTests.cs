@@ -33,7 +33,18 @@ namespace XRApartment.Tests
             Assert.AreEqual(3, lab.PresetCount);
             Assert.AreEqual(3, lab.FinishCount);
             Assert.IsNull(Object.FindObjectOfType<JourneyRuntimeHost>());
-            var counter = GameObject.Find("SM_KitchenTable").GetComponent<MeshRenderer>();
+            var originalDock = fridge.transform.position;
+            var sink = GameObject.Find("BASIN_Collect").transform;
+            var acrossFromFridge = Vector3.ProjectOnPlane(sink.position - originalDock, Vector3.up).normalized;
+            Assert.That(Vector3.Dot(fridge.transform.forward, acrossFromFridge), Is.GreaterThan(.99f));
+
+            var cabinet = GameObject.Find("SM_KitchenTable");
+            var cabinetCollider = cabinet.GetComponent<MeshCollider>();
+            Assert.AreEqual("KitchenTable", cabinetCollider.sharedMesh.name);
+            Assert.That(cabinet.GetComponent<MeshRenderer>().bounds.max.x, Is.GreaterThan(-1.47f));
+            Assert.IsTrue(cabinetCollider.Raycast(new Ray(new Vector3(-1.87f, 2f, 1.98f), Vector3.down),
+                out _, 2f), "The original cabinet must support objects in the former fridge slot.");
+            var counter = cabinet.GetComponent<MeshRenderer>();
             var original = counter.sharedMaterial.color;
             var fullEnamel = EnamelRenderers(fridge);
             var fridgeCard = station.transform.Find("UI_FridgeInstructions");
@@ -44,6 +55,7 @@ namespace XRApartment.Tests
             var fridgeDetail = fridgeCard.Find("Detail").GetComponent<TMP_Text>();
             var stock = station.GetComponentsInChildren<KitchenStoredIngredient>();
             Assert.AreEqual(11, stock.Length);
+            Assert.IsTrue(stock.All(food => fridge.Contains(food.transform.position)), "Stock must start on the moved shelves.");
             AssertClosedDoorRouteIsClear();
 
             var background = InputSystem.settings.backgroundBehavior;
@@ -66,7 +78,8 @@ namespace XRApartment.Tests
                 }
                 ClickWithTrackedRay(movement, menu.transform.Find("ForwardDock"));
                 Assert.AreEqual(1, lab.ActivePresetIndex);
-                Assert.That(fridge.transform.position.z, Is.EqualTo(1.82f).Within(.005f));
+                Assert.That(Vector3.Distance(fridge.transform.position, originalDock + fridge.transform.forward * .16f),
+                    Is.LessThan(.005f));
                 Assert.IsFalse(fridge.Door.IsOpen);
                 Assert.IsTrue(stock.All(food => fridge.Contains(food.transform.position) && !food.WasRetrieved));
                 AssertClosedDoorRouteIsClear();
@@ -74,7 +87,7 @@ namespace XRApartment.Tests
 
                 fridge.Door.SetOpen(true);
                 yield return new WaitForSeconds(1.4f);
-                Assert.IsTrue(fridge.Accessible, "The forward dock must allow access to its stocked shelves.");
+                Assert.That(lab.ObservedSwing(false), Is.EqualTo("105°"), "The forward dock must allow a full opening.");
                 Assert.IsTrue(lab.TryApply(2, out var status), status);
                 yield return null;
                 yield return null;
@@ -151,7 +164,7 @@ namespace XRApartment.Tests
                 AssertClosedDoorRouteIsClear();
                 compact.Door.SetOpen(true);
                 yield return new WaitForSeconds(1.4f);
-                Assert.IsTrue(compact.Accessible, "The forward dock must also work with the compact model.");
+                Assert.That(lab.ObservedSwing(true), Is.EqualTo("105°"), "The forward dock must also clear the compact door.");
 
                 Assert.IsTrue(lab.TryApply(0, out status), status);
                 for (var frame = 0; frame < 3; frame++) yield return null;
@@ -161,12 +174,12 @@ namespace XRApartment.Tests
                 yield return null;
                 yield return null;
                 Assert.AreSame(fridge, station.ActiveFridge);
-                Assert.That(fridge.transform.position.z, Is.EqualTo(1.98f).Within(.005f));
+                Assert.That(Vector3.Distance(fridge.transform.position, originalDock), Is.LessThan(.005f));
                 Assert.IsFalse(fridge.Door.IsOpen);
                 Assert.IsTrue(stock.All(food => fridge.Contains(food.transform.position)));
                 fridge.Door.SetOpen(true);
                 yield return new WaitForSeconds(1.4f);
-                Assert.Greater(fridge.Door.Progress, .90);
+                Assert.That(lab.ObservedSwing(false), Is.EqualTo("105°"), "The door must clear the restored cabinet.");
 
                 yield return OpenLayoutMenu(keyboard, movement);
                 ClickWithTrackedRay(movement, menu.transform.Find("FinishWarmIvory"));
@@ -234,21 +247,25 @@ namespace XRApartment.Tests
 
         private static void AssertClosedDoorRouteIsClear()
         {
-            var entrance = new Vector3(-2.51f, 0f, .82f);
-            var fridgeApproach = new Vector3(-2.06f, 0f, .91f);
-            var worktopApproach = new Vector3(-3.68f, 0f, .91f);
-            for (var step = 0; step <= 24; step++)
+            var player = GameObject.Find("PREF_XR_KitchenRig").transform;
+            var route = new[]
             {
-                var first = Vector3.Lerp(entrance, fridgeApproach, step / 24f);
-                var second = Vector3.Lerp(fridgeApproach, worktopApproach, step / 24f);
-                foreach (var position in new[] { first, second })
+                new Vector3(-2.62f, 0f, .72f),
+                new Vector3(-2.90f, 0f, .72f),
+                new Vector3(-2.90f, 0f, 1.21f),
+                new Vector3(-2.57f, 0f, 1.21f),
+                new Vector3(-3.68f, 0f, 1.21f)
+            };
+            for (var leg = 1; leg < route.Length; leg++)
+                for (var step = 0; step <= 24; step++)
                 {
+                    var position = Vector3.Lerp(route[leg - 1], route[leg], step / 24f);
                     var overlaps = Physics.OverlapCapsule(position + Vector3.up * .12f, position + Vector3.up * 1.34f,
-                        .1f, ~0, QueryTriggerInteraction.Ignore);
+                        .1f, ~0, QueryTriggerInteraction.Ignore)
+                        .Where(collider => !collider.transform.IsChildOf(player)).ToArray();
                     Assert.IsEmpty(overlaps, "Blocked kitchen route at " + position + " by " +
                         string.Join(", ", overlaps.Select(collider => collider.name)));
                 }
-            }
         }
 
         [UnityTest]
@@ -260,7 +277,8 @@ namespace XRApartment.Tests
             var fridge = Object.FindObjectOfType<KitchenFridge>();
             var stove = Object.FindObjectOfType<KitchenHeatSource>();
             var blocker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            blocker.transform.SetPositionAndRotation(new Vector3(-1.87f, .7f, 1.36f), Quaternion.identity);
+            var originalDock = fridge.transform.position;
+            blocker.transform.position = fridge.transform.TransformPoint(new Vector3(0f, .7f, .62f));
             blocker.transform.localScale = Vector3.one * .08f;
             stove.SetOn(true);
             try
@@ -268,10 +286,10 @@ namespace XRApartment.Tests
                 Assert.IsFalse(lab.TryApply(1, out var reason));
                 Assert.That(reason, Does.Contain("Move yourself"));
                 Assert.AreEqual(0, lab.ActivePresetIndex);
-                Assert.That(fridge.transform.position.z, Is.EqualTo(1.98f).Within(.005f));
+                Assert.AreEqual(originalDock, fridge.transform.position);
                 Assert.IsTrue(stove.IsOn, "A refused switch must preserve the current meal.");
 
-                blocker.transform.position = fridge.transform.position + new Vector3(.337f, .7f, 0f);
+                blocker.transform.position = fridge.transform.TransformPoint(new Vector3(.337f, .7f, 0f));
                 blocker.transform.localScale = Vector3.one * .015f;
                 Assert.IsTrue(lab.TrySelectFridge(true, out reason), reason);
                 for (var frame = 0; frame < 3; frame++) yield return null;

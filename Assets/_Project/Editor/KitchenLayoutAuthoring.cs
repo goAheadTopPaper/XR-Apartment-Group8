@@ -17,8 +17,10 @@ namespace XRApartment.EditorTools
         private const string LabMenuPath = KitchenAuthoring.Prefabs + "UI/PREF_UI_KitchenLayoutLab.prefab";
         private const string CompactFridgeName = "FRIDGE_Compact";
         private const float CompactFridgeScale = .85f;
-        private static readonly Vector3 ForwardDock = new Vector3(-1.87f, 0f, 1.82f);
-        private static readonly Vector3 PantryDock = new Vector3(-1.73f, 0f, 1.15f);
+        private const float ForwardDockOffset = .16f;
+        private static readonly Vector3 CookingFridgeDock = new Vector3(-1.81f, 0f, 1.055f);
+        private static readonly Quaternion CookingFridgeRotation = Quaternion.Euler(0f, -90f, 0f);
+        private static readonly Vector3 PantryOffset = new Vector3(-.10f, 0f, .83f);
         private static readonly Vector3 PantrySize = new Vector3(.25f, 1.82f, .26f);
         private static readonly KitchenLayoutLab.FinishPreset[] LayoutFinishes =
         {
@@ -34,10 +36,31 @@ namespace XRApartment.EditorTools
         {
             KitchenAuthoring.RequireEditMode();
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-            KitchenAuthoring.EditPrefab(StationPath, EnsureCompactFridge);
+            KitchenAuthoring.EditPrefab(StationPath, RelocateCookingFridge);
             var scene = EditorSceneManager.OpenScene(ScenePath);
             ConfigureLayoutLab(scene);
             KitchenAuthoring.SaveScene(scene);
+        }
+
+        private static void RelocateCookingFridge(GameObject workbench)
+        {
+            var fridge = workbench.GetComponent<KitchenCookingStation>().ActiveFridge.transform;
+            if (fridge.position != CookingFridgeDock || fridge.rotation != CookingFridgeRotation)
+            {
+                var previousPosition = fridge.position;
+                var turn = CookingFridgeRotation * Quaternion.Inverse(fridge.rotation);
+                foreach (var stock in workbench.GetComponentsInChildren<KitchenStoredIngredient>(true))
+                {
+                    var item = stock.transform;
+                    item.SetPositionAndRotation(CookingFridgeDock + turn * (item.position - previousPosition),
+                        turn * item.rotation);
+                }
+                fridge.SetPositionAndRotation(CookingFridgeDock, CookingFridgeRotation);
+            }
+
+            EnsureCompactFridge(workbench);
+            var guide = workbench.transform.Find("UI_FridgeInstructions");
+            if (guide != null) PlaceFridgeGuide(guide, fridge);
         }
 
         private static void EnsureCompactFridge(GameObject station)
@@ -65,7 +88,11 @@ namespace XRApartment.EditorTools
             var movement = rig.GetComponentInChildren<LocomotionSettingsView>(true);
             var fridgeBounds = FridgeEnvelope(fridge);
             var compactBounds = new Bounds(fridgeBounds.center * CompactFridgeScale, fridgeBounds.size * CompactFridgeScale);
-            BuildLabPrefab(fridge.transform.position, fridge.transform.rotation, fridgeBounds, compactBounds);
+            var dock = fridge.transform.position;
+            var rotation = fridge.transform.rotation;
+            var forwardDock = dock + rotation * Vector3.forward * ForwardDockOffset;
+            var pantryDock = dock + rotation * PantryOffset;
+            BuildLabPrefab(dock, rotation, forwardDock, pantryDock, fridgeBounds, compactBounds);
             BuildLabMenu();
 
             var lab = roots.Select(root => root.GetComponent<KitchenLayoutLab>()).SingleOrDefault(item => item != null);
@@ -80,9 +107,11 @@ namespace XRApartment.EditorTools
             labData.ApplyModifiedPropertiesWithoutUndo();
 
             var environment = roots.Single(root => root.name == "PREF_Kitchen_Environment");
+            var cabinet = environment.transform.Find("SM_KitchenTable");
+            RestoreCookingCabinet(cabinet);
             var furniture = new Renderer[]
             {
-                environment.transform.Find("SM_KitchenTable")?.GetComponent<MeshRenderer>(),
+                cabinet.GetComponent<MeshRenderer>(),
                 lab.transform.Find("MOD_Pantry/VIS_PantryCase")?.GetComponent<MeshRenderer>()
             };
             var enamel = KitchenAuthoring.LoadRequired<Material>(KitchenAuthoring.Root +
@@ -109,15 +138,30 @@ namespace XRApartment.EditorTools
             movementData.FindProperty("layout").objectReferenceValue = menu;
             movementData.ApplyModifiedPropertiesWithoutUndo();
 
-            Parameter("layout_forward_fridge_z", ForwardDock.z);
-            Parameter("layout_pantry_x", PantryDock.x);
-            Parameter("layout_pantry_z", PantryDock.z);
+            Parameter("cooking_fridge_center_x", dock.x);
+            Parameter("cooking_fridge_center_z", dock.z);
+            Parameter("layout_forward_fridge_x", forwardDock.x);
+            Parameter("layout_forward_fridge_z", forwardDock.z);
+            Parameter("layout_pantry_x", pantryDock.x);
+            Parameter("layout_pantry_z", pantryDock.z);
             Parameter("layout_pantry_width", PantrySize.x);
             Parameter("layout_pantry_height", PantrySize.y);
             Parameter("layout_pantry_depth", PantrySize.z);
             Parameter("layout_compact_fridge_width", .72f * CompactFridgeScale);
             Parameter("layout_compact_fridge_height", 1.81f * CompactFridgeScale);
             Parameter("layout_compact_fridge_closed_depth", compactBounds.size.z);
+        }
+
+        private static void RestoreCookingCabinet(Transform cabinet)
+        {
+            const string originalPath = KitchenAuthoring.Root + "Art/Kitchen/Meshes/SM_KitchenTable.fbx";
+            var original = KitchenAuthoring.LoadRequired<Mesh>(originalPath);
+            var mesh = cabinet.GetComponent<MeshFilter>();
+            var collider = cabinet.GetComponent<MeshCollider>();
+            mesh.sharedMesh = original;
+            collider.sharedMesh = original;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(mesh);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(collider);
         }
 
         private static Bounds FridgeEnvelope(KitchenFridge fridge)
@@ -133,7 +177,8 @@ namespace XRApartment.EditorTools
             return local;
         }
 
-        private static void BuildLabPrefab(Vector3 position, Quaternion rotation, Bounds fridgeBounds, Bounds compactBounds)
+        private static void BuildLabPrefab(Vector3 position, Quaternion rotation, Vector3 forwardDock,
+            Vector3 pantryDock, Bounds fridgeBounds, Bounds compactBounds)
         {
             var root = new GameObject("PREF_Cooking_LayoutLab");
             try
@@ -141,11 +186,11 @@ namespace XRApartment.EditorTools
                 var current = Child(root.transform, "LOC_Fridge_Original");
                 current.SetPositionAndRotation(position, rotation);
                 var forward = Child(root.transform, "LOC_Fridge_Forward");
-                forward.SetPositionAndRotation(ForwardDock, rotation);
+                forward.SetPositionAndRotation(forwardDock, rotation);
                 var pantry = Child(root.transform, "LOC_Pantry");
-                pantry.position = PantryDock;
+                pantry.SetPositionAndRotation(pantryDock, rotation * Quaternion.Euler(0f, 180f, 0f));
                 var cabinet = Child(root.transform, "MOD_Pantry");
-                cabinet.position = PantryDock;
+                cabinet.SetPositionAndRotation(pantry.position, pantry.rotation);
                 var collider = cabinet.gameObject.AddComponent<BoxCollider>();
                 collider.center = Vector3.up * (PantrySize.y * .5f);
                 collider.size = PantrySize;
@@ -164,10 +209,12 @@ namespace XRApartment.EditorTools
                 cabinet.gameObject.SetActive(false);
                 var options = new[]
                 {
-                    new KitchenLayoutLab.Preset { label = "A  |  Original kitchen",
-                        description = "Open the fridge and use the prep counter in the original layout.", fridgeSocket = current },
+                    new KitchenLayoutLab.Preset { label = "A  |  Opposite the sink",
+                        description = "The fridge is across from the sink. Try opening it and walking to the worktop.",
+                        fridgeSocket = current },
                     new KitchenLayoutLab.Preset { label = "B  |  Forward dock",
-                        description = "The fridge sits forward. Try the opening and the route to the worktop.", fridgeSocket = forward },
+                        description = "The fridge sits closer to the sink. Try the opening and the route to the worktop.",
+                        fridgeSocket = forward },
                     new KitchenLayoutLab.Preset { label = "C  |  Pantry return",
                         description = "Try opening the fridge with a pantry cabinet beside its doorway.",
                         fridgeSocket = current, panelSocket = pantry }
@@ -189,7 +236,7 @@ namespace XRApartment.EditorTools
                 var status = KitchenLocomotionAuthoring.Label("Status", root, 0, 210, 580, 83, 23, "");
                 var options = new[]
                 {
-                    KitchenLocomotionAuthoring.Button("Original", root, 0, 129, 566, 50, "A  ·  ORIGINAL KITCHEN"),
+                    KitchenLocomotionAuthoring.Button("Original", root, 0, 129, 566, 50, "A  ·  OPPOSITE THE SINK"),
                     KitchenLocomotionAuthoring.Button("ForwardDock", root, 0, 72, 566, 50, "B  ·  FORWARD DOCK"),
                     KitchenLocomotionAuthoring.Button("PantryReturn", root, 0, 15, 566, 50, "C  ·  PANTRY RETURN")
                 };

@@ -1245,6 +1245,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PREF_Kitchen_Environment
       objectReference: {fileID: 0}
+    - target: {fileID: 2622119806909515352, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
+      propertyPath: m_Mesh
+      value:
+      objectReference: {fileID: -5493147076075680602, guid: e3bae151186e0884db0522600c6021a5, type: 3}
+    - target: {fileID: 4297018116722186270, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
+      propertyPath: m_Mesh
+      value:
+      objectReference: {fileID: -5493147076075680602, guid: e3bae151186e0884db0522600c6021a5, type: 3}
     - target: {fileID: 5337958970369052670, guid: 931a6d90e54f2421083c4bb47e331af2, type: 3}
       propertyPath: m_IsActive
       value: 0
