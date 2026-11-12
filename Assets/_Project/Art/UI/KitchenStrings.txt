@@ -381,3 +381,83 @@ Flush + F2	齐平式 + F2
 ^Explore lets you preview B1 and B2 freely\..*$	探索时可以自由预览 B1 与 B2，然后完成正式任务。
 ^Explore  \|  Explore the kitchen$	探索 · 观察厨房
 ^not measured$	未测量
+KITCHEN GUIDE	厨房引导
+FEEDBACK NOTE	反馈便利贴
+Feedback note	反馈便利贴
+Calibrate your view	校准视角
+Choose a posture and adjust the eye height.	请选择站姿或坐姿，并调节视线高度。
+^Eye height: (.*) m$	视线高度 $1 米
+Start practice	开始练习
+Practice controls	练习操作
+Push the right stick forward to aim at the floor, then release to teleport.	向前推右摇杆瞄准地面，松开摇杆完成瞬移。
+Grip a kitchen tool, then release it.	握住一件厨房用具，再松手放下。
+Practice complete. Hold Menu and open Kitchen Guide to continue.	练习完成。长按菜单键，打开「厨房引导」继续。
+Practice complete. Start the recipe when ready.	练习完成。准备好后开始做菜。
+Teleport done	已完成瞬移
+Teleport pending	待练习瞬移
+Grab and release done	已完成抓取和放下
+Grab and release pending	待练习抓取和放下
+Start tomato and egg	开始做西红柿炒蛋
+Cook tomato and egg	做西红柿炒蛋
+Select tomato and egg to continue the guide.	选择西红柿炒蛋，继续跟随引导。
+Select tomato and egg	选择西红柿炒蛋
+Follow the step-by-step instructions at the worktop.	按照台面旁的步骤提示操作。
+Meal complete and stove off.	菜已做好，灶火已关闭。
+Meal complete. Hold Menu and open Kitchen Guide to continue.	菜已做好。长按菜单键，打开「厨房引导」继续。
+Preview fridges	预览冰箱
+Compare the fridges	比较两款冰箱
+Open Layout Lab	打开布局实验
+Grip and pull the current fridge handle until the door stops.	握住当前冰箱把手，拉到门扇停止。
+Hold Menu and open Layout Lab. Choose Full size, resume and try the door.	长按菜单键打开「布局实验」，选择「全尺寸」，继续游戏后试开冰箱门。
+Hold Menu and open Layout Lab. Choose Compact, resume and try the door.	长按菜单键打开「布局实验」，选择「紧凑款」，继续游戏后试开冰箱门。
+^Full size (.*) \| Compact size (.*)$	全尺寸 $1 · 紧凑款 $2
+You tried both sizes in the same layout.	已在同一摆位试开两款冰箱。
+Fridges compared. Hold Menu and open Kitchen Guide to continue.	已试开两款冰箱。长按菜单键，打开「厨房引导」继续。
+Leave feedback	留下反馈
+Hold Menu and choose Feedback note.	长按菜单键，选择「反馈便利贴」。
+Grip the yellow note. Release it close to the surface you want to review.	拿起黄色便利贴，靠近要反馈的物品表面后松手。
+Look toward open space and try the feedback note again.	面向空处，再选择一次「反馈便利贴」。
+Write your feedback and save it to the local document.	输入反馈并保存至本地文档。
+What would you change about this object?	你想对这件物品提出什么建议？
+Save feedback	保存反馈
+Discard draft	丢弃草稿
+Draft	草稿
+Saved feedback	已保存反馈
+Write your feedback	填写反馈
+Use the controller ray and trigger. Done returns to your note.	用手柄射线和扳机选字，选「完成」返回便利贴。
+Saved to KitchenFeedback/feedback.txt	已保存至 KitchenFeedback/feedback.txt
+Could not save. Your draft is still here. Try again.	保存失败，草稿已保留。请重试。
+Kitchen guide complete	厨房引导已完成
+Your feedback was saved. You can now explore the kitchen freely.	反馈已保存。你现在可以自由探索厨房。
+Calibrate again	重新校准
+Kitchen counter	厨房台面
+Pantry cabinet	储物柜
+Full-size fridge	全尺寸冰箱
+Full-size fridge door	全尺寸冰箱门
+Compact fridge	紧凑款冰箱
+Compact fridge door	紧凑款冰箱门
+Stove	灶台
+Mixing bowl	搅拌碗
+Prep bowl	备料碗
+Frying pan	煎锅
+Whisk	打蛋器
+Spatula	锅铲
+Chopping board	切菜板
+Ladle	汤勺
+Kitchen knife	菜刀
+Plate	盘子
+Cup	水杯
+Pot	汤锅
+Sink	水槽
+Faucet	水龙头
+Dining table	餐桌
+^Dining chair (\d+)$	餐椅 $1
+Return to guide	返回引导
+Kitchen Guide	厨房引导
+Layout Lab	布局实验
+Options	设置
+Hold left Menu / F8 to pause.	长按左手菜单键或 F8 暂停。
+Free play	自由活动
+Start free play	开始自由活动
+Return to free play	返回自由活动
+Explore the kitchen at your own pace.	自由探索厨房，试用不同布局或留下反馈。
