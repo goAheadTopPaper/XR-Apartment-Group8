@@ -826,38 +826,8 @@ namespace XRApartment.Runtime.UI
             return CalibratedPosture + " view calibrated. Your review progress is kept.";
         }
 
-        private bool ApplyEyeHeight()
-        {
-            if (xrOrigin == null || xrOrigin.Origin == null || xrOrigin.Camera == null) return false;
-            var origin = xrOrigin.Origin.transform;
-            var floorOffsetObject = xrOrigin.CameraFloorOffsetObject;
-            var trackingOffset = floorOffsetObject == null ? null : floorOffsetObject.transform;
-            if (trackingOffset == null || trackingOffset == origin || !trackingOffset.IsChildOf(origin) ||
-                !xrOrigin.Camera.transform.IsChildOf(trackingOffset)) return false;
-
-            if (eyeHeightOffset == null)
-            {
-                // Keep XROrigin's floor offset separate so tracking-origin updates and
-                // teleportation do not overwrite the participant's visual calibration.
-                eyeHeightOffset = new GameObject("Review Eye Height Offset").transform;
-                eyeHeightOffset.SetParent(trackingOffset.parent, false);
-                eyeHeightOffset.SetSiblingIndex(trackingOffset.GetSiblingIndex());
-                trackingOffset.SetParent(eyeHeightOffset, false);
-            }
-
-            var shift = DesiredEyeHeight - xrOrigin.CameraInOriginSpaceHeight;
-            eyeHeightOffset.position += origin.TransformVector(Vector3.up * shift);
-            if (origin.TryGetComponent<CharacterController>(out var controller))
-            {
-                // Use the same under-camera capsule convention as XRI's movement manipulator.
-                var head = xrOrigin.CameraInOriginSpacePos;
-                controller.height = Mathf.Max(head.y, 2f * controller.radius);
-                controller.center = new Vector3(head.x, controller.height * .5f + controller.skinWidth, head.z);
-            }
-            if (teleportationProvider is KitchenTeleportationProvider provider) provider.CancelPending();
-            Physics.SyncTransforms();
-            return true;
-        }
+        private bool ApplyEyeHeight() => KitchenLocomotionSettings.CalibrateEyeHeight(xrOrigin,
+            teleportationProvider as KitchenTeleportationProvider, DesiredEyeHeight, ref eyeHeightOffset);
         private void CompleteSetup()
         {
             if (!Setup || !postureChosen || !calibrated || host == null)

@@ -1,4 +1,3 @@
-using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,19 +16,13 @@ namespace XRApartment.Runtime.UI
         private RectTransform viewportRect;
         private Button skipContextButton;
         private Button openKeyboardButton;
-        private RectTransform keyboard;
+        private KitchenRayKeyboard keyboard;
         private CanvasGroup comparisonGroup;
-        private TMP_Text keyboardPreview;
-        private TMP_Text keyboardCount;
-        private TMP_Text shiftLabel;
         private TMP_Text error;
         private Shader keyboardSurfaceShader;
         private Shader keyboardTextShader;
-        private Material keyboardSurface;
-        private Material keyboardFont;
         private string preferred;
         private string skipped;
-        private bool shift;
 
         internal void ConfigureKeyboardShaders(Shader surface, Shader text)
         {
@@ -77,11 +70,7 @@ namespace XRApartment.Runtime.UI
 
         private void OnDisable() => CloseKeyboard();
 
-        private void OnDestroy()
-        {
-            if (keyboardSurface != null) Destroy(keyboardSurface);
-            if (keyboardFont != null) Destroy(keyboardFont);
-        }
+        private void OnDestroy() => keyboard?.ReleaseMaterials();
 
         private static bool Completed(JourneySnapshot snapshot, string id)
         {
@@ -140,143 +129,37 @@ namespace XRApartment.Runtime.UI
 
         private void OpenKeyboard()
         {
-            if (keyboard == null) BuildKeyboard();
-            tradeOff.DeactivateInputField();
-            shift = false;
-            RefreshKeyboard();
-            keyboard.SetAsLastSibling();
+            if (keyboard == null)
+            {
+                var panel = (RectTransform)transform.parent;
+                comparisonGroup = panel.gameObject.AddComponent<CanvasGroup>();
+                keyboard = new KitchenRayKeyboard("TradeOffKeyboard", panel, panel.parent, tradeOff,
+                    "Write your main trade-off", "Use the controller ray and trigger. Done returns to the comparison.",
+                    CloseKeyboard, keyboardSurfaceShader, keyboardTextShader);
+            }
             comparisonGroup.alpha = 0f;
             comparisonGroup.interactable = false;
             comparisonGroup.blocksRaycasts = false;
-            keyboard.gameObject.SetActive(true);
+            keyboard.Show();
             KitchenLocale.Set(error, string.Empty);
         }
 
         internal void CloseKeyboard()
         {
-            if (keyboard == null || !keyboard.gameObject.activeSelf) return;
-            keyboard.gameObject.SetActive(false);
+            if (keyboard == null || !keyboard.IsOpen) return;
+            keyboard.Hide();
             comparisonGroup.alpha = 1f;
             comparisonGroup.interactable = true;
             comparisonGroup.blocksRaycasts = true;
         }
 
-        private void BuildKeyboard()
-        {
-            var panel = (RectTransform)transform.parent;
-            comparisonGroup = panel.gameObject.AddComponent<CanvasGroup>();
-            // Center the keys on the viewer while the comparison panel is hidden.
-            keyboard = Rect("TradeOffKeyboard", 0f, 0f, panel.rect.width, panel.rect.height, panel.parent);
-            keyboard.gameObject.SetActive(false);
-            var surface = keyboard.gameObject.AddComponent<Image>();
-            surface.color = new Color(.08f, .12f, .18f);
-            var font = TMP_Settings.defaultFontAsset;
-            Text("Title", Rect("Heading", 0f, 247f, 820f, 50f, keyboard), "Write your main trade-off", 34, font);
-            keyboardPreview = Text("Note", Rect("Preview", 0f, 168f, 800f, 94f, keyboard), "", 25, font);
-            keyboardPreview.richText = false;
-            keyboardCount = Text("Count", Rect("CountLabel", 343f, 220f, 120f, 26f, keyboard), "", 18, font);
-            var rows = new[] { "1234567890", "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM,.?" };
-            for (int row = 0; row < rows.Length; row++)
-                for (int column = 0; column < rows[row].Length; column++)
-                {
-                    char key = rows[row][column];
-                    float x = (column - (rows[row].Length - 1) * .5f) * 76f;
-                    Key("Key " + key, key.ToString(), x, 95f - 69f * row, 66f, font,
-                        () => Append(shift ? key : char.ToLowerInvariant(key)));
-                }
-            shiftLabel = Key("Shift", "Shift", -326f, -183f, 140f, font, () =>
-            {
-                shift = !shift;
-                RefreshKeyboard();
-            }).GetComponentInChildren<TMP_Text>();
-            Key("Space", "Space", -121f, -183f, 246f, font, () => Append(' '));
-            Key("Backspace", "Backspace", 97f, -183f, 164f, font, Backspace);
-            Key("Done", "Done", 290f, -183f, 168f, font, CloseKeyboard);
-            Text("Help", Rect("HelpLabel", 0f, -260f, 820f, 36f, keyboard),
-                "Use the controller ray and trigger. Done returns to the comparison.", 22, font);
-            if (keyboardSurfaceShader != null)
-            {
-                keyboardSurface = new Material(keyboardSurfaceShader);
-                foreach (var image in keyboard.GetComponentsInChildren<Image>(true)) image.material = keyboardSurface;
-            }
-            if (keyboardTextShader != null && font != null)
-            {
-                keyboardFont = new Material(font.material) { shader = keyboardTextShader, renderQueue = 3100 };
-                foreach (var label in keyboard.GetComponentsInChildren<TMP_Text>(true)) label.fontSharedMaterial = keyboardFont;
-            }
-        }
-
-        private void Append(char key)
-        {
-            if (tradeOff.text.Length >= tradeOff.characterLimit) return;
-            tradeOff.text += key;
-            if (char.IsLetter(key)) shift = false;
-            RefreshKeyboard();
-        }
-
-        private void Backspace()
-        {
-            var starts = StringInfo.ParseCombiningCharacters(tradeOff.text);
-            if (starts.Length == 0) return;
-            tradeOff.text = tradeOff.text.Substring(0, starts[starts.Length - 1]);
-            RefreshKeyboard();
-        }
-
-        private void RefreshKeyboard()
-        {
-            if (tradeOff.text.Length == 0) KitchenLocale.Set(keyboardPreview, "Your note appears here.");
-            else KitchenLocale.SetVerbatim(keyboardPreview, tradeOff.text);
-            keyboardCount.text = $"{tradeOff.text.Length} / {tradeOff.characterLimit}";
-            KitchenLocale.Set(shiftLabel, shift ? "Shift on" : "Shift");
-        }
-
-        private Button Key(string name, string title, float x, float y, float width, TMP_FontAsset font,
-            UnityEngine.Events.UnityAction action) =>
-            AddButton(Rect(name, x, y, width, 58f, keyboard), title, font, action);
-
         private Button Choice(string title, float x, TMP_FontAsset font, UnityEngine.Events.UnityAction action)
-            => AddButton(Rect(title, x, 48f, 225f, 48f), title, font, action);
+            => KitchenRayKeyboard.Button(Rect(title, x, 48f, 225f, 48f), title, font, action);
 
-        private static Button AddButton(RectTransform rect, string title, TMP_FontAsset font,
-            UnityEngine.Events.UnityAction action)
-        {
-            var image = rect.gameObject.AddComponent<Image>();
-            image.color = new Color(.14f, .42f, .77f);
-            var button = rect.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            Text("Label", rect, title, 22, font);
-            button.onClick.AddListener(action);
-            return button;
-        }
+        private RectTransform Rect(string name, float x, float y, float width, float height, Transform parent = null)
+            => KitchenRayKeyboard.Rect(name, parent ?? transform, x, y, width, height);
 
-        private RectTransform Rect(string title, float x, float y, float width, float height,
-            Transform parent = null)
-        {
-            var rect = new GameObject(title, typeof(RectTransform)).GetComponent<RectTransform>();
-            rect.SetParent(parent == null ? transform : parent, false);
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(.5f, .5f);
-            rect.anchoredPosition = new Vector2(x, y);
-            rect.sizeDelta = new Vector2(width, height);
-            return rect;
-        }
-
-        private static TextMeshProUGUI Text(string title, RectTransform parent, string value,
-            int size, TMP_FontAsset font)
-        {
-            var label = new GameObject(title, typeof(RectTransform), typeof(TextMeshProUGUI))
-                .GetComponent<TextMeshProUGUI>();
-            label.transform.SetParent(parent, false);
-            label.rectTransform.anchorMin = Vector2.zero;
-            label.rectTransform.anchorMax = Vector2.one;
-            label.rectTransform.offsetMin = new Vector2(8f, 2f);
-            label.rectTransform.offsetMax = new Vector2(-8f, -2f);
-            label.font = font;
-            label.fontSize = size;
-            KitchenLocale.Set(label, value);
-            label.color = Color.white;
-            label.alignment = TextAlignmentOptions.Center;
-            label.raycastTarget = false;
-            return label;
-        }
+        private static TextMeshProUGUI Text(string name, RectTransform parent, string value, int size, TMP_FontAsset font)
+            => KitchenRayKeyboard.Text(name, parent, value, size, font);
     }
 }

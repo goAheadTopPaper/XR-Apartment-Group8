@@ -28,6 +28,7 @@ namespace XRApartment.Runtime
         bool started;
         KitchenRoomBounds room;
         Vector3 lastFloorPosition;
+        Transform eyeHeightOffset;
         public XROrigin Origin { get; private set; }
         public CharacterController Character { get; private set; }
         public KitchenMovementMode Mode { get; private set; }
@@ -76,6 +77,40 @@ namespace XRApartment.Runtime
 
         public void SelectTeleport() => SetMode(KitchenMovementMode.Teleport);
         public void SelectSmooth() => SetMode(KitchenMovementMode.Smooth);
+
+        internal bool CalibrateEyeHeight(float height) =>
+            CalibrateEyeHeight(Origin, teleportProvider, height, ref eyeHeightOffset);
+
+        internal static bool CalibrateEyeHeight(XROrigin xrOrigin, KitchenTeleportationProvider teleport,
+            float height, ref Transform offset)
+        {
+            if (xrOrigin == null || xrOrigin.Origin == null || xrOrigin.Camera == null) return false;
+            var origin = xrOrigin.Origin.transform;
+            var tracking = xrOrigin.CameraFloorOffsetObject?.transform;
+            if (tracking == null || tracking == origin || !tracking.IsChildOf(origin) ||
+                !xrOrigin.Camera.transform.IsChildOf(tracking)) return false;
+
+            if (offset == null)
+            {
+                // Keep the calibrated height separate from XROrigin's tracking-floor offset.
+                offset = new GameObject("Eye Height Offset").transform;
+                offset.SetParent(tracking.parent, false);
+                offset.SetSiblingIndex(tracking.GetSiblingIndex());
+                tracking.SetParent(offset, false);
+            }
+
+            var shift = height - xrOrigin.CameraInOriginSpaceHeight;
+            offset.position += origin.TransformVector(Vector3.up * shift);
+            if (origin.TryGetComponent<CharacterController>(out var character))
+            {
+                var head = xrOrigin.CameraInOriginSpacePos;
+                character.height = Mathf.Max(head.y, 2f * character.radius);
+                character.center = new Vector3(head.x, character.height * .5f + character.skinWidth, head.z);
+            }
+            if (teleport != null) teleport.CancelPending();
+            Physics.SyncTransforms();
+            return true;
+        }
 
         public void SetMode(KitchenMovementMode mode, bool persist = true)
         {
