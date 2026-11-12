@@ -93,6 +93,8 @@ namespace XRApartment.Runtime
             "Food burnt. Select RESET ROOM to try again."
         };
         public string Instructions => ActiveRecipe == KitchenRecipeChoice.BeefOnion ? BeefInstructions : TomatoInstructions;
+        internal string TomatoStepHint => Hints[(int)Recipe.Step];
+        internal bool TomatoMealFinished => ActiveRecipe == KitchenRecipeChoice.TomatoEgg && Recipe.Ready && !stove.IsOn;
         string TomatoInstructions => "TOMATO & EGG\n" +
             (Recipe.Step == TomatoEggStep.Ready || Recipe.Step == TomatoEggStep.Burnt ? "" :
                 "Step " + ((int)Recipe.Step + 1) + "/14: ") + Hints[(int)Recipe.Step] +
@@ -151,9 +153,16 @@ namespace XRApartment.Runtime
         }
         void ChangeRecipe(SelectEnterEventArgs args)
         {
-            if (station.IsResetting || beefStock == null || onionStock == null) return;
-            ActiveRecipe = ActiveRecipe == KitchenRecipeChoice.TomatoEgg ? KitchenRecipeChoice.BeefOnion : KitchenRecipeChoice.TomatoEgg;
+            SelectRecipe(ActiveRecipe == KitchenRecipeChoice.TomatoEgg ? KitchenRecipeChoice.BeefOnion : KitchenRecipeChoice.TomatoEgg);
+        }
+        internal bool SelectRecipe(KitchenRecipeChoice choice)
+        {
+            if (station.IsResetting) return false;
+            if (choice == ActiveRecipe) return true;
+            if (choice == KitchenRecipeChoice.BeefOnion && (beefStock == null || onionStock == null)) return false;
+            ActiveRecipe = choice;
             station.ResetStation();
+            return true;
         }
         internal void UseFridge(KitchenFridge storage)
         {

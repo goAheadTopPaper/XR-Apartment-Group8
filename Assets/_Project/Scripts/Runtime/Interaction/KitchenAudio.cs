@@ -67,6 +67,7 @@ namespace XRApartment.Runtime
             voice.transform.position = position;
             voice.pitch = .96f + .02f * (next % 5);
             voice.spatialBlend = cue == KitchenCue.Menu ? 0f : 1f;
+            voice.ignoreListenerPause = cue == KitchenCue.Menu;
             voice.PlayOneShot(clips[index], Mathf.Clamp01(volume));
         }
 

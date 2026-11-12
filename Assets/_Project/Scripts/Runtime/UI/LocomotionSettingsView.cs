@@ -17,32 +17,39 @@ namespace XRApartment.Runtime.UI
         [SerializeField] Button enterReview;
         [SerializeField] Button language;
         [SerializeField] KitchenLayoutMenu layout;
+        [SerializeField] KitchenPauseMenu pauseMenu;
         [SerializeField] Image blink;
         [SerializeField, Min(.1f)] float headDistance = .8f;
         [SerializeField, Min(.02f)] float blinkSeconds = .12f;
         InputAction toggle, layoutToggle;
+        GameObject auxiliaryPanel;
+        Pose panelPose;
+        bool layoutFromPauseMenu;
+        double menuPressedAt = -1;
+        bool menuHoldHandled;
         float blinkRemaining;
-        public bool IsOpen => panel.activeSelf || (layout != null && layout.gameObject.activeSelf);
+        public bool IsOpen => panel.activeSelf || (layout != null && layout.gameObject.activeSelf) ||
+            (auxiliaryPanel != null && auxiliaryPanel.activeSelf);
+        internal bool ReturnsToPauseFromLayout => layoutFromPauseMenu;
         const string CookingScene = "SCN_Kitchen_Cooking";
         const string ReviewScene = "SCN_Kitchen_Review";
+        const double MenuHoldSeconds = .55;
 
         void Awake()
         {
             if (language != null) language.onClick.AddListener(KitchenLocale.Toggle);
             teleport.onClick.AddListener(ChooseTeleport);
             smooth.onClick.AddListener(ChooseSmooth);
-            close.onClick.AddListener(Close);
-            if (enterReview != null)
-            {
-                enterReview.gameObject.SetActive(gameObject.scene.name == CookingScene &&
-                    Application.CanStreamedLevelBeLoaded(ReviewScene));
-                enterReview.onClick.AddListener(EnterReview);
-            }
-            toggle = new InputAction("Movement settings", InputActionType.Button);
-            toggle.AddBinding("<XRController>{LeftHand}/secondaryButton");
+            close.onClick.AddListener(CloseMovementSettings);
+            if (enterReview != null) enterReview.onClick.AddListener(EnterReview);
+            toggle = new InputAction("Kitchen menu", InputActionType.Button);
             toggle.AddBinding("<XRController>{LeftHand}/menuButton");
             toggle.AddBinding("<Keyboard>/f8");
-            toggle.performed += OnToggle;
+            if (pauseMenu == null)
+            {
+                toggle.AddBinding("<XRController>{LeftHand}/secondaryButton");
+                toggle.performed += OnToggle;
+            }
             panel.SetActive(false);
             if (layout != null)
             {
@@ -67,6 +74,8 @@ namespace XRApartment.Runtime.UI
         void OnDisable()
         {
             toggle.Disable();
+            menuPressedAt = -1;
+            menuHoldHandled = false;
             layoutToggle?.Disable();
             settings.Changed -= Refresh;
             settings.TeleportProvider.locomotionStarted -= OnTeleport;
@@ -87,52 +96,107 @@ namespace XRApartment.Runtime.UI
             }
             teleport.onClick.RemoveListener(ChooseTeleport);
             smooth.onClick.RemoveListener(ChooseSmooth);
-            close.onClick.RemoveListener(Close);
+            close.onClick.RemoveListener(CloseMovementSettings);
             if (enterReview != null) enterReview.onClick.RemoveListener(EnterReview);
         }
 
         void ChooseTeleport() => settings.SelectTeleport();
         void ChooseSmooth() => settings.SelectSmooth();
-        void OnToggle(InputAction.CallbackContext _) { if (IsOpen) Close(); else Open(); }
+        void OnToggle(InputAction.CallbackContext _)
+        {
+            if (IsOpen) Close();
+            else Open();
+        }
+
+        void Update()
+        {
+            if (pauseMenu == null) return;
+            if (!toggle.IsPressed())
+            {
+                menuPressedAt = -1;
+                menuHoldHandled = false;
+                return;
+            }
+            var now = Time.unscaledTimeAsDouble;
+            if (menuPressedAt < 0) menuPressedAt = now;
+            if (menuHoldHandled || now - menuPressedAt < MenuHoldSeconds) return;
+            menuHoldHandled = true;
+            pauseMenu.Toggle();
+        }
+
         void OnLayoutToggle(InputAction.CallbackContext _)
         {
-            if (layout.gameObject.activeSelf) Close();
-            else
-            {
-                panel.SetActive(false);
-                PlaceInView(layout.transform);
-                layout.gameObject.SetActive(true);
-                settings.SetMenuOpen(true);
-            }
+            if (layout.gameObject.activeSelf) CloseLayout();
+            else OpenLayout();
+        }
+
+        internal void OpenLayout(bool fromPauseMenu = false)
+        {
+            if (layout == null || (pauseMenu != null && !pauseMenu.AllowsLayout)) return;
+            layoutFromPauseMenu = fromPauseMenu;
+            ShowPanel(layout.gameObject);
+        }
+
+        internal void CloseLayout()
+        {
+            if (layoutFromPauseMenu && pauseMenu != null) pauseMenu.Open();
+            else Close();
+        }
+
+        void CloseMovementSettings()
+        {
+            if (pauseMenu != null) pauseMenu.Open();
+            else Close();
         }
 
         void EnterReview()
         {
             if (!enterReview.isActiveAndEnabled || !enterReview.interactable) return;
             enterReview.interactable = false;
+            Close();
             SceneManager.LoadScene(ReviewScene, LoadSceneMode.Single);
-            Time.timeScale = 1f;
         }
 
         public void Open()
         {
-            if (layout != null) layout.gameObject.SetActive(false);
-            PlaceInView(panel.transform);
-            panel.SetActive(true);
-            settings.SetMenuOpen(true);
+            ShowPanel(panel);
             Refresh();
         }
 
-        public void Close()
+        internal void OpenAuxiliary(GameObject target, bool recenter = false) => ShowPanel(target, recenter);
+
+        public void Close() => ShowPanel(null);
+
+        void ShowPanel(GameObject target, bool recenter = false)
         {
-            panel.SetActive(false);
-            if (layout != null) layout.gameObject.SetActive(false);
-            settings.SetMenuOpen(false);
+            if (auxiliaryPanel != null && auxiliaryPanel != target) auxiliaryPanel.SetActive(false);
+            if (panel != target) panel.SetActive(false);
+            var layoutPanel = layout == null ? null : layout.gameObject;
+            if (layoutPanel != null && layoutPanel != target) layoutPanel.SetActive(false);
+            auxiliaryPanel = target == panel || target == layoutPanel ? null : target;
+            if (target != null)
+            {
+                PlaceInView(target.transform, recenter);
+                target.SetActive(true);
+            }
+            settings.SetMenuOpen(target != null);
+            if (pauseMenu != null) pauseMenu.SetPaused(target != null);
         }
 
-        void PlaceInView(Transform target)
+        void PlaceInView(Transform target, bool recenter)
         {
             var camera = settings.Origin.Camera.transform;
+            if (pauseMenu != null)
+            {
+                if (!pauseMenu.IsPaused || recenter)
+                {
+                    var up = Mathf.Abs(Vector3.Dot(camera.forward, Vector3.up)) > .98f ? camera.up : Vector3.up;
+                    panelPose = new Pose(camera.position + camera.forward * headDistance,
+                        Quaternion.LookRotation(camera.forward, up));
+                }
+                target.SetPositionAndRotation(panelPose.position, panelPose.rotation);
+                return;
+            }
             var forward = Vector3.ProjectOnPlane(camera.forward, Vector3.up).normalized;
             if (forward.sqrMagnitude < .01f) forward = Vector3.forward;
             target.SetPositionAndRotation(camera.position + forward * headDistance, Quaternion.LookRotation(forward));
@@ -140,13 +204,15 @@ namespace XRApartment.Runtime.UI
 
         void Refresh()
         {
+            if (enterReview != null)
+                enterReview.gameObject.SetActive(gameObject.scene.name == CookingScene &&
+                    Application.CanStreamedLevelBeLoaded(ReviewScene) && (pauseMenu == null || pauseMenu.AllowsFreePlay));
             if (current == null) return;
             var continuous = settings.Mode == KitchenMovementMode.Smooth;
             KitchenLocale.Set(current, continuous ? "Current: Continuous" : "Current: Teleport");
             var help = continuous
                 ? "Left stick: walk where you look.\nRight stick: snap turn / teleport."
                 : "Push either stick forward to aim.\nRelease to teleport. Right stick: snap turn.";
-            if (layout != null) help += "\nLayout lab: Right B / F9";
             KitchenLocale.Set(instructions, help);
             teleport.interactable = continuous;
             smooth.interactable = !continuous;

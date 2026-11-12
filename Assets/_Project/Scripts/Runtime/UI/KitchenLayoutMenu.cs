@@ -33,7 +33,7 @@ namespace XRApartment.Runtime.UI
         private void Awake()
         {
             owner = GetComponentInParent<LocomotionSettingsView>();
-            close.onClick.AddListener(owner.Close);
+            close.onClick.AddListener(owner.CloseLayout);
             standard.onClick.AddListener(() => ChooseFridge(false));
             compact.onClick.AddListener(() => ChooseFridge(true));
             for (var index = 0; index < presets.Length; index++)
@@ -48,7 +48,11 @@ namespace XRApartment.Runtime.UI
             }
         }
 
-        private void OnEnable() => Refresh(lab.Description(lab.ActivePresetIndex));
+        private void OnEnable()
+        {
+            KitchenLocale.Set(close.GetComponentInChildren<TMP_Text>(), owner.ReturnsToPauseFromLayout ? "Back" : "CLOSE");
+            Refresh(lab.Description(lab.ActivePresetIndex));
+        }
 
         private void Choose(int option)
         {

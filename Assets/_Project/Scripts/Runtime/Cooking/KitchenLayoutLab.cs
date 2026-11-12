@@ -65,6 +65,8 @@ namespace XRApartment.Runtime
             return result.HasValue ? $"{result.Value.angle:0}°" : "try opening";
         }
 
+        internal bool HasObservedOpening(bool compact) => openings[OpeningIndex(ActivePresetIndex, compact)].HasValue;
+
         private void Awake() => openings = new OpeningResult?[PresetCount * 2];
 
         private static int OpeningIndex(int preset, bool compact) => preset * 2 + (compact ? 1 : 0);
