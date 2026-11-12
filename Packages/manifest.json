@@ -3,6 +3,7 @@
     "com.coplaydev.unity-mcp": "10.2.0",
     "com.unity.inputsystem": "1.19.0",
     "com.unity.postprocessing": "3.2.2",
+    "com.unity.render-pipelines.high-definition": "14.0.12",
     "com.unity.shadergraph": "14.0.12",
     "com.unity.textmeshpro": "3.0.9",
     "com.unity.toolchain.macos-arm64-linux-x86_64": "2.0.5",
