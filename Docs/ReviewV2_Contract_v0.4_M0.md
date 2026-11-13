@@ -1,5 +1,7 @@
 # Review V2：v0.4 叙事与 M0 开发边界
 
+**Phase 3 M0 State Contract 的唯一接口依据。** 对 `SCN_Kitchen_ReviewV2`，本文件定义会话/目标状态和跨角色接入边界；具体可编译签名以 `Assets/_Project/Scripts/Data/ReviewV2/ReviewContracts.cs` 为准，消费示例与事实 payload 见 `ReviewV2_M0_Integration.md`。`Module_Interface_Contract.md` 是 Phase 2 Legacy，不参与 V2 接口判定。修改公共状态或签名前须同步更新本文件、实现和相关测试，并由 T1/T2/T3 审核。本文不把尚未实现的 Marker Schema 或整厨 A/B 适配宣称为已冻结。
+
 依据用户提供的 `XR_Group8_Five_Task_Briefs_and_Unified_Narrative_v0.4.docx`，烹饪用于理解厨房空间；不要求完成菜谱才能回顾，也不要求选出 A/B 胜者。本文件描述当前实现与接入安排，不代表团队已完成接口冻结或后续里程碑验收。
 
 Phase 3 唯一产品集成与验收主场景已确定为 `SCN_Kitchen_ReviewV2`。T1–T5 的文件所有权、Prefab 接入与场景更新流程见 `ReviewV2_Scene_Ownership.md`。
@@ -10,6 +12,7 @@ Phase 3 唯一产品集成与验收主场景已确定为 `SCN_Kitchen_ReviewV2`�
 - `ReviewSessionHost` 提供 `ISessionReadModel`、`IReviewSessionCommands`、`IInteractionEventSource` 和 `Resolve(id)`。消费者只订阅、发命令，不写 Controller 内部状态。
 - 快照包含 SessionId、SchemeId、SchemeVisitId、ModelVersion、SchemeHistory、Goals、暂停/忙碌/保存状态及 IsMock。方案历史只在成功切换后追加；回顾、暂停、校准不创建 Visit。
 - 五个目标独立维护三态，可同时 InProgress。Available 独立表达功能可用性；EvidenceId 和 UpdatedAtMilliseconds 记录实际证据及会话单调时间。无证据不推断进度。
+- v0.5 叙事中的 `Unavailable` 在当前 M0 接口表示为 `Available=false`，不是 `GoalState` 第四个枚举值；T2 应显示“未接入”，T3 不把它当作失败或未完成证据。
 - 当前真实环境为 COOKING_BASELINE。只有 G02 的真实成菜边沿接入完成检测；G01、G03–G05 和 G02 进行中检测未接入。
 - `CommandResult.Accepted` 仅表示接受命令；异步操作通过 OperationCompleted 报告成功/失败。旧 Visit 证据和不匹配的保存回执拒绝。
 - M0 按用户确认允许未保存结束，始终显示“存储未接入，数据未保存”。T3 正式接入 ISessionSavePort 后必须真实写盘并读回验证；失败留在 Review。Mock 不产生真实保存成功。

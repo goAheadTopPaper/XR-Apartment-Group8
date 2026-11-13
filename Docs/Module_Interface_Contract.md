@@ -1,5 +1,7 @@
 # Module Interface Contract — 厨房评审核心流程
 
+> **LEGACY / Phase 2 历史合同。** 本文的 B1/B2 标准化 Challenge、八步证据链、强制流程及以下 Frozen v0.5 状态仅适用于 `SCN_Kitchen_Review` 和旧 Journey 模块。它不是 Group 8 Phase 3 `SCN_Kitchen_ReviewV2` 的接口依据。T1–T5 开发 V2 时，以 [Review V2 M0 State Contract](ReviewV2_Contract_v0.4_M0.md)、[集成说明](ReviewV2_M0_Integration.md) 和 [场景所有权](ReviewV2_Scene_Ownership.md) 为准；旧场景与接口保留供回归和历史追溯。
+
 **状态**：Frozen v0.5（2026-10-18）；公共接口基线，变更须先修订本文并审查
 **适用范围**：P0 B1=Proud+F2、B2=Flush-oriented+F2 的运行时评审旅程及 Core、Feedback、UI、Conflict Detection、Storage 的交接  
 **需求依据**：Lean PRD v0.3 Final §§8–12、FR-01/02/03/05/06/07/09/10/11/12、SAFE-01。本文约定模块交接，不代替 PRD 验收。现有模型与 PRD 的差异单独记录，由模型模块修复。

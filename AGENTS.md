@@ -1,5 +1,7 @@
 # AGENTS.md — 给 AI 编码助手的项目指令
 
+> **Phase 3 范围更新（2026-11-13）：** `SCN_Kitchen_ReviewV2` 是唯一产品集成与验收主场景。开发 V2 时，以 `Docs/ReviewV2_Contract_v0.4_M0.md`、`Docs/ReviewV2_M0_Integration.md`、`Docs/ReviewV2_Scene_Ownership.md` 和 `Data/ReviewV2/ReviewContracts.cs` 为当前 M0 接口依据。下文 Lean PRD v0.3、B1/B2 标准化 Challenge、八步旅程及 `Docs/Module_Interface_Contract.md` 的要求继续用于 Phase 2 历史场景，不强加于 V2。Cooking 保留功能回归；默认 Build Settings 暂不切换。v0.5 叙事与尚未实现的 M1/M2 功能应按里程碑处理，不冒充 M0 已完成。
+
 面向在本仓库工作的 agent 会话。人类向说明看 `README.md`。**Phase 2 产品范围与验收以 `Docs/COMP5424_Scenario_C_Lean_PRD_CN_Final.docx`（Lean PRD v0.3 Final，2026-10-03）为准**；Final Proposal 是该 PRD 的实施来源，冰箱 archetype 定义以 PRD Final §6.2 为准。本文是操作摘要，冲突时核对 PRD Final；需求追溯见 README §12。
 
 ## 这个项目是什么
