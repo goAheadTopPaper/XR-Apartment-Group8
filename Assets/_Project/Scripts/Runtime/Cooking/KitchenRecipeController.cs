@@ -281,7 +281,7 @@ namespace XRApartment.Runtime
                 return $"Mixing bowl  {bowl.Batch.Millilitres:0} mL egg  /  {bowl.Batch.MixedFraction:P0} mixed";
             if (step >= TomatoEggStep.TurnOnStove && step <= TomatoEggStep.Ready)
                 return $"Pan  {pan.Batch.Millilitres:0} mL egg  /  {contents.TomatoGrams:0} g tomato  /  {StoveStatus}";
-            return "Grip to hold  /  Trigger to use  /  RECIPE to switch";
+            return "Grip to hold  /  Trigger to use" + (recipeButton == null ? "" : "  /  RECIPE to switch");
         }
 
         string BeefProgress(BeefOnionStep step)
