@@ -4,9 +4,11 @@
 
 当前集成基线为 `origin/test@e319aaf`（HDRP 14.0.12），开发安排对齐 `XR_Group8_Five_Task_Briefs_and_Unified_Narrative_v0.4.docx`。M0 接口与后续分工见 `ReviewV2_Contract_v0.4_M0.md`；原 Built-in 基线的验证仅作历史证据。
 
+Phase 3 正式产品集成与验收统一使用 `SCN_Kitchen_ReviewV2`。Cooking 用于功能回归，旧 Review 用于 Phase 2 历史参考。场景、Prefab、烘焙数据的依赖和 T1–T5 文件所有权见 `ReviewV2_Scene_Ownership.md`。
+
 ## 打开与体验
 
-Unity **2022.3.62f3**，StandaloneWindows64。菜单 `XR Apartment / Review V2 / Open M0 Scene` 打开 `Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity`，并仅设置当前编辑器会话的 Play 场景覆盖。默认构建入口仍为 Cooking，V2 没有替换 Build Settings。
+Unity **2022.3.62f3**，StandaloneWindows64。菜单 `XR Apartment / Review V2 / Open Phase 3 Review` 打开 `Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity`，并仅设置当前编辑器会话的 Play 场景覆盖。默认构建入口仍为 Cooking，V2 没有替换 Build Settings。
 
 Play 后使用 XR 射线操作临时面板，或用 F8 / 左手 Y / Menu 打开面板。依次 Confirm setup、Start experience 后即可探索，任意时刻 Review feedback，再 Continue exploring 或 Finish。零目标、零反馈均允许结束。Recenter 调用当前 XR 子系统，设备不支持时明确返回失败；它不是强制传送，也不替代头显系统的地面/房间校准。
 

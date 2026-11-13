@@ -2,6 +2,8 @@
 
 依据用户提供的 `XR_Group8_Five_Task_Briefs_and_Unified_Narrative_v0.4.docx`，烹饪用于理解厨房空间；不要求完成菜谱才能回顾，也不要求选出 A/B 胜者。本文件描述当前实现与接入安排，不代表团队已完成接口冻结或后续里程碑验收。
 
+Phase 3 唯一产品集成与验收主场景已确定为 `SCN_Kitchen_ReviewV2`。T1–T5 的文件所有权、Prefab 接入与场景更新流程见 `ReviewV2_Scene_Ownership.md`。
+
 ## 当前可接入契约
 
 - 会话由 `SessionController` 独占：Setup → Onboarding → Experience ↔ Review → Finished；SafeExit 到 Exited，Pause 为叠加状态。零目标可回顾和结束。
@@ -46,4 +48,4 @@ M3：正式用户评估。后续阶段需要团队验收，不能由 M0 的测�
 
 从 `test@e319aaf` 的 Cooking 场景通过 Editor 作者工具生成 V2，保留 HDRP、烘焙、家具、水体、抓取和 XR 引用。Guide/Pause/FeedbackNotes 已存在于新版 test；V2 关闭旧菜单父对象，保留原 Cooking 的行为与共享 Prefab。V2 独立门控 Setup/暂停时的物体交互，UI 射线保持可用；站坐姿校准复用新版移动组件。
 
-默认启动场景及 Build Settings 不变，显式 Open M0 Scene 只覆盖本次编辑器会话的 Play 入口。原有未提交个人修改和两份 v0.1 草案不在此 PR 范围。
+默认启动场景及 Build Settings 不变，显式 `Open Phase 3 Review` 只覆盖本次编辑器会话的 Play 入口。原有未提交个人修改和两份 v0.1 草案不在此改动范围。

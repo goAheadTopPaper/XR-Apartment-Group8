@@ -30,8 +30,27 @@ namespace XRApartment.EditorTools
         static T[] All<T>(Scene scene) where T : Component => scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<T>(true)).ToArray();
         [MenuItem("XR Apartment/Review V2/Create M0 Scene")]
         public static void Create() => CreateInternal(false);
-        // Explicit migration entry; preserves the V2 scene GUID and existing object IDs.
-        public static void RebaseOnCooking() => CreateInternal(true);
+        // Destructive one-off migration, not the normal path for bringing shared Prefab changes into V2.
+        public static void RebaseOnCooking()
+        {
+            if (Application.isPlaying) throw new InvalidOperationException("Stop Play mode before replacing the V2 scene.");
+            if (!File.Exists(ScenePath)) throw new FileNotFoundException("V2 scene does not exist", ScenePath);
+            const string flag = "-reviewV2AllowDestructiveRebase";
+            if (Application.isBatchMode)
+            {
+                if (!Environment.GetCommandLineArgs().Contains(flag))
+                    throw new InvalidOperationException("Full V2 scene replacement is blocked. Pass " + flag + " only after reviewing V2-only scene changes.");
+            }
+            else if (!EditorUtility.DisplayDialog("Replace the Phase 3 review scene?",
+                "This rebuilds the entire V2 scene from Cooking and can remove T2/T3 integrations. A backup is written under Logs/ReviewV2. Continue only after reviewing scene-specific changes.",
+                "Back up and replace", "Cancel")) return;
+            Directory.CreateDirectory("Logs/ReviewV2");
+            var backup = "Logs/ReviewV2/ReviewV2-before-rebase-" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff");
+            File.Copy(ScenePath, backup + ".unity");
+            const string catalog = "Docs/ReviewV2_M0_Identities.tsv";
+            if (File.Exists(catalog)) File.Copy(catalog, backup + "-identities.tsv");
+            CreateInternal(true);
+        }
         static void CreateInternal(bool rebase)
         {
             if (Application.isPlaying || (!rebase && File.Exists(ScenePath))) throw new InvalidOperationException("Create requires Edit mode and no existing V2 scene; use the explicit migration entry to rebase.");
@@ -119,7 +138,7 @@ namespace XRApartment.EditorTools
             if (ids.Any(i => string.IsNullOrWhiteSpace(i.Id)) || ids.Select(i => i.Id).Distinct().Count() != ids.Length)
                 throw new InvalidOperationException("Invalid or duplicate stable identity");
         }
-        [MenuItem("XR Apartment/Review V2/Open M0 Scene")]
+        [MenuItem("XR Apartment/Review V2/Open Phase 3 Review")]
         public static void Open()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
