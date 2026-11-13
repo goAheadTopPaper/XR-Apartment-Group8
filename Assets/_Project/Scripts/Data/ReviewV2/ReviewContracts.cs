@@ -7,7 +7,13 @@ namespace XRApartment.Data.ReviewV2
     public enum SessionPhase { Setup, Onboarding, Experience, Review, Finished, Exited }
     public enum GoalState { NotStarted, InProgress, Completed }
     public enum SaveStatus { NotConfigured, Pending, Failed, Verified }
-    public enum CommandType { CompleteSetup, CompleteOnboarding, Review, Continue, Finish, Pause, Resume, Recenter, ChangeScheme, ResetWorld, SafeExit }
+    public enum CommandType { CompleteSetup, CompleteOnboarding, Review, Continue, Finish, Pause, Resume, Recenter, ChangeScheme, ResetWorld, SafeExit, CalibrateStanding, CalibrateSeated }
+    public static class SchemeIds
+    {
+        public const string Baseline = "COOKING_BASELINE";
+        public const string IntegratedKitchen = "SCHEME_A";
+        public const string ExternalRefrigerator = "SCHEME_B";
+    }
     public enum InteractionKind { ObjectGrabbed, ObjectReleased, DishCooked }
     public sealed class CommandResult
     {
@@ -23,8 +29,9 @@ namespace XRApartment.Data.ReviewV2
         public GoalState State { get; }
         public bool Available { get; }
         public string EvidenceId { get; }
-        public GoalSnapshot(string id, GoalState state, bool available, string evidenceId = null)
-        { Id = id; State = state; Available = available; EvidenceId = evidenceId; }
+        public long? UpdatedAtMilliseconds { get; }
+        public GoalSnapshot(string id, GoalState state, bool available, string evidenceId = null, long? updatedAtMilliseconds = null)
+        { Id = id; State = state; Available = available; EvidenceId = evidenceId; UpdatedAtMilliseconds = updatedAtMilliseconds; }
     }
     public sealed class SessionSnapshot
     {
@@ -34,17 +41,20 @@ namespace XRApartment.Data.ReviewV2
         public string SchemeVisitId { get; }
         public string ModelVersion { get; }
         public IReadOnlyList<GoalSnapshot> Goals { get; }
+        public IReadOnlyList<string> SchemeHistory { get; }
         public bool IsPaused { get; }
         public bool IsBusy { get; }
         public bool IsMock { get; }
         public SaveStatus SaveStatus { get; }
         public bool CanReview => Phase == SessionPhase.Experience && !IsPaused && !IsBusy;
         public SessionSnapshot(string sessionId, SessionPhase phase, string schemeId, string visitId,
-            string modelVersion, IEnumerable<GoalSnapshot> goals, bool paused, bool busy, bool mock, SaveStatus saveStatus)
+            string modelVersion, IEnumerable<GoalSnapshot> goals, bool paused, bool busy, bool mock, SaveStatus saveStatus,
+            IEnumerable<string> schemeHistory = null)
         {
             SessionId = sessionId; Phase = phase; SchemeId = schemeId; SchemeVisitId = visitId;
             ModelVersion = modelVersion; Goals = new ReadOnlyCollection<GoalSnapshot>(new List<GoalSnapshot>(goals));
             IsPaused = paused; IsBusy = busy; IsMock = mock; SaveStatus = saveStatus;
+            SchemeHistory = new ReadOnlyCollection<string>(new List<string>(schemeHistory ?? new[] { schemeId }));
         }
     }
     public sealed class InteractionEvent
@@ -83,6 +93,7 @@ namespace XRApartment.Data.ReviewV2
         void Reset(string requestId, Action<string, bool, string> completed);
         CommandResult Recenter();
     }
+    public interface ICalibrationPort { CommandResult Calibrate(bool seated); }
     // Verified means durable write AND read-back confirmation. Mock providers must never return verified=true.
     public interface ISessionSavePort
     {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using XRApartment.Data.ReviewV2;
 using V2SaveStatus = XRApartment.Data.ReviewV2.SaveStatus;
 
@@ -12,6 +13,7 @@ namespace XRApartment.Simulation.ReviewV2
         readonly IWorldPort world;
         readonly ISessionSavePort storage;
         readonly bool mock;
+        readonly List<string> schemeHistory = new List<string>();
         string schemeId, visitId = Guid.NewGuid().ToString("N"), pending;
         SessionPhase phase;
         bool paused;
@@ -19,10 +21,10 @@ namespace XRApartment.Simulation.ReviewV2
         public event Action<SessionSnapshot> Changed;
         public event Action<OperationResult> OperationCompleted;
         public SessionSnapshot Snapshot => new SessionSnapshot(sessionId, phase, schemeId, visitId,
-            "cooking-m0-1", goals.Snapshot, paused, pending != null, mock, saveStatus);
+            "cooking-m0-hdrp-e319aaf", goals.Snapshot, paused, pending != null, mock, saveStatus, schemeHistory);
         public SessionController(IWorldPort world = null, ISchemePort schemes = null, ISessionSavePort storage = null, bool isMock = false)
         { this.world = world; this.schemes = schemes; this.storage = storage; mock = isMock;
-            schemeId = isMock ? "MOCK_A" : "COOKING_BASELINE"; goals = new GoalTracker(isMock); }
+            schemeId = isMock ? "MOCK_A" : SchemeIds.Baseline; schemeHistory.Add(schemeId); goals = new GoalTracker(isMock); }
         bool Terminal => phase == SessionPhase.Finished || phase == SessionPhase.Exited;
         void Publish() => Changed?.Invoke(Snapshot);
         public CommandResult Execute(CommandType command, string targetSchemeId = null)
@@ -35,6 +37,8 @@ namespace XRApartment.Simulation.ReviewV2
             if (command == CommandType.Pause && !paused) { paused = true; Publish(); return new CommandResult(true); }
             if (command == CommandType.Resume && paused) { paused = false; Publish(); return new CommandResult(true); }
             if (command == CommandType.Recenter) return world?.Recenter() ?? new CommandResult(false, "XRUnavailable");
+            if (command == CommandType.CalibrateStanding || command == CommandType.CalibrateSeated)
+                return world is ICalibrationPort calibration ? calibration.Calibrate(command == CommandType.CalibrateSeated) : new CommandResult(false, "CalibrationUnavailable");
             if (paused) return new CommandResult(false, "Paused");
             switch (command)
             {
@@ -79,13 +83,13 @@ namespace XRApartment.Simulation.ReviewV2
                 if (success) phase = SessionPhase.Finished;
             }
             else if (success)
-            { if (target != null) schemeId = target; visitId = Guid.NewGuid().ToString("N"); goals.Reset(); }
+            { if (target != null) { schemeId = target; schemeHistory.Add(target); } visitId = Guid.NewGuid().ToString("N"); goals.Reset(); }
             Publish(); OperationCompleted?.Invoke(new OperationResult(id, command, success, message));
         }
-        public bool ObserveGoal(string session, string visit, string goalId, GoalState state, string evidenceId)
+        public bool ObserveGoal(string session, string visit, string goalId, GoalState state, string evidenceId, long? updatedAtMilliseconds = null)
         {
             if (Terminal || paused || pending != null || (phase != SessionPhase.Experience && phase != SessionPhase.Review) || session != sessionId || visit != visitId) return false;
-            if (!goals.Observe(goalId, state, evidenceId)) return false;
+            if (!goals.Observe(goalId, state, evidenceId, updatedAtMilliseconds)) return false;
             Publish(); return true;
         }
     }

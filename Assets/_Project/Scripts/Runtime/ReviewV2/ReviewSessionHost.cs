@@ -11,7 +11,7 @@ using XRApartment.Simulation.ReviewV2;
 namespace XRApartment.Runtime.ReviewV2
 {
     [DefaultExecutionOrder(-100)]
-    public sealed class ReviewSessionHost : MonoBehaviour, ISessionReadModel, IReviewSessionCommands, IInteractionEventSource, IWorldPort
+    public sealed class ReviewSessionHost : MonoBehaviour, ISessionReadModel, IReviewSessionCommands, IInteractionEventSource, IWorldPort, ICalibrationPort
     {
         public KitchenCookingStation station;
         public KitchenRoomReset roomReset;
@@ -27,8 +27,16 @@ namespace XRApartment.Runtime.ReviewV2
         public event Action<SessionSnapshot> Changed;
         public event Action<InteractionEvent> Observed;
         public event Action<OperationResult> OperationCompleted;
-        public bool CanObserve => core != null && (Snapshot.Phase == SessionPhase.Experience || Snapshot.Phase == SessionPhase.Review) && !Snapshot.IsPaused &&
-            !Snapshot.IsBusy && !resetInFlight && !station.IsResetting && !roomReset.IsResetting;
+        public bool CanObserve
+        {
+            get
+            {
+                if (core == null) return false;
+                var s = Snapshot;
+                return (s.Phase == SessionPhase.Experience || s.Phase == SessionPhase.Review) && !s.IsPaused &&
+                    !s.IsBusy && !resetInFlight && !station.IsResetting && !roomReset.IsResetting;
+            }
+        }
         void Awake()
         {
             core = new SessionController(this);
@@ -60,7 +68,7 @@ namespace XRApartment.Runtime.ReviewV2
             if (!CanObserve || Resolve(objectId) == null) return;
             var fact = new InteractionEvent(Snapshot, kind, objectId, clock.ElapsedMilliseconds);
             if (kind == InteractionKind.DishCooked)
-                core.ObserveGoal(fact.SessionId, fact.SchemeVisitId, "G02", GoalState.Completed, fact.EventId);
+                core.ObserveGoal(fact.SessionId, fact.SchemeVisitId, "G02", GoalState.Completed, fact.EventId, fact.ElapsedMilliseconds);
             Observed?.Invoke(fact);
         }
         void LateUpdate()
@@ -100,5 +108,7 @@ namespace XRApartment.Runtime.ReviewV2
             foreach (var input in inputs) if (input.running && input.TryRecenter()) return new CommandResult(true);
             return new CommandResult(false, "XR runtime did not support recenter; use the headset system calibration");
         }
+        public CommandResult Calibrate(bool seated) => locomotion != null && locomotion.CalibrateEyeHeight(seated ? 1.2f : 1.65f)
+            ? new CommandResult(true) : new CommandResult(false, "CalibrationUnavailable");
     }
 }

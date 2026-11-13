@@ -56,6 +56,9 @@ namespace XRApartment.Tests
             Assert.AreEqual(1, All<XRInteractionManager>().Count(x => x.isActiveAndEnabled));
             Assert.AreEqual(0, All<JourneyRuntimeHost>().Length);
             Assert.IsFalse(All<LocomotionSettingsView>().Any(x => x.gameObject.activeInHierarchy));
+            Assert.IsFalse(All<KitchenActivityGuide>().Any(x => x.gameObject.activeInHierarchy));
+            Assert.IsFalse(All<KitchenPauseMenu>().Any(x => x.gameObject.activeInHierarchy));
+            Assert.IsFalse(All<KitchenFeedbackNotes>().Any(x => x.gameObject.activeInHierarchy));
             Assert.AreEqual(All<ReviewSceneIdentity>().Length, All<ReviewSceneIdentity>().Select(i => i.Id).Distinct().Count());
             CapturePanel(All<XROrigin>().Single().Camera);
             var host = Experience(); var grab = All<XRGrabInteractable>().First(g => g.isActiveAndEnabled);
@@ -101,7 +104,9 @@ namespace XRApartment.Tests
         }
         static void CapturePanel(Camera camera)
         {
-            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) return;
+            // Camera.Render is a Built-in pipeline API. Do not make old screenshot evidence stand for HDRP QA.
+            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null ||
+                UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null) return;
             var target = new RenderTexture(1024, 1024, 24);
             var pixels = new Texture2D(1024, 1024, TextureFormat.RGB24, false);
             var previous = camera.targetTexture; var active = RenderTexture.active;
@@ -113,6 +118,31 @@ namespace XRApartment.Tests
                 System.IO.File.WriteAllBytes("Logs/ReviewV2/panel.png", pixels.EncodeToPNG());
             }
             finally { camera.targetTexture = previous; RenderTexture.active = active; Object.Destroy(target); Object.Destroy(pixels); }
+        }
+        [UnityTest] public IEnumerator SetupAndPauseGatePhysicalInteractionAndCalibrationPreservesVisit()
+        {
+            var host = All<ReviewSessionHost>().Single();
+            var grab = All<KitchenEgg>().First(e => e.gameObject.activeInHierarchy).GetComponent<XRGrabInteractable>();
+            var manager = All<XRInteractionManager>().Single();
+            handObject = new GameObject("V2 gate hand"); var hand = handObject.AddComponent<DrivenGrabInteractor>();
+            hand.interactionManager = manager; hand.keepSelectedTargetValid = true; grab.interactionManager = manager;
+            host.station.ActiveFridge.Door.SetOpenImmediate(true);
+            hand.transform.position = grab.transform.position; yield return null;
+            Assert.IsFalse(manager.IsSelectPossible((IXRSelectInteractor)hand, grab), "Setup must block Cooking selections");
+            string visit = host.Snapshot.SchemeVisitId;
+            Assert.IsTrue(host.Execute(CommandType.CalibrateSeated).Accepted);
+            Assert.IsTrue(host.Execute(CommandType.CalibrateStanding).Accepted);
+            Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
+            Experience(); manager.SelectEnter((IXRSelectInteractor)hand, grab); Assert.IsTrue(grab.isSelected);
+            var position = grab.transform.position;
+            host.Execute(CommandType.Pause);
+            Assert.IsFalse(grab.isSelected); Assert.IsFalse(manager.IsSelectPossible((IXRSelectInteractor)hand, grab));
+            Assert.AreEqual(position, grab.transform.position); Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
+            Assert.AreEqual(0, Time.timeScale);
+            host.Execute(CommandType.Resume);
+            Assert.IsTrue(manager.IsSelectPossible((IXRSelectInteractor)hand, grab));
+            Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
+            yield return null;
         }
     }
 }

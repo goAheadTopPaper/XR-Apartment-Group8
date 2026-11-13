@@ -1,8 +1,26 @@
 # Review V2 M0 验证记录
 
-日期：2026-11-13（香港时间）。本地基线 `test@bac8771`，工作分支 `codex/review-v2-m0`。未提交、未推送。
+日期：2026-11-13（香港时间）。下列原始结果来自旧本地基线 `test@bac8771`、原分支 `codex/review-v2-m0`，实现已提交为 `384a1f4`；不代表新 HDRP 基线通过。新基线验证另列。
 
-## 实际执行结果
+## 新 test / HDRP 集成验证
+
+基线 `origin/test@e319aaf`，集成分支 `feature/zh`。M0 检查点由 `384a1f4` 移入为 `25fdfa1`；原个人修改和两份草案先备份再暂存，未混入提交。按本轮约定只执行新基线必要的编译、场景生成与 V2 定向测试，不重跑全量旧测试。
+
+| 项目 | 结果与证据 |
+|---|---|
+| Unity 导入与脚本编译 | HDRP 14.0.12 导入完成，项目脚本编译通过 |
+| 从最新 Cooking 生成 V2 | 成功；`Logs/ReviewV2/rebase-hdrp-retry.log`。首次迁移因重复层级名称中止，改用旧场景序列化对象/Prefab 身份后成功 |
+| 稳定身份 | 64/64 抓取 ID 保留；含 COOKING_STATION、FRIDGE 共 66 项，目录未改，场景 GUID 未改 |
+| 场景结构 | 作者验证通过：唯一活动 Rig/EventSystem/交互管理器/Host/面板/交互门控，无旧 Journey、无 missing script，旧 Guide/Pause/FeedbackNotes 不激活 |
+| 源场景设置 | V2 的 OcclusionCullingSettings、RenderSettings、LightmapSettings 与新版 Cooking 逐段一致；原 Cooking/Review 与光照资源未改写 |
+| V2 EditMode | **15/15 通过**；`Logs/ReviewV2/hdrp-editmode.xml`，包含新增方案历史隔离、证据时间与校准端口拒绝测试 |
+| V2 PlayMode | **3/3 通过**；`Logs/ReviewV2/hdrp-playmode.xml`。真实 XRI 抓取/释放、Bridge 重启、重置隔离、回顾保持世界、Setup/暂停交互门控和站坐姿校准保持 Visit |
+
+测试产生的共享 Rig/OpenXR 空白格式及牛肉材质浮点尾数变动已恢复，未作为产品改动提交。
+
+本轮未重跑全量回归、未重建 HDRP Windows Player。下方旧 Windows 构建不能作为当前 HDRP 分支的构建验收。HDRP 下跳过 Built-in 专用 Camera.Render 截图步骤，旧 panel.png 也不能作为新版面板视觉证据；新版头显显示、真实 Recenter、Quest Link 仍未验证。
+
+## 旧基线实际执行结果（历史证据）
 
 | 项目 | 结果与证据 |
 |---|---|

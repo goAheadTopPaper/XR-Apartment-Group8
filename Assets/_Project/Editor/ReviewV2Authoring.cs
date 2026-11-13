@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.XR.CoreUtils;
@@ -28,12 +29,24 @@ namespace XRApartment.EditorTools
         const string FontPath = "Assets/_Project/Art/UI/FNT_ReviewV2Integration.asset";
         static T[] All<T>(Scene scene) where T : Component => scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<T>(true)).ToArray();
         [MenuItem("XR Apartment/Review V2/Create M0 Scene")]
-        public static void Create()
+        public static void Create() => CreateInternal(false);
+        // Explicit migration entry; preserves the V2 scene GUID and existing object IDs.
+        public static void RebaseOnCooking() => CreateInternal(true);
+        static void CreateInternal(bool rebase)
         {
-            if (Application.isPlaying || File.Exists(ScenePath)) throw new InvalidOperationException("Create requires Edit mode and no existing V2 scene; it never overwrites an integration scene.");
+            if (Application.isPlaying || (!rebase && File.Exists(ScenePath))) throw new InvalidOperationException("Create requires Edit mode and no existing V2 scene; use the explicit migration entry to rebase.");
             if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-            if (!AssetDatabase.CopyAsset(Source, ScenePath)) throw new IOException("Cannot copy Cooking scene");
-            var scene = EditorSceneManager.OpenScene(ScenePath);
+            var previous = new Dictionary<string, string>(StringComparer.Ordinal);
+            const string catalog = "Docs/ReviewV2_M0_Identities.tsv";
+            if (rebase && File.Exists(ScenePath))
+            {
+                var oldScene = EditorSceneManager.OpenScene(ScenePath);
+                foreach (var grab in All<XRGrabInteractable>(oldScene))
+                    if (grab.TryGetComponent<ReviewSceneIdentity>(out var identity))
+                        previous.Add(SerializedKey(grab), identity.Id);
+            }
+            var scene = EditorSceneManager.OpenScene(Source);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath)) throw new IOException("Cannot save isolated Cooking copy");
             foreach (var view in All<LocomotionSettingsView>(scene)) view.gameObject.SetActive(false);
             foreach (var menu in All<KitchenLayoutMenu>(scene)) menu.gameObject.SetActive(false);
             foreach (var lab in All<KitchenLayoutLab>(scene)) { lab.enabled = false; PrefabUtility.RecordPrefabInstancePropertyModifications(lab); }
@@ -51,13 +64,15 @@ namespace XRApartment.EditorTools
             var host = new GameObject("ReviewV2 Session").AddComponent<ReviewSessionHost>();
             host.station = station; host.recipe = recipe; host.roomReset = All<KitchenRoomReset>(scene).Single();
             host.locomotion = All<KitchenLocomotionSettings>(scene).Single();
+            host.gameObject.AddComponent<ReviewWorldInteractionGate>().host = host;
             AddId(station.gameObject, "COOKING_STATION");
             AddId(station.ActiveFridge != null ? station.ActiveFridge.gameObject :
                 (new SerializedObject(station).FindProperty("fridge").objectReferenceValue as Component).gameObject, "FRIDGE");
-            int index = 0;
+            int index = previous.Values.Where(id => id.StartsWith("OBJECT_", StringComparison.Ordinal))
+                .Select(id => int.Parse(id.Substring(7))).DefaultIfEmpty(0).Max();
             foreach (var grab in All<XRGrabInteractable>(scene).OrderBy(g => Hierarchy(g.transform), StringComparer.Ordinal))
             {
-                AddId(grab.gameObject, "OBJECT_" + (++index).ToString("D3"));
+                AddId(grab.gameObject, previous.TryGetValue(SerializedKey(grab), out var stableId) ? stableId : "OBJECT_" + (++index).ToString("D3"));
                 grab.gameObject.AddComponent<CookingGrabBridge>().host = host;
             }
             host.identities = All<ReviewSceneIdentity>(scene);
@@ -72,10 +87,17 @@ namespace XRApartment.EditorTools
             AssetDatabase.SaveAssets();
             Directory.CreateDirectory("Logs/ReviewV2");
             File.WriteAllLines("Logs/ReviewV2/identity-catalog.tsv", host.identities.Select(i => i.Id + "\t" + Hierarchy(i.transform)));
+            File.WriteAllLines(catalog, host.identities.Select(i => i.Id + "\t" + Hierarchy(i.transform)));
+            Debug.Log("REVIEW_V2_IDENTITIES retained=" + host.identities.Count(i => previous.Values.Contains(i.Id)) + " total=" + host.identities.Length);
             Debug.Log("REVIEW_V2_CREATED: isolated scene; original build settings unchanged");
         }
         static void AddId(GameObject go, string id)
         { var identity = go.GetComponent<ReviewSceneIdentity>() ?? go.AddComponent<ReviewSceneIdentity>(); identity.Configure(id); }
+        static string SerializedKey(Object item)
+        {
+            var id = GlobalObjectId.GetGlobalObjectIdSlow(item);
+            return id.targetObjectId + ":" + id.targetPrefabId;
+        }
         static string Hierarchy(Transform t) => t.parent == null ? t.name : Hierarchy(t.parent) + "/" + t.name;
         public static void Validate(Scene scene)
         {
@@ -84,7 +106,11 @@ namespace XRApartment.EditorTools
                 All<XRInteractionManager>(scene).Count(x => x.isActiveAndEnabled) != 1 ||
                 All<ReviewSessionHost>(scene).Count(x => x.isActiveAndEnabled) != 1 ||
                 All<ReviewIntegrationPanel>(scene).Count(x => x.isActiveAndEnabled) != 1 ||
+                All<ReviewWorldInteractionGate>(scene).Count(x => x.isActiveAndEnabled) != 1 ||
                 All<JourneyRuntimeHost>(scene).Length != 0 ||
+                All<KitchenActivityGuide>(scene).Any(x => x.gameObject.activeInHierarchy) ||
+                All<KitchenPauseMenu>(scene).Any(x => x.gameObject.activeInHierarchy) ||
+                All<KitchenFeedbackNotes>(scene).Any(x => x.gameObject.activeInHierarchy) ||
                 All<LocomotionSettingsView>(scene).Any(x => x.gameObject.activeInHierarchy))
                 throw new InvalidOperationException("Duplicate or legacy control infrastructure");
             foreach (var t in All<Transform>(scene))
@@ -141,7 +167,8 @@ namespace XRApartment.EditorTools
                 view.teleport = Button(panel, "Teleport", 8); view.smooth = Button(panel, "Continuous movement", 9);
                 view.recenter = Button(panel, "Recenter", 10); view.reset = Button(panel, "Reset world...", 11);
                 view.confirmReset = Button(panel, "Confirm reset", 12); view.cancelReset = Button(panel, "Cancel reset", 13);
-                view.close = Button(panel, "Close menu / F8", 14);
+                view.standing = Button(panel, "Standing view", 14); view.seated = Button(panel, "Seated view", 15);
+                view.close = Button(panel, "Close menu / F8", 16);
                 PrefabUtility.SaveAsPrefabAsset(root, PanelPath);
             }
             finally { Object.DestroyImmediate(root); }

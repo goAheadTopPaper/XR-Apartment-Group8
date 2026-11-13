@@ -16,6 +16,7 @@ namespace XRApartment.Runtime.ReviewV2
         public TMP_Text status;
         public XRSimpleInteractable resetButton;
         public Button setup, onboarding, review, back, finish, pause, resume, recenter, reset, confirmReset, cancelReset, exit, close, teleport, smooth;
+        public Button standing, seated;
         InputAction toggle;
         bool confirming;
         string message = "";
@@ -29,6 +30,8 @@ namespace XRApartment.Runtime.ReviewV2
             pause.onClick.AddListener(() => Send(CommandType.Pause));
             resume.onClick.AddListener(() => Send(CommandType.Resume));
             recenter.onClick.AddListener(() => Send(CommandType.Recenter));
+            standing.onClick.AddListener(() => Send(CommandType.CalibrateStanding));
+            seated.onClick.AddListener(() => Send(CommandType.CalibrateSeated));
             exit.onClick.AddListener(() => Send(CommandType.SafeExit));
             reset.onClick.AddListener(AskReset);
             confirmReset.onClick.AddListener(() => { confirming = false; Send(CommandType.ResetWorld); });
@@ -92,6 +95,7 @@ namespace XRApartment.Runtime.ReviewV2
             confirmReset.gameObject.SetActive(confirming); cancelReset.gameObject.SetActive(confirming);
             confirmReset.interactable = reset.interactable;
             bool terminal = s.Phase == SessionPhase.Finished || s.Phase == SessionPhase.Exited;
+            standing.interactable = seated.interactable = recenter.interactable = !terminal && !s.IsBusy;
             pause.interactable = ready && !terminal; resume.interactable = s.IsPaused && !s.IsBusy;
             exit.interactable = !terminal;
             ApplyMovement(s);

@@ -116,5 +116,22 @@ namespace XRApartment.Tests
             var goals = new GoalTracker(); Assert.IsFalse(goals.Observe("G02", GoalState.InProgress, null));
             Assert.IsFalse(goals.Observe("missing", GoalState.Completed, "e")); Assert.IsFalse(goals.Observe("G05", GoalState.Completed, "e"));
         }
+        [Test] public void SchemeHistoryAndEvidenceTimeAreImmutableSnapshots()
+        {
+            var mock = new MockReviewProvider(); Experience(mock);
+            mock.SetGoal("G02", GoalState.InProgress); var before = mock.Snapshot;
+            Assert.That(before.Goals.Single(g => g.Id == "G02").UpdatedAtMilliseconds, Is.GreaterThan(0));
+            mock.Execute(CommandType.ChangeScheme, "MOCK_B");
+            CollectionAssert.AreEqual(new[] { "MOCK_A" }, before.SchemeHistory);
+            CollectionAssert.AreEqual(new[] { "MOCK_A", "MOCK_B" }, mock.Snapshot.SchemeHistory);
+            mock.Execute(CommandType.ResetWorld);
+            Assert.AreEqual(2, mock.Snapshot.SchemeHistory.Count, "World reset is not a scheme visit to a different layout");
+        }
+        [Test] public void MissingCalibrationPortRejectsWithoutAdvancingPhase()
+        {
+            var core = new SessionController();
+            Assert.AreEqual("CalibrationUnavailable", core.Execute(CommandType.CalibrateStanding).Reason);
+            Assert.AreEqual(SessionPhase.Setup, core.Snapshot.Phase);
+        }
     }
 }
