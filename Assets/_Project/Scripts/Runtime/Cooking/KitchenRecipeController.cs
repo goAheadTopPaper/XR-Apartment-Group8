@@ -31,6 +31,7 @@ namespace XRApartment.Runtime
         static readonly Color Complete = new Color(.68f, 1f, .76f);
         static readonly Color Attention = new Color(1f, .77f, .44f);
         [SerializeField] KitchenCookingProfile profile;
+        [SerializeField] bool requireFridgeOpening = true;
         [SerializeField] KitchenFridge fridge;
         [SerializeField] PreparedKitchenProp tomato;
         [SerializeField] PreparedKitchenProp[] slices;
@@ -51,7 +52,8 @@ namespace XRApartment.Runtime
         KitchenPanContents contents;
         KitchenCookingStation station;
         KitchenStoredIngredient beefStock, onionStock;
-        public TomatoEggRecipe Recipe { get; } = new TomatoEggRecipe();
+        public TomatoEggRecipe Recipe { get; private set; } = new TomatoEggRecipe();
+        public int TomatoCutCount => tomato == null ? 0 : tomato.CutCount;
         public KitchenRecipeChoice ActiveRecipe { get; private set; }
         public BeefOnionStep BeefStep
         {
@@ -131,6 +133,7 @@ namespace XRApartment.Runtime
         }
         void Awake()
         {
+            if (!requireFridgeOpening) Recipe = new TomatoEggRecipe(false);
             bowlGrab = bowl.GetComponent<XRGrabInteractable>();
             contents = pan.GetComponent<KitchenPanContents>();
             station = GetComponent<KitchenCookingStation>();

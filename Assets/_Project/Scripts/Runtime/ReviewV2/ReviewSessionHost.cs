@@ -18,9 +18,16 @@ namespace XRApartment.Runtime.ReviewV2
         public KitchenRecipeController recipe;
         public KitchenLocomotionSettings locomotion;
         public ReviewSceneIdentity[] identities;
+        public ReviewGroceryActivity groceries;
+        public MonoBehaviour sessionSavePort;
+        public MonoBehaviour schemePort;
+        public string initialSchemeId = SchemeIds.Baseline;
+        public string modelVersion = "cooking-m0-hdrp-e319aaf";
         SessionController core;
         readonly Stopwatch clock = new Stopwatch();
         bool cooked, resetInFlight;
+        TomatoEggAction previousRecipeActions;
+        int previousTomatoCutCount;
         float previousTimeScale = 1;
         bool ownsFreeze;
         public SessionSnapshot Snapshot => core.Snapshot;
@@ -39,7 +46,9 @@ namespace XRApartment.Runtime.ReviewV2
         }
         void Awake()
         {
-            core = new SessionController(this);
+            var storage = sessionSavePort as ISessionSavePort;
+            if (sessionSavePort != null && storage == null) storage = new InvalidSavePort();
+            core = new SessionController(groceries != null && groceries.IsConfigured, this, schemePort as ISchemePort, storage, false, modelVersion, initialSchemeId);
             core.Changed += OnChanged;
             core.OperationCompleted += OnOperation;
             clock.Start();
@@ -63,17 +72,46 @@ namespace XRApartment.Runtime.ReviewV2
             foreach (var item in identities) if (item != null && item.Id == stableId) return item.transform;
             return null;
         }
+        public void WorldRebound(bool resetObservation = true)
+        {
+            if (resetObservation) { cooked = false; previousRecipeActions = TomatoEggAction.None; previousTomatoCutCount = 0; }
+            var gate = GetComponent<ReviewWorldInteractionGate>();
+            if (gate != null) gate.RefreshWorld();
+        }
         internal void Observe(InteractionKind kind, string objectId)
         {
             if (!CanObserve || Resolve(objectId) == null) return;
             var fact = new InteractionEvent(Snapshot, kind, objectId, clock.ElapsedMilliseconds);
-            if (kind == InteractionKind.DishCooked)
+            if (kind == InteractionKind.TomatoCut || kind == InteractionKind.EggReceivedInBowl)
+            {
+                if (!core.ObserveGoal(fact.SessionId, fact.SchemeVisitId, "G02", GoalState.InProgress,
+                    fact.EventId, fact.ElapsedMilliseconds)) return;
+            }
+            else if (kind == InteractionKind.DishCooked)
                 core.ObserveGoal(fact.SessionId, fact.SchemeVisitId, "G02", GoalState.Completed, fact.EventId, fact.ElapsedMilliseconds);
+            Observed?.Invoke(fact);
+        }
+        internal void ObserveGroceryStored(string objectId, string zoneId, GoalState state)
+        {
+            if (!CanObserve || Resolve(objectId) == null || Resolve(zoneId) == null) return;
+            var fact = new InteractionEvent(Snapshot, InteractionKind.IngredientStored, objectId, clock.ElapsedMilliseconds, zoneId, zoneId);
+            core.ObserveGoal(fact.SessionId, fact.SchemeVisitId, "G01", state, fact.EventId, fact.ElapsedMilliseconds);
             Observed?.Invoke(fact);
         }
         void LateUpdate()
         {
-            if (recipe == null || !CanObserve) return;
+            if (recipe == null) return;
+            var actions = recipe.ActiveRecipe == KitchenRecipeChoice.TomatoEgg ? recipe.Recipe.Actions : TomatoEggAction.None;
+            var cutCount = recipe.ActiveRecipe == KitchenRecipeChoice.TomatoEgg ? recipe.TomatoCutCount : 0;
+            var newlyProcessed = CookingPreparationEvidence.NewProcessingActions(previousRecipeActions, actions);
+            var newlyCut = CookingPreparationEvidence.HasNewTomatoCut(previousTomatoCutCount, cutCount);
+            previousRecipeActions = actions;
+            previousTomatoCutCount = cutCount;
+            if (!CanObserve) return;
+            if (newlyCut || (newlyProcessed & TomatoEggAction.SliceTomato) != TomatoEggAction.None)
+                Observe(InteractionKind.TomatoCut, "COOKING_STATION");
+            else if ((newlyProcessed & TomatoEggAction.CrackEgg) != TomatoEggAction.None)
+                Observe(InteractionKind.EggReceivedInBowl, "COOKING_STATION");
             bool ready = recipe.ActiveRecipe == KitchenRecipeChoice.TomatoEgg && recipe.Recipe.Step == TomatoEggStep.Ready;
             if (ready && !cooked) Observe(InteractionKind.DishCooked, "COOKING_STATION");
             cooked = ready;
@@ -99,7 +137,7 @@ namespace XRApartment.Runtime.ReviewV2
                 { resetInFlight = false; completed(id, false, "World restoration timed out; inspect scene before retrying"); yield break; }
                 yield return null;
             }
-            cooked = false; resetInFlight = false;
+            cooked = false; previousRecipeActions = TomatoEggAction.None; previousTomatoCutCount = 0; resetInFlight = false;
             completed(id, true, "World reset completed; feedback remains owned by its original visit");
         }
         public CommandResult Recenter()
@@ -110,5 +148,10 @@ namespace XRApartment.Runtime.ReviewV2
         }
         public CommandResult Calibrate(bool seated) => locomotion != null && locomotion.CalibrateEyeHeight(seated ? 1.2f : 1.65f)
             ? new CommandResult(true) : new CommandResult(false, "CalibrationUnavailable");
+        sealed class InvalidSavePort : ISessionSavePort
+        {
+            public void Save(string id, SessionSnapshot snapshot, Action<string, bool, string> completed)
+                => completed(id, false, "Configured component does not implement ISessionSavePort");
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace XRApartment.Simulation.ReviewV2
         readonly IWorldPort world;
         readonly ISessionSavePort storage;
         readonly bool mock;
+        string modelVersion;
         readonly List<string> schemeHistory = new List<string>();
         string schemeId, visitId = Guid.NewGuid().ToString("N"), pending;
         SessionPhase phase;
@@ -21,10 +22,19 @@ namespace XRApartment.Simulation.ReviewV2
         public event Action<SessionSnapshot> Changed;
         public event Action<OperationResult> OperationCompleted;
         public SessionSnapshot Snapshot => new SessionSnapshot(sessionId, phase, schemeId, visitId,
-            "cooking-m0-hdrp-e319aaf", goals.Snapshot, paused, pending != null, mock, saveStatus, schemeHistory);
+            modelVersion, goals.Snapshot, paused, pending != null, mock, saveStatus, schemeHistory);
         public SessionController(IWorldPort world = null, ISchemePort schemes = null, ISessionSavePort storage = null, bool isMock = false)
+            : this(false, world, schemes, storage, isMock) { }
+        public SessionController(bool groceriesAvailable, IWorldPort world = null, ISchemePort schemes = null, ISessionSavePort storage = null, bool isMock = false)
+            : this(groceriesAvailable, world, schemes, storage, isMock,
+                groceriesAvailable ? "cooking-m1-groceries-v1" : "cooking-m0-hdrp-e319aaf") { }
+        public SessionController(bool groceriesAvailable, IWorldPort world, ISchemePort schemes, ISessionSavePort storage, bool isMock, string modelVersion)
+            : this(groceriesAvailable, world, schemes, storage, isMock, modelVersion, isMock ? "MOCK_A" : SchemeIds.Baseline) { }
+        public SessionController(bool groceriesAvailable, IWorldPort world, ISchemePort schemes, ISessionSavePort storage, bool isMock, string modelVersion, string initialSchemeId)
         { this.world = world; this.schemes = schemes; this.storage = storage; mock = isMock;
-            schemeId = isMock ? "MOCK_A" : SchemeIds.Baseline; schemeHistory.Add(schemeId); goals = new GoalTracker(isMock); }
+            this.modelVersion = string.IsNullOrWhiteSpace(modelVersion) ? "UNVERSIONED" : modelVersion;
+            if (string.IsNullOrWhiteSpace(initialSchemeId)) throw new ArgumentException("Initial scheme identity is required", nameof(initialSchemeId));
+            schemeId = initialSchemeId; schemeHistory.Add(schemeId); goals = new GoalTracker(isMock, groceriesAvailable); }
         bool Terminal => phase == SessionPhase.Finished || phase == SessionPhase.Exited;
         void Publish() => Changed?.Invoke(Snapshot);
         public CommandResult Execute(CommandType command, string targetSchemeId = null)
@@ -58,21 +68,44 @@ namespace XRApartment.Simulation.ReviewV2
                     if (phase != SessionPhase.Experience) break;
                     if (string.IsNullOrWhiteSpace(targetSchemeId) || targetSchemeId == schemeId) return new CommandResult(false, "InvalidScheme");
                     if (schemes == null || !schemes.Supports(targetSchemeId)) return new CommandResult(false, "NotSupported");
-                    return Begin(command, (id, done) => schemes.Change(id, targetSchemeId, done), targetSchemeId);
+                    var version = schemes is ISchemeModelCatalog catalog ? catalog.ModelVersionFor(targetSchemeId) : modelVersion;
+                    if (string.IsNullOrWhiteSpace(version)) return new CommandResult(false, "ModelVersionUnavailable");
+                    return Begin(command, (id, done) => SaveThenChange(id, targetSchemeId, done), targetSchemeId, version);
             }
             return new CommandResult(false, "InvalidPhase");
         }
         CommandResult Transition(SessionPhase next) { phase = next; Publish(); return new CommandResult(true); }
-        CommandResult Begin(CommandType command, Action<string, Action<string, bool, string>> action, string target = null)
+        void SaveThenChange(string id, string target, Action<string, bool, string> done)
+        {
+            if (storage == null) { schemes.Change(id, target, done); return; }
+            saveStatus = V2SaveStatus.Pending; Publish();
+            bool received = false;
+            try { storage.Save(id, Snapshot, (receipt, verified, message) =>
+            {
+                if (receipt != id || pending != id || Terminal || received) return;
+                received = true;
+                if (!verified || mock)
+                { saveStatus = V2SaveStatus.Failed; done(id, false, message); return; }
+                saveStatus = V2SaveStatus.Verified;
+                try { schemes.Change(id, target, done); }
+                catch (Exception ex) { done(id, false, ex.Message); }
+            }); }
+            catch
+            {
+                if (pending == id) saveStatus = V2SaveStatus.Failed;
+                throw;
+            }
+        }
+        CommandResult Begin(CommandType command, Action<string, Action<string, bool, string>> action, string target = null, string targetVersion = null)
         {
             var id = pending = Guid.NewGuid().ToString("N");
             if (command == CommandType.Finish) saveStatus = V2SaveStatus.Pending;
             Publish();
-            try { action(id, (receipt, success, message) => Complete(receipt, command, success, message, target)); }
-            catch (Exception ex) { Complete(id, command, false, ex.Message, target); }
+            try { action(id, (receipt, success, message) => Complete(receipt, command, success, message, target, targetVersion)); }
+            catch (Exception ex) { Complete(id, command, false, ex.Message, target, targetVersion); }
             return new CommandResult(true, "Accepted; observe OperationCompleted", id);
         }
-        void Complete(string id, CommandType command, bool success, string message, string target)
+        void Complete(string id, CommandType command, bool success, string message, string target, string targetVersion)
         {
             if (id != pending || Terminal) return;
             pending = null;
@@ -83,7 +116,7 @@ namespace XRApartment.Simulation.ReviewV2
                 if (success) phase = SessionPhase.Finished;
             }
             else if (success)
-            { if (target != null) { schemeId = target; schemeHistory.Add(target); } visitId = Guid.NewGuid().ToString("N"); goals.Reset(); }
+            { if (target != null) { schemeId = target; modelVersion = targetVersion; schemeHistory.Add(target); } visitId = Guid.NewGuid().ToString("N"); goals.Reset(); }
             Publish(); OperationCompleted?.Invoke(new OperationResult(id, command, success, message));
         }
         public bool ObserveGoal(string session, string visit, string goalId, GoalState state, string evidenceId, long? updatedAtMilliseconds = null)

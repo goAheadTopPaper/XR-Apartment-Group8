@@ -14,7 +14,7 @@ namespace XRApartment.Data.ReviewV2
         public const string IntegratedKitchen = "SCHEME_A";
         public const string ExternalRefrigerator = "SCHEME_B";
     }
-    public enum InteractionKind { ObjectGrabbed, ObjectReleased, DishCooked }
+    public enum InteractionKind { ObjectGrabbed, ObjectReleased, DishCooked, TomatoCut, EggReceivedInBowl, IngredientStored }
     public sealed class CommandResult
     {
         public bool Accepted { get; }
@@ -87,6 +87,11 @@ namespace XRApartment.Data.ReviewV2
     {
         bool Supports(string schemeId);
         void Change(string requestId, string schemeId, Action<string, bool, string> completed);
+    }
+    // Optional additive capability: authored model identity, independent of goal availability.
+    public interface ISchemeModelCatalog
+    {
+        string ModelVersionFor(string schemeId);
     }
     public interface IWorldPort
     {

@@ -16,12 +16,25 @@ namespace XRApartment.Runtime.ReviewV2
         public ReviewSessionHost host;
         XRBaseInteractable[] objects;
         bool blocked;
+        bool busyOnly;
         public bool canProcess => isActiveAndEnabled;
         public bool Process(IXRHoverInteractor hand, IXRHoverInteractable target) => !blocked;
-        public bool Process(IXRSelectInteractor hand, IXRSelectInteractable target) => !blocked;
-        void Awake() => objects = gameObject.scene.GetRootGameObjects()
+        public bool Process(IXRSelectInteractor hand, IXRSelectInteractable target) => !blocked ||
+            (busyOnly && target.interactorsSelecting.Contains(hand));
+        void Awake() => objects = WorldObjects();
+        XRBaseInteractable[] WorldObjects() => gameObject.scene.GetRootGameObjects()
+            .Concat(host.station.gameObject.scene.GetRootGameObjects()).Distinct()
             .SelectMany(r => r.GetComponentsInChildren<XRBaseInteractable>(true))
             .Where(x => !(x is BaseTeleportationInteractable) && x.GetComponentInParent<XROrigin>(true) == null).ToArray();
+        public void RefreshWorld()
+        {
+            if (objects == null) return;
+            foreach (var item in objects) if (item != null) { item.hoverFilters.Remove(this); item.selectFilters.Remove(this); }
+            objects = WorldObjects();
+            if (!isActiveAndEnabled) return;
+            foreach (var item in objects) { item.hoverFilters.Add(this); item.selectFilters.Add(this); }
+            Apply(host.Snapshot);
+        }
         void OnEnable()
         {
             foreach (var item in objects) { item.hoverFilters.Add(this); item.selectFilters.Add(this); }
@@ -34,9 +47,13 @@ namespace XRApartment.Runtime.ReviewV2
         }
         void Apply(SessionSnapshot snapshot)
         {
-            blocked = snapshot.Phase == SessionPhase.Setup || snapshot.Phase == SessionPhase.Finished ||
-                snapshot.Phase == SessionPhase.Exited || snapshot.IsPaused || snapshot.IsBusy;
-            if (!blocked) return;
+            bool hardBlock = snapshot.Phase == SessionPhase.Setup || snapshot.Phase == SessionPhase.Finished ||
+                snapshot.Phase == SessionPhase.Exited || snapshot.IsPaused;
+            blocked = hardBlock || snapshot.IsBusy;
+            busyOnly = snapshot.IsBusy && !hardBlock;
+            // Pending save/preflight blocks new selections, but preserves existing hands until
+            // the world transaction commits. Reset and successful unload cancel their own holds.
+            if (!hardBlock) return;
             foreach (var item in objects)
             {
                 if (item == null || !item.isSelected || item.interactionManager == null) continue;

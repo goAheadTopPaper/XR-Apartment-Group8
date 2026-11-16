@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using XRApartment.Data;
 using XRApartment.Data.ReviewV2;
 using XRApartment.Simulation.ReviewV2;
 
@@ -8,6 +9,64 @@ namespace XRApartment.Tests
 {
     public class ReviewV2SessionTests
     {
+        [Test] public void ExplicitModelVersionSurvivesUnavailableGoalsReviewAndReset()
+        {
+            var port = new PendingPort();
+            var core = new SessionController(false, port, null, null, false, "cooking-m1-groceries-v1");
+            Experience(core); var before = core.Snapshot;
+            Assert.IsFalse(before.Goals.Single(g => g.Id == "G01").Available);
+            core.Execute(CommandType.Review); core.Execute(CommandType.Continue);
+            Assert.AreEqual(before.ModelVersion, core.Snapshot.ModelVersion);
+            Assert.AreEqual(before.SchemeVisitId, core.Snapshot.SchemeVisitId);
+            core.Execute(CommandType.ResetWorld); port.Complete(port.Id, true, "restored");
+            Assert.AreEqual(before.ModelVersion, core.Snapshot.ModelVersion);
+            Assert.AreNotEqual(before.SchemeVisitId, core.Snapshot.SchemeVisitId);
+        }
+        [Test] public void V2RecipePolicyDoesNotInventFridgeEvidenceOrChangeLegacyDefault()
+        {
+            var actions = (TomatoEggAction)((1 << 14) - 1) & ~TomatoEggAction.OpenFridge;
+            var legacy = new XRApartment.Simulation.TomatoEggRecipe();
+            var review = new XRApartment.Simulation.TomatoEggRecipe(false);
+            legacy.Observe(actions); review.Observe(actions);
+            legacy.ObserveCooking(true, true, false); review.ObserveCooking(true, true, false);
+            Assert.IsFalse(legacy.Ready); Assert.IsTrue(review.Ready);
+            Assert.AreEqual(TomatoEggAction.None, review.Actions & TomatoEggAction.OpenFridge);
+            review.Reset(); Assert.AreEqual(TomatoEggStep.TakeTomato, review.Step);
+            Assert.AreEqual(TomatoEggStep.OpenFridge, new XRApartment.Simulation.TomatoEggRecipe().Step);
+        }
+        [Test] public void GroceryPlacementsAreDistinctAndCanCoexistWithCooking()
+        {
+            var storage = new GroceryStorageProgress(new[] { "tomato", "egg", "other" }, 2);
+            Assert.IsFalse(storage.Store("unknown")); Assert.AreEqual(GoalState.NotStarted, storage.State);
+            Assert.IsTrue(storage.Store("egg")); Assert.AreEqual(GoalState.InProgress, storage.State);
+            Assert.IsFalse(storage.Store("egg")); Assert.AreEqual(GoalState.InProgress, storage.State);
+            var core = new SessionController(groceriesAvailable: true); Experience(core); var s = core.Snapshot;
+            Assert.AreEqual("cooking-m1-groceries-v1", s.ModelVersion);
+            Assert.IsTrue(core.ObserveGoal(s.SessionId, s.SchemeVisitId, "G01", storage.State, "stored-egg"));
+            Assert.IsTrue(core.ObserveGoal(s.SessionId, s.SchemeVisitId, "G02", GoalState.InProgress, "cut"));
+            Assert.AreEqual(2, core.Snapshot.Goals.Count(g => g.State == GoalState.InProgress));
+            Assert.IsTrue(storage.Store("tomato")); Assert.AreEqual(GoalState.Completed, storage.State);
+            Assert.AreEqual(SessionPhase.Experience, core.Snapshot.Phase);
+            storage.Reset(); Assert.AreEqual(GoalState.NotStarted, storage.State);
+        }
+        [Test] public void OnlyNewRealPreparationFlagsCanStartG02()
+        {
+            var preliminary = TomatoEggAction.OpenFridge | TomatoEggAction.TakeTomato |
+                TomatoEggAction.TakeEgg | TomatoEggAction.TakeBowl | TomatoEggAction.TurnOnStove;
+            Assert.AreEqual(TomatoEggAction.None, CookingPreparationEvidence.NewProcessingActions(TomatoEggAction.None, preliminary));
+            Assert.AreEqual(TomatoEggAction.SliceTomato, CookingPreparationEvidence.NewProcessingActions(preliminary,
+                preliminary | TomatoEggAction.SliceTomato));
+            Assert.AreEqual(TomatoEggAction.CrackEgg, CookingPreparationEvidence.NewProcessingActions(preliminary,
+                preliminary | TomatoEggAction.CrackEgg));
+            Assert.AreEqual(TomatoEggAction.None, CookingPreparationEvidence.NewProcessingActions(
+                preliminary | TomatoEggAction.CrackEgg, preliminary | TomatoEggAction.CrackEgg));
+            Assert.AreEqual(TomatoEggAction.None, CookingPreparationEvidence.NewProcessingActions(
+                preliminary | TomatoEggAction.CrackEgg, TomatoEggAction.None));
+            Assert.IsTrue(CookingPreparationEvidence.HasNewTomatoCut(0, 1));
+            Assert.IsTrue(CookingPreparationEvidence.HasNewTomatoCut(1, 2));
+            Assert.IsFalse(CookingPreparationEvidence.HasNewTomatoCut(2, 2));
+            Assert.IsFalse(CookingPreparationEvidence.HasNewTomatoCut(2, 0));
+        }
         static void Experience(IReviewSessionCommands core)
         { Assert.IsTrue(core.Execute(CommandType.CompleteSetup).Accepted); Assert.IsTrue(core.Execute(CommandType.CompleteOnboarding).Accepted); }
         [Test] public void ZeroGoalsCanReviewReturnAndFinishWithoutClaimingSave()

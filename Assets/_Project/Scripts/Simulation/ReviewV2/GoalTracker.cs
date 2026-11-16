@@ -6,8 +6,9 @@ namespace XRApartment.Simulation.ReviewV2
     public sealed class GoalTracker
     {
         readonly Dictionary<string, GoalSnapshot> goals = new Dictionary<string, GoalSnapshot>();
-        public GoalTracker(bool allAvailable = false)
-        { for (int i = 1; i <= 5; i++) { var id = "G0" + i; goals.Add(id, new GoalSnapshot(id, GoalState.NotStarted, allAvailable || i == 2)); } }
+        public GoalTracker(bool allAvailable = false) : this(allAvailable, false) { }
+        public GoalTracker(bool allAvailable, bool groceriesAvailable)
+        { for (int i = 1; i <= 5; i++) { var id = "G0" + i; goals.Add(id, new GoalSnapshot(id, GoalState.NotStarted, allAvailable || i == 2 || (i == 1 && groceriesAvailable))); } }
         public IEnumerable<GoalSnapshot> Snapshot => new List<GoalSnapshot>(goals.Values);
         public bool Observe(string id, GoalState state, string evidenceId, long? updatedAtMilliseconds = null)
         {

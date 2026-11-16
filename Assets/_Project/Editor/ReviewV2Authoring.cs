@@ -215,6 +215,17 @@ namespace XRApartment.EditorTools
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { ScenePath },
                 locationPathName = "Builds/ReviewV2/ReviewV2.exe", target = BuildTarget.StandaloneWindows64, options = BuildOptions.Development });
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded) throw new Exception("V2 build failed: " + report.summary.result);
+            Directory.CreateDirectory("Logs/ReviewV2");
+            File.WriteAllLines("Logs/ReviewV2/M2-build-summary.txt", new[] {
+                "result=" + report.summary.result, "scene=" + ScenePath,
+                "platform=" + report.summary.platform, "unity=" + Application.unityVersion,
+                "output=" + report.summary.outputPath, "bytes=" + report.summary.totalSize,
+                "errors=" + report.summary.totalErrors, "warnings=" + report.summary.totalWarnings,
+                "duration=" + report.summary.totalTime,
+                "A=" + AssetDatabase.LoadAssetAtPath<GameObject>(ReviewV2SchemeAuthoring.LayoutPath(XRApartment.Data.ReviewV2.SchemeIds.IntegratedKitchen)).GetComponent<ReviewSchemeWorld>().modelVersion,
+                "B=" + AssetDatabase.LoadAssetAtPath<GameObject>(ReviewV2SchemeAuthoring.LayoutPath(XRApartment.Data.ReviewV2.SchemeIds.ExternalRefrigerator)).GetComponent<ReviewSchemeWorld>().modelVersion
+            });
+            Debug.Log("REVIEW_V2_BUILD_SUCCEEDED: " + report.summary.outputPath);
         }
     }
 }
