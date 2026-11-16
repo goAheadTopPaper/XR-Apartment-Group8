@@ -1,5 +1,7 @@
 # Review V2 M0 集成基线
 
+**当前M2增量（2026-11-14）：** 唯一V2主场景已接完整A/B世界端口，运行时初始A；原M1世界原位保留停用，并另存M1Regression场景作历史测试。Host新增可选schemePort/initialSchemeId，ReviewSchemePort在-200绑定当前世界，Host在-100创建Core，UI/门控随后初始化。正式T2/T3仍按Docs/M2/Integration_Manifest.md接入；下文M0 NotSupported/Baseline/旧烘焙说明仅适用于其历史基线，不能覆盖当前M2实际状态。最新测试范围与失败见Docs/M2/T1_Development_Progress.md。
+
 本实现根据已确认的 M0 任务和实施计划隔离接入 Cooking。它是可执行接口，不宣称两份 v0.1 Draft 已获得团队冻结批准。旧 Phase 2 契约仍只适用于旧 Review。
 
 当前集成基线为 `origin/test@e319aaf`（HDRP 14.0.12），开发安排对齐 `XR_Group8_Five_Task_Briefs_and_Unified_Narrative_v0.4.docx`。M0 接口与后续分工见 `ReviewV2_Contract_v0.4_M0.md`；原 Built-in 基线的验证仅作历史证据。
@@ -32,7 +34,7 @@ M0 的 Finish 表示体验结束，**不表示数据已保存**。面板显示�
 
 快照提供 SessionId、Phase、SchemeId、SchemeVisitId、ModelVersion、SchemeHistory、Goals、CanReview、IsPaused、IsBusy、IsMock、SaveStatus。GoalSnapshot 包含 Id、State、Available、EvidenceId、可空 UpdatedAtMilliseconds。快照与集合均防御性复制，旧快照不会随新状态变化。
 
-G01–G05 为稳定 ID，无 ActiveGoal。生产环境只有 G02 的结果检测接入；其他目标 Available=false，T2 应标为未接入而不是可完成。G02 完成来自 KitchenRecipeController 的真实 TomatoEgg Ready 状态；G02 的 InProgress 检测暂未接入。单次抓取不推断活动。Mock 可同时设置多个 InProgress，不能用来声称生产检测已完成。
+G01–G05 为稳定 ID，无 ActiveGoal。M1 V2 原型在完整配置 ReviewGroceryActivity 时开放 G01，其他旧/缺少配置的环境仍只开放 G02；G03–G05 Available=false。G02 InProgress 来自真实番茄 CutCount 首次增加或新出现的 CrackEgg 足量入碗标志；SliceTomato 仅作整颗完成切分后的后备证据。开冰箱、取材、拿工具、开炉及普通抓取不推断开始。G02 Completed 仍来自真实 TomatoEgg Ready 边沿。可用性、同对象购物/料理策略及回归状态见 `M1/T1_Development_Progress.md`。
 
 ### T2：快照、订阅和命令
 
@@ -65,11 +67,11 @@ var anchorTransform = host.Resolve("COOKING_STATION");
 // OnFact 接收不可变 InteractionEvent。禁用/销毁时 source.Observed -= OnFact。
 ```
 
-初始真实方案是 `COOKING_BASELINE`，模型版本 `cooking-m0-hdrp-e319aaf`，不是最终 A/B。SessionId 在启动时生成；SchemeVisitId 每次成功显式重置后更新，普通回顾、暂停和返回不改变。T3 捕获标记时应保存当时完整身份，不在之后读取当前 Host 身份来覆盖历史记录。
+真实方案是 COOKING_BASELINE，不是最终 A/B。M0 模型版本为 cooking-m0-hdrp-e319aaf；启用同对象购物原型的 V2 为 cooking-m1-groceries-v1。SessionId 启动时生成，成功显式重置更新 Visit，普通回顾/暂停/返回不改变。T3 捕获时保存完整身份，不能用后来的当前快照覆盖历史。
 
 对象目录见 `ReviewV2_M0_Identities.tsv`。OBJECT_nnn 是新场景中序列化的固定 ID；运行时不从名称、路径或 GetInstanceID 派生。首次作者生成时分配并保存；显式 RebaseOnCooking 作者入口读取旧场景的序列化对象与 Prefab 实例标识来保留 ID，新对象在旧最大编号后追加；同名对象不靠层级路径区分。若重建源对象改变了序列化身份，须人工核对映射，不将其自动视为同一对象。运行时不执行此编辑器匹配。目录中的层级路径仅用于作者定位。
 
-M0 明确登记 COOKING_STATION、FRIDGE 和所有已接抓取对象。Zone 事件未接入，ZoneId 为 null。其他语义锚点（包括 DINING_TABLE、SINK、MICROWAVE）尚未登记；Resolve 返回 null 不等于物理模型不存在，T3 不应猜测坐标。位置转换使用 Runtime 返回的 Transform，纯 C# 契约不含 Unity 对象。
+M0 明确登记 COOKING_STATION、FRIDGE 和已接抓取对象。M1 增量登记 GROCERY_BAG、ZONE_FRIDGE_STORAGE；IngredientStored 带具体食材 ObjectId 和储物 ZoneId/AnchorId，其他原事件仍可为空。其他语义锚点（DINING_TABLE、SINK、MICROWAVE）尚未登记，Resolve 返回 null 不等于物理模型不存在。T3 不应猜测坐标，位置转换使用 Runtime 返回的 Transform。最新目录见 ReviewV2_M1_Identities.tsv，交接见 M1/T1_T3_Context_Handoff.md。
 
 事实事件带 EventId、单调 ElapsedMilliseconds、SessionId、SchemeId、SchemeVisitId、ModelVersion、Kind、ObjectId、可空 ZoneId/AnchorId、IsMock。事件目前在 Experience 和 Review 期间产生，暂停/重置/终态隔离；程序取消抓取不报告用户释放。例子（示意 JSON，不代表写盘产物）：
 
@@ -92,6 +94,8 @@ M0 明确登记 COOKING_STATION、FRIDGE 和所有已接抓取对象。Zone 事�
 
 同一抓取从第一只手选中到最后一只手释放只产生一对事件。Bridge 在禁用时只移除自己的监听。DishCooked 是结果事实，不包含舒适性、空间质量等主观判断。
 
+M1-01 追加 `InteractionKind.TomatoCut` 与 `InteractionKind.EggReceivedInBowl`，分别表示上述两种已验证的配方加工边沿。`ObjectId=COOKING_STATION` 是配方事实来源，不代表具体食材的稳定 ID；ZoneId/AnchorId 仍为空。事件沿用 EventId、SessionId、SchemeId、SchemeVisitId、ModelVersion、ElapsedMilliseconds 和 IsMock 字段。G02 刚进入 InProgress 时，`GoalSnapshot.EvidenceId` 等于该事件的 EventId。首次开始后其他加工动作不会重复发布开始事件；Review 往返保留证据，显式 WorldReset 成功后新 Visit 可重新产生开始事实。既有 `DishCooked` 事件与消费者订阅方式不变。T3 应按事件当时的 Visit 归属保存，不以当前快照重写历史。
+
 ## 方案、重置与保存边界
 
 共享基础设施：XR Rig、输入、EventSystem、V2 Host/面板、会话身份与未来反馈存储。未来可替换方案资产：冰箱、厨房柜体/布局、方案内道具与区域/锚点映射。M0 未移动或重组原美术/烘焙层级；保留引用优先，最终方案适配由后续里程碑完成。
@@ -100,7 +104,7 @@ M0 明确登记 COOKING_STATION、FRIDGE 和所有已接抓取对象。Zone 事�
 
 World reset 在确认后调用 KitchenRoomReset，等待 station 和 roomReset 两者 IsResetting=false 才发布成功、新 Visit 与清空后的目标。期间的程序释放被隔离。T3 应按 IsBusy 关闭旧 Visit 的上下文窗口，新快照后建立新窗口；本模块没有权限删除历史反馈。
 
-`ISessionSavePort.Save` 是后续存储适配点。回调必须包含原 RequestId，true 仅允许真实写盘并读回验证。正式端口接入后，Finish 在 Review 等待回执，失败留在 Review、允许重试，成功才 Finished/Verified。旧或重复回执无效，SafeExit 使待处理回执失效。M0 Host 未连接存储，结束保持 NotConfigured。Mock Controller 即使收到 true 也不会生成 Verified。
+ISessionSavePort.Save 为 T3 存储适配点。Host 新增可选的 sessionSavePort MonoBehaviour 引用，由 T1 接线；组件必须实现该接口，否则 Finish 得到失败。回调携带原 RequestId，true 仅允许真实写盘并读回验证。正式端口接入后，失败留在 Review 可重试，成功才 Finished/Verified，旧/重复/退出后回执无效。当前场景仍未连接正式存储，保持 NotConfigured；测试端口仅证明接线，不证明写盘。Mock 不生成 Verified。
 
 与 v0.1 草案的明确差异：按用户确认，M0 未配置存储仍可 Finished；可用性与三态 GoalState 分开；scheme_epoch 用唯一 SchemeVisitId 表达；初始 Cooking 基线不命名 SCHEME_A。暂不提供最终 Marker/仓库 schema，不把演示事实缓存称为反馈存储。
 
@@ -121,4 +125,6 @@ World reset 在确认后调用 KitchenRoomReset，等待 station 和 roomReset �
 
 实际执行结果见 `ReviewV2_M0_Validation.md`。日志、XML、构建输出放在忽略的 Logs/ReviewV2 与 Builds/ReviewV2，不提交。
 
-未完成：T2 正式 UI/教学、T3 Marker 和真实持久化、G01/G03/G04/G05 检测、G02 进行中检测、完整锚点/Zone 注册、整厨 A/B 模型/加载/存储协调、头显校准及 Quest Link 实测。五个建议不是五个已实现活动。
+M1-01 更新（2026-11-14）：G02 进行中检测已通过本次 Unity 编译、V2 EditMode 16/16 与 PlayMode 7/7（含真实料理纵切），过程失败和复测见 `M1/T1_Development_Progress.md`。这是 COOKING_BASELINE 的编辑器技术验证，不是完整 M1 或设备验收。
+
+未完成：T2 正式 UI/教学、T3 Marker 和真实持久化、G03/G04/G05 检测、完整语义锚点、最终 A/B 与设备验收。G01 已有原型实现，但完整叙事和最新真实测试状态须查 M1/T1_Development_Progress.md，不能沿用上面的历史 G02 结果。后续依赖计划见 ReviewV2_M1_Narrative_Plan.md。

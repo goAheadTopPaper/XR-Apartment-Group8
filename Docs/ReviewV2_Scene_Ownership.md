@@ -4,6 +4,8 @@
 
 ## 当前依赖审查
 
+**2026-11-14 M2当前增量：** 唯一V2主场景已接ReviewSchemePort，运行时加载SCHEME_A/B完整世界Prefab到隔离Scene，初始A。Rig、Host、UI及保存注入点留在会话场景；每案世界拥有环境/家具/工作台/水站/RoomReset/身份。原M1世界对象在主场景中原位保留并停用；原接线另存为 `SCN_Kitchen_ReviewV2_M1Regression.unity`，仅供历史回归。`SCN_Kitchen_ReviewV2_M2.unity` 是制作期间的隔离测试场景，不是第二产品入口，当前M2测试已改为加载唯一主场景。下文15个共享实例及Cooking烘焙引用保留M0/M1历史；当前主场景和新世界已清旧lightmap索引，使用实时照明，设备/性能验收未完成。最新进度和真实证据见Docs/M2。
+
 V2 从 Cooking 复制而来。两个场景分别持有同一批 **15 个共享 Prefab 的实例**：`PREF_Cooking_Workbench`（含冰箱、食材和厨具）、`PREF_Cooking_WaterStation`、`PREF_Cooking_RoomReset`、水壶/水杯、`PREF_Furniture_DiningSet`、`PREF_Kitchen_Environment`、`PREF_Apartment_Dressing`、`PREF_XR_KitchenRig`、`PREF_Lighting_KitchenDaylight`、`PREF_Lighting_CookingFill`、Teleport 和旧 UI/Layout Prefab。Prefab 源资产变化会传给两边，除非相应属性被场景实例覆盖。V2 另实例化 `PREF_UI_ReviewV2Integration`，并有场景内的 `ReviewV2 Session`、EventSystem、XR Interaction Manager 和 SceneIDMap。
 
 V2 工作台实例上叠加稳定身份与抓取桥，并覆盖菜谱/重置接线；旧活动菜单父对象在 V2 关闭。V2 和 Cooking 各自的摆位、实例属性、增删对象及 SceneIDMap 是独立场景数据。Prefab 源更新不等于场景覆盖自动同步。变更共享 Prefab 时同时在 V2 和 Cooking 检查引用、覆盖和回归；不得用整场景复制替代逐项接入。
