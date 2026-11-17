@@ -2,6 +2,8 @@
 
 > **Phase 3 开发入口：** `SCN_Kitchen_ReviewV2` 是唯一的产品集成与验收主场景。T1–T5 的 M0 会话/目标状态、命令和事件接口以 [Review V2 M0 State Contract](Docs/ReviewV2_Contract_v0.4_M0.md) 及其链接的 [集成说明](Docs/ReviewV2_M0_Integration.md) 为准。使用 `XR Apartment / Review V2 / Open Phase 3 Review` 开发测试。`SCN_Kitchen_Cooking` 用于功能回归，`SCN_Kitchen_Review` 和下文 B1/B2 标准化 Challenge 流程属于 Phase 2 历史参考；[旧 Module Interface Contract](Docs/Module_Interface_Contract.md) 不适用于 V2。默认 Build Settings 暂未切换。
 
+**T2/T3 对接入口：** [T1 接口清单与产品逻辑接入手册](Docs/ReviewV2_T1_Interface_Reference.md) 汇总当前 A-v5/B-v8 的函数签名、输入输出、数据结构、命令/回调与保存约定，并说明如何实现引导、标记、回顾、切换、重置和保存结束。可编译签名仍以 ReviewContracts.cs 为准。
+
 ## 1. Introduction
 
 ### Group 8

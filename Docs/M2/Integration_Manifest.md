@@ -1,5 +1,21 @@
 # M2 Integration Manifest
 
+2026-11-17 任务书占位接入：原 `PREF_UI_ReviewV2Integration` 增加 `ReviewActivityBriefView` 和 `brief/quickBrief/briefBack/activityBrief` 引用，Onboarding 自动显示说明，Experience 主菜单/快捷栏可再次打开。原 Panel 保持唯一 Host 订阅与命令入口；只读 view 以 Id 匹配当前 Goals 并展示 State/Available，未接入或缺失项独立显示，不采用 v0.5 文案中的第四个状态枚举。活动名称来自任务书 v0.5 §3.3，G01/G02 可并行；开合不重置世界/Visit，Review 不设活动完成门槛。四项快捷操作沿用原 Canvas/射线和输入。作者 Ensure 仅补缺失对象，T2 替换时仍禁用整个原 Panel；不依赖 T3，不修改其接口/数据。26/26同批PlayMode与实际模拟器入口检查、16:9/4:3截图通过；具体证据及设备限制见最新 Progress 与 [使用说明](../ReviewV2_Placeholder_UI_Usage.md)。
+
+资源检查：本轮开始时的 399 个既有 Prefab 对象 ID 全部保留，当前 493 个；重复作者操作字节一致。2231 个已跟踪源代码/资源/配置基线中，除预期的 Panel 源码和 UI Prefab 外，其余 2229 个字节一致；本轮还修改既有未跟踪的作者/测试文件，并新增只读 view 及其 Unity metadata。测试自动改动的字体缓存和 EditorSettings 已还原本轮前版本，临时本地验证桥及其 metadata 已移除。场景、公共接口、Host/Core、方案世界和输入资源保持原样。
+
+2026-11-17 最简占位UI实施增量：已批准并完成P1–P5，主场景沿用原UI实例及Host引用，无场景重建；新增Mark表单/丢弃确认、体验快捷栏、Review滚动看板，沿用F8/左手Y及现有Rig输入。UI归会话场景；快捷栏运行时跟随现有Camera，控制器禁用/销毁时关闭和清理，不随方案世界卸载。`ReviewMarkDraftView.t3Source`与`ReviewPlaceholderBoardView.t3Source`为可空占位，非空也仅显示待适配，不假定接口或开放提交；`sessionSavePort`仍为空。真实接口接入按P6清单执行。24/24定向回归和实际模拟器UI输入通过，详见 [使用及接线说明](../ReviewV2_Placeholder_UI_Usage.md) 与最新Development Progress；正式T2/T3闭环及设备仍待验收。临时FXAA处理覆盖主面板和新快捷栏，全部UI隐藏/禁用时恢复；全局画质和输入资产保持。
+
+2026-11-17 占位UI规划入口：[最简完整占位UI执行计划](../ReviewV2_Placeholder_UI_Execution_Plan.md)。状态Proposed，尚未实施；T3相关引用允许为空，显式显示未接入并禁用提交/读取，真实会话命令继续由唯一Host执行。Mark/Review业务待T3实际交付后适配，不新增假保存或先行冻结Marker公共接口；P1–P5独立UI验收与P6真实T3联调分别记录。点击问题按用户已解决处理。
+
+2026-11-17 临时A/B切换入口（用户批准）：`ReviewIntegrationPanel.changeScheme` 只在Experience显示；通过同一Host的 `Execute(ChangeScheme,target)` 调用已实现的真实端口。当前A显示切B、当前B显示切A；`confirmScheme/cancelScheme` 是独立于Reset的确认页，明确初始世界/活动进度重置、既有反馈归属和实际保存状态。取消不发命令，Busy时不可重复切换；根据匹配requestId的OperationCompleted显示成功/失败，兼容完成事件早于Execute返回。原Prefab原位新增三个Button并保存引用，原有对象/GUID保持；作者Refresh入口仅补缺失按钮，可重复执行。正式T2菜单/联合持久化仍Integration Pending，临时入口不替代正式交付。测试结果见本轮Development Progress增量。
+
+2026-11-17 占位菜单显示增量：`Runtime/ReviewV2/ReviewIntegrationPanel.cs` 按Host快照决定页面操作与自适应布局，字号30–40、宽960、视线前0.9m；原 `Prefabs/UI/PREF_UI_ReviewV2Integration.prefab` 原位升级，不改变任何公共契约、方案资源、会话数据或场景接线。`ReviewV2Authoring.RefreshPanelPresentation()` 提供可重复的原位作者入口，BuildPanel也使用同一显示配置。仅菜单可见时临时停用当前相机FXAA，关闭/禁用恢复，其他AA模式不改。T2替换时禁用整个组件以解除输入、移动偏好订阅和临时AA处理。新增 `ReviewV2PanelPlayTests` 覆盖设置→引导→体验→暂停/偏好→取消重置→回顾往返→未保存结束，以及俯视开菜单的视野/布局/字溢出和FXAA关闭、禁用、重新启用恢复；不代替真实XR射线点击、正式T2/T3或设备验收。
+
+验证：最终源码在Unity 2022.3.62f3中执行Panel与既有Integration两组PlayMode **12/12通过**（job `b90b8847f44d4ed9a1fece09c0a00d36`，约14.13秒）；此前不含AA恢复断言的批次也是12/12，不能混为额外用例数。测试加载历史场景时仍输出已有“referenced script … is missing”警告，本轮未处理历史场景资源。运行时检查脚本、字体/FXAA对比及截图位于不入库的 `Logs/ReviewV2/ui_*`；本轮未构建Player或执行Quest Link。T1独立显示修复已验证，正式UI/持久化仍待联调。
+
+2026-11-17 接口交接文档增量：新增 [T1 接口清单与产品逻辑接入手册](../ReviewV2_T1_Interface_Reference.md)，依据当前 `feature/zh` / `ed7d549` 的源码及 A-v5/B-v8 资源核对。覆盖函数输入输出、DTO、回调时序、初始化与 T2/T3 产品流程；列明 Marker Schema、面板调用及保存恢复待确认项。仅文档交付，不变更签名、场景或既有验收状态；正式 T2/T3 联合与设备验收仍待完成。
+
 2026-11-16 B冰箱留缝增量：当前A integrated-kitchen-m2-v5、B external-fridge-m2-v8。冰箱仅向水槽横墙靠近10cm，目标净距约7.7cm，105°及碰撞规则保留；其余v7布局保持。实测最小净距0.077018m；Edit35/35、Play24/24、B收纳/完整G02 2/2分批通过，10文件重复作者一致。Windows64构建0错误/0警告及启动冒烟通过，2811保护文件不变，用户未保存B设置保留。T1 Verified — Independent / Ready for Integration，Quest Link仍待验收。见 [B_Fridge_Wall_Gap.md](B_Fridge_Wall_Gap.md)。下文为此前历史。
 
 2026-11-16 B加长板/微波炉/工具布局增量：当前A integrated-kitchen-m2-v5、B external-fridge-m2-v7。悬空板1.56m、左段下方固定微波炉；B工具按A水平布局和朝向同步，因台面低1cm相应下降，B台面形状保留。Edit35/35、Play24/24、完整料理/收纳5/5分批通过，10文件重复作者字节一致；Windows64构建0错误/0警告、默认A启动冒烟通过，2792保护文件不变。B Player交互/Quest Link仍待验收；T1 Verified — Independent / Ready for Integration。见 [B_Extended_Shelf_And_Tools.md](B_Extended_Shelf_And_Tools.md)。下文为此前历史。

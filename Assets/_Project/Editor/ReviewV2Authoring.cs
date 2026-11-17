@@ -188,9 +188,30 @@ namespace XRApartment.EditorTools
                 view.confirmReset = Button(panel, "Confirm reset", 12); view.cancelReset = Button(panel, "Cancel reset", 13);
                 view.standing = Button(panel, "Standing view", 14); view.seated = Button(panel, "Seated view", 15);
                 view.close = Button(panel, "Close menu / F8", 16);
+                view.changeScheme = Button(panel, "Change scheme", 17);
+                view.confirmScheme = Button(panel, "Confirm scheme", 18); view.cancelScheme = Button(panel, "Cancel scheme", 19);
+                ReviewPlaceholderUiAuthoring.Ensure(view);
+                view.ConfigurePresentation();
                 PrefabUtility.SaveAsPrefabAsset(root, PanelPath);
             }
             finally { Object.DestroyImmediate(root); }
+        }
+        [MenuItem("XR Apartment/Review V2/Refresh Integration Panel Presentation")]
+        public static void RefreshPanelPresentation()
+        {
+            if (Application.isPlaying) throw new InvalidOperationException("Stop Play mode before updating the panel Prefab.");
+            var root = PrefabUtility.LoadPrefabContents(PanelPath);
+            try
+            {
+                var view = root.GetComponent<ReviewIntegrationPanel>();
+                if (view.changeScheme == null) { view.changeScheme = Object.Instantiate(view.reset, view.panel.transform); view.changeScheme.name = "Change scheme"; }
+                if (view.confirmScheme == null) { view.confirmScheme = Object.Instantiate(view.confirmReset, view.panel.transform); view.confirmScheme.name = "Confirm scheme"; }
+                if (view.cancelScheme == null) { view.cancelScheme = Object.Instantiate(view.cancelReset, view.panel.transform); view.cancelScheme.name = "Cancel scheme"; }
+                ReviewPlaceholderUiAuthoring.Ensure(view);
+                view.ConfigurePresentation();
+                PrefabUtility.SaveAsPrefabAsset(root, PanelPath);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
         }
         static void EnsureFont()
         {

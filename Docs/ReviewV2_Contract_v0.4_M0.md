@@ -6,6 +6,8 @@
 
 Phase 3 唯一产品集成与验收主场景已确定为 `SCN_Kitchen_ReviewV2`。T1–T5 的文件所有权、Prefab 接入与场景更新流程见 `ReviewV2_Scene_Ownership.md`。
 
+**T2/T3 接口查阅与产品编排：** 见 [T1 接口清单与产品逻辑接入手册](ReviewV2_T1_Interface_Reference.md)（2026-11-17，当前 A-v5/B-v8）。含精确签名、字段字典、命令条件、同步/异步回执、Marker 与真实保存边界及端到端流程；本次仅补充说明，未修改公共签名或冻结 T3 Schema。
+
 ## 当前可接入契约
 
 - 会话由 `SessionController` 独占：Setup → Onboarding → Experience ↔ Review → Finished；SafeExit 到 Exited，Pause 为叠加状态。零目标可回顾和结束。
