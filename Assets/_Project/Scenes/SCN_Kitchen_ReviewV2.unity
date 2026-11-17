@@ -785,6 +785,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 86404924331022853, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
+      propertyPath: host
+      value:
+      objectReference: {fileID: 879540774}
+    - target: {fileID: 86404924331022853, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
+      propertyPath: t3Source
+      value:
+      objectReference: {fileID: 879540780}
     - target: {fileID: 1426822637215017567, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
       propertyPath: host
       value:
@@ -793,6 +801,14 @@ PrefabInstance:
       propertyPath: resetButton
       value:
       objectReference: {fileID: 570474994}
+    - target: {fileID: 2076581845137232886, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
+      propertyPath: t3Source
+      value:
+      objectReference: {fileID: 879540780}
+    - target: {fileID: 2076581845137232886, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
+      propertyPath: positionCapture
+      value:
+      objectReference: {fileID: 879540781}
     - target: {fileID: 2131182632694826505, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
       propertyPath: m_Name
       value: PREF_UI_ReviewV2Integration
@@ -846,6 +862,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
+--- !u!114 &505717535 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1426822637215017567, guid: 784b29d1a9ebcce4781b1057a05a24a9, type: 3}
+  m_PrefabInstance: {fileID: 505717534}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e1c370478eea8b48bbc9cf332d50e67, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &537126516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2312,6 +2339,10 @@ GameObject:
   - component: {fileID: 879540775}
   - component: {fileID: 879540777}
   - component: {fileID: 879540778}
+  - component: {fileID: 879540780}
+  - component: {fileID: 879540779}
+  - component: {fileID: 879540781}
+  - component: {fileID: 879540782}
   m_Layer: 0
   m_Name: ReviewV2 Session
   m_TagString: Untagged
@@ -2405,7 +2436,7 @@ MonoBehaviour:
   - {fileID: 2040717632}
   - {fileID: 935892575}
   groceries: {fileID: 879540777}
-  sessionSavePort: {fileID: 0}
+  sessionSavePort: {fileID: 879540779}
   schemePort: {fileID: 879540778}
   initialSchemeId: SCHEME_A
   modelVersion: integrated-kitchen-m2-v2
@@ -2478,6 +2509,63 @@ MonoBehaviour:
   - {fileID: 6559580821338883443, guid: 73c1812f17e971c4c8f2599148dd0160, type: 3}
   - {fileID: 7871602388241644614, guid: 047c8c8d7737c4344b57592f526fb54a, type: 3}
   initialSchemeId: SCHEME_A
+--- !u!114 &879540779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 879540773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba00fc231baf7d9469a530e802c80553, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  recorder: {fileID: 879540780}
+--- !u!114 &879540780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 879540773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b154aca54d77479f88601e7f14fe3d68, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  host: {fileID: 879540774}
+  contextEventLimit: 12
+--- !u!114 &879540781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 879540773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 569b5f89d13c81442b646ea927be3de1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  host: {fileID: 879540774}
+  panel: {fileID: 505717535}
+  rightRay: {fileID: 0}
+--- !u!114 &879540782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 879540773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722356632edb41a381bb368d4176370b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  host: {fileID: 879540774}
+  recorder: {fileID: 879540780}
+  markerPrefab: {fileID: 759469107398346832, guid: 14d693a077379ce4d9fcf13dece9f53a, type: 3}
 --- !u!114 &922705026
 MonoBehaviour:
   m_ObjectHideFlags: 0

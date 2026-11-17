@@ -17,10 +17,11 @@ namespace XRApartment.Runtime.ReviewV2
         XRBaseInteractable[] objects;
         bool blocked;
         bool busyOnly;
+        bool Capturing => host.GetComponent<ReviewFeedbackCapture>()?.IsCapturing == true;
         public bool canProcess => isActiveAndEnabled;
-        public bool Process(IXRHoverInteractor hand, IXRHoverInteractable target) => !blocked;
-        public bool Process(IXRSelectInteractor hand, IXRSelectInteractable target) => !blocked ||
-            (busyOnly && target.interactorsSelecting.Contains(hand));
+        public bool Process(IXRHoverInteractor hand, IXRHoverInteractable target) => !blocked && !Capturing;
+        public bool Process(IXRSelectInteractor hand, IXRSelectInteractable target) => (!Capturing || target.interactorsSelecting.Contains(hand)) && (!blocked ||
+            (busyOnly && target.interactorsSelecting.Contains(hand)));
         void Awake() => objects = WorldObjects();
         XRBaseInteractable[] WorldObjects() => gameObject.scene.GetRootGameObjects()
             .Concat(host.station.gameObject.scene.GetRootGameObjects()).Distinct()

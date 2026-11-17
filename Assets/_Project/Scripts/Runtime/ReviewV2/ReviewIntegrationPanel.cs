@@ -380,12 +380,12 @@ namespace XRApartment.Runtime.ReviewV2
             {
                 bool showBoard = s.Phase == SessionPhase.Review && ready && !DraftOpen;
                 reviewBoard.gameObject.SetActive(showBoard);
-                if (showBoard) reviewBoard.ShowUnavailable();
+                if (showBoard) reviewBoard.Refresh();
             }
             if (quickBar != null)
             {
                 quickBar.SetActive(isActiveAndEnabled && s.CanReview && !panel.activeSelf);
-                quickStatus.text = SchemeName(s.SchemeId) + " · 活动顺序自由 · 标记与存储待接入";
+                quickStatus.text = SchemeName(s.SchemeId) + (host.sessionSavePort != null ? " · 活动顺序自由 · Mark 记录 / Review 回顾" : " · 活动顺序自由 · 标记与存储待接入");
             }
             string title, hint;
             if (confirming) { title = "确认重置 / RESET"; hint = "物品和活动进度将恢复初始状态。\n已有反馈保留原方案归属。"; }
@@ -395,17 +395,19 @@ namespace XRApartment.Runtime.ReviewV2
             else switch (s.Phase)
             {
                 case SessionPhase.Setup: title = "初始设置 / SETUP"; hint = "选择移动方式，校准站姿或坐姿。\n完成后选择“确认设置”。"; break;
-                case SessionPhase.Onboarding: title = "操作引导 / GETTING STARTED"; hint = "探索厨房并抓取物品；Mark 记录，Review 回顾。\n体验下方有快捷入口；标记服务待接入。"; break;
+                case SessionPhase.Onboarding: title = "操作引导 / GETTING STARTED"; hint = "探索厨房并抓取物品；Mark 记录，Review 回顾。\n体验下方有任务书、标记与回顾快捷入口。"; break;
                 case SessionPhase.Experience: title = "体验菜单 / EXPERIENCE"; hint = "自由探索厨房，随时进入回顾。"; break;
                 case SessionPhase.Review: title = "体验回顾 / REVIEW"; hint = "整理体验反馈；可以继续体验或结束。"; break;
                 case SessionPhase.Finished: title = "体验结束 / FINISHED"; hint = "本次体验已结束。"; break;
                 default: title = "会话已中止 / EXITED"; hint = "本次会话已中止，未验证的数据不保证保存。"; break;
             }
-            string storage = s.SaveStatus == SaveStatus.Verified ? "保存已验证" : s.SaveStatus == SaveStatus.Pending ? "正在保存，请等待验证" :
-                s.SaveStatus == SaveStatus.Failed ? "保存失败，数据未验证" : "存储未接入，数据未保存";
+            string storage = s.SaveStatus == SaveStatus.Verified ? (s.Phase == SessionPhase.Finished ? "保存已验证" : "上次会话保存已验证") : s.SaveStatus == SaveStatus.Pending ? "正在保存，请等待验证" :
+                s.SaveStatus == SaveStatus.Failed ? "保存失败，数据未验证" : (host.sessionSavePort != null ? "存储已接入，结束或切换时验证会话" : "存储未接入，数据未保存");
+            var feedbackRecorder = host.GetComponent<SpatialFeedbackRecorder>();
+            if (feedbackRecorder != null && !feedbackRecorder.IsReady) storage = "标记读取或保存失败，请在回顾页重试";
             string scheme = SchemeName(s.SchemeId);
             string movement = host.locomotion.Mode == KitchenMovementMode.Teleport ? "传送移动" : "连续移动";
-            status.text = DraftOpen ? "<size=40><b>记录标记 / MARK</b></size>\n" + scheme + " · 备注仅试填 · F8：返回" :
+            status.text = DraftOpen ? "<size=40><b>记录标记 / MARK</b></size>\n" + scheme + (host.sessionSavePort != null ? " · F8：返回" : " · 备注仅试填 · F8：返回") :
                 showBrief ? "<size=40><b>任务书 / ACTIVITY BRIEF</b></size>\n" + scheme + " · " + storage + " · F8：菜单" +
                     (string.IsNullOrEmpty(message) ? "" : "\n<size=28><color=#FFCF70>" + message + "</color></size>") :
                 "<size=40><b>" + title + "</b></size>\n" + hint + "\n" + scheme + " · " + movement + " · F8 / 左手 Y：菜单\n" +

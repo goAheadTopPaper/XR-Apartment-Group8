@@ -28,8 +28,13 @@ namespace XRApartment.Tests
         int preference;
         GameObject extraSession;
 
+        string feedbackDirectory, previousFeedbackDirectory;
         [UnitySetUp] public IEnumerator Load()
         {
+            previousFeedbackDirectory = System.Environment.GetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY");
+            feedbackDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ReviewV2-regression-" + System.Guid.NewGuid().ToString("N"));
+            System.Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY", feedbackDirectory);
+
             hadPreference = PlayerPrefs.HasKey(KitchenLocomotionSettings.PreferenceKey);
             preference = PlayerPrefs.GetInt(KitchenLocomotionSettings.PreferenceKey);
             foreach (var root in SceneManager.GetActiveScene().GetRootGameObjects())
@@ -45,6 +50,9 @@ namespace XRApartment.Tests
 
         [UnityTearDown] public IEnumerator Cleanup()
         {
+            System.Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY", previousFeedbackDirectory);
+            if (System.IO.Directory.Exists(feedbackDirectory)) System.IO.Directory.Delete(feedbackDirectory, true);
+
             if (extraSession != null) { Object.Destroy(extraSession); yield return null; yield return null; }
             if (scene.IsValid() && scene.isLoaded) yield return SceneManager.UnloadSceneAsync(scene);
             foreach (var go in hidden) if (go != null) go.SetActive(true);
@@ -122,8 +130,8 @@ namespace XRApartment.Tests
             panel.back.onClick.Invoke(); Assert.AreEqual(visit, panel.host.Snapshot.SchemeVisitId);
             panel.SetOpen(true); panel.review.onClick.Invoke(); panel.finish.onClick.Invoke();
             Assert.AreEqual(SessionPhase.Finished, panel.host.Snapshot.Phase);
-            Assert.AreEqual(SaveStatus.NotConfigured, panel.host.Snapshot.SaveStatus);
-            StringAssert.Contains("数据未保存", panel.status.text);
+            Assert.AreEqual(SaveStatus.Verified, panel.host.Snapshot.SaveStatus);
+            StringAssert.Contains("保存已验证", panel.status.text);
             Assert.AreEqual(1, panel.panel.GetComponentsInChildren<Button>().Length);
             yield return null;
         }
@@ -217,7 +225,7 @@ namespace XRApartment.Tests
             var world = port.Current; var visit = host.Snapshot.SchemeVisitId; var session = host.Snapshot.SessionId;
             panel.changeScheme.onClick.Invoke();
             Assert.IsTrue(panel.confirmScheme.gameObject.activeSelf); Assert.IsFalse(panel.confirmReset.gameObject.activeSelf);
-            StringAssert.Contains("活动进度重置", panel.status.text); StringAssert.Contains("数据未保存", panel.status.text);
+            StringAssert.Contains("活动进度重置", panel.status.text); StringAssert.Contains("存储已接入", panel.status.text);
             Canvas.ForceUpdateCanvases(); Assert.IsFalse(panel.status.isTextOverflowing);
             panel.cancelScheme.onClick.Invoke();
             Assert.AreSame(world, port.Current); Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
@@ -226,7 +234,7 @@ namespace XRApartment.Tests
             Assert.AreEqual(SchemeIds.ExternalRefrigerator, host.Snapshot.SchemeId);
             Assert.AreEqual(port.ModelVersionFor(SchemeIds.ExternalRefrigerator), host.Snapshot.ModelVersion);
             Assert.AreNotSame(world, port.Current); Assert.AreNotEqual(visit, host.Snapshot.SchemeVisitId);
-            Assert.AreEqual(session, host.Snapshot.SessionId); Assert.AreEqual(SaveStatus.NotConfigured, host.Snapshot.SaveStatus);
+            Assert.AreEqual(session, host.Snapshot.SessionId); Assert.AreEqual(SaveStatus.Verified, host.Snapshot.SaveStatus);
             StringAssert.Contains("已切换至方案 B", panel.status.text);
             StringAssert.Contains("方案 A", panel.changeScheme.GetComponentInChildren<TMP_Text>().text);
             Assert.IsTrue(host.Snapshot.Goals.All(g => g.State == GoalState.NotStarted));
@@ -298,10 +306,10 @@ namespace XRApartment.Tests
             StringAssert.Contains("synthetic retry failure", view.status.text);
         }
 
-        [UnityTest] public IEnumerator UnconnectedFeedbackPagesSupportDraftDiscardAndZeroMarkerFinish()
+        [UnityTest] public IEnumerator ConnectedFeedbackPagesSupportDraftDiscardAndZeroMarkerFinish()
         {
-            Assert.IsNull(panel.markDraft.t3Source); Assert.IsNull(panel.reviewBoard.t3Source);
-            Assert.IsNull(panel.host.sessionSavePort);
+            Assert.IsNotNull(panel.markDraft.t3Source); Assert.IsNotNull(panel.reviewBoard.t3Source);
+            Assert.IsNotNull(panel.host.sessionSavePort);
             panel.OpenMark(); Assert.IsFalse(panel.markDraft.IsOpen);
             panel.setup.onClick.Invoke(); panel.onboarding.onClick.Invoke();
             Assert.IsTrue(panel.quickBar.activeSelf); Assert.IsFalse(panel.panel.activeSelf);
@@ -311,7 +319,7 @@ namespace XRApartment.Tests
             Assert.AreEqual(SessionPhase.Experience, panel.host.Snapshot.Phase);
             Assert.IsTrue(panel.markDraft.IsOpen); Assert.IsTrue(panel.host.locomotion.MenuOpen);
             Assert.IsFalse(panel.quickBar.activeSelf);
-            Assert.IsFalse(panel.markDraft.submit.interactable); Assert.IsFalse(panel.markDraft.capture.interactable);
+            Assert.IsFalse(panel.markDraft.submit.interactable); Assert.IsTrue(panel.markDraft.capture.interactable);
             panel.markDraft.note.text = "柜门开启后这里不方便通过。这是未保存的试填草稿。";
             panel.markDraft.cancel.onClick.Invoke();
             Assert.IsTrue(panel.markDraft.IsConfirmingDiscard); Assert.IsFalse(panel.markDraft.editor.interactable);
@@ -323,15 +331,15 @@ namespace XRApartment.Tests
             Assert.IsTrue(panel.quickBar.activeSelf); Assert.AreEqual(visit, panel.host.Snapshot.SchemeVisitId);
             panel.quickReview.onClick.Invoke();
             Assert.AreEqual(SessionPhase.Review, panel.host.Snapshot.Phase);
-            Assert.AreEqual(ReviewBoardDisplayState.NotConnected, panel.reviewBoard.State);
+            Assert.AreEqual(ReviewBoardDisplayState.Empty, panel.reviewBoard.State);
             panel.OpenMark(); Assert.IsFalse(panel.markDraft.IsOpen);
-            StringAssert.Contains("T3 未接入", panel.reviewBoard.listText.text);
-            Assert.IsFalse(panel.reviewBoard.currentScheme.interactable); Assert.IsFalse(panel.reviewBoard.allSchemes.interactable);
+            StringAssert.Contains("暂无标记", panel.reviewBoard.listText.text);
+            Assert.IsTrue(panel.reviewBoard.currentScheme.interactable); Assert.IsTrue(panel.reviewBoard.allSchemes.interactable);
             panel.back.onClick.Invoke(); Assert.AreEqual(visit, panel.host.Snapshot.SchemeVisitId);
             panel.quickReview.onClick.Invoke(); panel.finish.onClick.Invoke();
             Assert.AreEqual(SessionPhase.Finished, panel.host.Snapshot.Phase);
-            Assert.AreEqual(SaveStatus.NotConfigured, panel.host.Snapshot.SaveStatus);
-            StringAssert.Contains("数据未保存", panel.status.text);
+            Assert.AreEqual(SaveStatus.Verified, panel.host.Snapshot.SaveStatus);
+            StringAssert.Contains("保存已验证", panel.status.text);
             panel.OpenMark(); Assert.IsFalse(panel.markDraft.IsOpen);
             yield return null;
         }

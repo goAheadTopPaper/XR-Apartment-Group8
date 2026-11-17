@@ -20,8 +20,13 @@ namespace XRApartment.Tests
         ReviewSchemePort port;
         GameObject heldDriver;
         int initialHistoryCount;
+        string feedbackDirectory, previousFeedbackDirectory;
         [UnitySetUp] public IEnumerator Load()
         {
+            previousFeedbackDirectory = System.Environment.GetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY");
+            feedbackDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ReviewV2-regression-" + System.Guid.NewGuid().ToString("N"));
+            System.Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY", feedbackDirectory);
+
             scene = EditorSceneManager.LoadSceneInPlayMode("Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity", new LoadSceneParameters(LoadSceneMode.Additive));
             while (!scene.isLoaded) yield return null;
             yield return null;
@@ -36,6 +41,9 @@ namespace XRApartment.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
+            System.Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY", previousFeedbackDirectory);
+            if (System.IO.Directory.Exists(feedbackDirectory)) System.IO.Directory.Delete(feedbackDirectory, true);
+
             Time.timeScale = 1;
             if (heldDriver != null) Object.Destroy(heldDriver);
             if (scene.IsValid() && scene.isLoaded) yield return SceneManager.UnloadSceneAsync(scene);

@@ -27,8 +27,13 @@ namespace XRApartment.Tests
         GameObject handObject;
         readonly List<GameObject> hidden = new List<GameObject>();
         T[] All<T>() where T : Component => scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<T>(true)).ToArray();
+        string feedbackDirectory, previousFeedbackDirectory;
         [UnitySetUp] public IEnumerator Load()
         {
+            previousFeedbackDirectory = System.Environment.GetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY");
+            feedbackDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ReviewV2-regression-" + System.Guid.NewGuid().ToString("N"));
+            System.Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY", feedbackDirectory);
+
             foreach (var root in SceneManager.GetActiveScene().GetRootGameObjects())
                 if (root.activeSelf && (root.GetComponentInChildren<XROrigin>(true) != null || root.GetComponentInChildren<EventSystem>(true) != null || root.GetComponentInChildren<XRInteractionManager>(true) != null))
                 { hidden.Add(root); root.SetActive(false); }
@@ -38,6 +43,9 @@ namespace XRApartment.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
+            System.Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY", previousFeedbackDirectory);
+            if (System.IO.Directory.Exists(feedbackDirectory)) System.IO.Directory.Delete(feedbackDirectory, true);
+
             if (handObject != null) Object.Destroy(handObject);
             if (scene.IsValid() && scene.isLoaded) yield return SceneManager.UnloadSceneAsync(scene);
             foreach (var go in hidden) if (go != null) go.SetActive(true);
