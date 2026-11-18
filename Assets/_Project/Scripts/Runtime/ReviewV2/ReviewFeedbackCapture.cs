@@ -19,7 +19,7 @@ namespace XRApartment.Runtime.ReviewV2
             if (!host.Snapshot.CanReview || !panel.markDraft.IsOpen) return;
             if (rightRay == null) rightRay = host.locomotion.Origin.GetComponentsInChildren<NearFarInteractor>(true)
                 .FirstOrDefault(r => r.name.IndexOf("Right", StringComparison.OrdinalIgnoreCase) >= 0 || r.transform.parent.name.IndexOf("Right", StringComparison.OrdinalIgnoreCase) >= 0);
-            if (rightRay == null) { panel.markDraft.ShowMessage("右手射线不可用，请检查模拟器。"); return; }
+            if (rightRay == null) { panel.markDraft.ShowMessage("Right-hand ray unavailable. Check the simulator."); return; }
             armed = false; completing = false; releasedFrame = 0; IsCapturing = true;
             panel.panel.GetComponent<Canvas>().enabled = false;
             panel.markDraft.note.DeactivateInputField();
@@ -38,7 +38,7 @@ namespace XRApartment.Runtime.ReviewV2
             if (panel.quickBar == null) return;
             foreach (var b in new[] { panel.quickBrief, panel.quickMark, panel.quickReview, panel.quickMenu }) if (b != null) b.gameObject.SetActive(!show);
             panel.quickBar.SetActive(show);
-            if (show) panel.quickStatus.text = "指向厨房，松开后再按右扳机确认；F8取消";
+            if (show) panel.quickStatus.text = "Point at the kitchen. Release, then press the right trigger to confirm. U: Cancel";
         }
         void Update()
         {

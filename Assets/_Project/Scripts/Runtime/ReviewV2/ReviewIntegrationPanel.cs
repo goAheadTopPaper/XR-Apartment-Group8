@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.UI;
@@ -26,6 +27,14 @@ namespace XRApartment.Runtime.ReviewV2
         public ReviewPlaceholderBoardView reviewBoard;
         public Button brief, quickBrief, briefBack;
         public ReviewActivityBriefView activityBrief;
+        [SerializeField] bool openOnStart = true;
+        [SerializeField] private bool deferSetupAndOnboardingToT2 = false;
+        [SerializeField] bool useT2ExperienceMenu;
+        [SerializeField] UI.ReviewGlobalMenuView t2Menu;
+        [SerializeField] UI.ReviewV2UiController experienceUi;
+        ReviewWorldInteractionGate worldGate;
+        double lastToggleTime = double.NegativeInfinity;
+        bool T2Visible => useT2ExperienceMenu && experienceUi != null && experienceUi.AnyPanelVisible;
         InputAction toggle;
         Button[] buttons;
         HDAdditionalCameraData menuCamera;
@@ -37,6 +46,7 @@ namespace XRApartment.Runtime.ReviewV2
         string message = "";
         void Awake()
         {
+            worldGate = host.GetComponent<ReviewWorldInteractionGate>();
             ConfigurePresentation();
             setup.onClick.AddListener(() => Send(CommandType.CompleteSetup));
             onboarding.onClick.AddListener(() => Send(CommandType.CompleteOnboarding));
@@ -67,7 +77,7 @@ namespace XRApartment.Runtime.ReviewV2
             if (briefBack != null) briefBack.onClick.AddListener(() => SetOpen(false));
             if (markDraft != null) markDraft.Closed += DraftClosed;
             toggle = new InputAction("V2 menu", InputActionType.Button);
-            toggle.AddBinding("<Keyboard>/f8"); toggle.AddBinding("<XRController>{LeftHand}/secondaryButton");
+            toggle.AddBinding("<Keyboard>/u"); toggle.AddBinding("<XRController>{LeftHand}/secondaryButton");
             toggle.AddBinding("<XRController>{LeftHand}/menuButton"); toggle.performed += Toggle;
         }
         void Start()
@@ -82,10 +92,11 @@ namespace XRApartment.Runtime.ReviewV2
                 quickBar.transform.localPosition = new Vector3(0, -.22f, .9f);
                 quickBar.transform.localRotation = Quaternion.identity;
             }
-            SetOpen(true);
+            SetOpen(openOnStart);
         }
         void OnEnable()
         {
+            if (experienceUi != null) experienceUi.VisibilityChanged += ExperienceVisibilityChanged;
             toggle.Enable(); host.Changed += Render; host.OperationCompleted += Completed;
             host.locomotion.Changed += MovementChanged;
             if (resetButton != null) resetButton.selectEntered.AddListener(ResetSelected);
@@ -93,6 +104,8 @@ namespace XRApartment.Runtime.ReviewV2
         }
         void OnDisable()
         {
+            if (experienceUi != null) experienceUi.VisibilityChanged -= ExperienceVisibilityChanged;
+            if (worldGate != null) worldGate.SetExternalMenuBlocked(false);
             restoreOpen = panel.activeSelf;
             if (markDraft != null) markDraft.Invalidate();
             briefRequested = false;
@@ -111,7 +124,26 @@ namespace XRApartment.Runtime.ReviewV2
             if (quickBar != null && quickBar.transform.parent != transform) Destroy(quickBar);
             toggle.performed -= Toggle; toggle.Dispose();
         }
-        void Toggle(InputAction.CallbackContext _) => SetOpen(!panel.activeSelf);
+        void Toggle(InputAction.CallbackContext context)
+        {
+            if (context.time - lastToggleTime < .1) return;
+            lastToggleTime = context.time;
+            ToggleMenuInput();
+        }
+        public void ToggleMenuInput()
+        {
+            if (useT2ExperienceMenu && host.Snapshot.Phase == SessionPhase.Experience)
+            {
+                if (DraftOpen) { SetOpen(false); return; }
+                if (confirming || schemeConfirmation != null || t2Menu == null) return;
+                if (T2Visible) t2Menu.Close();
+                else { HideMenuForT2(); t2Menu.TryOpen(); }
+                ApplyMovement(host.Snapshot);
+                return;
+            }
+            SetOpen(!panel.activeSelf);
+        }
+        void ExperienceVisibilityChanged() => ApplyMovement(host.Snapshot);
         void ResetSelected(SelectEnterEventArgs _) => AskReset();
         void AskReset()
         {
@@ -169,8 +201,42 @@ namespace XRApartment.Runtime.ReviewV2
             }
             message = result.Message; Render(host.Snapshot);
         }
+        bool DefersToT2(SessionSnapshot snapshot) => deferSetupAndOnboardingToT2 &&
+            (snapshot.Phase == SessionPhase.Setup || snapshot.Phase == SessionPhase.Onboarding);
+
+        public void RequestReviewFromT2()
+        {
+            if (!isActiveAndEnabled || host.Snapshot.Phase != SessionPhase.Experience) return;
+            if (DraftOpen && !markDraft.RequestClose()) return;
+            Send(CommandType.Review);
+        }
+        public bool PrepareT2DestructiveAction(out string reason)
+        {
+            reason = "";
+            if (markDraft == null)
+            { reason = "Marker draft protection is unavailable. Operation blocked."; return false; }
+            if (markDraft.IsOpen || markDraft.HasDraft ||
+                (markDraft.positionCapture != null && markDraft.positionCapture.IsCapturing))
+            {
+                if (T2Visible) t2Menu.Close();
+                if (markDraft.IsOpen) SetMenuVisible(true);
+                markDraft.RequestClose();
+                reason = "Resolve the Mark draft, then request this operation again.";
+                return false;
+            }
+            var recorder = host != null ? host.GetComponent<SpatialFeedbackRecorder>() : null;
+            if (recorder == null || !recorder.IsReady)
+            { reason = "Marker storage is unavailable. Check Review before proceeding."; return false; }
+            foreach (var record in recorder.Records)
+                if (record.saveStatus != XRApartment.Data.ReviewV2.FeedbackSaveStatus.Verified)
+                { reason = "An unverified marker is retained in memory. Retry saving in Review before proceeding."; return false; }
+            return true;
+        }
         void Send(CommandType command)
         {
+            if ((command == CommandType.CompleteSetup || command == CommandType.CompleteOnboarding) &&
+                deferSetupAndOnboardingToT2 && DefersToT2(host.Snapshot)) return;
+
             var result = host.Execute(command); message = result.Accepted ? "" : result.Reason;
             if (result.Accepted && command == CommandType.Review) SetMenuVisible(true);
             if (result.Accepted && (command == CommandType.Recenter || command == CommandType.CalibrateStanding || command == CommandType.CalibrateSeated)) SetOpen(true);
@@ -179,6 +245,9 @@ namespace XRApartment.Runtime.ReviewV2
         }
         public void SetOpen(bool open)
         {
+            if (open && useT2ExperienceMenu && host.Snapshot.Phase == SessionPhase.Experience)
+            { if (!DraftOpen && t2Menu != null) t2Menu.TryOpen(); return; }
+            if (open && deferSetupAndOnboardingToT2 && DefersToT2(host.Snapshot)) return;
             if (DraftOpen && !markDraft.RequestClose()) return;
             if (!open) briefRequested = false;
             SetMenuVisible(open);
@@ -194,17 +263,29 @@ namespace XRApartment.Runtime.ReviewV2
         {
             var s = host.Snapshot;
             if (!isActiveAndEnabled || !s.CanReview || confirming || schemeConfirmation != null || markDraft == null || DraftOpen) return;
-            briefRequested = false; message = ""; SetMenuVisible(true); markDraft.Open(s); Render(s);
+            if (T2Visible) t2Menu.Close();
+            briefRequested = false; message = "";
+            if (useT2ExperienceMenu) { markDraft.Open(s); SetMenuVisible(true); }
+            else { SetMenuVisible(true); markDraft.Open(s); }
+            Render(s);
         }
         void DraftClosed() => SetMenuVisible(false);
         void SetMenuVisible(bool open)
         {
+            if (open && deferSetupAndOnboardingToT2 && DefersToT2(host.Snapshot)) return;
             if (!open) schemeConfirmation = null;
             panel.SetActive(open);
             if (open)
             {
                 var camera = host.locomotion.Origin.Camera.transform;
                 panel.transform.SetPositionAndRotation(camera.position + camera.forward * .9f, camera.rotation);
+                if (useT2ExperienceMenu && host.Snapshot.Phase == SessionPhase.Review)
+                {
+                    var forward = Vector3.ProjectOnPlane(camera.forward, Vector3.up).normalized;
+                    if (forward.sqrMagnitude < .01f) forward = Vector3.forward;
+                    panel.transform.SetPositionAndRotation(camera.position + forward * .9f + Vector3.up * .19f,
+                        Quaternion.LookRotation(forward, Vector3.up));
+                }
                 menuCamera = camera.GetComponent<HDAdditionalCameraData>();
                 // FXAA smears the thin world-space TMP glyphs. Limit the bypass to this menu;
                 // retain every other camera/quality setting and restore FXAA when it closes.
@@ -243,7 +324,7 @@ namespace XRApartment.Runtime.ReviewV2
             status.fontSize = 30; status.alignment = TextAlignmentOptions.TopLeft;
             status.richText = true;
             SetLabel(setup, "确认设置 / Next"); SetLabel(onboarding, "开始体验 / Start");
-            SetLabel(review, "进入回顾 / Review"); SetLabel(back, "继续体验 / Continue");
+            SetLabel(review, "Review"); SetLabel(back, "Continue Exploring");
             SetLabel(finish, "结束体验 / Finish"); SetLabel(exit, "中止会话 / Exit");
             SetLabel(pause, "暂停与设置 / Pause"); SetLabel(resume, "恢复体验 / Resume");
             SetLabel(teleport, "传送移动 / Teleport"); SetLabel(smooth, "连续移动 / Smooth");
@@ -252,7 +333,7 @@ namespace XRApartment.Runtime.ReviewV2
             SetLabel(confirmReset, "确认重置 / Confirm"); SetLabel(cancelReset, "取消 / Cancel");
             SetLabel(close, "关闭菜单 / Close");
             SetLabel(changeScheme, "切换方案 / Switch"); SetLabel(confirmScheme, "确认切换 / Confirm"); SetLabel(cancelScheme, "取消 / Cancel");
-            SetLabel(mark, "记录标记 / Mark");
+            SetLabel(mark, "Mark");
             SetLabel(brief, "任务书 / Activities"); SetLabel(briefBack, "返回体验 / Back");
             foreach (var button in buttons) Show(button, button == setup || button == teleport || button == smooth ||
                 button == standing || button == seated || button == recenter || button == exit || button == close);
@@ -271,7 +352,7 @@ namespace XRApartment.Runtime.ReviewV2
                 }
             }
             if (quickStatus != null) quickStatus.rectTransform.sizeDelta = new Vector2(884, 44);
-            status.text = "<size=40><b>初始设置 / SETUP</b></size>\n选择移动方式，校准站姿或坐姿。\n完成后选择“确认设置”。\nF8 / 左手 Y：菜单\n<color=#FFCF70>存储未接入，数据未保存</color>";
+            status.text = "<size=40><b>初始设置 / SETUP</b></size>\n选择移动方式，校准站姿或坐姿。\n完成后选择“确认设置”。\nU / 左手 Y：菜单\n<color=#FFCF70>存储未接入，数据未保存</color>";
             LayoutButtons();
         }
         static void SetLabel(Button button, string text)
@@ -289,7 +370,8 @@ namespace XRApartment.Runtime.ReviewV2
         {
             int count = 0;
             foreach (var button in buttons) if (button != null && button.gameObject.activeSelf) count++;
-            bool board = reviewBoard != null && reviewBoard.gameObject.activeSelf;
+            bool board = reviewBoard != null && (reviewBoard.gameObject.activeSelf ||
+                (useT2ExperienceMenu && host.Snapshot.Phase == SessionPhase.Review && !DraftOpen));
             bool briefVisible = activityBrief != null && activityBrief.gameObject.activeSelf;
             float briefNotice = briefVisible && !string.IsNullOrEmpty(message) ? 64 : 0;
             float height = DraftOpen ? 662 : (briefVisible ? 620 + briefNotice : board ? 550 : 290) + ((count + 1) / 2) * 82;
@@ -323,26 +405,47 @@ namespace XRApartment.Runtime.ReviewV2
                 { menuCamera.antialiasing = HDAdditionalCameraData.AntialiasingMode.None; suspendedFxaa = true; }
             }
             else if (!uiVisible) RestoreAntialiasing();
-            host.locomotion.SetMenuOpen(panel.activeSelf || snapshot.IsPaused || snapshot.IsBusy ||
+            if (worldGate != null) worldGate.SetExternalMenuBlocked(useT2ExperienceMenu && (T2Visible || panel.activeSelf));
+            host.locomotion.SetMenuOpen(T2Visible || panel.activeSelf || snapshot.IsPaused || snapshot.IsBusy ||
                 snapshot.Phase == SessionPhase.Finished || snapshot.Phase == SessionPhase.Exited);
         }
+        void HideMenuForT2()
+        {
+            var eventSystem = EventSystem.current;
+            var selected = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
+            if (selected != null && (selected == panel || selected.transform.IsChildOf(panel.transform)))
+                eventSystem.SetSelectedGameObject(null);
+
+            // The draft lives under the panel. Hide its parent without discarding the draft.
+            if (DraftOpen) markDraft.positionCapture?.Cancel();
+            panel.SetActive(false);
+            confirming = briefRequested = false;
+            schemeConfirmation = null;
+            message = "";
+            RestoreAntialiasing();
+        }
+
         void Render(SessionSnapshot s)
         {
+            if (useT2ExperienceMenu && s.Phase != SessionPhase.Experience && T2Visible) experienceUi.HideAll();
+            bool deferredToT2 = DefersToT2(s);
+            if (useT2ExperienceMenu && s.Phase == SessionPhase.Experience && !DraftOpen && panel.activeSelf) HideMenuForT2();
+            if (deferredToT2 && panel.activeSelf) HideMenuForT2();
             bool ready = !s.IsPaused && !s.IsBusy;
             bool terminal = s.Phase == SessionPhase.Finished || s.Phase == SessionPhase.Exited;
-            if (DraftOpen && (!s.CanReview || !markDraft.Matches(s)))
+            if (!deferredToT2 && DraftOpen && (!s.CanReview || !markDraft.Matches(s)))
             {
-                markDraft.Invalidate(); message = "上下文已变化，草稿已清除；未提交、未保存。";
+                markDraft.Invalidate(); message = "Context changed. Draft cleared; not submitted or saved.";
             }
             if (!ready || s.Phase != SessionPhase.Experience) confirming = false;
             if (!ready || s.Phase != SessionPhase.Experience || confirmationVisit != s.SchemeVisitId) schemeConfirmation = null;
             bool confirmation = confirming || schemeConfirmation != null;
             if (!s.CanReview || confirmation) briefRequested = false;
-            bool showBrief = activityBrief != null && ready && !DraftOpen &&
+            bool showBrief = !deferredToT2 && activityBrief != null && ready && !DraftOpen &&
                 (s.Phase == SessionPhase.Onboarding || (s.Phase == SessionPhase.Experience && briefRequested));
             bool settings = !terminal && !s.IsBusy && !confirmation && (s.Phase == SessionPhase.Setup || s.IsPaused);
-            Show(setup, ready && s.Phase == SessionPhase.Setup);
-            Show(onboarding, ready && s.Phase == SessionPhase.Onboarding);
+            Show(setup, !deferredToT2 && ready && s.Phase == SessionPhase.Setup);
+            Show(onboarding, !deferredToT2 && ready && s.Phase == SessionPhase.Onboarding);
             Show(review, s.CanReview && !confirmation);
             Show(mark, s.CanReview && !confirmation && markDraft != null);
             Show(brief, s.CanReview && !confirmation && activityBrief != null);
@@ -384,7 +487,7 @@ namespace XRApartment.Runtime.ReviewV2
             }
             if (quickBar != null)
             {
-                quickBar.SetActive(isActiveAndEnabled && s.CanReview && !panel.activeSelf);
+                quickBar.SetActive(!useT2ExperienceMenu && isActiveAndEnabled && s.CanReview && !panel.activeSelf);
                 quickStatus.text = SchemeName(s.SchemeId) + (host.sessionSavePort != null ? " · 活动顺序自由 · Mark 记录 / Review 回顾" : " · 活动顺序自由 · 标记与存储待接入");
             }
             string title, hint;
@@ -407,13 +510,29 @@ namespace XRApartment.Runtime.ReviewV2
             if (feedbackRecorder != null && !feedbackRecorder.IsReady) storage = "标记读取或保存失败，请在回顾页重试";
             string scheme = SchemeName(s.SchemeId);
             string movement = host.locomotion.Mode == KitchenMovementMode.Teleport ? "传送移动" : "连续移动";
-            status.text = DraftOpen ? "<size=40><b>记录标记 / MARK</b></size>\n" + scheme + (host.sessionSavePort != null ? " · F8：返回" : " · 备注仅试填 · F8：返回") :
-                showBrief ? "<size=40><b>任务书 / ACTIVITY BRIEF</b></size>\n" + scheme + " · " + storage + " · F8：菜单" +
+            status.text = DraftOpen ? "<size=40><b>记录标记 / MARK</b></size>\n" + scheme + (host.sessionSavePort != null ? " · U：返回" : " · 备注仅试填 · U：返回") :
+                showBrief ? "<size=40><b>任务书 / ACTIVITY BRIEF</b></size>\n" + scheme + " · " + storage + " · U：菜单" +
                     (string.IsNullOrEmpty(message) ? "" : "\n<size=28><color=#FFCF70>" + message + "</color></size>") :
-                "<size=40><b>" + title + "</b></size>\n" + hint + "\n" + scheme + " · " + movement + " · F8 / 左手 Y：菜单\n" +
+                "<size=40><b>" + title + "</b></size>\n" + hint + "\n" + scheme + " · " + movement + " · U / 左手 Y：菜单\n" +
                 "<color=#FFCF70>" + storage + "</color>" + (string.IsNullOrEmpty(message) ? "" : "\n<size=28>" + message + "</size>");
-            setup.interactable = ready && s.Phase == SessionPhase.Setup;
-            onboarding.interactable = ready && s.Phase == SessionPhase.Onboarding;
+            setup.interactable = !deferredToT2 && ready && s.Phase == SessionPhase.Setup;
+            if (DraftOpen || s.Phase == SessionPhase.Review)
+            {
+                string englishScheme = s.SchemeId == SchemeIds.IntegratedKitchen ? "Scheme A" :
+                    s.SchemeId == SchemeIds.ExternalRefrigerator ? "Scheme B" : s.SchemeId;
+                string save = s.SaveStatus == SaveStatus.Verified ? "Last save verified." :
+                    s.SaveStatus == SaveStatus.Pending ? "Saving; verification pending." :
+                    s.SaveStatus == SaveStatus.Failed ? "Save failed; data not verified." :
+                    host.sessionSavePort != null ? "Storage connected; verified on finish or switch." : "Storage unavailable; data not saved.";
+                if (feedbackRecorder != null && !feedbackRecorder.IsReady) save = "Marker read or save failed. Retry from Review.";
+                status.text = DraftOpen ? "<size=40><b>MARK</b></size>\n" + englishScheme + " · U: Back" :
+                    "<size=40><b>REVIEW</b></size>\nReview your feedback. Continue exploring or finish.\n" +
+                    englishScheme + " · " + (host.locomotion.Mode == KitchenMovementMode.Teleport ? "Teleport" : "Smooth Movement") +
+                    " · U: Menu\n<color=#FFCF70>" + save + "</color>";
+                SetLabel(finish, "Finish Experience");
+                if (!string.IsNullOrEmpty(message)) status.text += "\n<size=28>" + message + "</size>";
+            }
+            onboarding.interactable = !deferredToT2 && ready && s.Phase == SessionPhase.Onboarding;
             review.interactable = s.CanReview;
             back.interactable = finish.interactable = ready && s.Phase == SessionPhase.Review;
             reset.interactable = ready && s.Phase == SessionPhase.Experience;
@@ -421,6 +540,11 @@ namespace XRApartment.Runtime.ReviewV2
             standing.interactable = seated.interactable = recenter.interactable = !terminal && !s.IsBusy;
             pause.interactable = ready && !terminal; resume.interactable = s.IsPaused && !s.IsBusy;
             exit.interactable = !terminal;
+            if (useT2ExperienceMenu)
+            {
+                foreach (var button in buttons) if (button != back && button != finish) Show(button, false);
+                if (s.Phase != SessionPhase.Review || DraftOpen) { Show(back, false); Show(finish, false); }
+            }
             LayoutButtons();
             ApplyMovement(s);
         }

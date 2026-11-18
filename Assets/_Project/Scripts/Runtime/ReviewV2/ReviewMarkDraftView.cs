@@ -44,13 +44,13 @@ namespace XRApartment.Runtime.ReviewV2
             bool connected = positive != null;
             var heading = (RectTransform)editor.transform.Find("Note heading");
             heading.anchoredPosition = new Vector2(0, connected ? -164 : -100); heading.sizeDelta = new Vector2(884, 48);
-            heading.GetComponent<TMP_Text>().text = connected ? "备注（可选，最多 2000 字）" : "备注（可试填，最多 2000 字）";
+            heading.GetComponent<TMP_Text>().text = connected ? "Note (optional, up to 2000 characters)" : "Note (preview, up to 2000 characters)";
             var input = (RectTransform)note.transform;
             input.anchoredPosition = new Vector2(0, connected ? -220 : -156); input.sizeDelta = new Vector2(884, connected ? 166 : 230);
             note.targetGraphic.color = new Color(.1f, .19f, .26f, 1);
             note.textViewport.sizeDelta = input.sizeDelta - new Vector2(32, 24);
             note.textComponent.rectTransform.sizeDelta = note.textViewport.sizeDelta; ((RectTransform)note.placeholder.transform).sizeDelta = note.textViewport.sizeDelta;
-            if (connected) ((TMP_Text)note.placeholder).text = "记录厨房体验中的感受、问题或建议…";
+            if (connected) ((TMP_Text)note.placeholder).text = "Describe your experience, concerns or suggestions...";
             foreach (var button in new[] { capture, submit, cancel }) { var r = (RectTransform)button.transform; r.anchoredPosition = new Vector2(r.anchoredPosition.x, -406); }
             note.textComponent.fontSize = 30; note.textComponent.alignment = TextAlignmentOptions.TopLeft;
             note.textComponent.overflowMode = TextOverflowModes.Overflow; note.textComponent.richText = note.richText = false;
@@ -64,7 +64,7 @@ namespace XRApartment.Runtime.ReviewV2
                 var label = b.GetComponentInChildren<TMP_Text>(true); label.fontSize = 28;
                 label.rectTransform.offsetMin = new Vector2(8, 4); label.rectTransform.offsetMax = new Vector2(-8, -4);
             }
-            SetLabel(capture, connected ? "捕捉位置" : "位置待接入"); SetLabel(submit, connected ? "提交标记" : "提交待接入");
+            SetLabel(capture, connected ? "Capture Position" : "Position Unavailable"); SetLabel(submit, connected ? "Submit Marker" : "Submit Unavailable");
             capture.interactable = submit.interactable = false;
         }
         public void Open(SessionSnapshot context)
@@ -72,26 +72,26 @@ namespace XRApartment.Runtime.ReviewV2
             Initialize(); session = context.SessionId; visit = context.SchemeVisitId; scheme = context.SchemeId; model = context.ModelVersion;
             markerId = objectId = null; hasPosition = saved = false; feedbackType = FeedbackType.Discuss;
             note.SetTextWithoutNotify(""); note.readOnly = false; ConfirmDiscard(false); gameObject.SetActive(true);
-            Refresh("先选择类型，再捕捉厨房中的位置。\n尚未提交、未保存。");
+            Refresh("Select a type, then capture a location.\nNot submitted or saved.");
         }
         public void SetCapturedPoint(Vector3 worldPoint, string stableObjectId)
         {
             if (positionCapture == null || !Matches(positionCapture.host.Snapshot)) return;
             point = worldPoint; objectId = stableObjectId; hasPosition = true;
-            Refresh("位置：" + (objectId ?? "世界坐标") + "\n填写备注后提交，尚未保存。");
+            Refresh("Location: " + (objectId ?? "World Position") + "\nAdd an optional note, then submit. Not saved yet.");
         }
         void SelectType(FeedbackType type) { if (markerId == null) { feedbackType = type; Refresh(null); } }
-        public static string TypeName(FeedbackType type) => type == FeedbackType.Positive ? "正面 +" : type == FeedbackType.Concern ? "担忧 !" : "待讨论 ?";
+        public static string TypeName(FeedbackType type) => type == FeedbackType.Positive ? "Positive +" : type == FeedbackType.Concern ? "Concern !" : "Discuss ?";
         public void ShowMessage(string message) => Refresh(message);
         void Refresh(string message)
         {
             bool ready = Recorder != null && Recorder.IsReady;
-            if (Recorder == null) message = t3Source == null ? "标记服务未接入 · 捕捉和提交暂不可用\n界面草稿，未提交、未保存" : "T3 组件已配置，待接口适配 · 提交暂不可用\n界面草稿，未提交、未保存";
-            else if (!ready) message = "保存或读取失败，可重试；数据尚未验证。\n" + Short(Recorder.Error);
+            if (Recorder == null) message = t3Source == null ? "Marker service unavailable. Capture and submit disabled.\nDraft only; not submitted or saved." : "T3 configured; integration pending. Submit unavailable.\nDraft only; not submitted or saved.";
+            else if (!ready) message = "Read or save failed. Retry; data is not verified.\n" + Short(Recorder.Error);
             if (message != null) availability.text = message;
             capture.interactable = ready && !saved && markerId == null && positionCapture != null;
             submit.interactable = !saved && Recorder != null && ((ready && hasPosition) || markerId != null);
-            SetLabel(submit, markerId != null && !saved ? "重试保存" : "提交标记");
+            SetLabel(submit, markerId != null && !saved ? "Retry Save" : "Submit Marker");
             foreach (var button in new[] { positive, concern, discuss })
                 if (button != null) { button.interactable = !saved && markerId == null; button.GetComponent<UnityEngine.UI.Image>().color =
                     (button == positive && feedbackType == FeedbackType.Positive) || (button == concern && feedbackType == FeedbackType.Concern) || (button == discuss && feedbackType == FeedbackType.Discuss)
@@ -110,17 +110,17 @@ namespace XRApartment.Runtime.ReviewV2
                 }
                 else saved = Recorder.AddExplanation(markerId, note.text, "");
                 note.readOnly = saved;
-                Refresh(saved ? TypeName(feedbackType) + " · 已提交并读回验证\n位置：" + (objectId ?? "世界坐标") : "保存失败，保留同一标记；请重试。");
+                Refresh(saved ? TypeName(feedbackType) + " · Submitted and verified\nLocation: " + (objectId ?? "World Position") : "Save failed. The same marker is retained; retry.");
             }
-            catch (Exception ex) { Refresh("提交失败：" + Short(ex.Message)); }
+            catch (Exception ex) { Refresh("Submit failed: " + Short(ex.Message)); }
         }
-        static string Short(string s) => string.IsNullOrEmpty(s) ? "请检查存储路径。" : s.Length > 65 ? s.Substring(0, 65) + "…" : s;
+        static string Short(string s) => string.IsNullOrEmpty(s) ? "Check the storage path." : s.Length > 65 ? s.Substring(0, 65) + "…" : s;
         static void SetLabel(Button button, string text) => button.GetComponentInChildren<TMP_Text>(true).text = text;
         public bool Matches(SessionSnapshot context) => session == context.SessionId && visit == context.SchemeVisitId && scheme == context.SchemeId && model == context.ModelVersion;
         public bool RequestClose()
         {
             if (positionCapture != null && positionCapture.IsCapturing) { positionCapture.Cancel(); return false; }
-            if (HasDraft) { discardMessage.text = markerId == null ? "丢弃未提交的草稿？\n\n备注和位置尚未提交，也没有保存。" : "离开未保存的标记？\n\n该标记仍保留在本次内存中，可在回顾页重试保存。"; ConfirmDiscard(true); return false; }
+            if (HasDraft) { discardMessage.text = markerId == null ? "Discard draft?\nNote and location: not submitted or saved." : "Leave unsaved marker?\nKept in memory. Retry saving from Review."; ConfirmDiscard(true); return false; }
             Close(); return true;
         }
         void ConfirmDiscard(bool show) { discardPrompt.SetActive(show); editor.interactable = editor.blocksRaycasts = !show; if (show) note.DeactivateInputField(); }

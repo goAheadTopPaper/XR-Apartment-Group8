@@ -420,6 +420,36 @@ namespace XRApartment.Tests
             Assert.IsEmpty(feedback.text);
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void UnavailableDraftProtectionBlocksOpeningConfirmation(bool resetAction)
+        {
+            var holder = Child("Unavailable T3 bridge", root.transform);
+            holder.SetActive(false);
+            var bridge = holder.AddComponent<XRApartment.Runtime.ReviewV2.ReviewIntegrationPanel>();
+            Field(view, "reviewIntegration", bridge);
+            Open();
+            (resetAction ? reset : exit).onClick.Invoke();
+            Assert.IsFalse(modal.activeSelf);
+            Assert.IsEmpty(session.Commands);
+            StringAssert.Contains("protection is unavailable", feedback.text);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void DraftProtectionIsRecheckedAtFinalConfirm(bool resetAction)
+        {
+            Open();
+            (resetAction ? reset : exit).onClick.Invoke();
+            Assert.IsTrue(modal.activeSelf);
+            var holder = Child("Late unavailable T3 bridge", root.transform);
+            holder.SetActive(false);
+            Field(view, "reviewIntegration", holder.AddComponent<XRApartment.Runtime.ReviewV2.ReviewIntegrationPanel>());
+            confirm.onClick.Invoke();
+            Assert.IsFalse(modal.activeSelf);
+            Assert.IsEmpty(session.Commands);
+        }
+
         void Open() => Assert.IsTrue(view.TryOpen());
 
         void AskReset()

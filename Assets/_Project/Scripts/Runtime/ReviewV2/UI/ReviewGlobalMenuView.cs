@@ -16,6 +16,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
         [SerializeField] ReviewV2UiSessionAdapter session;
         [SerializeField] ReviewV2UiController uiController;
         [SerializeField] ReviewTaskBookView taskBook;
+        [SerializeField] ReviewIntegrationPanel reviewIntegration;
         [SerializeField] GameObject panel, taskBookPanel, helpPanel, confirmationPanel;
         [SerializeField] CanvasGroup menuBody;
         [SerializeField] Button taskBookButton, helpButton, reviewButton, switchSchemeButton;
@@ -194,7 +195,12 @@ namespace XRApartment.Runtime.ReviewV2.UI
             }
         }
 
-        void Review() => Send(CommandType.Review);
+        void Review()
+        {
+            if (!CanUseMenu()) return;
+            if (reviewIntegration != null) reviewIntegration.RequestReviewFromT2();
+            else Send(CommandType.Review);
+        }
         void Recenter() => Send(CommandType.Recenter);
         void PauseOrResume()
         {
@@ -207,6 +213,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
         void AskConfirmation(CommandType action)
         {
             if (!CanUseMenu() || !AllowCommand(ReadSnapshot(), action)) return;
+            if (!CheckDraftProtection()) return;
             bool reset = action == CommandType.ResetWorld;
             confirmation = action;
             SetText(confirmationTitle, reset ? "Reset current world?" : "Leave the experience?");
@@ -228,7 +235,16 @@ namespace XRApartment.Runtime.ReviewV2.UI
             if (!IsOpen || !confirmation.HasValue) return;
             var action = confirmation.Value;
             DismissConfirmation(true);
+            if (!CheckDraftProtection()) return;
             Send(action);
+        }
+        bool CheckDraftProtection()
+        {
+            if (reviewIntegration == null) return true; // Independent UI fixtures have no T3 scene bridge.
+            string reason;
+            if (reviewIntegration.PrepareT2DestructiveAction(out reason)) return true;
+            SetFeedback(reason);
+            return false;
         }
 
         void DismissConfirmation(bool restoreFocus)

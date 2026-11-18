@@ -38,11 +38,13 @@ namespace XRApartment.Runtime.ReviewV2
                 ((RectTransform)filter.transform).sizeDelta = new Vector2(206, 52);
                 var label = filter.GetComponentInChildren<TMP_Text>(true); label.fontSize = 28; label.rectTransform.sizeDelta = new Vector2(186, 44);
             }
-            if (retry != null) retry.GetComponentInChildren<TMP_Text>(true).text = "重试 / Retry";
+            if (retry != null) retry.GetComponentInChildren<TMP_Text>(true).text = "Retry";
+            // The English label otherwise wraps beyond its existing 186 x 44 text rect.
+            if (currentScheme != null) currentScheme.GetComponentInChildren<TMP_Text>(true).fontSize = 24;
             if (rowTemplate != null) rowTemplate.GetComponentInChildren<TMP_Text>(true).fontSize = 28;
             foreach (var text in new[] { listText, detailText }) { text.fontSize = 30; text.alignment = TextAlignmentOptions.TopLeft; text.overflowMode = TextOverflowModes.Overflow; text.richText = false; }
         }
-        public void ShowUnavailable() => Present(ReviewBoardDisplayState.NotConnected, t3Source == null ? "T3 未接入\n暂不能读取标记" : "T3 组件已配置\n待完成接口适配", "标记详情\n\n当前没有加载反馈数据。");
+        public void ShowUnavailable() => Present(ReviewBoardDisplayState.NotConnected, t3Source == null ? "T3 unavailable\nMarkers cannot be loaded." : "T3 configured\nIntegration pending.", "Marker Details\n\nNo feedback data loaded.");
         public void Refresh()
         {
             if (!isActiveAndEnabled) return;
@@ -50,12 +52,12 @@ namespace XRApartment.Runtime.ReviewV2
             if (Recorder == null || host == null || rowTemplate == null) { ShowUnavailable(); return; }
             currentScheme.interactable = allSchemes.interactable = true;
             if (retry != null) retry.gameObject.SetActive(!Recorder.IsReady);
-            if (!Recorder.IsReady) { Present(ReviewBoardDisplayState.Failed, "标记读取或保存失败\n点击重试，保留原数据。", Recorder.Error); EnableFilters(); return; }
+            if (!Recorder.IsReady) { Present(ReviewBoardDisplayState.Failed, "Marker read or save failed.\nRetry; existing data is retained.", Recorder.Error); EnableFilters(); return; }
             var s = host.Snapshot;
             var records = Recorder.Records.Where(r => r.sessionId == s.SessionId && (all || r.schemeId == s.SchemeId)).OrderByDescending(r => r.timestampUtcMilliseconds).ToArray();
             State = records.Length == 0 ? ReviewBoardDisplayState.Empty : ReviewBoardDisplayState.Ready;
-            listText.gameObject.SetActive(records.Length == 0); listText.text = "暂无标记";
-            if (records.Length == 0) { detailText.text = "标记详情\n\n本次会话尚无符合筛选条件的记录。"; selected = null; }
+            listText.gameObject.SetActive(records.Length == 0); listText.text = "No Markers Yet";
+            if (records.Length == 0) { detailText.text = "Marker Details\n\nNo matching records in this session."; selected = null; }
             else
             {
                 if (!records.Any(r => r.markerId == selected)) selected = records[0].markerId;
@@ -70,20 +72,20 @@ namespace XRApartment.Runtime.ReviewV2
             EnableFilters(); Canvas.ForceUpdateCanvases(); listScroll.verticalNormalizedPosition = 1;
         }
         void EnableFilters() { currentScheme.interactable = allSchemes.interactable = true; }
-        static string LocationName(SpatialFeedbackRecord r) => !string.IsNullOrEmpty(r.objectId) ? r.objectId : !string.IsNullOrEmpty(r.anchorId) ? r.anchorId : "世界坐标";
+        static string LocationName(SpatialFeedbackRecord r) => !string.IsNullOrEmpty(r.objectId) ? r.objectId : !string.IsNullOrEmpty(r.anchorId) ? r.anchorId : "World Position";
         void ShowDetail(SpatialFeedbackRecord r)
         {
-            detailText.text = ReviewMarkDraftView.TypeName(r.type) + " · " + (r.saveStatus == FeedbackSaveStatus.Verified ? "保存已验证" : "保存未验证") +
-                "\n方案：" + r.schemeId + "\nVisit：" + r.schemeVisitId.Substring(0, Math.Min(8, r.schemeVisitId.Length)) +
-                "\n模型：" + r.modelVersion + "\n对象：" + LocationName(r) +
-                "\n位置：" + new Vector3(r.worldX, r.worldY, r.worldZ).ToString("F2") + "\n\n" + (string.IsNullOrEmpty(r.explanation) ? "（无备注）" : r.explanation);
+            detailText.text = ReviewMarkDraftView.TypeName(r.type) + " · " + (r.saveStatus == FeedbackSaveStatus.Verified ? "Save Verified" : "Save Not Verified") +
+                "\nScheme: " + r.schemeId + "\nVisit：" + r.schemeVisitId.Substring(0, Math.Min(8, r.schemeVisitId.Length)) +
+                "\nModel: " + r.modelVersion + "\nObject: " + LocationName(r) +
+                "\nLocation: " + new Vector3(r.worldX, r.worldY, r.worldZ).ToString("F2") + "\n\n" + (string.IsNullOrEmpty(r.explanation) ? "(No note)" : r.explanation);
             detailScroll.verticalNormalizedPosition = 1;
         }
         public void Present(ReviewBoardDisplayState state, string list = null, string detail = null)
         {
             State = state; listText.gameObject.SetActive(true);
-            listText.text = list ?? (state == ReviewBoardDisplayState.Empty ? "暂无标记" : state == ReviewBoardDisplayState.Failed ? "标记读取失败，请重试" : state == ReviewBoardDisplayState.Ready ? "标记已加载" : state == ReviewBoardDisplayState.Loading ? "正在读取标记…" : "T3 未接入，暂不能读取标记");
-            detailText.text = detail ?? "标记详情"; currentScheme.interactable = allSchemes.interactable = false;
+            listText.text = list ?? (state == ReviewBoardDisplayState.Empty ? "No Markers Yet" : state == ReviewBoardDisplayState.Failed ? "Unable to load markers. Retry." : state == ReviewBoardDisplayState.Ready ? "Markers Loaded" : state == ReviewBoardDisplayState.Loading ? "Loading Markers..." : "T3 unavailable. Markers cannot be loaded.");
+            detailText.text = detail ?? "Marker Details"; currentScheme.interactable = allSchemes.interactable = false;
             Canvas.ForceUpdateCanvases(); listScroll.verticalNormalizedPosition = detailScroll.verticalNormalizedPosition = 1;
         }
     }
