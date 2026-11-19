@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,14 +17,19 @@ namespace XRApartment.Runtime.UI
         [SerializeField] Button teleport, smooth, close;
         [SerializeField] Button enterReview;
         [SerializeField] Button language;
+        [SerializeField] Button standingHeight, seatedHeight;
         [SerializeField] KitchenLayoutMenu layout;
         [SerializeField] KitchenPauseMenu pauseMenu;
         [SerializeField] Image blink;
         [SerializeField, Min(.1f)] float headDistance = .8f;
         [SerializeField, Min(.02f)] float blinkSeconds = .12f;
         InputAction toggle, layoutToggle;
+        KitchenMenuHoldIndicator menuHoldIndicator;
         GameObject auxiliaryPanel;
         Pose panelPose;
+        readonly RaycastHit[] panelHits = new RaycastHit[48];
+        readonly Dictionary<RectTransform, Vector3> panelScales = new Dictionary<RectTransform, Vector3>();
+        Vector3 lastLayoutEyePosition;
         bool layoutFromPauseMenu;
         double menuPressedAt = -1;
         bool menuHoldHandled;
@@ -37,19 +43,30 @@ namespace XRApartment.Runtime.UI
 
         void Awake()
         {
-            if (language != null) language.onClick.AddListener(KitchenLocale.Toggle);
+            if (language != null)
+            {
+                language.onClick.AddListener(OpenLanguage);
+                KitchenLocale.Set(language.GetComponentInChildren<TMP_Text>(true), "Language");
+            }
             teleport.onClick.AddListener(ChooseTeleport);
             smooth.onClick.AddListener(ChooseSmooth);
             close.onClick.AddListener(CloseMovementSettings);
             if (enterReview != null) enterReview.onClick.AddListener(EnterReview);
+            if (standingHeight != null)
+            {
+                standingHeight.onClick.AddListener(AlignStandingHeight);
+                KitchenLocale.SetLabel(standingHeight, "Align standing height");
+            }
+            if (seatedHeight != null)
+            {
+                seatedHeight.onClick.AddListener(AlignSeatedHeight);
+                KitchenLocale.SetLabel(seatedHeight, "Align seated height");
+            }
             toggle = new InputAction("Kitchen menu", InputActionType.Button);
             toggle.AddBinding("<XRController>{LeftHand}/menuButton");
+            toggle.AddBinding("<XRController>{LeftHand}/secondaryButton");
             toggle.AddBinding("<Keyboard>/f8");
-            if (pauseMenu == null)
-            {
-                toggle.AddBinding("<XRController>{LeftHand}/secondaryButton");
-                toggle.performed += OnToggle;
-            }
+            if (pauseMenu == null) toggle.performed += OnToggle;
             panel.SetActive(false);
             if (layout != null)
             {
@@ -74,8 +91,7 @@ namespace XRApartment.Runtime.UI
         void OnDisable()
         {
             toggle.Disable();
-            menuPressedAt = -1;
-            menuHoldHandled = false;
+            CancelMenuHold();
             layoutToggle?.Disable();
             settings.Changed -= Refresh;
             settings.TeleportProvider.locomotionStarted -= OnTeleport;
@@ -86,7 +102,7 @@ namespace XRApartment.Runtime.UI
 
         void OnDestroy()
         {
-            if (language != null) language.onClick.RemoveListener(KitchenLocale.Toggle);
+            if (language != null) language.onClick.RemoveListener(OpenLanguage);
             toggle.performed -= OnToggle;
             toggle.Dispose();
             if (layoutToggle != null)
@@ -98,8 +114,18 @@ namespace XRApartment.Runtime.UI
             smooth.onClick.RemoveListener(ChooseSmooth);
             close.onClick.RemoveListener(CloseMovementSettings);
             if (enterReview != null) enterReview.onClick.RemoveListener(EnterReview);
+            if (standingHeight != null) standingHeight.onClick.RemoveListener(AlignStandingHeight);
+            if (seatedHeight != null) seatedHeight.onClick.RemoveListener(AlignSeatedHeight);
         }
 
+        void OpenLanguage() => LanguageSelectionView.Show();
+        void AlignStandingHeight() => AlignViewHeight(false);
+        void AlignSeatedHeight() => AlignViewHeight(true);
+
+        void AlignViewHeight(bool seated)
+        {
+            if (settings.AlignViewHeight(seated)) PlaceInView(panel.transform, true);
+        }
         void ChooseTeleport() => settings.SelectTeleport();
         void ChooseSmooth() => settings.SelectSmooth();
         void OnToggle(InputAction.CallbackContext _)
@@ -111,17 +137,33 @@ namespace XRApartment.Runtime.UI
         void Update()
         {
             if (pauseMenu == null) return;
-            if (!toggle.IsPressed())
+            if (LanguageSelectionView.IsVisible || !toggle.IsPressed())
             {
-                menuPressedAt = -1;
-                menuHoldHandled = false;
+                CancelMenuHold();
                 return;
             }
+            if (menuHoldHandled) return;
             var now = Time.unscaledTimeAsDouble;
             if (menuPressedAt < 0) menuPressedAt = now;
-            if (menuHoldHandled || now - menuPressedAt < MenuHoldSeconds) return;
+            var progress = (now - menuPressedAt) / MenuHoldSeconds;
+            var head = settings.Origin.Camera.transform;
+            if (progress < 1.0)
+            {
+                if (menuHoldIndicator == null) menuHoldIndicator = KitchenMenuHoldIndicator.Create(transform, pauseMenu.SurfaceMaterial);
+                menuHoldIndicator.Show(head, (float)progress);
+                return;
+            }
             menuHoldHandled = true;
+            menuHoldIndicator?.Hide();
             pauseMenu.Toggle();
+            KitchenAudio.Play(gameObject.scene, KitchenCue.Menu, head.position, .75f);
+        }
+
+        void CancelMenuHold()
+        {
+            menuPressedAt = -1;
+            menuHoldHandled = false;
+            menuHoldIndicator?.Hide();
         }
 
         void OnLayoutToggle(InputAction.CallbackContext _)
@@ -141,6 +183,11 @@ namespace XRApartment.Runtime.UI
         {
             if (layoutFromPauseMenu && pauseMenu != null) pauseMenu.Open();
             else Close();
+        }
+
+        internal void RefreshLayoutPlacement()
+        {
+            if (layout != null && layout.isActiveAndEnabled) PlaceInView(layout.transform, false);
         }
 
         void CloseMovementSettings()
@@ -185,7 +232,8 @@ namespace XRApartment.Runtime.UI
 
         void PlaceInView(Transform target, bool recenter)
         {
-            var camera = settings.Origin.Camera.transform;
+            var view = settings.Origin.Camera;
+            var camera = view.transform;
             if (pauseMenu != null)
             {
                 if (!pauseMenu.IsPaused || recenter)
@@ -194,7 +242,13 @@ namespace XRApartment.Runtime.UI
                     panelPose = new Pose(camera.position + camera.forward * headDistance,
                         Quaternion.LookRotation(camera.forward, up));
                 }
-                target.SetPositionAndRotation(panelPose.position, panelPose.rotation);
+                if (target is RectTransform rect)
+                {
+                    if (!panelScales.TryGetValue(rect, out var scale)) panelScales.Add(rect, scale = rect.localScale);
+                    KitchenPanelPlacement.Place(rect, view, settings.transform, panelPose, scale, panelHits);
+                }
+                else target.SetPositionAndRotation(panelPose.position, panelPose.rotation);
+                lastLayoutEyePosition = camera.position;
                 return;
             }
             var forward = Vector3.ProjectOnPlane(camera.forward, Vector3.up).normalized;
@@ -228,6 +282,9 @@ namespace XRApartment.Runtime.UI
 
         void LateUpdate()
         {
+            if (layout != null && layout.isActiveAndEnabled &&
+                (settings.Origin.Camera.transform.position - lastLayoutEyePosition).sqrMagnitude > .0016f)
+                RefreshLayoutPlacement();
             if (blinkRemaining <= 0 || blink == null) return;
             blinkRemaining -= Time.unscaledDeltaTime;
             var colour = Color.black;

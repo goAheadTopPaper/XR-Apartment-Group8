@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion;
 using XRApartment.Data;
 
@@ -13,7 +13,14 @@ namespace XRApartment.Runtime.UI
 {
     public sealed class KitchenActivityGuide : MonoBehaviour
     {
-        enum Step { Calibrate, Practice, Cook, Preview, Feedback, Done }
+        enum Step { AwaitingLanguage, ToKitchen, Practice, Cook, Preview, Feedback, Done }
+
+        const float EntryArrivalRadius = .38f;
+        const float EntryArrowLookAhead = 3.4f;
+        const string EntryControls = "Right stick to teleport. Click left stick to crouch or stand.";
+        const string ExploreKitchen = "Try the fridge, sink, chopping board or stove. Grip and release a kitchen tool.";
+        const string FridgeShortcut = "Right B / F9 to choose a full-size or compact fridge.";
+        const string GripPractice = "Grip a kitchen tool, then release it.";
 
         [SerializeField] LocomotionSettingsView menu;
         [SerializeField] KitchenLocomotionSettings movement;
@@ -21,19 +28,23 @@ namespace XRApartment.Runtime.UI
         [SerializeField] KitchenLayoutLab layout;
         [SerializeField] KitchenFeedbackNotes notes;
         [SerializeField] KitchenPauseMenu pauseMenu;
-        [SerializeField] GameObject panel, calibration;
-        [SerializeField] Button close, advance, standing, seated, lower, raise;
-        [SerializeField] TMP_Text title, instruction, detail, status, actionLabel, hint;
+        [SerializeField] GameObject panel;
+        [SerializeField] Button close, advance;
+        [SerializeField] TMP_Text title, instruction, detail, actionLabel, hint;
+        [SerializeField] Vector3[] entryRoute = System.Array.Empty<Vector3>();
+        [SerializeField] LineRenderer entryArrow;
         readonly HashSet<XRGrabInteractable> held = new HashSet<XRGrabInteractable>();
         XRGrabInteractable[] practiceItems;
+        InputAction crouchAction;
         RectTransform advanceRect;
         Vector2 advancePosition;
         Step step;
-        bool useSeated, calibrated, teleported, released, milestoneShown;
-        float standingHeight = 1.65f, seatedHeight = 1.20f, nextRefresh;
+        int entryWaypoint;
+        bool started, movementPracticed, released, milestoneShown;
+        float nextRefresh;
 
-        float EyeHeight => useSeated ? seatedHeight : standingHeight;
-        bool Practiced => teleported && released;
+        bool HasEntryRoute => entryRoute.Length > 1;
+        bool Practiced => movementPracticed && released;
         bool Compared => layout.HasObservedOpening(false) && layout.HasObservedOpening(true);
         bool ReadyForNextStep => step switch
         {
@@ -43,9 +54,10 @@ namespace XRApartment.Runtime.UI
             _ => false
         };
         public bool IsFreePlay { get; private set; }
-        internal bool AllowsLayout => !isActiveAndEnabled || IsFreePlay || step == Step.Preview;
-        internal bool AllowsFeedback => !isActiveAndEnabled || IsFreePlay || step == Step.Feedback;
-        internal bool RequiresChoice => isActiveAndEnabled && !IsFreePlay && (step == Step.Calibrate || step == Step.Done);
+        internal bool CanChooseFridgeBeforeCooking => isActiveAndEnabled && step == Step.Practice && movementPracticed;
+        internal bool AllowsLayout => !isActiveAndEnabled || IsFreePlay || CanChooseFridgeBeforeCooking || step == Step.Preview;
+        internal bool AllowsFeedback => !isActiveAndEnabled || step != Step.AwaitingLanguage;
+        internal bool RequiresChoice => isActiveAndEnabled && !IsFreePlay && step == Step.Done;
         internal string StageTitle => KitchenLocale.Source(title);
         internal string StageInstruction => KitchenLocale.Source(instruction);
 
@@ -55,61 +67,75 @@ namespace XRApartment.Runtime.UI
             advancePosition = advanceRect.anchoredPosition;
             close.onClick.AddListener(menu.Close);
             advance.onClick.AddListener(Advance);
-            standing.onClick.AddListener(() => ChoosePosture(false));
-            seated.onClick.AddListener(() => ChoosePosture(true));
-            lower.onClick.AddListener(() => AdjustHeight(-.05f));
-            raise.onClick.AddListener(() => AdjustHeight(.05f));
             notes.Saved += FeedbackSaved;
+            crouchAction = new InputAction("Kitchen crouch", InputActionType.Button, "<XRController>{LeftHand}/{Primary2DAxisClick}");
+            crouchAction.performed += Crouch;
         }
 
-        void Start() => Open();
+        void Start()
+        {
+            started = true;
+            ShowStartupLanguage();
+        }
+
+        void OnEnable()
+        {
+            crouchAction.Enable();
+            if (started && step == Step.AwaitingLanguage) ShowStartupLanguage();
+        }
+
+        void ShowStartupLanguage() => LanguageSelectionView.ShowForStartup(menu, movement.Origin.Camera, BeginEntry);
+
+        void OnDisable()
+        {
+            crouchAction?.Disable();
+            LanguageSelectionView.CancelStartup(menu);
+            if (entryArrow != null) entryArrow.enabled = false;
+            if (hint != null) hint.transform.parent.gameObject.SetActive(false);
+        }
 
         void OnDestroy()
         {
+            crouchAction?.Dispose();
             StopPractice();
             if (notes != null) notes.Saved -= FeedbackSaved;
         }
 
         internal void Open()
         {
+            if (step == Step.AwaitingLanguage) return;
             milestoneShown |= ReadyForNextStep;
-            KitchenLocale.Set(status, "");
             Refresh();
             menu.OpenAuxiliary(panel);
         }
 
-        void ChoosePosture(bool sitting)
+        void BeginEntry()
         {
-            useSeated = sitting;
-            calibrated = false;
+            movement.AlignViewHeight(false);
+            if (HasEntryRoute)
+            {
+                step = Step.ToKitchen;
+                entryWaypoint = 1;
+            }
+            else BeginPractice();
             Refresh();
-        }
-
-        void AdjustHeight(float change)
-        {
-            if (useSeated) seatedHeight = Mathf.Clamp(seatedHeight + change, .90f, 1.95f);
-            else standingHeight = Mathf.Clamp(standingHeight + change, .90f, 1.95f);
-            calibrated = false;
-            Refresh();
+            RefreshHint();
         }
 
         void Advance()
         {
-            KitchenLocale.Set(status, "");
             var previous = step;
             switch (step)
             {
-                case Step.Calibrate:
-                    if (!calibrated) ApplyCalibration();
-                    else if (IsFreePlay)
-                    {
-                        step = Step.Done;
-                        menu.Close();
-                    }
-                    else BeginPractice();
+                case Step.ToKitchen:
+                    menu.Close();
                     break;
                 case Step.Practice:
-                    if (Practiced && recipe.SelectRecipe(KitchenRecipeChoice.TomatoEgg))
+                    if (!Practiced)
+                    {
+                        if (CanChooseFridgeBeforeCooking) menu.OpenLayout();
+                    }
+                    else if (recipe.SelectRecipe(KitchenRecipeChoice.TomatoEgg))
                     {
                         StopPractice();
                         step = Step.Cook;
@@ -131,41 +157,58 @@ namespace XRApartment.Runtime.UI
                     notes.OpenOrSpawn();
                     break;
                 case Step.Done:
-                    if (IsFreePlay)
-                    {
-                        step = Step.Calibrate;
-                        calibrated = false;
-                        menu.OpenAuxiliary(panel, recenter: true);
-                    }
-                    else
-                    {
-                        IsFreePlay = true;
-                        menu.Close();
-                    }
+                    IsFreePlay = true;
+                    menu.Close();
                     break;
             }
             if (step != previous) milestoneShown = false;
             Refresh();
         }
 
-        void ApplyCalibration()
+        void Crouch(InputAction.CallbackContext _)
         {
-            var holding = movement.GetComponentsInChildren<XRBaseInteractor>()
-                .Any(interactor => interactor.interactablesSelected.Any(item => item is XRGrabInteractable));
-            if (holding)
-            {
-                KitchenLocale.Set(status, "Put down the item you are holding before changing the view.");
-                return;
-            }
-            calibrated = movement.CalibrateEyeHeight(EyeHeight);
-            if (calibrated) menu.OpenAuxiliary(panel, recenter: true);
-            else KitchenLocale.Set(status, "Eye height calibration needs a valid tracking offset on the XR rig.");
+            if (step != Step.AwaitingLanguage && !menu.IsOpen && !LanguageSelectionView.IsVisible)
+                movement.ToggleCrouch();
         }
 
-        void BeginPractice()
+        void UpdateEntryRoute()
+        {
+            if (entryArrow != null) entryArrow.enabled = step == Step.ToKitchen && !menu.IsOpen;
+            if (step != Step.ToKitchen || menu.IsOpen) return;
+
+            var feet = movement.Origin.Camera.transform.position;
+            feet.y = entryRoute[0].y;
+            var arrivalSquared = EntryArrivalRadius * EntryArrivalRadius;
+            if ((feet - entryRoute[entryRoute.Length - 1]).sqrMagnitude <= arrivalSquared)
+            {
+                if (entryArrow != null) entryArrow.enabled = false;
+                BeginPractice(movedToKitchen: true);
+                return;
+            }
+            if (entryWaypoint < entryRoute.Length - 1 && (feet - entryRoute[entryWaypoint]).sqrMagnitude <= arrivalSquared)
+                entryWaypoint++;
+
+            if (entryArrow == null) return;
+            var start = entryRoute[entryWaypoint - 1];
+            var segment = entryRoute[entryWaypoint] - start;
+            var direction = segment.normalized;
+            var ahead = Mathf.Clamp(Vector3.Dot(feet - start, direction) + EntryArrowLookAhead, 0f, segment.magnitude);
+            entryArrow.transform.SetPositionAndRotation(start + direction * ahead + Vector3.up * .025f,
+                Quaternion.LookRotation(direction));
+        }
+
+        string EntryInstruction() => entryWaypoint switch
+        {
+            1 => "Follow the arrow straight past the sofa.",
+            2 => "Turn left and follow the arrow past the dining table.",
+            _ => "Turn right through the kitchen opening and go to the worktop."
+        };
+
+        void BeginPractice(bool movedToKitchen = false)
         {
             step = Step.Practice;
-            teleported = released = false;
+            movementPracticed = movedToKitchen;
+            released = false;
             practiceItems = FindObjectsByType<XRGrabInteractable>(FindObjectsSortMode.None)
                 .Where(item => item.gameObject.scene == gameObject.scene && !item.TryGetComponent<KitchenFeedbackNote>(out _))
                 .ToArray();
@@ -193,7 +236,7 @@ namespace XRApartment.Runtime.UI
             held.Clear();
         }
 
-        void Teleported(LocomotionProvider _) => teleported = true;
+        void Teleported(LocomotionProvider _) => movementPracticed = true;
         void Grabbed(SelectEnterEventArgs args) => held.Add((XRGrabInteractable)args.interactableObject);
         void Released(SelectExitEventArgs args)
         {
@@ -209,6 +252,7 @@ namespace XRApartment.Runtime.UI
 
         void LateUpdate()
         {
+            UpdateEntryRoute();
             if (!menu.IsOpen && (RequiresChoice || (!milestoneShown && ReadyForNextStep && !pauseMenu.HasSelection)))
                 Open();
             if (menu.IsOpen) hint.transform.parent.gameObject.SetActive(false);
@@ -229,12 +273,16 @@ namespace XRApartment.Runtime.UI
             if (notes.SpawnBlocked)
                 message = "Look toward open space and try the feedback note again.";
             else if (notes.HasLooseNote)
-                message = "Grip the yellow note. Release it close to the surface you want to review.";
+                message = "Grip the yellow note and throw it at an object, or release it against the surface.";
             else
                 switch (step)
                 {
+                    case Step.ToKitchen:
+                        message = entryWaypoint == 1 ? EntryInstruction() + "\n" + EntryControls : EntryInstruction();
+                        break;
                     case Step.Practice:
-                        message = Practiced ? "Practice complete. Hold Menu and open Kitchen Guide to continue." : PracticeInstruction();
+                        message = Practiced ? "Practice complete. Hold Menu and open Kitchen Guide to continue."
+                            : CanChooseFridgeBeforeCooking ? FridgeShortcut + "\n" + GripPractice : PracticeInstruction();
                         break;
                     case Step.Cook:
                         if (recipe.TomatoMealFinished) message = "Meal complete. Hold Menu and open Kitchen Guide to continue.";
@@ -250,9 +298,9 @@ namespace XRApartment.Runtime.UI
             KitchenLocale.Set(hint, message);
         }
 
-        string PracticeInstruction() => !teleported
+        string PracticeInstruction() => !movementPracticed
             ? "Push the right stick forward to aim at the floor, then release to teleport."
-            : "Grip a kitchen tool, then release it.";
+            : HasEntryRoute ? ExploreKitchen : GripPractice;
 
         string PreviewInstruction() => !layout.HasObservedOpening(layout.CompactSelected)
             ? "Grip and pull the current fridge handle until the door stops."
@@ -262,22 +310,18 @@ namespace XRApartment.Runtime.UI
 
         void Refresh()
         {
-            calibration.SetActive(step == Step.Calibrate);
             close.gameObject.SetActive(!RequiresChoice);
             advanceRect.anchoredPosition = RequiresChoice ? new Vector2(0f, advancePosition.y) : advancePosition;
             switch (step)
             {
-                case Step.Calibrate:
-                    standing.interactable = useSeated;
-                    seated.interactable = !useSeated;
-                    Show("Calibrate your view", "Choose a posture and adjust the eye height.",
-                        $"Eye height: {EyeHeight:0.00} m",
-                        !calibrated ? "Calibrate" : IsFreePlay ? "Return to free play" : "Start practice");
+                case Step.ToKitchen:
+                    Show("Find the kitchen", EntryInstruction(), EntryControls, "Resume");
                     break;
                 case Step.Practice:
                     Show("Practice controls", Practiced ? "Practice complete. Start the recipe when ready." : PracticeInstruction(),
-                        (teleported ? "Teleport done" : "Teleport pending") + " | " +
-                        (released ? "Grab and release done" : "Grab and release pending"), "Start tomato and egg", Practiced);
+                        Practiced ? FridgeShortcut : (HasEntryRoute ? "Kitchen reached" : movementPracticed ? "Teleport done" : "Teleport pending") + " | " +
+                        (released ? "Grab and release done" : "Grab and release pending"),
+                        Practiced ? "Start tomato and egg" : "Choose a fridge", Practiced || CanChooseFridgeBeforeCooking);
                     break;
                 case Step.Cook:
                     var tomato = recipe.ActiveRecipe == KitchenRecipeChoice.TomatoEgg;
@@ -293,12 +337,12 @@ namespace XRApartment.Runtime.UI
                         Compared ? "Leave feedback" : "Open Layout Lab");
                     break;
                 case Step.Feedback:
-                    Show("Leave feedback", "Grip the yellow note. Release it close to the surface you want to review.",
+                    Show("Leave feedback", "Grip the yellow note and throw it at an object, or release it against the surface.",
                         "Write your feedback and save it to the local document.", "Feedback note");
                     break;
                 case Step.Done:
                     if (IsFreePlay)
-                        Show("Free play", "Explore the kitchen at your own pace.", "", "Calibrate again");
+                        Show("Free play", "Explore the kitchen at your own pace.", "", "Resume");
                     else
                         Show("Kitchen guide complete", "Your feedback was saved. You can now explore the kitchen freely.",
                             "Hold left Menu / F8 to pause.", "Start free play");

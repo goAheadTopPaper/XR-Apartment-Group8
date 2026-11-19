@@ -56,13 +56,13 @@ namespace XRApartment.Runtime.UI
 
         private void Choose(int option)
         {
-            lab.TryApply(option, out var message);
+            if (lab.TryApply(option, out var message)) owner.RefreshLayoutPlacement();
             Refresh(message);
         }
 
         private void ChooseFridge(bool compactSize)
         {
-            lab.TrySelectFridge(compactSize, out var message);
+            if (lab.TrySelectFridge(compactSize, out var message)) owner.RefreshLayoutPlacement();
             Refresh(message);
         }
 

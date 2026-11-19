@@ -62,6 +62,7 @@ namespace XRApartment.Tests
             Assert.IsTrue(scene.isLoaded); SceneManager.SetActiveScene(scene);
             settings = scene.GetRootGameObjects().Select(g => g.GetComponent<KitchenLocomotionSettings>()).Single(s => s != null);
             KitchenSceneTestSetup.DisableStartupGuide(settings.GetComponentInChildren<LocomotionSettingsView>());
+            settings.transform.position = new Vector3(-3.15f, 0f, 1.12f);
             simulator = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(SimulatorPath)).GetComponent<XRInteractionSimulator>();
             while (Time.time < 1.1f) yield return null;
             for (var i = 0; i < 4; i++) yield return null;
@@ -121,6 +122,41 @@ namespace XRApartment.Tests
             settings.SetMode(KitchenMovementMode.Teleport, false);
             Assert.IsFalse(move.enabled); Assert.IsFalse(ActionEnabled("Left", "m_Move"));
             Assert.IsTrue(ActionEnabled("Left", "m_TeleportMode"));
+        }
+
+        [UnityTest] public IEnumerator SmoothWalkingStopsAtTheLivingRoomExteriorOpening()
+        {
+            settings.transform.position = new Vector3(-3.88f, 0f, -4.3f);
+            Physics.SyncTransforms();
+            yield return null;
+            settings.SetMode(KitchenMovementMode.Smooth, false);
+            var move = settings.MoveProvider;
+            move.leftHandMoveInput.inputSourceMode = XRInputValueReader.InputSourceMode.ManualValue;
+            move.leftHandMoveInput.manualValue = Vector2.left;
+            var head = settings.Origin.Camera.transform;
+            var start = head.position;
+            var elapsed = 0f;
+            while (elapsed < 1.35f) { yield return null; elapsed += Time.deltaTime; }
+            move.leftHandMoveInput.manualValue = Vector2.zero;
+            Assert.That(head.position.x, Is.InRange(-4.56f, start.x - .22f),
+                "Walking must approach the living room glazing and stop before the exterior floor.");
+            move.leftHandMoveInput.manualValue = Vector2.right;
+            var contactX = head.position.x;
+            elapsed = 0f;
+            while (elapsed < .25f) { yield return null; elapsed += Time.deltaTime; }
+            move.leftHandMoveInput.manualValue = Vector2.zero;
+            Assert.That(head.position.x, Is.GreaterThan(contactX + .12f));
+        }
+
+        [UnityTest] public IEnumerator TeleportRejectsTheExteriorFloorBeyondTheLivingRoom()
+        {
+            settings.transform.position = new Vector3(-3.88f, 0f, -4.3f);
+            Physics.SyncTransforms();
+            yield return null;
+            var provider = settings.TeleportProvider;
+            Assert.IsTrue(provider.CanTeleportTo(new Vector3(-4f, .004f, -4.3f)), "Indoor floor must stay usable.");
+            Assert.IsFalse(provider.CanTeleportTo(new Vector3(-5.7f, .004f, -4.3f)),
+                "The apartment's larger floor mesh includes the exterior next to the living room.");
         }
 
         [UnityTest] public IEnumerator ActualRaySelectionTeleportsToClearFloorAndPreservesFacing()

@@ -10,18 +10,28 @@ namespace XRApartment.Runtime
     [DefaultExecutionOrder(-200)]
     public sealed class KitchenLocale : MonoBehaviour
     {
-        public const string Preference = "XRApartment.UI.Chinese";
+        public enum Language
+        {
+            English = 0,
+            SimplifiedChinese = 1,
+            TraditionalChinese = 2
+        }
+
+        public const string Preference = "XRApartment.UI.Language";
+        public const string LegacyPreference = "XRApartment.UI.Chinese";
         [SerializeField] TextAsset table;
         [SerializeField] TMP_FontAsset hanzi;
-        static readonly Dictionary<string, string> Exact = new Dictionary<string, string>(StringComparer.Ordinal);
-        static readonly List<(Regex pattern, string translation)> Patterns = new List<(Regex, string)>();
+        static readonly Dictionary<string, string[]> Exact = new Dictionary<string, string[]>(StringComparer.Ordinal);
+        static readonly List<(Regex pattern, string[] translations)> Patterns = new List<(Regex, string[])>();
         static readonly Dictionary<TMP_Text, string> Labels = new Dictionary<TMP_Text, string>();
-        static readonly string[] Separators = { "  /  ", "  |  ", " | " };
+        static readonly string[] Separators = { "  /  ", "  |  ", " | ", " · " };
         static readonly Regex GroupReference = new Regex(@"\$(\d+)", RegexOptions.CultureInvariant);
         static TextAsset loadedTable;
-        static bool chinese;
+        static Language language = Language.TraditionalChinese;
 
-        public static bool Chinese => chinese;
+        public static Language Current => language;
+        public static bool Chinese => language != Language.English;
+        public static bool HasSavedPreference => PlayerPrefs.HasKey(Preference) || PlayerPrefs.HasKey(LegacyPreference);
         public void Configure(TextAsset translations, TMP_FontAsset fallback) { table = translations; hanzi = fallback; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -31,28 +41,51 @@ namespace XRApartment.Runtime
             Patterns.Clear();
             Labels.Clear();
             loadedTable = null;
-            chinese = false;
+            language = ReadPreference();
+        }
+
+        static Language ReadPreference()
+        {
+            if (PlayerPrefs.HasKey(Preference))
+                return (Language)Mathf.Clamp(PlayerPrefs.GetInt(Preference, 0), 0, 2);
+            if (PlayerPrefs.HasKey(LegacyPreference))
+                return PlayerPrefs.GetInt(LegacyPreference) == 1 ? Language.SimplifiedChinese : Language.English;
+            return Language.TraditionalChinese;
         }
 
         void Awake()
         {
-            if (table == null || hanzi == null) return;
-            if (table != loadedTable)
+            if (table != null && table != loadedTable)
             {
                 Exact.Clear();
                 Patterns.Clear();
                 foreach (var line in table.text.Split('\n'))
                 {
                     var columns = line.TrimEnd('\r').Split('\t');
-                    if (columns.Length != 2) continue;
+                    if (columns.Length < 2) continue;
+                    var translations = columns.Length >= 3
+                        ? new[] { columns[1], columns[2] }
+                        : new[] { columns[1], columns[1] };
                     if (columns[0].StartsWith("^", StringComparison.Ordinal))
-                        Patterns.Add((new Regex(columns[0], RegexOptions.CultureInvariant), columns[1]));
-                    else Exact.Add(columns[0], columns[1]);
+                        Patterns.Add((new Regex(columns[0], RegexOptions.CultureInvariant), translations));
+                    else
+                        Exact[columns[0]] = translations;
                 }
                 loadedTable = table;
             }
-            chinese = PlayerPrefs.GetInt(Preference) == 1;
-            if (!TMP_Settings.fallbackFontAssets.Contains(hanzi)) TMP_Settings.fallbackFontAssets.Add(hanzi);
+            var preference = ReadPreference();
+            if (language != preference)
+            {
+                language = preference;
+                Refresh();
+            }
+            if (hanzi != null && !TMP_Settings.fallbackFontAssets.Contains(hanzi))
+                TMP_Settings.fallbackFontAssets.Add(hanzi);
+            // TMP 3.0.9 uses this cached primary atlas when it creates a second page
+            // on an Editor font asset. Warm it before the first dynamic glyph lookup.
+            foreach (var fallback in TMP_Settings.fallbackFontAssets)
+                if (fallback != null && fallback.atlasTextures != null && fallback.atlasTextures.Length > 0)
+                    _ = fallback.atlasTexture;
             foreach (var root in gameObject.scene.GetRootGameObjects())
             {
                 foreach (var label in root.GetComponentsInChildren<TMP_Text>(true))
@@ -73,11 +106,19 @@ namespace XRApartment.Runtime
             foreach (var label in stale) Labels.Remove(label);
         }
 
-        public static void Toggle()
+        public static void Select(Language value)
         {
-            chinese = !chinese;
-            PlayerPrefs.SetInt(Preference, chinese ? 1 : 0);
+            language = value;
+            PlayerPrefs.SetInt(Preference, (int)value);
+            PlayerPrefs.DeleteKey(LegacyPreference);
             PlayerPrefs.Save();
+            Refresh();
+        }
+
+        public static void Toggle() => Select((Language)(((int)language + 1) % 3));
+
+        static void Refresh()
+        {
             foreach (var label in Labels)
                 if (label.Key != null) label.Key.text = Translate(label.Value);
         }
@@ -89,6 +130,13 @@ namespace XRApartment.Runtime
             if (Labels.TryGetValue(label, out var previous) && previous == english) return;
             Labels[label] = english;
             label.text = Translate(english);
+        }
+
+        public static string T(string english) => Translate(english);
+
+        public static void SetLabel(Button button, string english)
+        {
+            if (button != null) Set(button.GetComponentInChildren<TMP_Text>(true), english);
         }
 
         public static void SetVerbatim(TMP_Text label, string value)
@@ -109,21 +157,24 @@ namespace XRApartment.Runtime
 
         static string Translate(string value)
         {
-            if (!chinese || string.IsNullOrEmpty(value)) return value;
-            if (Exact.TryGetValue(value, out var text)) return text;
+            if (language == Language.English || string.IsNullOrEmpty(value)) return value;
+            var slot = language == Language.SimplifiedChinese ? 0 : 1;
+            if (Exact.TryGetValue(value, out var text)) return Normalize(text[slot] ?? value);
             foreach (var entry in Patterns)
             {
                 var match = entry.pattern.Match(value);
                 if (match.Success)
-                    return GroupReference.Replace(entry.translation, group =>
-                        Translate(match.Groups[int.Parse(group.Groups[1].Value)].Value));
+                    return Normalize(GroupReference.Replace(entry.translations[slot] ?? value, group =>
+                        Translate(match.Groups[int.Parse(group.Groups[1].Value)].Value)));
             }
             if (value.IndexOf('\n') >= 0)
                 return string.Join("\n", Array.ConvertAll(value.Split('\n'), Translate));
             foreach (var separator in Separators)
                 if (value.Contains(separator))
                     return string.Join(separator, Array.ConvertAll(value.Split(new[] { separator }, StringSplitOptions.None), Translate));
-            return value;
+            return Normalize(value);
         }
+
+        static string Normalize(string value) => value == null ? null : value.Replace("\\n", "\n");
     }
 }

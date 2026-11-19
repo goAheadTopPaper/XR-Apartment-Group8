@@ -28,6 +28,7 @@ namespace XRApartment.Runtime.UI
         bool previousAudioPause;
 
         public bool IsPaused { get; private set; }
+        internal Material SurfaceMaterial => resume.image.material;
         internal bool AllowsLayout => guide.AllowsLayout;
         internal bool AllowsFreePlay => !guide.isActiveAndEnabled || guide.IsFreePlay;
         internal bool HasSelection => Array.Exists(interactors, interactor => interactor != null && interactor.hasSelection);
@@ -46,9 +47,21 @@ namespace XRApartment.Runtime.UI
             kitchenGuide.onClick.AddListener(guide.Open);
             layout.onClick.AddListener(() => menu.OpenLayout(fromPauseMenu: true));
             feedback.onClick.AddListener(notes.OpenOrSpawn);
+            AddSavedFeedbackEntry();
             options.onClick.AddListener(menu.Open);
             graphicsMenu.Bind(this);
             graphics.onClick.AddListener(() => graphicsMenu.Open(menu));
+        }
+
+        void AddSavedFeedbackEntry()
+        {
+            var shortcut = panel.transform.Find("Context/Shortcut");
+            if (shortcut == null) return;
+            var label = shortcut.GetComponent<TMP_Text>();
+            var button = KitchenRayKeyboard.Button(KitchenRayKeyboard.Rect("SavedFeedback", shortcut.parent, 0, -148, 442, 47),
+                "Saved feedback", label.font, () => notes.OpenSavedFeedback(() => Open()));
+            button.image.material = resume.image.material;
+            button.GetComponentInChildren<TMP_Text>().fontSharedMaterial = label.fontSharedMaterial;
         }
 
         void OnEnable()
@@ -83,6 +96,7 @@ namespace XRApartment.Runtime.UI
             kitchenGuide.interactable = guiding;
             layout.interactable = guide.AllowsLayout;
             feedback.interactable = guide.AllowsFeedback;
+            KitchenLocale.SetLabel(layout, guide.CanChooseFridgeBeforeCooking ? "Choose a fridge" : "Layout Lab");
             KitchenLocale.Set(resumeLabel, guide.RequiresChoice ? "Return to guide" : "Resume");
             KitchenLocale.Set(stageTitle, guiding ? guide.StageTitle : "Free play");
             KitchenLocale.Set(stageInstruction, guiding ? guide.StageInstruction : "Explore the kitchen at your own pace.");
