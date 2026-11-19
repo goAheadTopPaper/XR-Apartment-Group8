@@ -43,44 +43,50 @@ namespace XRApartment.Runtime
             RotationBlocker = null;
             RecoveryBlocker = null;
             rig = ownerRig;
-            // ComputePenetration in Unity 2022 requires an enabled query collider.
-            // It is disabled again before XRI or the physics simulation can observe it.
-            probe.size = probeSize + Vector3.Scale(inverseScale, Vector3.one * (skin * 2f));
-            probe.enabled = true;
-            try
-            {
-                var safe = RecoverOverlap(from, skin);
-                if (QuerySaturated) return from;
-                safe.rotation = Rotate(safe, requested.rotation, rotationStepDegrees, rotationIterations);
-                safe.position = Slide(safe, requested.position, skin);
-                return safe;
-            }
-            finally
-            {
-                probe.enabled = false;
-                probe.size = probeSize;
-            }
+            var safe = RecoverOverlap(from, skin);
+            if (QuerySaturated) return from;
+            safe.rotation = Rotate(safe, requested.rotation, rotationStepDegrees, rotationIterations);
+            safe.position = Slide(safe, requested.position, skin);
+            return safe;
         }
 
         Pose RecoverOverlap(Pose pose, float skin)
         {
-            for (var iteration = 0; iteration < 4; iteration++)
+            bool probeActive = false;
+            try
             {
-                var count = Overlap(pose, Vector3.one * skin);
-                if (QuerySaturated) return pose;
-                var moved = false;
-                for (var i = 0; i < count; i++)
+                for (var iteration = 0; iteration < 4; iteration++)
                 {
-                    var obstacle = overlaps[i];
-                    if (!Blocks(obstacle)) continue;
-                    if (!Physics.ComputePenetration(probe, pose.position, pose.rotation,
-                            obstacle, obstacle.transform.position, obstacle.transform.rotation,
-                            out var normal, out var depth)) continue;
-                    if (RecoveryBlocker == null) RecoveryBlocker = obstacle;
-                    pose.position += normal * (depth + skin);
-                    moved = true;
+                    var count = Overlap(pose, Vector3.one * skin);
+                    if (QuerySaturated) return pose;
+                    var moved = false;
+                    for (var i = 0; i < count; i++)
+                    {
+                        var obstacle = overlaps[i];
+                        if (!Blocks(obstacle)) continue;
+                        if (!probeActive)
+                        {
+                            // Unity 2022 needs an enabled probe for ComputePenetration, not for broad-phase queries.
+                            probe.size = probeSize + Vector3.Scale(inverseScale, Vector3.one * (skin * 2f));
+                            probe.enabled = probeActive = true;
+                        }
+                        if (!Physics.ComputePenetration(probe, pose.position, pose.rotation,
+                                obstacle, obstacle.transform.position, obstacle.transform.rotation,
+                                out var normal, out var depth)) continue;
+                        if (RecoveryBlocker == null) RecoveryBlocker = obstacle;
+                        pose.position += normal * (depth + skin);
+                        moved = true;
+                    }
+                    if (!moved) break;
                 }
-                if (!moved) break;
+            }
+            finally
+            {
+                if (probeActive)
+                {
+                    probe.enabled = false;
+                    probe.size = probeSize;
+                }
             }
             return pose;
         }
