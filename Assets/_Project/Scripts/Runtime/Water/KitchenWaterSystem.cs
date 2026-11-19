@@ -85,7 +85,7 @@ namespace XRApartment.Runtime
 
         public void Simulate(float dt)
         {
-            if (dt <= 0f) return;
+            if (dt <= 0f || ActiveParcels == 0) return;
             Vector3 gravity = Physics.gravity;
             for (int i = 0; i < parcels.Length; i++)
             {

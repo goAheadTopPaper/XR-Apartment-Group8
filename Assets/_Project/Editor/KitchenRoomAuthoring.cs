@@ -140,6 +140,7 @@ namespace XRApartment.EditorTools
             importer.maxTextureSize = 4096; importer.mipmapEnabled = true;
             importer.wrapModeU = TextureWrapMode.Repeat; importer.wrapModeV = TextureWrapMode.Clamp; importer.SaveAndReimport();
             KitchenHdrpAuthoring.ConfigureEnvironment(scene, KitchenAuthoring.LoadRequired<Cubemap>(CityTexture), 120f);
+            ConfigureCookingAmenities(scene);
         }
 
         [Serializable] sealed class WindowInfo { public string path, material, shader; public Bounds bounds; public Color colour; public float mode; }

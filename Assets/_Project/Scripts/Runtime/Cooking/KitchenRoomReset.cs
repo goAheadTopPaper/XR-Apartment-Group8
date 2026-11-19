@@ -37,6 +37,7 @@ namespace XRApartment.Runtime
         bool[] openDoors, openDrawers;
         ParticleSystem[] effects;
         AudioSource[] audioEffects;
+        KitchenRadio[] radios;
         int restoreFrame = -1;
         public int LoosePropCount => actors == null ? 0 : actors.Length;
         public bool IsResetting => restoreFrame >= 0;
@@ -72,6 +73,7 @@ namespace XRApartment.Runtime
             doors = InScene<KinematicSwingDoor>().Where(OutsideStation).ToArray(); openDoors = doors.Select(d => d.IsOpen).ToArray();
             drawers = InScene<KinematicLinearDrawer>().Where(OutsideStation).ToArray(); openDrawers = drawers.Select(d => d.IsOpen).ToArray();
             effects = InScene<ParticleSystem>(); audioEffects = InScene<AudioSource>();
+            radios = InScene<KitchenRadio>();
         }
         void OnEnable() { if (station != null) station.ResetStarting += ResetRemainder; }
         void OnDisable()
@@ -111,6 +113,7 @@ namespace XRApartment.Runtime
             foreach (var stream in streams) if (stream != null) stream.Stop();
             foreach (var effect in effects) if (effect != null) effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             foreach (var sound in audioEffects) if (sound != null) sound.Stop();
+            foreach (var radio in radios) if (radio != null) radio.ResetPlayback();
             Physics.SyncTransforms();
         }
         static void SynchronizeBody(Actor actor)

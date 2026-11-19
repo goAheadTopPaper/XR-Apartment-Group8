@@ -13,6 +13,7 @@ namespace XRApartment.Runtime
         readonly AudioSource[] voices = new AudioSource[6];
         static readonly List<KitchenAudio> Active = new List<KitchenAudio>();
         KitchenLocomotionSettings locomotion;
+        AudioSource menuVoice;
         Vector3 previousPosition;
         float distance;
         int next;
@@ -25,16 +26,25 @@ namespace XRApartment.Runtime
             previousPosition = transform.position;
             for (var i = 0; i < voices.Length; i++)
             {
-                var voice = new GameObject("Kitchen audio voice").AddComponent<AudioSource>();
-                voice.transform.SetParent(transform, false);
-                voice.playOnAwake = false;
+                var voice = CreateVoice("Kitchen audio voice");
                 voice.spatialBlend = 1f;
-                voice.minDistance = .42f;
+                voice.minDistance = .8f;
                 voice.maxDistance = 7f;
                 voice.rolloffMode = AudioRolloffMode.Linear;
                 voice.dopplerLevel = 0f;
                 voices[i] = voice;
             }
+            menuVoice = CreateVoice("Kitchen menu audio voice");
+            menuVoice.spatialBlend = 0f;
+            menuVoice.ignoreListenerPause = true;
+        }
+
+        AudioSource CreateVoice(string voiceName)
+        {
+            var voice = new GameObject(voiceName).AddComponent<AudioSource>();
+            voice.transform.SetParent(transform, false);
+            voice.playOnAwake = false;
+            return voice;
         }
 
         void OnEnable() => Active.Add(this);
@@ -42,6 +52,7 @@ namespace XRApartment.Runtime
         {
             Active.Remove(this);
             foreach (var voice in voices) if (voice != null) voice.Stop();
+            if (menuVoice != null) menuVoice.Stop();
         }
 
         public static void Play(Scene scene, KitchenCue cue, Vector3 position, float volume = 1f)
@@ -60,15 +71,19 @@ namespace XRApartment.Runtime
         void PlayCue(KitchenCue cue, Vector3 position, float volume)
         {
             var index = (int)cue;
-            if (clips == null || index >= clips.Length || clips[index] == null) return;
-            var voice = voices[next];
-            next = (next + 1) % voices.Length;
+            if (clips == null || index < 0 || index >= clips.Length || clips[index] == null) return;
+            var voice = menuVoice;
+            if (cue != KitchenCue.Menu)
+            {
+                if (AudioListener.pause) return;
+                voice = voices[next];
+                next = (next + 1) % voices.Length;
+                voice.transform.position = position;
+                voice.pitch = .96f + .02f * (next % 5);
+            }
             voice.Stop();
-            voice.transform.position = position;
-            voice.pitch = .96f + .02f * (next % 5);
-            voice.spatialBlend = cue == KitchenCue.Menu ? 0f : 1f;
-            voice.ignoreListenerPause = cue == KitchenCue.Menu;
-            voice.PlayOneShot(clips[index], Mathf.Clamp01(volume));
+            // Low-speed contacts keep their relative levels and remain audible.
+            voice.PlayOneShot(clips[index], Mathf.Sqrt(Mathf.Clamp01(volume)));
         }
 
         void LateUpdate()
