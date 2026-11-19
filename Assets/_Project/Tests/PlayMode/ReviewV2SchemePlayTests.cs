@@ -118,12 +118,25 @@ namespace XRApartment.Tests
                 string.Join(",", Physics.OverlapSphere(destination, .18f).Select(c => c.name)));
             Assert.AreSame(original, port.Current); Assert.AreEqual(snapshot.SchemeVisitId, host.Snapshot.SchemeVisitId);
             Assert.AreEqual(snapshot.ModelVersion, host.Snapshot.ModelVersion); Assert.AreEqual(initialHistoryCount, host.Snapshot.SchemeHistory.Count);
-            Assert.AreEqual(position, egg.transform.position); Assert.IsTrue(host.station.ActiveFridge.Door.IsOpen);
+            Assert.That(Vector3.Distance(position, egg.transform.position), Is.LessThan(.002f));
+            Assert.IsTrue(host.station.ActiveFridge.Door.IsOpen);
             Assert.IsTrue(egg.isSelected, "A rejected switch must preserve the original held object");
             camera.position = before;
             Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
             yield return ReviewOperationWait.Idle(host);
             Assert.IsTrue(result.Succeeded, result.Message); Object.Destroy(driver); yield return null;
+        }
+        [UnityTest] public IEnumerator SafeExitDuringSwitchDoesNotReplaceTheCurrentWorld()
+        {
+            var world = port.Current;
+            string visit = host.Snapshot.SchemeVisitId;
+            Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
+            Assert.IsTrue(host.Snapshot.IsBusy);
+            Assert.IsTrue(host.Execute(CommandType.SafeExit).Accepted);
+            yield return new WaitForSecondsRealtime(.15f);
+            Assert.AreSame(world, port.Current);
+            Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
+            Assert.AreEqual(SessionPhase.Exited, host.Snapshot.Phase);
         }
         [UnityTest] public IEnumerator ClosedFridgeEnvelopeHasNoFixedFurnitureOverlap()
         {

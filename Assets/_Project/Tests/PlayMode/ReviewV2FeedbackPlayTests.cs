@@ -24,12 +24,12 @@ namespace XRApartment.Tests
         [UnitySetUp] public IEnumerator Setup()
         {
             previous=Environment.GetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY"); directory=Path.Combine(Path.GetTempPath(),"ReviewV2-play-"+Guid.NewGuid().ToString("N")); Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY",directory);
-            foreach(var root in SceneManager.GetActiveScene().GetRootGameObjects()) if(root.activeSelf && (root.GetComponentInChildren<XROrigin>(true)!=null || root.GetComponentInChildren<EventSystem>(true)!=null || root.GetComponentInChildren<XRInteractionManager>(true)!=null)) { hidden.Add(root);root.SetActive(false); }
+            foreach(var root in SceneManager.GetActiveScene().GetRootGameObjects()) if(root.activeSelf && (root.GetComponentInChildren<XROrigin>(true)!=null || root.GetComponentInChildren<EventSystem>(true)!=null || root.GetComponentInChildren<XRInteractionManager>(true)!=null || root.GetComponentsInChildren<Light>(true).Any(light => light.type == LightType.Directional && light.isActiveAndEnabled))) { hidden.Add(root);root.SetActive(false); }
             scene=EditorSceneManager.LoadSceneInPlayMode("Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity",new LoadSceneParameters(LoadSceneMode.Additive));
             while(!scene.isLoaded) yield return null; yield return null;
             panel=scene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<ReviewIntegrationPanel>(true)).Single();recorder=panel.host.GetComponent<SpatialFeedbackRecorder>();
             yield return ReviewOperationWait.Until(() => recorder.IsReady, "feedback loaded");
-            panel.setup.onClick.Invoke();panel.onboarding.onClick.Invoke();
+            EnterExperience();
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
@@ -42,12 +42,18 @@ namespace XRApartment.Tests
             foreach(var root in hidden) if(root!=null)root.SetActive(true);hidden.Clear();Time.timeScale=1;
             Environment.SetEnvironmentVariable("REVIEW_V2_FEEDBACK_DIRECTORY",previous); if(Directory.Exists(directory))Directory.Delete(directory,true);
         }
+        void EnterExperience()
+        {
+            // Formal V2 delegates onboarding to T2. These tests exercise feedback, not the onboarding views.
+            Assert.IsTrue(panel.host.Execute(CommandType.CompleteSetup).Accepted);
+            Assert.IsTrue(panel.host.Execute(CommandType.CompleteOnboarding).Accepted);
+        }
         void Submit(string note)
         {
             panel.OpenMark();panel.markDraft.concern.onClick.Invoke();panel.markDraft.SetCapturedPoint(panel.host.Resolve("FRIDGE").position,"FRIDGE");panel.markDraft.note.text=note;panel.markDraft.submit.onClick.Invoke();
         }
         IEnumerator MarkSaved(FeedbackSaveStatus status = FeedbackSaveStatus.Verified) =>
-            ReviewOperationWait.Until(() => recorder.Records.Last().saveStatus == status &&
+            ReviewOperationWait.Until(() => recorder.Records.LastOrDefault()?.saveStatus == status &&
                 (panel.markDraft.note.readOnly == (status == FeedbackSaveStatus.Verified)), "marker write and UI settled");
         IEnumerator Idle() => ReviewOperationWait.Idle(panel.host);
         void Observe() => typeof(ReviewSessionHost).GetMethod("Observe",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(panel.host,new object[]{InteractionKind.ObjectGrabbed,"FRIDGE"});
@@ -57,7 +63,7 @@ namespace XRApartment.Tests
             Assert.AreEqual(FeedbackType.Concern,recorder.Records[0].type);
             var first=recorder.Records[0];
             var marker = panel.host.transform.Find("Feedback " + first.markerId);
-            panel.markDraft.cancel.onClick.Invoke(); panel.quickReview.onClick.Invoke();
+            panel.markDraft.cancel.onClick.Invoke(); panel.RequestReviewFromT2();
             Assert.AreSame(marker, panel.host.transform.Find(marker.name));
             var row = panel.reviewBoard.listScroll.content.Find("Marker " + first.markerId);
             panel.reviewBoard.Refresh();
@@ -67,12 +73,12 @@ namespace XRApartment.Tests
             Assert.IsTrue(panel.host.Execute(CommandType.ChangeScheme,SchemeIds.ExternalRefrigerator).Accepted);yield return Idle();
             Assert.AreEqual(SchemeIds.ExternalRefrigerator,panel.host.Snapshot.SchemeId);Submit("B feedback");yield return MarkSaved();panel.markDraft.cancel.onClick.Invoke();
             Assert.AreEqual(2,recorder.Records.Count);Assert.AreNotEqual(first.schemeVisitId,recorder.Records[1].schemeVisitId);
-            panel.quickReview.onClick.Invoke();Assert.AreEqual(1,panel.reviewBoard.listScroll.content.GetComponentsInChildren<UnityEngine.UI.Button>().Length);
+            panel.RequestReviewFromT2();Assert.AreEqual(1,panel.reviewBoard.listScroll.content.GetComponentsInChildren<UnityEngine.UI.Button>().Length);
             panel.reviewBoard.allSchemes.onClick.Invoke();Assert.AreEqual(2,panel.reviewBoard.listScroll.content.GetComponentsInChildren<UnityEngine.UI.Button>().Count(b=>b.gameObject.activeSelf));
             panel.back.onClick.Invoke();panel.host.Execute(CommandType.ChangeScheme,SchemeIds.IntegratedKitchen);yield return Idle();
             Assert.AreEqual(2,recorder.Records.Count);Assert.AreEqual(0,panel.host.GetComponent<ReviewFeedbackMarkers>().transform.Cast<Transform>().Count(t=>t.name.StartsWith("Feedback ")&&t.gameObject.activeSelf));
             panel.host.Execute(CommandType.ResetWorld);for(int i=0;i<180&&panel.host.Snapshot.IsBusy;i++)yield return null;
-            Assert.AreEqual(2,recorder.Records.Count);panel.quickReview.onClick.Invoke();panel.finish.onClick.Invoke();yield return Idle();
+            Assert.AreEqual(2,recorder.Records.Count);panel.RequestReviewFromT2();panel.finish.onClick.Invoke();yield return Idle();
             Assert.AreEqual(SessionPhase.Finished,panel.host.Snapshot.Phase);Assert.AreEqual(SaveStatus.Verified,panel.host.Snapshot.SaveStatus);
             Assert.AreEqual(2,new LocalFeedbackStore().Load().records.Count);Assert.IsTrue(File.Exists(ReviewFeedbackSavePort.CheckpointPath(panel.host.Snapshot.SessionId)));
         }
@@ -86,7 +92,7 @@ namespace XRApartment.Tests
             using(var locked=new FileStream(checkpoint+".tmp",FileMode.Create,FileAccess.ReadWrite,FileShare.None))
             {
                 panel.host.Execute(CommandType.ChangeScheme,SchemeIds.ExternalRefrigerator);yield return Idle();Assert.AreEqual(visit,panel.host.Snapshot.SchemeVisitId);Assert.AreEqual(SaveStatus.Failed,panel.host.Snapshot.SaveStatus);
-                panel.quickReview.onClick.Invoke();panel.finish.onClick.Invoke();yield return Idle();Assert.AreEqual(SessionPhase.Review,panel.host.Snapshot.Phase);Assert.AreEqual(SaveStatus.Failed,panel.host.Snapshot.SaveStatus);
+                panel.RequestReviewFromT2();panel.finish.onClick.Invoke();yield return Idle();Assert.AreEqual(SessionPhase.Review,panel.host.Snapshot.Phase);Assert.AreEqual(SaveStatus.Failed,panel.host.Snapshot.SaveStatus);
             }
             panel.finish.onClick.Invoke();yield return Idle();Assert.AreEqual(SessionPhase.Finished,panel.host.Snapshot.Phase);Assert.AreEqual(SaveStatus.Verified,panel.host.Snapshot.SaveStatus);yield return null;
         }
@@ -121,7 +127,7 @@ namespace XRApartment.Tests
             Assert.IsEmpty(marker.GetComponentsInChildren<Collider>());
             var fridge=panel.host.Resolve("FRIDGE");var oldPoint=marker.position;fridge.position+=Vector3.right*.1f;yield return null;
             Assert.That(Vector3.Distance(oldPoint+Vector3.right*.1f,marker.position),Is.LessThan(.01f));fridge.position-=Vector3.right*.1f;
-            panel.quickReview.onClick.Invoke();
+            panel.RequestReviewFromT2();
             foreach(var size in new[]{new Vector2Int(1280,720),new Vector2Int(960,720)})
             {
                 var target=new RenderTexture(size.x,size.y,24);target.Create();camera.targetTexture=target;camera.aspect=(float)size.x/size.y;
@@ -149,7 +155,7 @@ namespace XRApartment.Tests
             panel=scene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<ReviewIntegrationPanel>(true)).Single();recorder=panel.host.GetComponent<SpatialFeedbackRecorder>();
             yield return ReviewOperationWait.Until(() => recorder.IsReady, "feedback loaded");
             Assert.AreEqual(1,recorder.Records.Count);Assert.AreNotEqual(oldSession,panel.host.Snapshot.SessionId);
-            panel.setup.onClick.Invoke();panel.onboarding.onClick.Invoke();panel.quickReview.onClick.Invoke();Assert.AreEqual(ReviewBoardDisplayState.Empty,panel.reviewBoard.State);
+            EnterExperience();panel.RequestReviewFromT2();Assert.AreEqual(ReviewBoardDisplayState.Empty,panel.reviewBoard.State);
             panel.finish.onClick.Invoke();yield return Idle();Assert.AreEqual(SaveStatus.Verified,panel.host.Snapshot.SaveStatus);
         }
     }
