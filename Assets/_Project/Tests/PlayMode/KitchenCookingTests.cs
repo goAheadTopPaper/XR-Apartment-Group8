@@ -128,12 +128,15 @@ namespace XRApartment.Tests
             // Transfer is verified; loose shells must not obstruct the independent whisking fixture.
             egg.SetActive(false);
             var whisk = Load(Cooking + "PREF_Cooking_Whisk.prefab", Vector3.up * -.005f);
-            var grab = whisk.GetComponent<XRGrabInteractable>(); hand.transform.position = whisk.transform.position;
+            var grab = whisk.GetComponent<XRGrabInteractable>();
+            var grip = grab.attachTransform;
+            var gripOffset = grip.position - whisk.transform.position;
+            hand.transform.SetPositionAndRotation(grip.position, grip.rotation);
             yield return null; manager.SelectEnter((IXRSelectInteractor)hand, grab);
             for (var i = 0; i < 240 && bowl.Stage != CookingStage.Beaten; i++)
             {
                 var angle = i * .35f;
-                hand.transform.position = origin + new Vector3(Mathf.Cos(angle) * .035f, -.005f, Mathf.Sin(angle) * .035f);
+                hand.transform.position = origin + new Vector3(Mathf.Cos(angle) * .035f, -.005f, Mathf.Sin(angle) * .035f) + gripOffset;
                 yield return null;
                 yield return new WaitForFixedUpdate();
             }
@@ -268,24 +271,132 @@ namespace XRApartment.Tests
         }
 
         [UnityTest]
+        public IEnumerator CookingToolsAlignAuthoredGripForEitherHand()
+        {
+            const string prefabs = "Assets/_Project/Prefabs/";
+            var tools = new[]
+            {
+                (path: "Generated/knife_v001/PREF_Prop_knife.prefab", axis: Vector3.forward, direction: Vector3.down),
+                (path: "Cooking/PREF_Cooking_FryingPan.prefab", axis: Vector3.up, direction: Vector3.up),
+                (path: "Cooking/Recipe/PREF_Cooking_FryingPan.prefab", axis: Vector3.up, direction: Vector3.up),
+                (path: "Cooking/PREF_Cooking_WaterPot.prefab", axis: Vector3.up, direction: Vector3.up),
+                (path: "Cooking/Recipe/PREF_Cooking_Spatula.prefab", axis: Vector3.back, direction: Vector3.forward),
+                (path: "Cooking/PREF_Cooking_Whisk.prefab", axis: Vector3.down, direction: new Vector3(0f, -.866f, .5f))
+            };
+            foreach (var (path, axis, direction) in tools)
+            {
+                var tool = Load(prefabs + path, Vector3.zero);
+                var body = tool.GetComponent<Rigidbody>();
+                var grab = tool.GetComponent<XRGrabInteractable>();
+                var guard = tool.GetComponent<CollisionConstrainedGrabTransformer>();
+                Assert.IsNotNull(grab.attachTransform, path);
+                body.interpolation = RigidbodyInterpolation.None;
+                var grips = new List<Transform> { grab.attachTransform };
+                if (path.EndsWith("WaterPot.prefab", System.StringComparison.Ordinal))
+                {
+                    var other = tool.transform.Find("ATT_AlternateGrip");
+                    Assert.IsNotNull(other, "Both visible stockpot handles must be grippable.");
+                    grips.Add(other);
+                }
+
+                foreach (var side in new[] { InteractorHandedness.Left, InteractorHandedness.Right })
+                foreach (var grip in grips)
+                {
+                    var start = new Pose(origin + Vector3.up * .2f, Quaternion.Euler(24f, 73f, 11f));
+                    body.position = start.position; body.rotation = start.rotation;
+                    body.velocity = body.angularVelocity = Vector3.zero;
+                    tool.transform.SetPositionAndRotation(start.position, start.rotation);
+                    grab.SetTargetPose(start);
+                    hand.handedness = side;
+                    var handRotation = Quaternion.Euler(6f, -25f, 9f);
+                    hand.transform.SetPositionAndRotation(grip.position + Vector3.up * .03f, handRotation);
+                    Physics.SyncTransforms();
+                    yield return null;
+                    manager.SelectEnter((IXRSelectInteractor)hand, grab);
+                    for (var frame = 0; frame < 5; frame++) yield return null;
+
+                    Assert.IsTrue(grab.isSelected, path);
+                    Assert.IsFalse(guard.IsBlocked, path);
+                    Assert.That(Vector3.Distance(grip.position, hand.GetAttachTransform(grab).position), Is.LessThan(.003f), $"{side} {path}");
+                    Assert.That(Quaternion.Angle(grip.rotation, handRotation), Is.LessThan(.5f), $"{side} {path}");
+                    Assert.That(Vector3.Dot(tool.transform.TransformDirection(axis), handRotation * direction), Is.GreaterThan(.98f), $"{side} {path}");
+                    manager.SelectExit((IXRSelectInteractor)hand, grab);
+                    yield return null;
+                }
+                Object.DestroyImmediate(tool);
+            }
+
+            var food = Prop("tomato", Vector3.zero).GetComponent<XRGrabInteractable>();
+            Assert.IsTrue(food.useDynamicAttach && food.matchAttachPosition && food.matchAttachRotation);
+        }
+
+        [UnityTest]
         public IEnumerator ActualHeldKnifeTriggerCutsFoodButDroppedKnifeDoesNot()
         {
             var tomato = Prop("tomato", Vector3.up * .05f);
-            tomato.GetComponent<Rigidbody>().isKinematic = true;
+            var tomatoBody = tomato.GetComponent<Rigidbody>();
+            tomatoBody.interpolation = RigidbodyInterpolation.None;
+            tomatoBody.isKinematic = true;
             var target = tomato.GetComponent<PreparedKitchenProp>();
-            var knife = Prop("knife", new Vector3(.055f, .08f, 0));
-            knife.GetComponent<Rigidbody>().isKinematic = true;
-            yield return new WaitForFixedUpdate(); yield return new WaitForFixedUpdate();
-            Assert.IsFalse(target.IsSplit, "An unheld knife cannot activate a prepared cut.");
-            knife.transform.position = origin + new Vector3(.055f, .2f, 0); Physics.SyncTransforms();
-            var grab = knife.GetComponent<XRGrabInteractable>(); hand.transform.position = knife.transform.position;
-            yield return null; manager.SelectEnter((IXRSelectInteractor)hand, grab);
-            for (var i = 0; i < 20 && !target.IsSplit; i++)
+            var knife = Prop("knife", Vector3.zero);
+            var knifeBody = knife.GetComponent<Rigidbody>();
+            var grab = knife.GetComponent<XRGrabInteractable>();
+            var guard = knife.GetComponent<CollisionConstrainedGrabTransformer>();
+            var blade = knife.GetComponentInChildren<PreparedKitchenKnife>().GetComponent<BoxCollider>();
+            var upright = Quaternion.Euler(90f, 0f, 0f);
+            knifeBody.interpolation = RigidbodyInterpolation.None;
+            knifeBody.isKinematic = true;
+
+            void SetKnifePose(Vector3 position)
             {
-                hand.transform.position -= Vector3.up * .008f;
-                yield return new WaitForFixedUpdate();
+                knifeBody.position = position;
+                knifeBody.rotation = upright;
+                knife.transform.SetPositionAndRotation(position, upright);
+                grab.SetTargetPose(new Pose(position, upright));
+                Physics.SyncTransforms();
             }
-            Assert.IsTrue(target.IsSplit, "Authored blade trigger must reach food when its physical blade is constrained at contact.");
+
+            SetKnifePose(origin + new Vector3(-.071f, .08f, 0f));
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+            Assert.IsFalse(target.IsSplit, "An unheld knife cannot activate a prepared cut.");
+
+            var handleStart = origin + new Vector3(.095f, .24f, 0f);
+            var tomatoMaxX = tomato.GetComponent<XRGrabInteractable>().colliders.Max(collider => collider.bounds.max.x);
+            SetKnifePose(handleStart);
+            yield return new WaitForFixedUpdate();
+            yield return null;
+            hand.transform.SetPositionAndRotation(grab.attachTransform.position, grab.attachTransform.rotation);
+            manager.SelectEnter((IXRSelectInteractor)hand, grab);
+            yield return null;
+            Assert.IsTrue(grab.isSelected);
+            var gripOffset = grab.GetAttachTransform(hand).position - knife.transform.position;
+
+            IEnumerator PressFrom(Vector3 start)
+            {
+                for (var step = 1; step <= 30 && !target.IsSplit; step++)
+                {
+                    hand.transform.position = start + gripOffset - Vector3.up * (.008f * step);
+                    yield return null;
+                    yield return new WaitForFixedUpdate();
+                }
+            }
+
+            yield return PressFrom(handleStart);
+            Assert.IsTrue(guard.IsBlocked, "The solid handle must actually press against the tomato.");
+            Assert.That(blade.bounds.min.x, Is.GreaterThan(tomatoMaxX + .005f),
+                $"The blade must stay clear during the handle press. Knife {knife.transform.position:F4}.");
+            Assert.IsFalse(target.IsSplit, "Pressing the handle against the food must not cut it.");
+
+            hand.transform.position = handleStart + gripOffset;
+            yield return null;
+            yield return new WaitForFixedUpdate();
+            var bladeStart = origin + new Vector3(-.071f, .24f, 0f);
+            hand.transform.position = bladeStart + gripOffset;
+            yield return null;
+            yield return new WaitForFixedUpdate();
+            yield return PressFrom(bladeStart);
+            Assert.IsTrue(target.IsSplit, "The held cutting edge must cut at the solid guard's contact distance.");
             manager.SelectExit((IXRSelectInteractor)hand, grab);
         }
 

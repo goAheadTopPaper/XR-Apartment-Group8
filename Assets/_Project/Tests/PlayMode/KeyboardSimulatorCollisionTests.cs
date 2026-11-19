@@ -57,6 +57,7 @@ namespace XRApartment.Tests
             SceneManager.SetActiveScene(scene);
             rig = scene.GetRootGameObjects().Single(g => g.name == "PREF_XR_KitchenRig").transform;
             KitchenSceneTestSetup.DisableStartupGuide(rig.GetComponentInChildren<LocomotionSettingsView>());
+            rig.position = new Vector3(-3.15f, 0f, 1.12f);
             head = rig.GetComponentInChildren<Camera>().transform;
             simulator = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(SimulatorPath))
                 .GetComponent<XRInteractionSimulator>();

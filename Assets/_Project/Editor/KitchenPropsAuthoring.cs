@@ -153,8 +153,19 @@ public static class KitchenPropsAuthoring
                 // The existing water cup and pot retain their open-vessel colliders and scripts.
                 foreach (var filter in root.GetComponentsInChildren<MeshFilter>())
                 {
+                    if (name == "CerealBox")
+                    {
+                        // Even the vendor Low cereal box has 260 triangles, above the
+                        // 256-polygon convex limit. A sphere proxy avoids the partial hull.
+                        var sphere = filter.gameObject.AddComponent<SphereCollider>();
+                        sphere.radius = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * .5f /
+                            Mathf.Max(.0001f, filter.transform.localScale.x);
+                        continue;
+                    }
                     var collider = filter.gameObject.AddComponent<MeshCollider>();
-                    collider.sharedMesh = filter.sharedMesh;
+                    // Convex MeshCollider accepts at most 256 polygons. Vendor Mid/High
+                    // variants exceed that, so use the matching Low mesh as a proxy.
+                    collider.sharedMesh = ConvexProxy(model, filter.sharedMesh);
                     collider.convex = true;
                 }
                 var body = root.AddComponent<Rigidbody>();
@@ -176,6 +187,22 @@ public static class KitchenPropsAuthoring
             PrefabUtility.SaveAsPrefabAsset(root, Prefabs + "PREF_Prop_" + name + ".prefab");
         }
         finally { UnityEngine.Object.DestroyImmediate(root); }
+    }
+
+    static Mesh ConvexProxy(GameObject source, Mesh visual)
+    {
+        if (visual == null || visual.triangles.Length / 3 <= 256) return visual;
+        int split = visual.name.IndexOf("_Mid_", StringComparison.Ordinal);
+        if (split < 0) split = visual.name.IndexOf("_High_", StringComparison.Ordinal);
+        if (split < 0) return visual;
+        var prefix = visual.name.Substring(0, split);
+        foreach (var filter in source.GetComponentsInChildren<MeshFilter>(true))
+        {
+            var low = filter.sharedMesh;
+            if (low != null && low.name.StartsWith(prefix + "_Low_", StringComparison.Ordinal) &&
+                low.triangles.Length / 3 <= 256) return low;
+        }
+        return visual;
     }
 
     static Material AdaptMaterial(Material source)

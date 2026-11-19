@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 709048886833725326}
   - component: {fileID: 3812086060374249992}
   - component: {fileID: 2942059654347354481}
+  - component: {fileID: 2942059654347354501}
   m_Layer: 0
   m_Name: VIS_CerealBox
   m_TagString: Untagged
@@ -101,11 +102,32 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
-  m_Convex: 1
+  m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 4300002, guid: a92fd95f7bd4407489bad6082f018ff6, type: 3}
+  m_Mesh: {fileID: 0}
+--- !u!135 &2942059654347354501
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180572439192822980}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 5.89
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5329185596319542549
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,7 +205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_InteractionManager: {fileID: 0}
   m_Colliders:
-  - {fileID: 2942059654347354481}
+  - {fileID: 2942059654347354501}
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1

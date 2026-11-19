@@ -59,7 +59,8 @@ namespace XRApartment.Runtime
         void Cut(Collider other)
         {
             if (grab == null || !grab.isSelected || strokeUsed || downward < .00015f ||
-                other.attachedRigidbody == null) return;
+                other.isTrigger || other.attachedRigidbody == null ||
+                Vector3.Dot(transform.forward, Vector3.down) < .35f) return;
             var prop = other.attachedRigidbody.GetComponent<PreparedKitchenProp>();
             if (prop == null)
             {

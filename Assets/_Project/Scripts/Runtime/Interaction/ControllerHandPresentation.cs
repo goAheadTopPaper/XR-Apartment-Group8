@@ -7,8 +7,7 @@ using XRApartment.Data;
 
 namespace XRApartment.Runtime
 {
-    /// Adapts Mzh's Grip/Trigger animation and tracked-hand ghost to the existing XRI rig.
-    /// Only the rendered palm stops at surfaces; tracked inputs, UI and task logic stay live.
+    /// Animates the hand attached to its tracked controller and signals blocked held props.
     [DisallowMultipleComponent]
     public sealed class ControllerHandPresentation : MonoBehaviour
     {
@@ -22,18 +21,9 @@ namespace XRApartment.Runtime
         [SerializeField] Transform ghostRoot;
         [SerializeField] SphereCollider contactProbe;
         [SerializeField] Animator solidAnimator;
-        [SerializeField] Animator ghostAnimator;
 
-        Transform tracked;
-        Transform rigRoot;
         Renderer[] solidRenderers;
-        Renderer[] ghostRenderers;
         MaterialPropertyBlock properties;
-        KinematicPalmSolver solver;
-        Vector3 palmPosition;
-        Vector3 lastRigPosition;
-        Quaternion lastRigRotation;
-        float radius, skin, ghostShow, ghostHide, teleportDistance;
         float grip, trigger;
         int feedbackState = -1;
         CollisionConstrainedGrabTransformer heldProp;
@@ -42,38 +32,23 @@ namespace XRApartment.Runtime
 
         public float Grip => grip;
         public float Trigger => trigger;
-        public bool GhostVisible { get; private set; }
-        public Vector3 PalmPosition => palmPosition;
-        public float TrackingOffset => Vector3.Distance(palmPosition, tracked.position);
-        public float TrackingAngle => Quaternion.Angle(solidRoot.rotation, tracked.rotation);
 
         void Awake()
         {
-            tracked = transform.parent;
-            rigRoot = transform.root;
-            contactProbe.enabled = false;
-            contactProbe.center = Vector3.zero;
-            radius = profile.Length("hand_palm_radius");
-            skin = profile.Length("hand_contact_skin");
-            ghostShow = profile.Length("hand_ghost_show_distance");
-            ghostHide = profile.Length("hand_ghost_hide_distance");
-            teleportDistance = profile.Length("hand_teleport_reset_distance");
+            // The solid hand inherits the controller pose from the rig. Disable the older
+            // visual-contact components on existing prefabs.
+            if (contactProbe != null) contactProbe.enabled = false;
+            if (ghostRoot != null) ghostRoot.gameObject.SetActive(false);
             solidRenderers = solidRoot.GetComponentsInChildren<Renderer>(true);
             // Sample the space occupied by the player when a rendered hand reaches across a wall.
             var camera = GetComponentInParent<XROrigin>()?.Camera;
             if (camera != null)
                 foreach (var renderer in solidRenderers)
                     if (renderer.probeAnchor == null) renderer.probeAnchor = camera.transform;
-            ghostRenderers = ghostRoot.GetComponentsInChildren<Renderer>(true);
             properties = new MaterialPropertyBlock();
-            solver = new KinematicPalmSolver(contactProbe, rigRoot, profile.ContactLayers);
-            palmPosition = tracked.position;
-            lastRigPosition = rigRoot.position;
-            lastRigRotation = rigRoot.rotation;
             haptics = interactor.GetComponentInParent<HapticImpulsePlayer>();
             interactor.selectEntered.AddListener(OnSelected);
             interactor.selectExited.AddListener(OnReleased);
-            SetGhost(false);
         }
 
         void OnDestroy()
@@ -102,8 +77,6 @@ namespace XRApartment.Runtime
             trigger = Mathf.MoveTowards(trigger, Mathf.Clamp01(interactor.activateInput.ReadValue()), step);
             solidAnimator.SetFloat(GripId, grip);
             solidAnimator.SetFloat(TriggerId, trigger);
-            ghostAnimator.SetFloat(GripId, grip);
-            ghostAnimator.SetFloat(TriggerId, trigger);
 
             var state = holding ? 2 : interactor.hasHover ? 1 : 0;
             if (state == feedbackState) return;
@@ -114,32 +87,11 @@ namespace XRApartment.Runtime
 
         void LateUpdate()
         {
-            var teleported = Vector3.Distance(rigRoot.position, lastRigPosition) > teleportDistance ||
-                             Quaternion.Angle(rigRoot.rotation, lastRigRotation) > 30f;
-            var from = teleported ? tracked.position : palmPosition;
-            var held = interactor.hasSelection ? interactor.firstInteractableSelected.transform : null;
-            var desired = new Pose(tracked.position, tracked.rotation);
-            if (heldProp != null && interactor.selectionRegion.Value != NearFarInteractor.Region.Far)
-                desired = heldProp.ResolveHand(desired);
-            palmPosition = solver.Resolve(from, desired.position, radius, skin, held);
-            solidRoot.SetPositionAndRotation(palmPosition, desired.rotation);
-            ghostRoot.SetPositionAndRotation(tracked.position, tracked.rotation);
-            var offset = TrackingOffset;
-            if (!GhostVisible && (offset > ghostShow || TrackingAngle > profile.GhostShowAngle)) SetGhost(true);
-            else if (GhostVisible && offset < ghostHide && TrackingAngle < profile.GhostHideAngle) SetGhost(false);
             if (heldProp != null && heldProp.IsBlocked && haptics != null && Time.unscaledTime >= nextBlockedHaptic)
             {
                 haptics.SendHapticImpulse(profile.BlockedHapticAmplitude, profile.BlockedHapticDuration);
                 nextBlockedHaptic = Time.unscaledTime + profile.BlockedHapticInterval;
             }
-            lastRigPosition = rigRoot.position;
-            lastRigRotation = rigRoot.rotation;
-        }
-
-        void SetGhost(bool visible)
-        {
-            GhostVisible = visible;
-            foreach (var renderer in ghostRenderers) renderer.enabled = visible;
         }
     }
 }

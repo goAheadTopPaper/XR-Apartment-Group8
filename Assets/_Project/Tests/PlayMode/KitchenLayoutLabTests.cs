@@ -89,33 +89,46 @@ namespace XRApartment.Tests
                 fridge.Door.SetOpen(true);
                 yield return new WaitForSeconds(1.4f);
                 Assert.That(lab.ObservedSwing(false), Is.EqualTo("105°"), "The forward dock must allow a full opening.");
+                var originalCounterMesh = cabinetCollider.sharedMesh;
+                var formerCounterEnd = new Vector3(-1.83f, 1.6f, 1.98f);
+                var blocker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                blocker.transform.SetPositionAndRotation(new Vector3(-1.87f, 1.35f, 1.98f), Quaternion.identity);
+                blocker.transform.localScale = Vector3.one * .14f;
+                try
+                {
+                    Assert.IsFalse(lab.TryApply(2, out _), "An occupied slot must reject the move.");
+                    Assert.AreEqual(1, lab.ActivePresetIndex);
+                    Assert.AreSame(originalCounterMesh, cabinetCollider.sharedMesh, "Blocked C must restore the full mesh.");
+                }
+                finally { Object.Destroy(blocker); }
+                yield return null;
                 Assert.IsTrue(lab.TryApply(2, out var status), status);
                 yield return null;
-                yield return null;
                 AssertClosedDoorRouteIsClear();
+                Assert.That(Vector3.Distance(fridge.transform.position, new Vector3(-1.87f, 0, 1.98f)), Is.LessThan(.005f));
+                Assert.IsNull(lab.transform.Find("MOD_Pantry"));
+                Assert.AreNotSame(originalCounterMesh, cabinetCollider.sharedMesh);
+                Assert.AreSame(cabinet.GetComponent<MeshFilter>().sharedMesh, cabinetCollider.sharedMesh);
+                Assert.That(counter.bounds.max.x, Is.EqualTo(-2.29f).Within(.01f));
+                Assert.IsFalse(cabinetCollider.Raycast(new Ray(formerCounterEnd, Vector3.down), out _, 1f));
                 fridge.Door.SetOpen(true);
                 yield return new WaitForSeconds(1.4f);
-                Assert.That(fridge.Door.Progress, Is.InRange(.15, .79), "The pantry must physically limit the same door.");
-                Assert.IsFalse(fridge.Accessible, "The full-size leaf cannot clear the shelf-access threshold beside the pantry.");
-                Assert.That(lab.Description(2), Does.Contain("The pantry stopped the fridge door"));
-                Assert.That(fridgeAction.text, Does.Contain("blocked"));
-                Assert.That(fridgeDetail.text, Does.Contain("compact fridge"));
-                var fullAngle = Mathf.Abs(Mathf.DeltaAngle(0f, fridge.Door.transform.localEulerAngles.y));
+                Assert.IsTrue(fridge.Accessible, $"The embedded full-size door must expose shelves (observed {lab.ObservedSwing(false)}).");
+                Assert.That(lab.Description(2), Does.Contain("shortened worktop"));
                 var fullObservation = lab.ObservedSwing(false);
                 var foodScales = stock.Select(food => food.transform.lossyScale).ToArray();
 
                 yield return OpenLayoutMenu(keyboard, movement);
                 ClickWithTrackedRay(movement, menu.transform.Find("FinishSage"));
                 Assert.AreEqual(1, lab.ActiveFinishIndex);
-                Assert.That(menu.transform.Find("SelectedFinish").GetComponent<TMP_Text>().text, Does.EndWith("Sage"));
+                Assert.That(KitchenLocale.Source(menu.transform.Find("SelectedFinish").GetComponent<TMP_Text>()), Does.EndWith("Sage"));
                 Assert.AreEqual(original, counter.sharedMaterial.color);
                 var sage = InstanceColour(counter);
                 Assert.Greater(sage.g, sage.r);
-                Assert.AreEqual(sage, InstanceColour(GameObject.Find("VIS_PantryCase").GetComponent<Renderer>()));
                 Assert.That(fullEnamel.Select(InstanceColour).Distinct().Count(), Is.EqualTo(1),
                     "Full-size door and body should share their finish at both LODs.");
                 Assert.AreEqual(fullObservation, lab.ObservedSwing(false));
-                Assert.That(fridge.Door.Progress, Is.GreaterThan(.15), "Finish selection must leave the blocked door open.");
+                Assert.IsTrue(fridge.Accessible, "Finish selection must leave the usable door open.");
 
                 ClickWithTrackedRay(movement, menu.transform.Find("CompactFridge"));
                 Assert.AreEqual(2, lab.ActivePresetIndex, "Model selection must preserve the furniture arrangement.");
@@ -137,12 +150,10 @@ namespace XRApartment.Tests
 
                 compact.Door.SetOpen(true);
                 yield return new WaitForSeconds(1.4f);
-                var compactAngle = Mathf.Abs(Mathf.DeltaAngle(0f, compact.Door.transform.localEulerAngles.y));
-                Assert.That(compactAngle, Is.GreaterThan(fullAngle + 4f), "A smaller door should clear more of the same pantry.");
-                Assert.IsTrue(compact.Accessible, "The compact leaf should clear the shelf-access threshold in the same layout.");
-                Assert.That(fridgeAction.text, Does.Contain("Grip to take a tomato"));
+                Assert.IsTrue(compact.Accessible, "The compact fridge must also remain usable in C.");
+                Assert.That(KitchenLocale.Source(fridgeAction), Does.Contain("Grip to take a tomato"));
                 yield return OpenLayoutMenu(keyboard, movement);
-                var comparison = menu.transform.Find("ObservedSwing").GetComponent<TMP_Text>().text;
+                var comparison = KitchenLocale.Source(menu.transform.Find("ObservedSwing").GetComponent<TMP_Text>());
                 Assert.That(comparison, Does.Contain("Full " + fullObservation).And.Contain("Compact " + lab.ObservedSwing(true)));
                 Assert.That(lab.ObservedSwing(true), Does.EndWith("°"));
                 var recipe = station.GetComponent<KitchenRecipeController>().Recipe;
@@ -154,11 +165,13 @@ namespace XRApartment.Tests
                 Assert.AreSame(compact, station.ActiveFridge);
                 Assert.AreEqual(step, recipe.Step);
                 Assert.IsTrue(compact.Accessible);
-                Assert.AreEqual(comparison, menu.transform.Find("ObservedSwing").GetComponent<TMP_Text>().text);
+                Assert.AreEqual(comparison, KitchenLocale.Source(menu.transform.Find("ObservedSwing").GetComponent<TMP_Text>()));
                 TestContext.WriteLine(comparison);
                 movement.Close();
 
                 Assert.IsTrue(lab.TryApply(1, out status), status);
+                Assert.AreSame(originalCounterMesh, cabinetCollider.sharedMesh);
+                Assert.IsTrue(cabinetCollider.Raycast(new Ray(formerCounterEnd, Vector3.down), out _, 1f));
                 for (var frame = 0; frame < 3; frame++) yield return null;
                 Assert.AreEqual(2, lab.ActiveFinishIndex);
                 Assert.AreSame(compact, station.ActiveFridge);

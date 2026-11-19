@@ -74,6 +74,7 @@ Simulation 可以使用 Data 的枚举/记录，但不使用 ScriptableObject �
 - `KinematicPalmSolver` 处理静态表面的手掌球，`HeldPropSweep` 处理整个持物的平移与旋转。两者碰撞规则不同，分别维护。
 - `KitchenInteractionSimulator` 只把编辑器模拟器的 FPS 走路交给原有 `XRBodyTransformer` / `CharacterController`，避免直接改追踪位置绕过碰撞；输入和手部模式继续复用 XRI。项目模拟器 Prefab 使用这个派生组件，见 [KeyboardLocomotion.md](KeyboardLocomotion.md)。
 - `KitchenLocomotionSettings` 维护瞬移 / 平移的本机偏好，`LocomotionSettingsView` 提供左手 Y / Menu 与 F8 设置入口；`KitchenTeleportationProvider` / `KitchenTeleportationArea` 约束实际 XRI 瞬移落点和路径。共享 Prefab 接线由 `KitchenLocomotionAuthoring` 统一制作，旧演示菜单转交同一状态；见 [LocomotionModes.md](LocomotionModes.md)。
+- `KitchenLocale` 提供英文 / 简体中文 / 繁体中文三语言，字符串表 `KitchenStrings.txt` 为 `英文<TAB>简体<TAB>繁体`，支持精确匹配、正则规则和富文本标记。首次进入场景且未保存语言偏好时，`LanguageSelectionView` 运行时生成世界空间选择面板；设置菜单的语言按钮重新打开该面板。作者入口为 `XR Apartment/UI/Apply Three-Language UI`。
 - `ReviewElement`、`BenchmarkSlotMarker` 是场景语义入口；状态机和反馈 schema 仍有 PRD 职责，不能按“当前未接 UI”删除。
 - 手部/水体参数来自登记表；不把几何尺寸分散回运行时脚本。当前正式旅程为 B1/B2，共用动作链、交互约束与环境；B3 的代理资源保留，不自动进入主线的 P0 会话计划。
 

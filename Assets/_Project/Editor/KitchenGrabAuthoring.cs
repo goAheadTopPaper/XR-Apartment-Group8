@@ -31,6 +31,22 @@ public static class KitchenGrabAuthoring
         Debug.Log("Collision-constrained grabbing configured for project props.");
     }
 
+    public static void ConfigureCookingToolGrips()
+    {
+        KitchenAuthoring.RequireEditMode();
+        foreach (var path in new[]
+        {
+            "Generated/knife_v001/PREF_Prop_knife.prefab",
+            "Cooking/PREF_Cooking_FryingPan.prefab",
+            "Cooking/Recipe/PREF_Cooking_FryingPan.prefab",
+            "Cooking/PREF_Cooking_WaterPot.prefab",
+            "Cooking/Recipe/PREF_Cooking_Spatula.prefab",
+            "Cooking/PREF_Cooking_Whisk.prefab"
+        })
+            KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + path, ConfigureProp);
+        AssetDatabase.SaveAssets();
+    }
+
     public static void ConfigureProp(GameObject root)
     {
         var grab = root.GetComponent<XRGrabInteractable>();
@@ -75,6 +91,7 @@ public static class KitchenGrabAuthoring
         var data = new SerializedObject(transformer);
         data.FindProperty("profile").objectReferenceValue = profile;
         data.FindProperty("sweepProbe").objectReferenceValue = probe;
+        data.FindProperty("alternateGrip").objectReferenceValue = ConfigureGrip(root.transform, grab, physical);
         data.ApplyModifiedPropertiesWithoutUndo();
         transformer.allowOneHandedScaling = false;
         transformer.allowTwoHandedScaling = false;
@@ -83,9 +100,6 @@ public static class KitchenGrabAuthoring
         grab.startingSingleGrabTransformers.Add(transformer);
         grab.startingMultipleGrabTransformers.Add(transformer);
         grab.addDefaultGrabTransformers = false;
-        grab.useDynamicAttach = true;
-        grab.matchAttachPosition = true;
-        grab.matchAttachRotation = true;
         grab.colliders.Clear();
         grab.colliders.AddRange(physical);
         // The final pose is swept before XRI applies it, including OnBeforeRender.
@@ -106,6 +120,66 @@ public static class KitchenGrabAuthoring
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         EditorUtility.SetDirty(grab);
         EditorUtility.SetDirty(transformer);
+    }
+
+    static Transform ConfigureGrip(Transform root, XRGrabInteractable grab, Collider[] physical)
+    {
+        Transform grip = null, alternate = null;
+        switch (root.name)
+        {
+            case "PREF_Prop_knife":
+                // The blade projects along +X and its cutting edge is on the +Z side.
+                grip = WriteGrip(root, "ATT_Handle", new Vector3(-.095f, .014f, -.01f),
+                    Quaternion.LookRotation(Vector3.right, Vector3.back));
+                break;
+            case "PREF_Cooking_FryingPan":
+                grip = WriteGrip(root, GripCentre(PickHandle("COL_Proxy_VIS_PanHandle", "VIS_PanHandle")),
+                    Quaternion.LookRotation(Vector3.left, Vector3.up));
+                break;
+            case "PREF_Cooking_Spatula":
+                grip = WriteGrip(root, GripCentre(PickHandle("COL_SpatulaHandle")),
+                    Quaternion.LookRotation(Vector3.back, Vector3.up));
+                break;
+            case "PREF_Cooking_Whisk":
+                grip = WriteGrip(root, GripCentre(PickHandle("COL_Proxy_VIS_Handle", "VIS_Handle")),
+                    Quaternion.Euler(30f, 0f, 0f));
+                break;
+            case "PREF_Cooking_WaterPot":
+                var handles = physical.OfType<BoxCollider>()
+                    .Where(collider => collider.name == "COL_Proxy_HANDLE_Pot" || collider.name == "HANDLE_Pot")
+                    .Select(GripCentre).OrderBy(position => position.x).ToArray();
+                if (handles.Length != 2) throw new InvalidOperationException("The water pot needs two solid handle proxies.");
+                grip = WriteGrip(root, handles[0], Quaternion.LookRotation(Vector3.right, Vector3.up));
+                alternate = WriteGrip(root, "ATT_AlternateGrip", handles[1], Quaternion.LookRotation(Vector3.left, Vector3.up));
+                break;
+        }
+
+        if (grip != null) grab.attachTransform = grip;
+        // A two-handle pot uses a mutable XRI attachment for the chosen handle.
+        // Single-handle tools use a fixed attachment, and generic props keep free pickup.
+        grab.useDynamicAttach = grip == null || alternate != null;
+        grab.matchAttachPosition = grip == null;
+        grab.matchAttachRotation = grip == null;
+        return alternate;
+
+        BoxCollider PickHandle(string name, string sourceName = null) => physical.OfType<BoxCollider>()
+            .Single(collider => collider.name == name || collider.name == sourceName);
+        Vector3 GripCentre(BoxCollider handle) => root.InverseTransformPoint(handle.transform.TransformPoint(handle.center));
+    }
+
+    static Transform WriteGrip(Transform root, Vector3 position, Quaternion rotation) =>
+        WriteGrip(root, "ATT_ToolGrip", position, rotation);
+
+    static Transform WriteGrip(Transform root, string name, Vector3 position, Quaternion rotation)
+    {
+        var grip = root.Find(name);
+        if (grip == null)
+        {
+            grip = new GameObject(name).transform;
+            grip.SetParent(root, false);
+        }
+        grip.SetLocalPositionAndRotation(position, rotation);
+        return grip;
     }
 
     static Bounds LocalBounds(Transform root, Collider[] colliders)

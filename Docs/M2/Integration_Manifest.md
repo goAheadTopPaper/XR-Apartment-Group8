@@ -1,5 +1,7 @@
 # M2 Integration Manifest
 
+2026-11-19 V2 Core 性能增量：调用方继续使用 `ISessionReadModel.Snapshot` / `Changed`；无状态变化时读相同的不可变快照，旧快照仍可保留为历史上下文。保存验证成功、方案加载尚未回执时，直接读取仍可看到 `Verified + IsBusy`，不新增 `Changed`；身份切换与 `OperationCompleted` 顺序保持。无需重绑 Host、T2/T3、Prefab 或端口。纯逻辑验证和帧率限制见 [Development Progress](T1_Development_Progress.md)。
+
 2026-11-17 T1+T3试用集成（用户批准，Editor联调已验证）：独立工作区与 `integration/t1-t3-preview`，引入 `feature/mzh@7175372` 的记录Schema/Recorder/Store及原metadata，原位适配现有Mark/Review，新增真实保存端口、右手Near-Far捕捉及独立Marker Prefab。既有公共契约/Core/A/B资源保持；正式T2未接入。实际输入已完成A记录→Review→B记录→两案筛选/详情→Finish/Verified，使用隔离磁盘目录。接线、范围、失败修正和使用步骤见 [T1+T3试用说明](../ReviewV2_T1_T3_Preview.md)。最终EditMode 29/29（job `818e277d434c4981b828ce76f16d743f`）与PlayMode 32/32（job `1a8222042daa4df9b534b5249faa5a53`）分批通过；16:9/4:3的Mark/Review截图检查无字溢出，作者重复配置3资源字节一致，既有UI 493对象与场景333对象ID全部保留；当前控制台0 error、历史警告保留；不据此宣称设备或正式全产品验收。
 
 2026-11-17 任务书占位接入：原 `PREF_UI_ReviewV2Integration` 增加 `ReviewActivityBriefView` 和 `brief/quickBrief/briefBack/activityBrief` 引用，Onboarding 自动显示说明，Experience 主菜单/快捷栏可再次打开。原 Panel 保持唯一 Host 订阅与命令入口；只读 view 以 Id 匹配当前 Goals 并展示 State/Available，未接入或缺失项独立显示，不采用 v0.5 文案中的第四个状态枚举。活动名称来自任务书 v0.5 §3.3，G01/G02 可并行；开合不重置世界/Visit，Review 不设活动完成门槛。四项快捷操作沿用原 Canvas/射线和输入。作者 Ensure 仅补缺失对象，T2 替换时仍禁用整个原 Panel；不依赖 T3，不修改其接口/数据。26/26同批PlayMode与实际模拟器入口检查、16:9/4:3截图通过；具体证据及设备限制见最新 Progress 与 [使用说明](../ReviewV2_Placeholder_UI_Usage.md)。

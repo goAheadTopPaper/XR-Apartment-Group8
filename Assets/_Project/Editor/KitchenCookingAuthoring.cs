@@ -74,9 +74,6 @@ namespace XRApartment.EditorTools
             EnsureWaterSupport(cookingScene);
             ApplyCookingWaterVariants(cookingScene);
             ApplyFurnitureScene(cookingScene);
-            var recipeRig = cookingScene.GetRootGameObjects().Single(go => go.name == "PREF_XR_KitchenRig");
-            recipeRig.transform.SetPositionAndRotation(new Vector3(-3.15f, 0, 1.12f), Quaternion.identity);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(recipeRig.transform);
             ConfigureCookingRoom(cookingScene);
             ConfigureLayoutLab(cookingScene);
             ConfigureSharedExperience();
@@ -166,28 +163,37 @@ namespace XRApartment.EditorTools
             var whole = GetOrAdd<CookableIngredient>(root); whole.Configure(profile, pieces);
         });
 
+        public static void ApplyKnifeInteractionBatch()
+        {
+            KitchenAuthoring.RequireEditMode();
+            ConfigureKnife();
+            KitchenAuthoring.EditPrefab(ChoppingBoardPath, ConfigureChoppingBoardGrab);
+            KitchenAuthoring.EditPrefab(StationPath, ConfigureKnifeRest);
+            AssetDatabase.SaveAssets();
+        }
+
         static void ConfigureKnife() => KitchenAuthoring.EditPrefab(Generated("knife"), root =>
         {
-            // Reviewed source: blade at -X, handle at +X, flat on the tabletop.
-            var old = root.transform.Find("ACT_Blade"); if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
-            var blade = Child(root.transform, "ACT_Blade");
-            var trigger = blade.gameObject.AddComponent<BoxCollider>();
-            trigger.isTrigger = true; trigger.center = new Vector3(-.055f, .006f, 0);
+            // Unity's FBX import mirrors the source X axis. The visible blade is at +X.
+            var blade = root.transform.Find("ACT_Blade") ?? Child(root.transform, "ACT_Blade");
+            var trigger = GetOrAdd<BoxCollider>(blade.gameObject);
+            trigger.isTrigger = true;
             ConfigureKnifeContact(trigger);
-            var tip = Child(blade, "BladeTip"); tip.localPosition = new Vector3(-.14f, .009f, 0);
-            blade.gameObject.AddComponent<PreparedKitchenKnife>().Configure(root.GetComponent<XRGrabInteractable>(), tip);
-            var attach = root.transform.Find("ATT_Handle") ?? Child(root.transform, "ATT_Handle");
-            attach.localPosition = new Vector3(.095f, .014f, 0);
-            root.GetComponent<XRGrabInteractable>().attachTransform = attach;
+            var tip = blade.Find("BladeTip") ?? Child(blade, "BladeTip");
+            tip.localPosition = new Vector3(.146f, .011f, -.012f);
+            var grab = root.GetComponent<XRGrabInteractable>();
+            GetOrAdd<PreparedKitchenKnife>(blade.gameObject).Configure(grab, tip);
             KitchenGrabAuthoring.ConfigureProp(root);
+            grab.distanceCalculationMode = XRBaseInteractable.DistanceCalculationMode.ColliderVolume;
         });
 
         internal static void ConfigureKnifeContact(BoxCollider blade)
         {
-            // The solid guard encloses the whole knife. Its safe stop can put the
-            // accepted cutting edge slightly above a slice lying flat on the board.
-            const float depth = .12f;
-            blade.size = new Vector3(.18f, .024f, depth);
+            // Give the cutting edge contact tolerance for the swept guard's standoff.
+            // The rest of the knife keeps its physical mesh for grabbing and collisions.
+            const float depth = .056f;
+            blade.center = new Vector3(.071f, .01f, .017f);
+            blade.size = new Vector3(.152f, .024f, depth);
             Parameter("cooking_knife_cut_contact_depth", depth);
         }
 

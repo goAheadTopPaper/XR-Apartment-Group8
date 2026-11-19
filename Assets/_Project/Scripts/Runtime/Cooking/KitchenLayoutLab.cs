@@ -12,7 +12,7 @@ namespace XRApartment.Runtime
             public string label;
             public string description;
             public Transform fridgeSocket;
-            public Transform panelSocket;
+            public bool shortenedCounter;
         }
 
         [Serializable]
@@ -28,7 +28,7 @@ namespace XRApartment.Runtime
         [SerializeField] private KitchenFridge fridge;
         [SerializeField] private KitchenFridge compactFridge;
         [SerializeField] private XROrigin player;
-        [SerializeField] private BoxCollider returnPanel;
+        [SerializeField] private Mesh shortenedCounterMesh;
         [SerializeField] private Bounds closedFridgeBounds;
         [SerializeField] private Bounds compactFridgeBounds;
         [SerializeField] private Preset[] presets;
@@ -36,14 +36,13 @@ namespace XRApartment.Runtime
         [SerializeField] private Renderer[] furnitureFinishTargets;
         [SerializeField] private Renderer[] enamelFinishTargets;
 
+        private MeshFilter counter;
+        private MeshCollider counterCollider;
+        private Mesh originalCounterMesh, originalCounterColliderMesh;
+        private Bounds restoredCounterSection;
         private readonly Collider[] overlaps = new Collider[48];
         private MaterialPropertyBlock finishProperties;
-        private struct OpeningResult
-        {
-            public float angle;
-            public bool hitPantry;
-        }
-        private OpeningResult?[] openings;
+        private float?[] openings;
         public int ActivePresetIndex { get; private set; }
         public int ActiveFinishIndex { get; private set; }
         public bool CompactSelected => station != null && compactFridge != null && station.ActiveFridge == compactFridge;
@@ -51,30 +50,54 @@ namespace XRApartment.Runtime
         public int FinishCount => finishes == null ? 0 : finishes.Length;
         public string Label(int index) => presets[index].label;
         public string FinishLabel(int index) => finishes[index].label;
-        public string Description(int index)
-        {
-            var result = openings[OpeningIndex(index, CompactSelected)];
-            return result.HasValue && result.Value.hitPantry
-                ? $"The pantry stopped the fridge door at {result.Value.angle:0}°."
-                : presets[index].description;
-        }
+        public string Description(int index) => presets[index].description;
 
         public string ObservedSwing(bool compact)
         {
             var result = openings[OpeningIndex(ActivePresetIndex, compact)];
-            return result.HasValue ? $"{result.Value.angle:0}°" : "try opening";
+            return result.HasValue ? $"{result.Value:0}°" : "try opening";
         }
 
         internal bool HasObservedOpening(bool compact) => openings[OpeningIndex(ActivePresetIndex, compact)].HasValue;
 
-        private void Awake() => openings = new OpeningResult?[PresetCount * 2];
+        private void Awake()
+        {
+            openings = new float?[PresetCount * 2];
+            foreach (var root in gameObject.scene.GetRootGameObjects())
+            {
+                if (root.name != "PREF_Kitchen_Environment") continue;
+                var worktop = root.transform.Find("SM_KitchenTable");
+                if (worktop == null) break;
+                counter = worktop.GetComponent<MeshFilter>();
+                counterCollider = worktop.GetComponent<MeshCollider>();
+                if (counter == null || counterCollider == null) break;
+                originalCounterMesh = counter.sharedMesh;
+                originalCounterColliderMesh = counterCollider.sharedMesh;
+                if (originalCounterColliderMesh != null && shortenedCounterMesh != null)
+                {
+                    var full = WorldBounds(worktop, originalCounterColliderMesh.bounds);
+                    var shortened = WorldBounds(worktop, shortenedCounterMesh.bounds);
+                    restoredCounterSection.SetMinMax(new Vector3(shortened.max.x, full.min.y, full.min.z), full.max);
+                }
+                break;
+            }
+        }
+
+        private static Bounds WorldBounds(Transform transform, Bounds local)
+        {
+            var world = new Bounds(transform.TransformPoint(local.center), Vector3.zero);
+            for (var i = 0; i < 8; i++)
+                world.Encapsulate(transform.TransformPoint(local.center + Vector3.Scale(local.extents,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1))));
+            return world;
+        }
 
         private static int OpeningIndex(int preset, bool compact) => preset * 2 + (compact ? 1 : 0);
 
-        public void Configure(BoxCollider panel, Bounds closedEnvelope, Bounds compactEnvelope, Preset[] layouts,
+        public void Configure(Mesh cutMesh, Bounds closedEnvelope, Bounds compactEnvelope, Preset[] layouts,
             FinishPreset[] appearance)
         {
-            returnPanel = panel;
+            shortenedCounterMesh = cutMesh;
             closedFridgeBounds = closedEnvelope;
             compactFridgeBounds = compactEnvelope;
             presets = layouts;
@@ -119,8 +142,7 @@ namespace XRApartment.Runtime
         {
             status = "Layout unavailable.";
             var target = compact ? compactFridge : fridge;
-            if (index < 0 || index >= PresetCount || station == null || target == null || returnPanel == null)
-                return false;
+            if (index < 0 || index >= PresetCount || station == null || target == null) return false;
             var current = station.ActiveFridge;
             var preset = presets[index];
             if (current == null || preset == null || preset.fridgeSocket == null) return false;
@@ -136,22 +158,26 @@ namespace XRApartment.Runtime
             }
 
             var socket = preset.fridgeSocket;
-            var panelSocket = preset.panelSocket;
+            var wasShortened = presets[ActivePresetIndex].shortenedCounter;
+            var shorten = preset.shortenedCounter;
+            if ((wasShortened || shorten) && (counter == null || counterCollider == null || shortenedCounterMesh == null))
+                return false;
             Physics.SyncTransforms();
-            if (Occupied(socket, compact ? compactFridgeBounds : closedFridgeBounds, current) ||
-                (panelSocket != null && Occupied(panelSocket, new Bounds(returnPanel.center, returnPanel.size), current)))
+            // Check the volume that grows back before restoring the original counter. For C,
+            // use its shorter geometry for the destination test and roll back if it is blocked.
+            var restoringBlocked = wasShortened && !shorten && RestoredSectionOccupied(current);
+            if (shorten && !wasShortened) SetCounter(true);
+            if (restoringBlocked || Occupied(socket, compact ? compactFridgeBounds : closedFridgeBounds, current))
             {
+                if (shorten && !wasShortened) SetCounter(false);
                 status = "Move yourself and any loose items away from the new layout.";
                 return false;
             }
 
-            // The closed destination has been checked, so place it before registering its door and colliders.
             current.gameObject.SetActive(false);
             target.transform.SetPositionAndRotation(socket.position, socket.rotation);
             target.ResetFridge();
-            if (panelSocket != null)
-                returnPanel.transform.SetPositionAndRotation(panelSocket.position, panelSocket.rotation);
-            returnPanel.gameObject.SetActive(panelSocket != null);
+            if (wasShortened && !shorten) SetCounter(false);
             target.gameObject.SetActive(true);
             station.UseFridge(target);
             ActivePresetIndex = index;
@@ -165,14 +191,36 @@ namespace XRApartment.Runtime
             var active = station == null ? null : station.ActiveFridge;
             if (active == null || !active.Door.IsOpen) return;
             var door = active.Door;
-            var hitPantry = returnPanel != null && door.OpeningBlocker == returnPanel;
-            if (!hitPantry && !door.ReachedOpenAngle) return;
-            openings[OpeningIndex(ActivePresetIndex, CompactSelected)] = new OpeningResult
-            {
-                angle = door.Angle,
-                hitPantry = hitPantry
-            };
+            if (door.OpeningBlocker == null && !door.ReachedOpenAngle) return;
+            openings[OpeningIndex(ActivePresetIndex, CompactSelected)] = door.Angle;
         }
+
+        private void SetCounter(bool shortened)
+        {
+            counter.sharedMesh = shortened ? shortenedCounterMesh : originalCounterMesh;
+            counterCollider.sharedMesh = shortened ? shortenedCounterMesh : originalCounterColliderMesh;
+            Physics.SyncTransforms();
+        }
+
+        private bool RestoredSectionOccupied(KitchenFridge current)
+        {
+            var section = restoredCounterSection;
+            var inner = section.extents - Vector3.one * .01f;
+            if (inner.x <= 0f || inner.y <= 0f || inner.z <= 0f) return false;
+            var camera = player == null ? null : player.Camera;
+            if (camera != null && section.SqrDistance(camera.transform.position) < .18f * .18f) return true;
+            var count = Physics.OverlapBoxNonAlloc(section.center, inner, overlaps, Quaternion.identity, ~0,
+                QueryTriggerInteraction.Ignore);
+            if (count == overlaps.Length) return true;
+            for (var i = 0; i < count; i++)
+                if (overlaps[i].attachedRigidbody != null && !IsFridgeStock(overlaps[i], current)) return true;
+            return false;
+        }
+
+        private static bool IsFridgeStock(Collider hit, KitchenFridge current) =>
+            hit.transform.IsChildOf(current.transform) || (hit.attachedRigidbody != null &&
+            hit.attachedRigidbody.TryGetComponent<KitchenStoredIngredient>(out var food) &&
+            food.Fridge == current && current.Contains(food.transform.position));
 
         private bool Occupied(Transform socket, Bounds bounds, KitchenFridge current)
         {
@@ -194,10 +242,7 @@ namespace XRApartment.Runtime
             for (var index = 0; index < count; index++)
             {
                 var hit = overlaps[index];
-                if (hit == returnPanel || hit.transform.IsChildOf(current.transform)) continue;
-                if (hit.attachedRigidbody != null &&
-                    hit.attachedRigidbody.TryGetComponent<KitchenStoredIngredient>(out var food) &&
-                    food.Fridge == current && current.Contains(food.transform.position)) continue;
+                if (IsFridgeStock(hit, current)) continue;
                 return true;
             }
             return false;

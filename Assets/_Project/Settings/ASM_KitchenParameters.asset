@@ -866,6 +866,24 @@ MonoBehaviour:
     owner: D/E
     status: Prototype assumption
     verification: Unity prototype geometry; client validation pending.
+  - key: cooking_living_window_width
+    valueMetres: 2.62
+    source: Cooking living-room SM_WallDoor aperture; fitted prototype glazing.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_living_window_height
+    valueMetres: 2.4
+    source: Cooking living-room SM_WallDoor aperture; fitted prototype glazing.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_window_collision_depth
+    valueMetres: 0.035
+    source: Cooking living-room SM_WallDoor aperture; fitted prototype glazing.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
   - key: layout_forward_fridge_z
     valueMetres: 1.055
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
@@ -945,7 +963,7 @@ MonoBehaviour:
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.
   - key: cooking_knife_cut_contact_depth
-    valueMetres: 0.12
+    valueMetres: 0.056
     source: Optional cooking sandbox authored asset geometry; not a client dimension.
     owner: Hzc
     status: Prototype assumption
@@ -1625,6 +1643,24 @@ MonoBehaviour:
   - key: apartment_exterior_door_depth
     valueMetres: 0.15
     source: Collider ray survey of shared apartment wall openings; prototype assumption.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: cooking_knife_rest_board_offset_z
+    valueMetres: 0.225
+    source: Optional cooking sandbox authored asset geometry; not a client dimension.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_embedded_fridge_x
+    valueMetres: -1.87
+    source: Prototype center of the existing shortened-counter slot.
+    owner: Hzc
+    status: Prototype assumption
+    verification: Editor bounds and interaction tests; VR handling pending.
+  - key: layout_embedded_fridge_z
+    valueMetres: 1.98
+    source: Prototype center of the existing shortened-counter slot.
     owner: Hzc
     status: Prototype assumption
     verification: Editor bounds and interaction tests; VR handling pending.

@@ -8,7 +8,7 @@ using XRApartment.Data;
 
 namespace XRApartment.Runtime
 {
-    /// XRI still computes the dynamic grip; only its final requested prop pose is constrained.
+    /// Constrains the final prop pose computed from the selected XRI grip.
     /// Throw smoothing therefore sees the accepted motion, never a controller inside a table.
     [DisallowMultipleComponent]
     public sealed class CollisionConstrainedGrabTransformer : XRGeneralGrabTransformer, IXRDropTransformer
@@ -16,6 +16,7 @@ namespace XRApartment.Runtime
         static readonly ProfilerMarker SweepMarker = new ProfilerMarker("XR Apartment.Held Prop Sweep");
         [SerializeField] HandInteractionProfile profile;
         [SerializeField] BoxCollider sweepProbe;
+        [SerializeField] Transform alternateGrip;
         HeldPropSweep sweep;
         Pose accepted;
         Transform rig;
@@ -45,10 +46,21 @@ namespace XRApartment.Runtime
         public override void OnGrab(XRGrabInteractable grabInteractable)
         {
             RestoreThrow(grabInteractable);
+            var interactor = grabInteractable.interactorsSelecting[0];
+            if (alternateGrip != null)
+            {
+                var primary = grabInteractable.attachTransform;
+                var handPosition = interactor.GetAttachTransform(grabInteractable).position;
+                var grip = (handPosition - alternateGrip.position).sqrMagnitude < (handPosition - primary.position).sqrMagnitude
+                    ? alternateGrip : primary;
+                // XRI made a private dynamic attach transform from the primary grip.
+                // Choose the closest handle before the transformer captures its relative pose.
+                grabInteractable.GetAttachTransform(interactor).SetPositionAndRotation(grip.position, grip.rotation);
+            }
             base.OnGrab(grabInteractable);
             accepted = new Pose(transform.position, transform.rotation);
             RequestedPose = accepted;
-            rig = grabInteractable.interactorsSelecting[0].transform.root;
+            rig = interactor.transform.root;
             IsBlocked = false;
             if (gripSoundFrame != Time.frameCount)
             {
@@ -75,13 +87,6 @@ namespace XRApartment.Runtime
             IsBlocked = sweep.QuerySaturated || Vector3.SqrMagnitude(accepted.position - targetPose.position) > .000001f ||
                         Quaternion.Angle(accepted.rotation, targetPose.rotation) > .5f;
             targetPose = accepted;
-        }
-
-        public Pose ResolveHand(Pose tracked)
-        {
-            var correction = transform.rotation * Quaternion.Inverse(RequestedPose.rotation);
-            return new Pose(transform.position + correction * (tracked.position - RequestedPose.position),
-                correction * tracked.rotation);
         }
 
         public void OnDrop(XRGrabInteractable grabInteractable, DropEventArgs args)

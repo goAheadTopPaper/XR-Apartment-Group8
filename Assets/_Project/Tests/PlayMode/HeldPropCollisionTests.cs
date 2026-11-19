@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.TestTools;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Inputs;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using XRApartment.Runtime;
@@ -39,7 +42,7 @@ namespace XRApartment.Tests
         [TearDown]
         public void TearDown()
         {
-            if (grab != null && grab.isSelected) manager.SelectExit((IXRSelectInteractor)hand, grab);
+            if (grab != null && grab.isSelected) manager.SelectExit(grab.firstInteractorSelecting, grab);
             for (var i = objects.Count - 1; i >= 0; i--)
                 if (objects[i] != null) Object.DestroyImmediate(objects[i]);
             objects.Clear();
@@ -93,6 +96,82 @@ namespace XRApartment.Tests
             PushThroughTable("Assets/_Project/Prefabs/Props/PREF_Prop_Mug.prefab");
 
         [UnityTest]
+        public IEnumerator EmptyControllerHandTracksAcrossSolidTable()
+        {
+            var table = Create("Test solid tabletop").AddComponent<BoxCollider>();
+            table.size = new Vector3(2f, .05f, 2f);
+            var presentation = CreateControllerHand(out _);
+            yield return null;
+
+            var controller = presentation.transform.parent;
+            controller.SetPositionAndRotation(origin + Vector3.down * .4f, Quaternion.Euler(20f, 35f, 15f));
+            yield return null;
+
+            AssertPalmMatchesController(presentation);
+        }
+
+        [UnityTest]
+        public IEnumerator GrabbingHandTracksAcrossTableWhilePotStops()
+        {
+            var table = Create("Test solid tabletop").AddComponent<BoxCollider>();
+            table.size = new Vector3(2f, .05f, 2f);
+            var presentation = CreateControllerHand(out var interactor);
+            LoadProp(PotPath);
+            yield return null;
+
+            interactor.selectInput.QueueManualState(true, 1f);
+            if (!grab.isSelected) manager.SelectEnter((IXRSelectInteractor)interactor, grab);
+            for (var frame = 0; frame < 4; frame++) yield return null;
+            Assert.IsTrue(interactor.IsSelecting(grab));
+
+            presentation.transform.parent.position = origin + Vector3.down * .4f;
+            for (var frame = 0; frame < 10; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
+
+            Assert.IsTrue(interactor.IsSelecting(grab));
+            Assert.IsTrue(grab.GetComponent<CollisionConstrainedGrabTransformer>().IsBlocked);
+            foreach (var collider in grab.colliders)
+                Assert.That(collider.bounds.min.y, Is.GreaterThanOrEqualTo(table.bounds.max.y - .003f), collider.name);
+            AssertPalmMatchesController(presentation);
+            manager.SelectExit((IXRSelectInteractor)interactor, grab);
+        }
+
+        ControllerHandPresentation CreateControllerHand(out NearFarInteractor interactor)
+        {
+            var rigContainer = Create("Test rig container");
+            rigContainer.SetActive(false);
+            var rig = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Prefabs/PREF_XR_KitchenRig.prefab"), rigContainer.transform, false);
+            // Register the groups and their members with the same manager even when a prior test left a scene loaded.
+            foreach (var group in rig.GetComponentsInChildren<XRInteractionGroup>(true))
+                group.interactionManager = manager;
+            foreach (var rigInteractor in rig.GetComponentsInChildren<XRBaseInteractor>(true))
+                rigInteractor.interactionManager = manager;
+            rig.GetComponentInChildren<XRInputModalityManager>(true).enabled = false;
+            var presentation = System.Array.Find(rig.GetComponentsInChildren<ControllerHandPresentation>(true),
+                handPresentation => handPresentation.name == "PREF_Hand_Right");
+            var controller = presentation.transform.parent;
+            controller.GetComponent<TrackedPoseDriver>().enabled = false;
+            controller.position = origin + Vector3.up * .4f;
+            interactor = controller.GetComponentInChildren<NearFarInteractor>(true);
+            interactor.keepSelectedTargetValid = true;
+            interactor.enableFarCasting = false;
+            interactor.selectInput.inputSourceMode = XRInputButtonReader.InputSourceMode.ManualValue;
+            for (var node = presentation.transform; node != rigContainer.transform; node = node.parent)
+                node.gameObject.SetActive(true);
+            rigContainer.SetActive(true);
+            Physics.SyncTransforms();
+            return presentation;
+        }
+
+        static void AssertPalmMatchesController(ControllerHandPresentation presentation)
+        {
+            var controller = presentation.transform.parent;
+            var palm = presentation.transform.Find("Solid Palm");
+            Assert.That(Vector3.Distance(controller.position, palm.position), Is.LessThan(.001f));
+            Assert.That(Quaternion.Angle(controller.rotation, palm.rotation), Is.LessThan(.1f));
+        }
+
+        [UnityTest]
         public IEnumerator RemainingFoodAndCupPrefabs_AlsoStopAtTheTable()
         {
             var paths = new[]
@@ -131,9 +210,8 @@ namespace XRApartment.Tests
             for (var frame = 0; frame < 10; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
             var guard = grab.GetComponent<CollisionConstrainedGrabTransformer>();
             Assert.IsTrue(guard.IsBlocked);
-            var presented = guard.ResolveHand(new Pose(hand.transform.position, hand.transform.rotation));
-            Assert.That(presented.position.y, Is.GreaterThan(table.bounds.max.y));
-            Assert.That(Vector3.Distance(presented.position, hand.transform.position), Is.GreaterThan(.1f));
+            Assert.That(guard.AcceptedPose.position.y, Is.GreaterThan(table.bounds.max.y));
+            Assert.That(Vector3.Distance(guard.AcceptedPose.position, guard.RequestedPose.position), Is.GreaterThan(.1f));
 
             hand.transform.position = origin + Vector3.up * .4f;
             for (var frame = 0; frame < 10; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
