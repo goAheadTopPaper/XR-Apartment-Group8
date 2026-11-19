@@ -23,8 +23,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
 
             public void Render(GoalSnapshot goal)
             {
-                if (title != null)
-                    title.text = string.IsNullOrWhiteSpace(displayTitle) ? "Goal " + id : displayTitle;
+                KitchenLocale.Set(title, string.IsNullOrWhiteSpace(displayTitle) ? "Goal " + id : displayTitle);
 
                 if (goal == null || !goal.Available)
                 {
@@ -53,7 +52,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
             {
                 if (status != null)
                 {
-                    status.text = label;
+                    KitchenLocale.Set(status, label);
                     status.color = foreground;
                 }
                 if (accent != null) accent.color = foreground;
@@ -134,7 +133,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
             if (sessionLabel != null)
             {
                 bool isMock = snapshot?.IsMock == true;
-                sessionLabel.text = isMock ? "Mock session" : string.Empty;
+                KitchenLocale.Set(sessionLabel, isMock ? "Mock session" : string.Empty);
                 sessionLabel.gameObject.SetActive(isMock);
             }
 

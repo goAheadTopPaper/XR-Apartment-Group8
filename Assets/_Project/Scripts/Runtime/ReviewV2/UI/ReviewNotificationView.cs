@@ -114,8 +114,8 @@ namespace XRApartment.Runtime.ReviewV2.UI
             }
 
             bool paused = currentId != null && snapshot.IsPaused;
-            SetText(statusText, paused ? "Paused" : "");
-            SetText(statusDescription, paused ? "Experience is paused" : "");
+            KitchenLocale.Set(statusText, paused ? "Paused" : "");
+            KitchenLocale.Set(statusDescription, paused ? "Experience is paused" : "");
             SetVisible(persistentStatus, paused);
         }
 
@@ -180,7 +180,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
 
             currentSeverity = severity;
             allowDismiss = canDismiss;
-            SetText(severityText, severity == Severity.SafetyPreview ? "SAFETY\nPREVIEW" :
+            KitchenLocale.Set(severityText, severity == Severity.SafetyPreview ? "SAFETY\nPREVIEW" :
                 severity == Severity.CriticalError ? "CRITICAL\nERROR" : "SYSTEM\nERROR");
             if (severityText != null) severityText.color = severity == Severity.SafetyPreview
                 ? new Color32(255, 208, 122, 255) : new Color32(255, 182, 192, 255);
@@ -291,7 +291,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
 
         static string PreviewPrefix(MessageIdentity identity) =>
             identity.Source == MessageSource.SafetyPreview || identity.Source == MessageSource.TestPreview
-                ? "PREVIEW — " : "";
+                ? KitchenLocale.T("PREVIEW — ") : "";
 
         bool IsDuplicate(MessageIdentity identity, int kind) => !string.IsNullOrWhiteSpace(identity.MessageId) &&
             remembered.Contains((identity.Source, identity.MessageId, kind));

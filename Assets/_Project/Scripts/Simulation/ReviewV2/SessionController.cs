@@ -19,9 +19,10 @@ namespace XRApartment.Simulation.ReviewV2
         SessionPhase phase;
         bool paused;
         V2SaveStatus saveStatus;
+        SessionSnapshot snapshot;
         public event Action<SessionSnapshot> Changed;
         public event Action<OperationResult> OperationCompleted;
-        public SessionSnapshot Snapshot => new SessionSnapshot(sessionId, phase, schemeId, visitId,
+        public SessionSnapshot Snapshot => snapshot ??= new SessionSnapshot(sessionId, phase, schemeId, visitId,
             modelVersion, goals.Snapshot, paused, pending != null, mock, saveStatus, schemeHistory);
         public SessionController(IWorldPort world = null, ISchemePort schemes = null, ISessionSavePort storage = null, bool isMock = false)
             : this(false, world, schemes, storage, isMock) { }
@@ -36,7 +37,11 @@ namespace XRApartment.Simulation.ReviewV2
             if (string.IsNullOrWhiteSpace(initialSchemeId)) throw new ArgumentException("Initial scheme identity is required", nameof(initialSchemeId));
             schemeId = initialSchemeId; schemeHistory.Add(schemeId); goals = new GoalTracker(isMock, groceriesAvailable); }
         bool Terminal => phase == SessionPhase.Finished || phase == SessionPhase.Exited;
-        void Publish() => Changed?.Invoke(Snapshot);
+        void Publish()
+        {
+            snapshot = null;
+            Changed?.Invoke(Snapshot);
+        }
         public CommandResult Execute(CommandType command, string targetSchemeId = null)
         {
             if (Terminal) return new CommandResult(false, "SessionEnded");
@@ -87,6 +92,8 @@ namespace XRApartment.Simulation.ReviewV2
                 if (!verified || mock)
                 { saveStatus = V2SaveStatus.Failed; done(id, false, message); return; }
                 saveStatus = V2SaveStatus.Verified;
+                // The scheme port can read this status before its load completes, without a Changed event.
+                snapshot = null;
                 try { schemes.Change(id, target, done); }
                 catch (Exception ex) { done(id, false, ex.Message); }
             }); }

@@ -119,7 +119,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
         void ResetPresentation()
         {
             SetFeedback(string.Empty);
-            if (teleportPracticeHint != null) teleportPracticeHint.text = "Optional: try a teleport.";
+            KitchenLocale.Set(teleportPracticeHint, "Optional: try a teleport.");
             ShowPage(0);
         }
 
@@ -137,7 +137,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
         void ShowTeleportPractice()
         {
             if (showingOnboarding && teleportPracticeHint != null)
-                teleportPracticeHint.text = "Teleport not connected.\nPractice is optional.";
+                KitchenLocale.Set(teleportPracticeHint, "Teleport not connected.\nPractice is optional.");
         }
 
         public void Skip() => Complete();
@@ -172,7 +172,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
         void SetFeedback(string message)
         {
             foreach (var page in pages)
-                if (page.feedback != null) page.feedback.text = message ?? string.Empty;
+                KitchenLocale.Set(page.feedback, message ?? string.Empty);
         }
     }
 }

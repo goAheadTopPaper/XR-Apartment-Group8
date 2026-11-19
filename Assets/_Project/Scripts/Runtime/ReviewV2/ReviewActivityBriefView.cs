@@ -11,13 +11,13 @@ namespace XRApartment.Runtime.ReviewV2
         public TMP_Text[] goalTitles, goalStates;
         static readonly string[] Titles =
         {
-            "G01  将今天买回来的食材放好", "G02  做好一份西红柿炒蛋",
-            "G03  将做好的菜端上餐桌", "G04  加热一份剩菜", "G05  准备一杯热水"
+            "G01  Put away today's groceries", "G02  Cook a tomato and egg stir-fry",
+            "G03  Serve the dish at the dining table", "G04  Reheat a leftover dish", "G05  Prepare a cup of hot water"
         };
 
         public void ConfigurePresentation()
         {
-            introduction.text = "体验待讨论的厨房设计，感受日常使用是否顺手。\n活动顺序自由，可以同时尝试或中途换一项。\n随时可 Mark 或进入 Review，无需完成活动。";
+            KitchenLocale.Set(introduction, "Experience the kitchen design under discussion and notice whether everyday tasks feel easy.\nActivities are free to reorder, overlap or skip.\nYou can Mark or enter Review at any time.");
             foreach (var text in GetComponentsInChildren<TMP_Text>(true))
             {
                 text.fontSize = 28; text.enableAutoSizing = false;
@@ -25,7 +25,7 @@ namespace XRApartment.Runtime.ReviewV2
                 text.overflowMode = TextOverflowModes.Truncate;
                 text.raycastTarget = false;
             }
-            for (int i = 0; i < Titles.Length; i++) goalTitles[i].text = Titles[i];
+            for (int i = 0; i < Titles.Length; i++) KitchenLocale.Set(goalTitles[i], Titles[i]);
         }
 
         public void Present(SessionSnapshot snapshot)
@@ -36,8 +36,9 @@ namespace XRApartment.Runtime.ReviewV2
                 foreach (var candidate in snapshot.Goals)
                     if (candidate.Id == "G0" + (i + 1)) { goal = candidate; break; }
                 bool available = goal != null && goal.Available;
-                goalStates[i].text = !available ? "未接入" : goal.State == GoalState.Completed ? "已完成" :
-                    goal.State == GoalState.InProgress ? "进行中" : "尚未开始";
+                var state = !available ? "Unavailable" : goal.State == GoalState.Completed ? "Completed" :
+                    goal.State == GoalState.InProgress ? "In Progress" : "Not Started";
+                KitchenLocale.Set(goalStates[i], state);
                 goalStates[i].color = !available ? new Color(1, .81f, .44f) :
                     goal.State == GoalState.Completed ? new Color(.5f, 1, .72f) : Color.white;
             }

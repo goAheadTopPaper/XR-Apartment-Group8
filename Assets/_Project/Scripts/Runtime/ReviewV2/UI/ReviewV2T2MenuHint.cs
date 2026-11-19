@@ -22,7 +22,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
             if (!visible || viewCamera == null) return;
             // Both left-hand secondary/menu controls are accepted by the existing action;
             // device-specific button names are intentionally not guessed.
-            label.text = XRSettings.isDeviceActive ? "控制器菜单 / Menu" : "U  菜单 / Menu";
+            KitchenLocale.Set(label, XRSettings.isDeviceActive ? "Controller Menu" : "U  Menu");
             label.raycastTarget = false;
             var p = viewCamera.ViewportToWorldPoint(new Vector3(.18f, .10f, .8f));
             transform.SetPositionAndRotation(p, viewCamera.transform.rotation);

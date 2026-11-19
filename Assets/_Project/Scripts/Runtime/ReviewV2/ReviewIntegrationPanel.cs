@@ -153,8 +153,8 @@ namespace XRApartment.Runtime.ReviewV2
         }
         static string OtherScheme(string scheme) => scheme == SchemeIds.IntegratedKitchen ? SchemeIds.ExternalRefrigerator :
             scheme == SchemeIds.ExternalRefrigerator ? SchemeIds.IntegratedKitchen : null;
-        static string SchemeName(string scheme) => scheme == SchemeIds.IntegratedKitchen ? "方案 A" :
-            scheme == SchemeIds.ExternalRefrigerator ? "方案 B" : scheme;
+        static string SchemeName(string scheme) => scheme == SchemeIds.IntegratedKitchen ? "Scheme A" :
+            scheme == SchemeIds.ExternalRefrigerator ? "Scheme B" : scheme;
         bool CanSwitch(SessionSnapshot s) => s.CanReview && OtherScheme(s.SchemeId) != null &&
             host.schemePort is ISchemePort port && port.Supports(OtherScheme(s.SchemeId));
         void AskScheme()
@@ -175,7 +175,7 @@ namespace XRApartment.Runtime.ReviewV2
             CommandResult result;
             try { result = host.Execute(CommandType.ChangeScheme, target); }
             finally { issuingScheme = false; }
-            if (!result.Accepted) message = "无法切换：" + result.Reason;
+            if (!result.Accepted) message = "Cannot switch: " + result.Reason;
             else
             {
                 schemeRequestId = result.RequestId;
@@ -188,7 +188,7 @@ namespace XRApartment.Runtime.ReviewV2
         void CompleteScheme(OperationResult result)
         {
             schemeRequestId = null;
-            message = result.Succeeded ? "已切换至" + SchemeName(host.Snapshot.SchemeId) + "，活动进度已重置。" : "切换失败：" + result.Message;
+            message = result.Succeeded ? "Switched to " + SchemeName(host.Snapshot.SchemeId) + ". Activity progress reset." : "Switch failed: " + result.Message;
             Render(host.Snapshot);
         }
         void Completed(OperationResult result)
@@ -323,18 +323,18 @@ namespace XRApartment.Runtime.ReviewV2
             }
             status.fontSize = 30; status.alignment = TextAlignmentOptions.TopLeft;
             status.richText = true;
-            SetLabel(setup, "确认设置 / Next"); SetLabel(onboarding, "开始体验 / Start");
+            SetLabel(setup, "Confirm Setup"); SetLabel(onboarding, "Start Experience");
             SetLabel(review, "Review"); SetLabel(back, "Continue Exploring");
-            SetLabel(finish, "结束体验 / Finish"); SetLabel(exit, "中止会话 / Exit");
-            SetLabel(pause, "暂停与设置 / Pause"); SetLabel(resume, "恢复体验 / Resume");
-            SetLabel(teleport, "传送移动 / Teleport"); SetLabel(smooth, "连续移动 / Smooth");
-            SetLabel(standing, "站姿校准 / Standing"); SetLabel(seated, "坐姿校准 / Seated");
-            SetLabel(recenter, "重新居中 / Recenter"); SetLabel(reset, "重置世界 / Reset");
-            SetLabel(confirmReset, "确认重置 / Confirm"); SetLabel(cancelReset, "取消 / Cancel");
-            SetLabel(close, "关闭菜单 / Close");
-            SetLabel(changeScheme, "切换方案 / Switch"); SetLabel(confirmScheme, "确认切换 / Confirm"); SetLabel(cancelScheme, "取消 / Cancel");
+            SetLabel(finish, "Finish"); SetLabel(exit, "Safe Exit");
+            SetLabel(pause, "Pause & Settings"); SetLabel(resume, "Resume");
+            SetLabel(teleport, "Teleport"); SetLabel(smooth, "Smooth Movement");
+            SetLabel(standing, "Standing"); SetLabel(seated, "Seated");
+            SetLabel(recenter, "Recenter"); SetLabel(reset, "Reset World");
+            SetLabel(confirmReset, "Confirm Reset"); SetLabel(cancelReset, "Cancel");
+            SetLabel(close, "Close Menu");
+            SetLabel(changeScheme, "Switch Scheme"); SetLabel(confirmScheme, "Confirm Switch"); SetLabel(cancelScheme, "Cancel");
             SetLabel(mark, "Mark");
-            SetLabel(brief, "任务书 / Activities"); SetLabel(briefBack, "返回体验 / Back");
+            SetLabel(brief, "Activity Book"); SetLabel(briefBack, "Back to Experience");
             foreach (var button in buttons) Show(button, button == setup || button == teleport || button == smooth ||
                 button == standing || button == seated || button == recenter || button == exit || button == close);
             if (markDraft != null) markDraft.ConfigurePresentation();
@@ -352,13 +352,13 @@ namespace XRApartment.Runtime.ReviewV2
                 }
             }
             if (quickStatus != null) quickStatus.rectTransform.sizeDelta = new Vector2(884, 44);
-            status.text = "<size=40><b>初始设置 / SETUP</b></size>\n选择移动方式，校准站姿或坐姿。\n完成后选择“确认设置”。\nU / 左手 Y：菜单\n<color=#FFCF70>存储未接入，数据未保存</color>";
+            KitchenLocale.Set(status, "<size=40><b>SETUP</b></size>\nChoose a movement mode and calibrate seated or standing.\nConfirm when ready.\nU / Left Y: Menu\n<color=#FFCF70>Storage unavailable; data not saved.</color>");
             LayoutButtons();
         }
         static void SetLabel(Button button, string text)
         {
             if (button == null) return;
-            var label = button.GetComponentInChildren<TMP_Text>(true); label.text = text;
+            var label = button.GetComponentInChildren<TMP_Text>(true); KitchenLocale.Set(label, text);
             label.rectTransform.anchorMin = Vector2.zero; label.rectTransform.anchorMax = Vector2.one;
             label.rectTransform.offsetMin = new Vector2(12, 4); label.rectTransform.offsetMax = new Vector2(-12, -4);
             var colors = button.colors;
@@ -459,7 +459,7 @@ namespace XRApartment.Runtime.ReviewV2
             Show(confirmReset, confirming); Show(cancelReset, confirming);
             Show(changeScheme, s.Phase == SessionPhase.Experience && !s.IsPaused && !confirmation && OtherScheme(s.SchemeId) != null);
             changeScheme.interactable = CanSwitch(s);
-            changeScheme.GetComponentInChildren<TMP_Text>(true).text = "切换到" + SchemeName(OtherScheme(s.SchemeId)) + " / Switch";
+            KitchenLocale.SetLabel(changeScheme, "Switch to " + SchemeName(OtherScheme(s.SchemeId)) + " / Switch");
             Show(confirmScheme, schemeConfirmation != null); Show(cancelScheme, schemeConfirmation != null);
             confirmScheme.interactable = schemeConfirmation != null && CanSwitch(s);
             Show(exit, !terminal && !confirmation); Show(close, !confirmation);
@@ -488,33 +488,39 @@ namespace XRApartment.Runtime.ReviewV2
             if (quickBar != null)
             {
                 quickBar.SetActive(!useT2ExperienceMenu && isActiveAndEnabled && s.CanReview && !panel.activeSelf);
-                quickStatus.text = SchemeName(s.SchemeId) + (host.sessionSavePort != null ? " · 活动顺序自由 · Mark 记录 / Review 回顾" : " · 活动顺序自由 · 标记与存储待接入");
+                KitchenLocale.Set(quickStatus, SchemeName(s.SchemeId) + (host.sessionSavePort != null
+                    ? " · Free activity order · Mark and Review" : " · Free activity order · storage pending"));
             }
             string title, hint;
-            if (confirming) { title = "确认重置 / RESET"; hint = "物品和活动进度将恢复初始状态。\n已有反馈保留原方案归属。"; }
-            else if (schemeConfirmation != null) { title = "切换到" + SchemeName(schemeConfirmation) + " / SWITCH"; hint = "目标方案从初始状态开始，活动进度重置。\n已有反馈保留原方案归属。"; }
-            else if (s.IsBusy) { title = issuingScheme || schemeRequestId != null ? "正在切换方案 / SWITCHING" : "正在处理 / PLEASE WAIT"; hint = "请等待当前操作完成。"; }
-            else if (s.IsPaused) { title = "已暂停 / PAUSED"; hint = "可调整移动方式或校准视角。"; }
+            if (confirming) { title = "RESET"; hint = "World objects and activity progress return to their initial state.\nExisting feedback keeps its original scheme."; }
+            else if (schemeConfirmation != null) { title = "SWITCH TO " + SchemeName(schemeConfirmation); hint = "The target scheme starts from its initial state and activity progress resets.\nExisting feedback keeps its original scheme."; }
+            else if (s.IsBusy) { title = issuingScheme || schemeRequestId != null ? "SWITCHING" : "PLEASE WAIT"; hint = "Please wait for the current operation to finish."; }
+            else if (s.IsPaused) { title = "PAUSED"; hint = "Adjust movement or recenter your view."; }
             else switch (s.Phase)
             {
-                case SessionPhase.Setup: title = "初始设置 / SETUP"; hint = "选择移动方式，校准站姿或坐姿。\n完成后选择“确认设置”。"; break;
-                case SessionPhase.Onboarding: title = "操作引导 / GETTING STARTED"; hint = "探索厨房并抓取物品；Mark 记录，Review 回顾。\n体验下方有任务书、标记与回顾快捷入口。"; break;
-                case SessionPhase.Experience: title = "体验菜单 / EXPERIENCE"; hint = "自由探索厨房，随时进入回顾。"; break;
-                case SessionPhase.Review: title = "体验回顾 / REVIEW"; hint = "整理体验反馈；可以继续体验或结束。"; break;
-                case SessionPhase.Finished: title = "体验结束 / FINISHED"; hint = "本次体验已结束。"; break;
-                default: title = "会话已中止 / EXITED"; hint = "本次会话已中止，未验证的数据不保证保存。"; break;
+                case SessionPhase.Setup: title = "SETUP"; hint = "Choose a movement mode and calibrate seated or standing.\nConfirm when ready."; break;
+                case SessionPhase.Onboarding: title = "GETTING STARTED"; hint = "Explore the kitchen and grab objects; Mark to record, Review to reflect.\nActivity book, Mark and Review shortcuts are below."; break;
+                case SessionPhase.Experience: title = "EXPERIENCE"; hint = "Explore the kitchen freely. Enter Review whenever you like."; break;
+                case SessionPhase.Review: title = "REVIEW"; hint = "Organise your feedback. Continue exploring or finish."; break;
+                case SessionPhase.Finished: title = "FINISHED"; hint = "This session has ended."; break;
+                default: title = "EXITED"; hint = "This session was exited. Unverified data is not guaranteed to be saved."; break;
             }
-            string storage = s.SaveStatus == SaveStatus.Verified ? (s.Phase == SessionPhase.Finished ? "保存已验证" : "上次会话保存已验证") : s.SaveStatus == SaveStatus.Pending ? "正在保存，请等待验证" :
-                s.SaveStatus == SaveStatus.Failed ? "保存失败，数据未验证" : (host.sessionSavePort != null ? "存储已接入，结束或切换时验证会话" : "存储未接入，数据未保存");
+            string storage = s.SaveStatus == SaveStatus.Verified ? (s.Phase == SessionPhase.Finished ? "Save verified." : "Last save verified.") :
+                s.SaveStatus == SaveStatus.Pending ? "Saving; waiting for verification." :
+                s.SaveStatus == SaveStatus.Failed ? "Save failed; data not verified." :
+                (host.sessionSavePort != null ? "Storage connected; session verified on finish or switch." : "Storage unavailable; data not saved.");
             var feedbackRecorder = host.GetComponent<SpatialFeedbackRecorder>();
-            if (feedbackRecorder != null && !feedbackRecorder.IsReady) storage = "标记读取或保存失败，请在回顾页重试";
+            if (feedbackRecorder != null && !feedbackRecorder.IsReady) storage = "Marker read or save failed. Retry in Review.";
             string scheme = SchemeName(s.SchemeId);
-            string movement = host.locomotion.Mode == KitchenMovementMode.Teleport ? "传送移动" : "连续移动";
-            status.text = DraftOpen ? "<size=40><b>记录标记 / MARK</b></size>\n" + scheme + (host.sessionSavePort != null ? " · U：返回" : " · 备注仅试填 · U：返回") :
-                showBrief ? "<size=40><b>任务书 / ACTIVITY BRIEF</b></size>\n" + scheme + " · " + storage + " · U：菜单" +
-                    (string.IsNullOrEmpty(message) ? "" : "\n<size=28><color=#FFCF70>" + message + "</color></size>") :
-                "<size=40><b>" + title + "</b></size>\n" + hint + "\n" + scheme + " · " + movement + " · U / 左手 Y：菜单\n" +
-                "<color=#FFCF70>" + storage + "</color>" + (string.IsNullOrEmpty(message) ? "" : "\n<size=28>" + message + "</size>");
+            string movement = host.locomotion.Mode == KitchenMovementMode.Teleport ? "Teleport" : "Smooth";
+            var source = DraftOpen
+                ? "<size=40><b>MARK</b></size>\n" + scheme + (host.sessionSavePort != null ? " · U: Back" : " · Note preview only · U: Back")
+                : showBrief
+                    ? "<size=40><b>ACTIVITY BRIEF</b></size>\n" + scheme + " · " + storage + " · U: Menu" +
+                        (string.IsNullOrEmpty(message) ? "" : "\n<size=28><color=#FFCF70>" + message + "</color></size>")
+                    : "<size=40><b>" + title + "</b></size>\n" + hint + "\n" + scheme + " · " + movement + " · U / Left Y: Menu\n" +
+                        "<color=#FFCF70>" + storage + "</color>" + (string.IsNullOrEmpty(message) ? "" : "\n<size=28>" + message + "</size>");
+            KitchenLocale.Set(status, source);
             setup.interactable = !deferredToT2 && ready && s.Phase == SessionPhase.Setup;
             if (DraftOpen || s.Phase == SessionPhase.Review)
             {
@@ -525,12 +531,13 @@ namespace XRApartment.Runtime.ReviewV2
                     s.SaveStatus == SaveStatus.Failed ? "Save failed; data not verified." :
                     host.sessionSavePort != null ? "Storage connected; verified on finish or switch." : "Storage unavailable; data not saved.";
                 if (feedbackRecorder != null && !feedbackRecorder.IsReady) save = "Marker read or save failed. Retry from Review.";
-                status.text = DraftOpen ? "<size=40><b>MARK</b></size>\n" + englishScheme + " · U: Back" :
+                var t2Source = DraftOpen ? "<size=40><b>MARK</b></size>\n" + englishScheme + " · U: Back" :
                     "<size=40><b>REVIEW</b></size>\nReview your feedback. Continue exploring or finish.\n" +
                     englishScheme + " · " + (host.locomotion.Mode == KitchenMovementMode.Teleport ? "Teleport" : "Smooth Movement") +
                     " · U: Menu\n<color=#FFCF70>" + save + "</color>";
+                if (!string.IsNullOrEmpty(message)) t2Source += "\n<size=28>" + message + "</size>";
+                KitchenLocale.Set(status, t2Source);
                 SetLabel(finish, "Finish Experience");
-                if (!string.IsNullOrEmpty(message)) status.text += "\n<size=28>" + message + "</size>";
             }
             onboarding.interactable = !deferredToT2 && ready && s.Phase == SessionPhase.Onboarding;
             review.interactable = s.CanReview;

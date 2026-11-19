@@ -38,7 +38,7 @@ namespace XRApartment.Runtime.ReviewV2
                 ((RectTransform)filter.transform).sizeDelta = new Vector2(206, 52);
                 var label = filter.GetComponentInChildren<TMP_Text>(true); label.fontSize = 28; label.rectTransform.sizeDelta = new Vector2(186, 44);
             }
-            if (retry != null) retry.GetComponentInChildren<TMP_Text>(true).text = "Retry";
+            KitchenLocale.SetLabel(retry, "Retry");
             // The English label otherwise wraps beyond its existing 186 x 44 text rect.
             if (currentScheme != null) currentScheme.GetComponentInChildren<TMP_Text>(true).fontSize = 24;
             if (rowTemplate != null) rowTemplate.GetComponentInChildren<TMP_Text>(true).fontSize = 28;
@@ -56,15 +56,15 @@ namespace XRApartment.Runtime.ReviewV2
             var s = host.Snapshot;
             var records = Recorder.Records.Where(r => r.sessionId == s.SessionId && (all || r.schemeId == s.SchemeId)).OrderByDescending(r => r.timestampUtcMilliseconds).ToArray();
             State = records.Length == 0 ? ReviewBoardDisplayState.Empty : ReviewBoardDisplayState.Ready;
-            listText.gameObject.SetActive(records.Length == 0); listText.text = "No Markers Yet";
-            if (records.Length == 0) { detailText.text = "Marker Details\n\nNo matching records in this session."; selected = null; }
+            listText.gameObject.SetActive(records.Length == 0); KitchenLocale.Set(listText, "No Markers Yet");
+            if (records.Length == 0) { KitchenLocale.Set(detailText, "Marker Details\n\nNo matching records in this session."); selected = null; }
             else
             {
                 if (!records.Any(r => r.markerId == selected)) selected = records[0].markerId;
                 foreach (var record in records)
                 {
                     var row = Instantiate(rowTemplate, listScroll.content); row.name = "Marker " + record.markerId; row.gameObject.SetActive(true);
-                    row.GetComponentInChildren<TMP_Text>(true).text = (record.schemeId == SchemeIds.IntegratedKitchen ? "A" : "B") + " · " + ReviewMarkDraftView.TypeName(record.type) + "\n" + LocationName(record);
+                    KitchenLocale.Set(row.GetComponentInChildren<TMP_Text>(true), (record.schemeId == SchemeIds.IntegratedKitchen ? "A" : "B") + " · " + ReviewMarkDraftView.TypeName(record.type) + "\n" + KitchenLocale.T(LocationName(record)));
                     row.onClick.AddListener(() => { selected = record.markerId; ShowDetail(record); }); rows.Add(row);
                     if (record.markerId == selected) ShowDetail(record);
                 }
@@ -75,17 +75,19 @@ namespace XRApartment.Runtime.ReviewV2
         static string LocationName(SpatialFeedbackRecord r) => !string.IsNullOrEmpty(r.objectId) ? r.objectId : !string.IsNullOrEmpty(r.anchorId) ? r.anchorId : "World Position";
         void ShowDetail(SpatialFeedbackRecord r)
         {
-            detailText.text = ReviewMarkDraftView.TypeName(r.type) + " · " + (r.saveStatus == FeedbackSaveStatus.Verified ? "Save Verified" : "Save Not Verified") +
-                "\nScheme: " + r.schemeId + "\nVisit：" + r.schemeVisitId.Substring(0, Math.Min(8, r.schemeVisitId.Length)) +
-                "\nModel: " + r.modelVersion + "\nObject: " + LocationName(r) +
-                "\nLocation: " + new Vector3(r.worldX, r.worldY, r.worldZ).ToString("F2") + "\n\n" + (string.IsNullOrEmpty(r.explanation) ? "(No note)" : r.explanation);
+            KitchenLocale.Set(detailText, KitchenLocale.T(ReviewMarkDraftView.TypeName(r.type)) + " · " +
+                (r.saveStatus == FeedbackSaveStatus.Verified ? "Save Verified" : "Save Not Verified") +
+                "\nScheme: " + r.schemeId + "\nVisit:" + r.schemeVisitId.Substring(0, Math.Min(8, r.schemeVisitId.Length)) +
+                "\nModel: " + r.modelVersion + "\nObject: " + KitchenLocale.T(LocationName(r)) +
+                "\nLocation: " + new Vector3(r.worldX, r.worldY, r.worldZ).ToString("F2") + "\n\n" +
+                (string.IsNullOrEmpty(r.explanation) ? "(No note)" : r.explanation));
             detailScroll.verticalNormalizedPosition = 1;
         }
         public void Present(ReviewBoardDisplayState state, string list = null, string detail = null)
         {
             State = state; listText.gameObject.SetActive(true);
-            listText.text = list ?? (state == ReviewBoardDisplayState.Empty ? "No Markers Yet" : state == ReviewBoardDisplayState.Failed ? "Unable to load markers. Retry." : state == ReviewBoardDisplayState.Ready ? "Markers Loaded" : state == ReviewBoardDisplayState.Loading ? "Loading Markers..." : "T3 unavailable. Markers cannot be loaded.");
-            detailText.text = detail ?? "Marker Details"; currentScheme.interactable = allSchemes.interactable = false;
+            KitchenLocale.Set(listText, list ?? (state == ReviewBoardDisplayState.Empty ? "No Markers Yet" : state == ReviewBoardDisplayState.Failed ? "Unable to load markers. Retry." : state == ReviewBoardDisplayState.Ready ? "Markers Loaded" : state == ReviewBoardDisplayState.Loading ? "Loading Markers..." : "T3 unavailable. Markers cannot be loaded."));
+            KitchenLocale.Set(detailText, detail ?? "Marker Details"); currentScheme.interactable = allSchemes.interactable = false;
             Canvas.ForceUpdateCanvases(); listScroll.verticalNormalizedPosition = detailScroll.verticalNormalizedPosition = 1;
         }
     }

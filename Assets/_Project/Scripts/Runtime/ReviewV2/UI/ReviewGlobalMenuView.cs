@@ -432,7 +432,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
         void SetFeedback(string message) => SetText(feedbackText, message);
         static void SetText(TMP_Text label, string message)
         {
-            if (label != null) label.text = message;
+            KitchenLocale.Set(label, message);
         }
 
         static void SetInteractable(Button button, bool value)

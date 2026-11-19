@@ -9,6 +9,39 @@ namespace XRApartment.Tests
 {
     public class ReviewV2SessionTests
     {
+        [Test] public void SnapshotReusesCurrentStateAndPreservesEarlierState()
+        {
+            var core = new SessionController();
+            var setup = core.Snapshot;
+            Assert.AreSame(setup, core.Snapshot);
+            Assert.IsFalse(core.Execute(CommandType.Finish).Accepted);
+            Assert.AreSame(setup, core.Snapshot);
+
+            SessionSnapshot published = null;
+            core.Changed += s => { published = s; Assert.AreSame(s, core.Snapshot); };
+            Experience(core);
+            var experience = core.Snapshot;
+            Assert.AreSame(published, experience);
+            Assert.AreEqual(SessionPhase.Experience, experience.Phase);
+            Assert.AreEqual(SessionPhase.Setup, setup.Phase);
+
+            core.Execute(CommandType.Pause);
+            var paused = core.Snapshot;
+            Assert.IsTrue(paused.IsPaused);
+            Assert.IsFalse(experience.IsPaused);
+            core.Execute(CommandType.Resume);
+            Assert.IsFalse(core.Snapshot.IsPaused);
+
+            Assert.IsTrue(core.ObserveGoal(experience.SessionId, experience.SchemeVisitId, "G02", GoalState.Completed, "cooked"));
+            var completed = core.Snapshot;
+            Assert.AreNotSame(experience, completed);
+            Assert.AreSame(published, completed);
+            Assert.AreEqual(GoalState.Completed, completed.Goals.Single(g => g.Id == "G02").State);
+            Assert.AreEqual(GoalState.NotStarted, experience.Goals.Single(g => g.Id == "G02").State);
+            Assert.IsFalse(core.ObserveGoal(experience.SessionId, experience.SchemeVisitId, "G02", GoalState.Completed, "duplicate"));
+            Assert.AreSame(completed, core.Snapshot);
+        }
+
         [Test] public void ExplicitModelVersionSurvivesUnavailableGoalsReviewAndReset()
         {
             var port = new PendingPort();

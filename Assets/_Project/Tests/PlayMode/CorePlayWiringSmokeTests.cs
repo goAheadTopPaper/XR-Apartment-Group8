@@ -182,13 +182,15 @@ public class CorePlayWiringSmokeTests
     [UnityTest]
     public IEnumerator LanguageMenuUpdatesCookingAndCarriesChineseIntoReview()
     {
-        var saved = PlayerPrefs.GetInt(KitchenLocale.Preference, -1);
-        PlayerPrefs.DeleteKey(KitchenLocale.Preference);
+        var saved = KitchenLocale.Current;
         try
         {
+            KitchenLocale.Select(KitchenLocale.Language.English);
             SceneManager.LoadScene("SCN_Kitchen_Cooking");
             yield return null;
+            yield return null;
             var menu = Object.FindObjectOfType<LocomotionSettingsView>();
+            KitchenSceneTestSetup.ChooseStartupLanguage(menu);
             var lab = menu.GetComponentInChildren<KitchenLayoutMenu>(true);
             lab.gameObject.SetActive(true);
             var layoutStatus = lab.transform.Find("Status").GetComponent<TMP_Text>();
@@ -199,9 +201,10 @@ public class CorePlayWiringSmokeTests
             menu.Open();
             yield return null;
             StringAssert.Contains("opposite the sink", worktopHint.text);
-            var button = menu.transform.Find("Panel/Language");
-            ClickTrackedButton(menu.GetComponent<TrackedDeviceGraphicRaycaster>(), button);
-            Assert.IsTrue(KitchenLocale.Chinese);
+            LanguageSelectionView.Show();
+            yield return null;
+            GameObject.Find("Simplified Chinese").GetComponent<Button>().onClick.Invoke();
+            Assert.AreEqual(KitchenLocale.Language.SimplifiedChinese, KitchenLocale.Current);
             var title = menu.transform.Find("Panel/Title").GetComponent<TMP_Text>();
             Assert.AreEqual("移动设置", title.text);
             title.ForceMeshUpdate();
@@ -213,21 +216,22 @@ public class CorePlayWiringSmokeTests
             worktopHint.ForceMeshUpdate();
             Assert.IsTrue(worktopHint.textInfo.characterInfo.Take(worktopHint.textInfo.characterCount)
                 .Any(character => character.character == '槽'));
+
             SceneManager.LoadScene("SCN_Kitchen_Review");
             yield return null;
             var reviewMenu = Object.FindObjectOfType<LocomotionSettingsView>();
             reviewMenu.Open();
             yield return null;
             Assert.AreEqual("移动设置", reviewMenu.transform.Find("Panel/Title").GetComponent<TMP_Text>().text);
-            ClickTrackedButton(reviewMenu.GetComponent<TrackedDeviceGraphicRaycaster>(), reviewMenu.transform.Find("Panel/Language"));
-            Assert.AreEqual("MOVEMENT", reviewMenu.transform.Find("Panel/Title").GetComponent<TMP_Text>().text);
+            LanguageSelectionView.Show();
+            yield return null;
+            GameObject.Find("Traditional Chinese").GetComponent<Button>().onClick.Invoke();
+            Assert.AreEqual("移動設置", reviewMenu.transform.Find("Panel/Title").GetComponent<TMP_Text>().text);
             reviewMenu.Close();
         }
         finally
         {
-            if (KitchenLocale.Chinese) KitchenLocale.Toggle();
-            if (saved < 0) PlayerPrefs.DeleteKey(KitchenLocale.Preference);
-            else PlayerPrefs.SetInt(KitchenLocale.Preference, saved);
+            KitchenLocale.Select(saved);
         }
     }
 
@@ -238,6 +242,8 @@ public class CorePlayWiringSmokeTests
         {
             SceneManager.LoadScene(scene);
             yield return null;
+            if (scene == "SCN_Kitchen_Cooking")
+                KitchenSceneTestSetup.DisableStartupGuide(Object.FindObjectOfType<LocomotionSettingsView>());
             var environment = GameObject.Find("PREF_Kitchen_Environment").transform;
             var windows = environment.Find("PREF_Kitchen_Windows");
             Assert.NotNull(windows, scene);
@@ -253,7 +259,8 @@ public class CorePlayWiringSmokeTests
                 Assert.IsTrue(collider.Raycast(new Ray(centre + Vector3.right * .35f, Vector3.left),
                     out _, .5f), scene + " " + path + " should close the exterior opening");
                 var material = pane.GetComponent<MeshRenderer>().sharedMaterial;
-                Assert.That(material.color.a, Is.InRange(.01f, .2f));
+                var expectedOpacity = scene == "SCN_Kitchen_Cooking" ? Is.InRange(.23f, .35f) : Is.InRange(.01f, .2f);
+                Assert.That(material.color.a, expectedOpacity);
                 Assert.GreaterOrEqual(material.renderQueue, 3000);
             }
         }

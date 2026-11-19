@@ -69,7 +69,9 @@ namespace XRApartment.Tests
         { for (var i = 0; i < n; i++) { yield return null; yield return new WaitForFixedUpdate(); } }
         IEnumerator Pick()
         {
-            hand.transform.SetPositionAndRotation(body.worldCenterOfMass, pan.transform.rotation);
+            var grip = pan.attachTransform;
+            hand.transform.SetPositionAndRotation(grip != null ? grip.position : body.worldCenterOfMass,
+                grip != null ? grip.rotation : pan.transform.rotation);
             Assert.IsTrue(manager.IsSelectPossible(hand, pan));
             manager.SelectEnter((IXRSelectInteractor)hand, pan); yield return null;
             Assert.IsTrue(pan.isSelected); Assert.IsFalse(snap.IsDocked);

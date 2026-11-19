@@ -4,6 +4,7 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -73,6 +74,7 @@ namespace XRApartment.EditorTools
             menuFields.FindProperty("headDistance").floatValue = .95f;
             menuFields.FindProperty("pauseMenu").objectReferenceValue = pause;
             menuFields.ApplyModifiedPropertiesWithoutUndo();
+            ConfigureComfortOptions(menu);
             Wire(pause, ("menu", menu), ("movement", movement));
             var pauseFields = new SerializedObject(pause);
             var recipeCards = recipe.GetComponentsInChildren<Canvas>(true);
@@ -81,11 +83,12 @@ namespace XRApartment.EditorTools
             for (var i = 0; i < recipeCards.Length; i++)
                 cardsField.GetArrayElementAtIndex(i).objectReferenceValue = recipeCards[i];
             pauseFields.ApplyModifiedPropertiesWithoutUndo();
-            Wire(activities.GetComponent<KitchenActivityGuide>(), ("menu", menu), ("movement", movement),
-                ("recipe", recipe), ("layout", lab));
+            var guide = activities.GetComponent<KitchenActivityGuide>();
+            Wire(guide, ("menu", menu), ("movement", movement), ("recipe", recipe), ("layout", lab));
+            ConfigureKitchenEntryRoute(scene, movement, guide);
             Wire(activities.GetComponent<KitchenFeedbackNotes>(), ("menu", menu), ("movement", movement),
                 ("layout", lab));
-            ConfigureFeedbackTargets(roots, recipe.transform, lab.transform);
+            ConfigureFeedbackTargets(roots, recipe.transform);
 
             void PlaceMenuItem(string name, float x, float y)
             {
@@ -102,6 +105,54 @@ namespace XRApartment.EditorTools
             }
         }
 
+        static void ConfigureKitchenEntryRoute(Scene scene, KitchenLocomotionSettings movement, KitchenActivityGuide guide)
+        {
+            var route = new[]
+            {
+                new Vector3(-.43f, 0f, -7.37f), // Inside the two exterior doors.
+                new Vector3(-.43f, 0f, .08f),
+                new Vector3(-3.15f, 0f, .08f),
+                new Vector3(-3.15f, 0f, 1.12f)
+            };
+            movement.transform.SetPositionAndRotation(route[0], Quaternion.identity);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(movement.transform);
+
+            const string markerName = "KitchenEntryArrow";
+            var marker = scene.GetRootGameObjects().SingleOrDefault(root => root.name == markerName);
+            if (marker == null)
+            {
+                marker = new GameObject(markerName);
+                SceneManager.MoveGameObjectToScene(marker, scene);
+            }
+            const string materialPath = Art + "MAT_Cooking_EntryArrow.mat";
+            var material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+            if (material == null)
+            {
+                material = new Material(Shader.Find("HDRP/Unlit"));
+                material.SetColor("_UnlitColor", new Color(.38f, 1f, .78f));
+                KitchenHdrpMaterials.Validate(material);
+                AssetDatabase.CreateAsset(material, materialPath);
+            }
+            var arrow = GetOrAdd<LineRenderer>(marker);
+            arrow.sharedMaterial = material;
+            arrow.useWorldSpace = false;
+            arrow.shadowCastingMode = ShadowCastingMode.Off;
+            arrow.receiveShadows = false;
+            arrow.widthMultiplier = .045f;
+            arrow.numCornerVertices = 2;
+            var chevron = new[] { new Vector3(-.18f, 0f, -.12f), new Vector3(0f, 0f, .13f), new Vector3(.18f, 0f, -.12f) };
+            arrow.positionCount = chevron.Length;
+            arrow.SetPositions(chevron);
+            arrow.enabled = false;
+
+            var fields = new SerializedObject(guide);
+            var points = fields.FindProperty("entryRoute");
+            points.arraySize = route.Length;
+            for (var i = 0; i < route.Length; i++) points.GetArrayElementAtIndex(i).vector3Value = route[i];
+            fields.FindProperty("entryArrow").objectReferenceValue = arrow;
+            fields.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         static void BuildKitchenActivities()
         {
             var root = KitchenLocomotionAuthoring.Rect("PREF_UI_KitchenActivities", null, 0, 0, 0, 0);
@@ -114,16 +165,10 @@ namespace XRApartment.EditorTools
                 BuildPauseMenu(root, pause, guide, notes, graphics);
                 BuildGraphicsMenu(root, graphics);
                 var panel = ActivityPanel("Guide", root, 710, 480, .0008f);
-                var title = KitchenLocomotionAuthoring.Label("Title", panel, 0, 187, 646, 52, 34, "Calibrate your view");
+                var title = KitchenLocomotionAuthoring.Label("Title", panel, 0, 187, 646, 52, 34, "Find the kitchen");
                 var instruction = KitchenLocomotionAuthoring.Label("Instruction", panel, 0, 104, 646, 99, 27, "");
                 var detail = KitchenLocomotionAuthoring.Label("Detail", panel, 0, 18, 646, 57, 23, "");
-                var calibration = KitchenLocomotionAuthoring.Rect("Posture", panel, 0, -66, 650, 64);
-                var standing = KitchenLocomotionAuthoring.Button("Standing", calibration, -221, 0, 172, 53, "Standing");
-                var seated = KitchenLocomotionAuthoring.Button("Seated", calibration, -35, 0, 172, 53, "Seated");
-                var lower = KitchenLocomotionAuthoring.Button("Lower", calibration, 104, 0, 91, 53, "−");
-                var raise = KitchenLocomotionAuthoring.Button("Raise", calibration, 209, 0, 91, 53, "+");
-                var status = KitchenLocomotionAuthoring.Label("Status", panel, 0, -130, 646, 46, 21, "");
-                var advance = KitchenLocomotionAuthoring.Button("Continue", panel, -93, -190, 417, 56, "Calibrate");
+                var advance = KitchenLocomotionAuthoring.Button("Continue", panel, -93, -190, 417, 56, "Resume");
                 advance.GetComponent<Image>().color = new Color(.14f, .42f, .37f);
                 var close = KitchenLocomotionAuthoring.Button("CloseGuide", panel, 229, -190, 176, 56, "CLOSE");
                 var hintCard = ActivityPanel("GuideHint", root, 800, 98, .00072f);
@@ -133,10 +178,9 @@ namespace XRApartment.EditorTools
                 ApplyActivityMaterials(hintCard);
                 panel.gameObject.SetActive(false);
                 hintCard.gameObject.SetActive(false);
-                Wire(guide, ("notes", notes), ("pauseMenu", pause), ("panel", panel.gameObject), ("calibration", calibration.gameObject),
-                    ("close", close), ("advance", advance), ("standing", standing), ("seated", seated),
-                    ("lower", lower), ("raise", raise), ("title", title), ("instruction", instruction),
-                    ("detail", detail), ("status", status), ("actionLabel", advance.GetComponentInChildren<TMP_Text>()),
+                Wire(guide, ("notes", notes), ("pauseMenu", pause), ("panel", panel.gameObject),
+                    ("close", close), ("advance", advance), ("title", title), ("instruction", instruction),
+                    ("detail", detail), ("actionLabel", advance.GetComponentInChildren<TMP_Text>()),
                     ("hint", hint));
 
                 var editor = ActivityPanel("FeedbackEditor", root, 880, 590, .00073f);
@@ -200,7 +244,7 @@ namespace XRApartment.EditorTools
             var feedback = Row("FeedbackNote", -64, "Feedback note");
             var options = Row("Options", -130, "Options");
             var graphicsButton = Row("Graphics", -196, "Graphics");
-            var stage = KitchenLocomotionAuthoring.Label("Stage", context, 0, 123, 442, 98, 43, "Calibrate your view");
+            var stage = KitchenLocomotionAuthoring.Label("Stage", context, 0, 123, 442, 98, 43, "Find the kitchen");
             stage.alignment = TextAlignmentOptions.MidlineLeft;
             var instructions = KitchenLocomotionAuthoring.Label("Instruction", context, 0, -16, 442, 155, 27, "");
             instructions.alignment = TextAlignmentOptions.TopLeft;
@@ -284,12 +328,9 @@ namespace XRApartment.EditorTools
                 typeof(XRGrabInteractable), typeof(KitchenFeedbackNote));
             try
             {
-                var body = root.GetComponent<Rigidbody>();
-                body.isKinematic = true;
-                body.useGravity = false;
                 root.GetComponent<BoxCollider>().size = new Vector3(.122f, .122f, .006f);
-                root.GetComponent<XRGrabInteractable>().throwOnDetach = false;
                 KitchenGrabAuthoring.ConfigureProp(root);
+                ConfigureFeedbackNoteFlight(root);
                 var face = KitchenLocomotionAuthoring.Rect("Paper", root.transform, 0, 0, 600, 600);
                 face.localScale = Vector3.one * .0002f;
                 face.gameObject.AddComponent<Canvas>().renderMode = RenderMode.WorldSpace;
@@ -305,11 +346,19 @@ namespace XRApartment.EditorTools
             finally { Object.DestroyImmediate(root); }
         }
 
-        static void ConfigureFeedbackTargets(GameObject[] roots, Transform station, Transform lab)
+        static void ConfigureFeedbackNoteFlight(GameObject root)
+        {
+            var body = root.GetComponent<Rigidbody>();
+            body.isKinematic = false;
+            body.useGravity = false;
+            body.constraints = RigidbodyConstraints.FreezeAll;
+            root.GetComponent<XRGrabInteractable>().throwOnDetach = true;
+        }
+
+        static void ConfigureFeedbackTargets(GameObject[] roots, Transform station)
         {
             var environment = roots.Single(root => root.name == "PREF_Kitchen_Environment").transform;
             Bind(environment.Find("SM_KitchenTable"), "counter", "Kitchen counter");
-            Bind(lab.Find("MOD_Pantry"), "pantry", "Pantry cabinet");
             foreach (var fridge in station.GetComponentsInChildren<KitchenFridge>(true))
             {
                 var compact = fridge.name == CompactFridgeName;

@@ -44,13 +44,13 @@ namespace XRApartment.Runtime.ReviewV2
             bool connected = positive != null;
             var heading = (RectTransform)editor.transform.Find("Note heading");
             heading.anchoredPosition = new Vector2(0, connected ? -164 : -100); heading.sizeDelta = new Vector2(884, 48);
-            heading.GetComponent<TMP_Text>().text = connected ? "Note (optional, up to 2000 characters)" : "Note (preview, up to 2000 characters)";
+            KitchenLocale.Set(heading.GetComponent<TMP_Text>(), connected ? "Note (optional, up to 2000 characters)" : "Note (preview, up to 2000 characters)");
             var input = (RectTransform)note.transform;
             input.anchoredPosition = new Vector2(0, connected ? -220 : -156); input.sizeDelta = new Vector2(884, connected ? 166 : 230);
             note.targetGraphic.color = new Color(.1f, .19f, .26f, 1);
             note.textViewport.sizeDelta = input.sizeDelta - new Vector2(32, 24);
             note.textComponent.rectTransform.sizeDelta = note.textViewport.sizeDelta; ((RectTransform)note.placeholder.transform).sizeDelta = note.textViewport.sizeDelta;
-            if (connected) ((TMP_Text)note.placeholder).text = "Describe your experience, concerns or suggestions...";
+            if (connected) KitchenLocale.Set((TMP_Text)note.placeholder, "Describe your experience, concerns or suggestions...");
             foreach (var button in new[] { capture, submit, cancel }) { var r = (RectTransform)button.transform; r.anchoredPosition = new Vector2(r.anchoredPosition.x, -406); }
             note.textComponent.fontSize = 30; note.textComponent.alignment = TextAlignmentOptions.TopLeft;
             note.textComponent.overflowMode = TextOverflowModes.Overflow; note.textComponent.richText = note.richText = false;
@@ -88,7 +88,7 @@ namespace XRApartment.Runtime.ReviewV2
             bool ready = Recorder != null && Recorder.IsReady;
             if (Recorder == null) message = t3Source == null ? "Marker service unavailable. Capture and submit disabled.\nDraft only; not submitted or saved." : "T3 configured; integration pending. Submit unavailable.\nDraft only; not submitted or saved.";
             else if (!ready) message = "Read or save failed. Retry; data is not verified.\n" + Short(Recorder.Error);
-            if (message != null) availability.text = message;
+            if (message != null) KitchenLocale.Set(availability, message);
             capture.interactable = ready && !saved && markerId == null && positionCapture != null;
             submit.interactable = !saved && Recorder != null && ((ready && hasPosition) || markerId != null);
             SetLabel(submit, markerId != null && !saved ? "Retry Save" : "Submit Marker");
@@ -110,17 +110,17 @@ namespace XRApartment.Runtime.ReviewV2
                 }
                 else saved = Recorder.AddExplanation(markerId, note.text, "");
                 note.readOnly = saved;
-                Refresh(saved ? TypeName(feedbackType) + " · Submitted and verified\nLocation: " + (objectId ?? "World Position") : "Save failed. The same marker is retained; retry.");
+                Refresh(saved ? KitchenLocale.T(TypeName(feedbackType)) + " · Submitted and verified\nLocation: " + KitchenLocale.T(objectId ?? "World Position") : "Save failed. The same marker is retained; retry.");
             }
             catch (Exception ex) { Refresh("Submit failed: " + Short(ex.Message)); }
         }
         static string Short(string s) => string.IsNullOrEmpty(s) ? "Check the storage path." : s.Length > 65 ? s.Substring(0, 65) + "…" : s;
-        static void SetLabel(Button button, string text) => button.GetComponentInChildren<TMP_Text>(true).text = text;
+        static void SetLabel(Button button, string text) => KitchenLocale.SetLabel(button, text);
         public bool Matches(SessionSnapshot context) => session == context.SessionId && visit == context.SchemeVisitId && scheme == context.SchemeId && model == context.ModelVersion;
         public bool RequestClose()
         {
             if (positionCapture != null && positionCapture.IsCapturing) { positionCapture.Cancel(); return false; }
-            if (HasDraft) { discardMessage.text = markerId == null ? "Discard draft?\nNote and location: not submitted or saved." : "Leave unsaved marker?\nKept in memory. Retry saving from Review."; ConfirmDiscard(true); return false; }
+            if (HasDraft) { KitchenLocale.Set(discardMessage, markerId == null ? "Discard draft?\nNote and location: not submitted or saved." : "Leave unsaved marker?\nKept in memory. Retry saving from Review."); ConfirmDiscard(true); return false; }
             Close(); return true;
         }
         void ConfirmDiscard(bool show) { discardPrompt.SetActive(show); editor.interactable = editor.blocksRaycasts = !show; if (show) note.DeactivateInputField(); }

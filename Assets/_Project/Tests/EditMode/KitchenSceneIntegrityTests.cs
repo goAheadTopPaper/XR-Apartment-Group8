@@ -71,13 +71,18 @@ namespace XRApartment.Tests
             foreach (var hand in hands)
             {
                 var serialized = new SerializedObject(hand);
-                foreach (var field in new[] { "interactor", "solidRoot", "ghostRoot", "contactProbe", "solidAnimator", "ghostAnimator" })
+                foreach (var field in new[] { "interactor", "solidRoot", "solidAnimator" })
                     Assert.IsNotNull(serialized.FindProperty(field).objectReferenceValue, hand.name + "." + field);
                 var profile = (HandInteractionProfile)serialized.FindProperty("profile").objectReferenceValue;
                 Assert.IsNotNull(profile, hand.name);
-                Assert.That(profile.Length("hand_palm_radius"), Is.GreaterThan(0f));
-                Assert.That(profile.Length("hand_ghost_show_distance"), Is.GreaterThan(profile.Length("hand_ghost_hide_distance")));
-                Assert.IsFalse(((SphereCollider)serialized.FindProperty("contactProbe").objectReferenceValue).enabled);
+                foreach (var collider in hand.GetComponentsInChildren<Collider>(true))
+                    Assert.IsFalse(collider.enabled, collider.name);
+                var palm = (Transform)serialized.FindProperty("solidRoot").objectReferenceValue;
+                Assert.AreSame(hand.transform, palm.parent);
+                Assert.AreEqual(Vector3.zero, hand.transform.localPosition);
+                Assert.AreEqual(Vector3.zero, palm.localPosition);
+                Assert.That(Quaternion.Angle(Quaternion.identity, hand.transform.localRotation), Is.LessThan(.01f));
+                Assert.That(Quaternion.Angle(Quaternion.identity, palm.localRotation), Is.LessThan(.01f));
                 var interactor = (Component)serialized.FindProperty("interactor").objectReferenceValue;
                 Assert.AreEqual(hand.transform.parent, interactor.transform.parent);
                 Assert.That(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(hand.transform.root.gameObject),

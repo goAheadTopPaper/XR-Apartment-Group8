@@ -85,7 +85,9 @@ namespace XRApartment.Runtime.ReviewV2.UI
             postureLabel = label;
             RenderPosture();
             bool mock = activeSession.Snapshot != null && activeSession.Snapshot.IsMock;
-            SetFeedback(label + " view selected." + (mock ? " Mock only; no hardware calibration was performed." : " Adjust or stop if you feel discomfort."));
+            SetFeedback(label + " view selected." + (mock
+                ? " Mock only; no hardware calibration was performed."
+                : " Adjust or stop if you feel discomfort."));
             RefreshControls();
         }
 
@@ -161,10 +163,9 @@ namespace XRApartment.Runtime.ReviewV2.UI
 
         void RenderPosture()
         {
-            if (selectedPostureText != null)
-                selectedPostureText.text = postureSelected
-                    ? "Selected experience: " + postureLabel
-                    : "Choose seated or standing view";
+            KitchenLocale.Set(selectedPostureText, postureSelected
+                ? "Selected experience: " + postureLabel
+                : "Choose seated or standing view");
             if (seatedSelection != null) seatedSelection.SetActive(postureSelected && postureLabel == "Seated");
             if (standingSelection != null) standingSelection.SetActive(postureSelected && postureLabel == "Standing");
         }
@@ -185,7 +186,7 @@ namespace XRApartment.Runtime.ReviewV2.UI
 
         void SetFeedback(string message)
         {
-            if (feedbackText != null) feedbackText.text = message ?? string.Empty;
+            KitchenLocale.Set(feedbackText, message ?? string.Empty);
         }
     }
 }
