@@ -14,8 +14,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Attachment;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.Interaction.Toolkit.Interactors.Casters;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 using Unity.Profiling;
@@ -51,6 +54,7 @@ namespace XRApartment.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
+            Time.timeScale = 1f;
             menuKeyboard?.Dispose();
             menuKeyboard = null;
             if (scene.IsValid() && scene.isLoaded)
@@ -101,7 +105,11 @@ namespace XRApartment.Tests
             grab.interactionManager = manager;
             Physics.SyncTransforms();
             var body = target.GetComponent<Rigidbody>();
-            hand.transform.SetPositionAndRotation(body == null ? target.transform.position : target.transform.TransformPoint(body.centerOfMass), target.transform.rotation);
+            var grip = grab.attachTransform;
+            if (grip != null && !grab.matchAttachPosition)
+                hand.transform.SetPositionAndRotation(grip.position, grip.rotation);
+            else
+                hand.transform.SetPositionAndRotation(body == null ? target.transform.position : body.worldCenterOfMass, target.transform.rotation);
             Physics.SyncTransforms();
             Assert.IsTrue(manager.IsSelectPossible(hand, grab), "Cannot select " + target.name);
             manager.SelectEnter((IXRSelectInteractor)hand, grab); yield return null;
@@ -194,13 +202,13 @@ namespace XRApartment.Tests
             Assert.IsFalse(fridge.Contains(item.transform.position), "Food must leave through the open doorway: " + item.name);
             Assert.IsTrue(item.GetComponent<KitchenStoredIngredient>().WasRetrieved);
         }
-        IEnumerator CutWithKnife(GameObject knife, PreparedKitchenProp food, float bladeOffset = .055f)
+        IEnumerator CutWithKnife(GameObject knife, PreparedKitchenProp food, float bladeOffset = -.071f)
         {
             for (var cut = food.CutCount; cut < food.RequiredCuts; cut++)
                 yield return CutOnceWithKnife(knife, food, bladeOffset);
         }
 
-        IEnumerator CutOnceWithKnife(GameObject knife, PreparedKitchenProp food, float bladeOffset = .055f)
+        IEnumerator CutOnceWithKnife(GameObject knife, PreparedKitchenProp food, float bladeOffset = -.071f)
         {
             var cuts = food.CutCount;
             var body = food.GetComponent<Rigidbody>();
@@ -300,6 +308,106 @@ namespace XRApartment.Tests
                 }
             }
             finally { Time.captureDeltaTime = originalDelta; }
+        }
+
+        [UnityTest] public IEnumerator NearGripDistinguishesKnifeHandleFromExposedBoard()
+        {
+            yield return LoadKitchen();
+            var board = station.transform.Find("PREF_Cooking_ChoppingBoard").GetComponent<XRGrabInteractable>();
+            var knife = station.transform.Find("PREF_Prop_knife").GetComponent<XRGrabInteractable>();
+            board.interactionManager = knife.interactionManager = manager;
+            var boardTop = board.GetComponent<BoxCollider>().bounds.max.y;
+            var knifeBody = knife.GetComponent<Rigidbody>();
+            knifeBody.interpolation = RigidbodyInterpolation.None;
+            knifeBody.isKinematic = true;
+            // Exercise the crowded case even if a player has moved the knife from its starting position.
+            var knifePose = new Pose(new Vector3(board.transform.position.x, boardTop + .004f, board.transform.position.z),
+                board.transform.rotation);
+            knifeBody.position = knifePose.position;
+            knifeBody.rotation = knifePose.rotation;
+            knife.transform.SetPositionAndRotation(knifePose.position, knifePose.rotation);
+            knife.SetTargetPose(knifePose);
+            Physics.SyncTransforms();
+            yield return new WaitForFixedUpdate();
+            yield return null;
+            var boardRest = board.transform.position;
+
+            var controller = Own(new GameObject("Near grip at the prep counter"));
+            controller.transform.position = board.transform.TransformPoint(new Vector3(.08f, .05f, -.083f));
+            var near = controller.AddComponent<NearFarInteractor>();
+            near.interactionManager = manager;
+            near.enableFarCasting = false;
+            near.enableUIInteraction = false;
+            near.nearCasterSortingStrategy = NearFarInteractor.NearCasterSortingStrategy.InteractableBased;
+            near.GetComponent<InteractionAttachController>().useDistanceBasedVelocityScaling = false;
+            var caster = (SphereInteractionCaster)near.nearInteractionCaster;
+            caster.castRadius = .1f;
+            caster.physicsLayerMask = 1;
+            caster.physicsTriggerInteraction = QueryTriggerInteraction.Ignore;
+            near.selectActionTrigger = XRBaseInputInteractor.InputTriggerType.StateChange;
+            near.selectInput.inputSourceMode = XRInputButtonReader.InputSourceMode.ManualValue;
+            Physics.SyncTransforms();
+            yield return null;
+            yield return null;
+
+            var targets = new List<IXRInteractable>();
+            manager.GetValidTargets(near, targets);
+            Assert.That(targets, Is.EqualTo(new[] { board }), "The exposed board face is nearer than the knife.");
+
+            controller.transform.position = knife.attachTransform.position + Vector3.up * .015f;
+            yield return null;
+            yield return null;
+            manager.GetValidTargets(near, targets);
+            var attach = near.GetAttachTransform(knife).position;
+            var nearby = Physics.OverlapSphere(attach, caster.castRadius, 1, QueryTriggerInteraction.Ignore);
+            var targeting = $"Grip {attach:F4}, knife pose {knife.transform.position:F4}, " +
+                $"distance to knife {Mathf.Sqrt(knife.GetDistance(attach).distanceSqr):F4}, " +
+                $"distance to board {Mathf.Sqrt(board.GetDistance(attach).distanceSqr):F4}, " +
+                $"near colliders {string.Join(", ", nearby.Select(collider => collider.name))}";
+            Assert.That(targets, Is.EqualTo(new[] { knife }), targeting);
+            near.selectInput.QueueManualState(true, 1f);
+            for (var frame = 0; frame < 8 && !near.hasSelection; frame++) yield return null;
+            Assert.That(near.interactablesSelected, Is.EqualTo(new[] { knife }), targeting);
+
+            controller.transform.position += Vector3.up * .16f;
+            for (var frame = 0; frame < 5; frame++) { yield return null; yield return new WaitForFixedUpdate(); }
+            Assert.That(knife.transform.position.y, Is.GreaterThan(boardTop + .1f));
+            Assert.That(Vector3.Distance(board.transform.position, boardRest), Is.LessThan(.005f));
+            Assert.IsFalse(board.isSelected);
+
+            near.selectInput.QueueManualState(false, 0f);
+            yield return null;
+        }
+
+        [UnityTest] public IEnumerator HeldKnifeStaysAboveSolidBoardWhenPushedDown()
+        {
+            yield return LoadKitchen();
+            var board = station.transform.Find("PREF_Cooking_ChoppingBoard").GetComponent<BoxCollider>();
+            var knife = station.transform.Find("PREF_Prop_knife").gameObject;
+            var visual = knife.GetComponentsInChildren<MeshRenderer>().Single(renderer => renderer.enabled);
+            var guard = knife.GetComponent<CollisionConstrainedGrabTransformer>();
+            Assert.That(visual.bounds.min.z, Is.GreaterThan(board.bounds.max.z + .005f),
+                "The knife starts beside the board with its own worktop support.");
+            var vertices = visual.GetComponent<MeshFilter>().sharedMesh.vertices;
+            var lowestVertex = vertices.Min(vertex => visual.transform.TransformPoint(vertex).y);
+            var meshBoundsBottom = visual.bounds.min.y;
+            var support = new Vector3(visual.bounds.center.x, lowestVertex + .3f, visual.bounds.center.z);
+            var hits = Physics.RaycastAll(support, Vector3.down, .6f, ~0, QueryTriggerInteraction.Ignore);
+            Assert.IsTrue(hits.Any(hit => hit.collider.attachedRigidbody == null && hit.normal.y > .8f &&
+                lowestVertex >= hit.point.y - .002f && lowestVertex <= hit.point.y + .012f),
+                $"The resting knife at {knife.transform.position:F4}, rotation {knife.transform.eulerAngles:F2}, " +
+                $"lowest visible vertex {lowestVertex:F4} (AABB bottom {meshBoundsBottom:F4}), must touch the worktop. " +
+                string.Join("; ", hits.Select(hit => $"{hit.collider.name} y={hit.point.y:F4} normal={hit.normal:F3} " +
+                    $"holder={hit.collider.attachedRigidbody?.name ?? "static"} layer={hit.collider.gameObject.layer}")));
+            yield return Pick(right, knife);
+            var upright = Quaternion.Euler(90f, 0f, 0f);
+            var high = board.bounds.center + Vector3.up * .17f;
+            yield return MoveHeld(right, knife, knife.transform.position + Vector3.up * .16f, knife.transform.rotation, 16);
+            yield return MoveHeld(right, knife, high, upright, 24);
+            yield return MoveHeld(right, knife, high + Vector3.down * .3f, upright, 30);
+            Assert.IsTrue(guard.IsBlocked);
+            Assert.That(visual.bounds.min.y, Is.GreaterThanOrEqualTo(board.bounds.max.y - .001f));
+            Assert.That(Vector3.Dot(knife.transform.up, upright * Vector3.up), Is.GreaterThan(.98f));
         }
 
         [UnityTest] public IEnumerator CounterCutDoesNotLaunchPiecesAndRoomResetClearsDetachedFood()
@@ -453,6 +561,90 @@ namespace XRApartment.Tests
             Assert.IsFalse(flame.IsLit); Assert.IsFalse(heat.IsOn); Assert.AreEqual(0,flame.ParticleCount);
         }
 
+        [UnityTest] public IEnumerator CookedScrambledEggPoursOntoPlateWhileStoveOnAndResetsCleanly()
+        {
+            yield return LoadKitchen();
+            var workbench = station.GetComponent<KitchenCookingStation>();
+            var flow = station.GetComponent<KitchenRecipeController>();
+            var heat = station.GetComponentInChildren<KitchenHeatSource>();
+            var pan = station.transform.Find("PREF_Cooking_FryingPan").GetComponent<KitchenFoodVessel>();
+            var contents = pan.GetComponent<KitchenPanContents>();
+            var surface = station.transform.Find("LOC_BurnerSurface");
+            var plate = station.transform.Find("PREF_Prop_plate/Intact");
+            var plateChildrenBefore = plate.childCount;
+
+            SelectKitchenControl("ACT_STOVE");
+            Assert.IsTrue(heat.IsOn);
+            yield return Pick(left, pan.gameObject);
+            yield return MoveHeld(left, pan.gameObject, surface.position + Vector3.up * .12f, Quaternion.identity, 20);
+            yield return MoveHeld(left, pan.gameObject, surface.position + Vector3.up * .002f, Quaternion.identity, 20);
+            yield return PlaceAndRelease(left, pan.gameObject);
+            Assert.That(pan.ReceiveEgg(50f), Is.EqualTo(50f).Within(.01f));
+
+            Time.timeScale = 4f;
+            for (var i = 0; i < 40 && pan.Stage != CookingStage.Cooked; i++) yield return new WaitForSeconds(.5f);
+            Time.timeScale = 1f;
+            Assert.AreEqual(CookingStage.Cooked, pan.Stage);
+            Assert.IsTrue(contents.CanPlateEgg);
+
+            yield return Pick(left, pan.gameObject);
+            yield return MoveHeld(left, pan.gameObject, pan.transform.position + Vector3.up * .32f, Quaternion.identity, 30);
+            var pour = plate.position + new Vector3(-.073f, .20f, 0f);
+            yield return MoveHeld(left, pan.gameObject, pour + Vector3.up * .14f, Quaternion.identity, 65);
+            yield return MoveHeld(left, pan.gameObject, pour, Quaternion.identity, 25);
+            Assert.Zero(contents.PlatedEggMillilitres, "Level pan must not pour cooked egg onto plate.");
+
+            var tilted = Quaternion.Euler(0f, 0f, -65f);
+            yield return MoveHeld(left, pan.gameObject, pour + Vector3.up * .14f, tilted, 26);
+            yield return MoveHeld(left, pan.gameObject, pour, tilted, 26);
+            yield return new WaitForSeconds(.35f);
+            var downhill = Vector3.ProjectOnPlane(Vector3.down, pan.transform.up).normalized;
+            var lip = pan.transform.position + downhill * pan.InnerRadius + pan.transform.up * (pan.InnerBottom + pan.InnerHeight);
+            Assert.That(contents.PlatedEggMillilitres, Is.EqualTo(50f).Within(.1f),
+                $"pan={pan.transform.position} up={pan.transform.up} plate={plate.position} target={plate.InverseTransformPoint(lip)} canEgg={contents.CanPlateEgg} sel={pan.GetComponent<XRGrabInteractable>().isSelected}");
+            Assert.That(pan.Batch.Millilitres, Is.LessThan(.01f));
+            Assert.Greater(plate.childCount, plateChildrenBefore, "Scrambled egg curds must parent to the serving plate.");
+            Assert.IsTrue(plate.Cast<Transform>().Skip(plateChildrenBefore).Any(t => t.gameObject.activeInHierarchy));
+            yield return PlaceAndRelease(left, pan.gameObject);
+
+            workbench.ResetStation();
+            yield return Frames(8);
+            Assert.Zero(contents.PlatedEggMillilitres);
+            Assert.AreEqual(plateChildrenBefore, plate.childCount);
+            Assert.AreEqual(CookingStage.Empty, pan.Stage);
+            Assert.IsFalse(heat.IsOn);
+            Assert.AreEqual(TomatoEggStep.OpenFridge, flow.Recipe.Step);
+        }
+
+        [UnityTest] public IEnumerator GasHobMeshAndControlsAreAlignedToCounterAxes()
+        {
+            yield return LoadKitchen();
+            var hob = station.transform.Find("VIS_Real_gas_hob");
+            var knob = station.transform.Find("ACT_STOVE");
+            var surface = station.transform.Find("LOC_BurnerSurface");
+            var renderer = hob.GetComponentInChildren<MeshRenderer>();
+            var filter = hob.GetComponentInChildren<MeshFilter>();
+            Assert.IsNotNull(renderer);
+            Assert.IsNotNull(filter);
+
+            var b = renderer.bounds;
+            Assert.That(b.center.x, Is.EqualTo(hob.position.x).Within(.005f));
+            Assert.That(b.center.z, Is.EqualTo(hob.position.z).Within(.005f));
+            Assert.That(b.size.x, Is.EqualTo(.32f).Within(.01f));
+            Assert.That(b.size.z, Is.EqualTo(.36f).Within(.01f));
+            Assert.That(b.min.y, Is.EqualTo(hob.position.y).Within(.003f));
+            Assert.That(b.max.y, Is.EqualTo(surface.position.y).Within(.003f));
+
+            var worldVerts = filter.sharedMesh.vertices.Select(v => filter.transform.TransformPoint(v)).ToArray();
+            var backLeftZ = worldVerts.Where(p => p.y > hob.position.y + .008f && p.y < hob.position.y + .026f && p.x < hob.position.x - .05f && p.z > hob.position.z + .14f).Max(p => p.z);
+            var backRightZ = worldVerts.Where(p => p.y > hob.position.y + .008f && p.y < hob.position.y + .026f && p.x > hob.position.x + .05f && p.z > hob.position.z + .14f).Max(p => p.z);
+            Assert.That(Mathf.Abs(backLeftZ - backRightZ), Is.LessThan(.005f), "Hob back tray edge must align squarely to counter Z axis.");
+
+            var knobVerts = worldVerts.Where(p => p.z < hob.position.z - .172f).ToArray();
+            Assert.IsNotEmpty(knobVerts, "Front hob knob should face -Z toward ACT_STOVE.");
+            Assert.That(knobVerts.Average(p => p.x), Is.EqualTo(knob.position.x).Within(.015f));
+        }
+
         [UnityTest] public IEnumerator RealisticWaterCupCanBeHeldAndFilledAtTheKitchenTap()
         {
             yield return LoadKitchen();
@@ -577,7 +769,7 @@ namespace XRApartment.Tests
             panBody.rotation = Quaternion.identity;
             Physics.SyncTransforms();
             var cut = board.position + new Vector3(0f, .029f, .09f);
-            yield return TakeAndCut(fridge, beef, knife, knifeRest, cut, .055f);
+            yield return TakeAndCut(fridge, beef, knife, knifeRest, cut, -.071f);
             var strips = beef.Prepared.Pieces.ToArray();
             Assert.AreEqual(4, strips.Length);
             yield return ReleaseIntoPan(strips, pan, contents);
@@ -585,7 +777,7 @@ namespace XRApartment.Tests
             yield return new WaitForSecondsRealtime(.22f);
             Assert.AreEqual("For this recipe: an onion.", fridgeDetail.text);
 
-            yield return TakeAndCut(fridge, onion, knife, knifeRest, cut, .043f);
+            yield return TakeAndCut(fridge, onion, knife, knifeRest, cut, -.059f);
             var quarters = onion.Prepared.Pieces.ToArray();
             Assert.AreEqual(4, quarters.Length);
             Assert.AreEqual(BeefOnionStep.AddToPan, flow.BeefStep);
@@ -910,10 +1102,8 @@ namespace XRApartment.Tests
                 // The slices keep the original tomato pivot. Place the actual
                 // centre of mass clear of the pile and inside the board edge.
                 var centreOffset = Vector3.Scale(sliceBody.centerOfMass, slice.transform.lossyScale);
-                // Use the clear front of A's relocated board rather than pressing the blade
-                // beside the remaining intact slices. The real collision/cut checks stay in place.
-                var sliceOffset = scheme == XRApartment.Data.ReviewV2.SchemeIds.IntegratedKitchen
-                    ? new Vector3(-.115f, .06f, -.105f) : new Vector3(-.115f, .06f, -.025f);
+                // Work at the front of the board, clear of the remaining slices behind it.
+                var sliceOffset = new Vector3(-.115f, .06f, -.105f);
                 var slicePlace = cutPosition + sliceOffset - Vector3.ProjectOnPlane(centreOffset, Vector3.up);
                 yield return MoveHeld(left, slice.gameObject, slicePlace + Vector3.up * .25f, Quaternion.identity, 25);
                 yield return MoveHeld(left, slice.gameObject, slicePlace, Quaternion.identity, 20);
@@ -923,6 +1113,8 @@ namespace XRApartment.Tests
                 Assert.IsTrue(boardSurface.Raycast(new Ray(centre + Vector3.up * .025f, Vector3.down), out _, .125f),
                     $"{slice.name} must settle on the chopping board before cutting. Centre {centre:F3}, " +
                     $"held centre {heldCentre:F3}, requested pivot {slicePlace:F3}, board {boardSurface.bounds}.");
+                Assert.That(board.transform.InverseTransformPoint(centre).z, Is.LessThan(-.055f),
+                    $"{slice.name} must clear the pile before the cut. Centre {centre:F3}, board {board.transform.position:F3}.");
                 yield return CutWithKnife(knife, slice);
                 yield return MoveHeld(right, knife, knifePark, cuttingGrip, 22);
                 // Clear each chopped slice into the actual prep bowl, as a player
@@ -1101,36 +1293,16 @@ namespace XRApartment.Tests
         {
             menuKeyboard = new KitchenMenuKeyboard();
             var menu = EnableKitchenMenu();
-            var movement = menu.GetComponentInParent<KitchenLocomotionSettings>();
             var guide = menu.transform.Find("PREF_UI_KitchenActivities/Guide");
             yield return null;
             yield return null;
-            Assert.IsTrue(guide.gameObject.activeInHierarchy);
+            Assert.IsNotNull(GameObject.Find("Language Selection Canvas"));
+            Assert.IsFalse(guide.gameObject.activeInHierarchy);
             Assert.AreEqual(0f, Time.timeScale);
             var startScene = SceneManager.GetActiveScene();
-            var startPosition = movement.Origin.Origin.transform.position;
-            yield return Click(menu, guide.Find("Posture/Seated"));
-            yield return Click(menu, guide.Find("Posture/Raise"));
-            yield return Click(menu, guide.Find("Continue"));
-            Assert.That(movement.Origin.CameraInOriginSpaceHeight, Is.EqualTo(1.25f).Within(.015f));
-            Assert.AreEqual(startPosition, movement.Origin.Origin.transform.position);
-            Capture("guide-calibration", sourceCamera.transform.position, guide.position);
-            yield return Click(menu, guide.Find("Continue"));
-            Assert.IsFalse(menu.IsOpen);
-            Assert.AreEqual("Practice controls", guide.Find("Title").GetComponent<TMP_Text>().text);
-            Assert.IsFalse(guide.Find("Continue").GetComponent<Button>().interactable);
-
-            var landing = new Vector3(-3.5f, .004f, 1.12f);
-            Assert.IsTrue(movement.TeleportProvider.QueueTeleportRequest(new TeleportRequest
-            {
-                destinationPosition = landing,
-                matchOrientation = MatchOrientation.None,
-                requestTime = Time.time
-            }));
-            for (var frame = 0; frame < 30 && Vector3.Distance(movement.Origin.Origin.transform.position, landing) > .03f; frame++)
-                yield return null;
-            Assert.That(Vector3.Distance(movement.Origin.Origin.transform.position, landing), Is.LessThan(.03f));
-            Assert.IsFalse(guide.Find("Continue").GetComponent<Button>().interactable);
+            KitchenSceneTestSetup.ChooseStartupLanguage(menu);
+            yield return FollowKitchenEntry(menu, guide);
+            Assert.AreEqual("Choose a fridge", KitchenLocale.Source(guide.Find("Continue").GetComponentInChildren<TMP_Text>()));
 
             var cup = scene.GetRootGameObjects().Single(root => root.name == "PREF_Prop_Cup");
             yield return Pick(left, cup);
@@ -1182,10 +1354,13 @@ namespace XRApartment.Tests
             var note = LooseNote();
             var counter = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Environment")
                 .transform.Find("SM_KitchenTable").GetComponent<MeshCollider>();
-            var above = new Vector3(-1.87f, 1.6f, 1.98f);
+            var above = new Vector3(-2.48f, 1.6f, 1.98f);
             Assert.IsTrue(counter.Raycast(new Ray(above, Vector3.down), out var surface, 1f));
             yield return PinNote(note, above, surface);
-            var form = guide.transform.Find("FeedbackEditor/Form");
+            var editor = guide.transform.Find("FeedbackEditor");
+            Assert.IsTrue(editor.Find("FeedbackKeyboard").gameObject.activeSelf);
+            yield return Click(menu, editor.Find("FeedbackKeyboard/Done"));
+            var form = editor.Find("Form");
             form.Find("FeedbackText").GetComponent<TMP_InputField>().text = "The counter is easy to reach.";
             var path = KitchenFeedbackNotes.DocumentPath;
             var backup = File.Exists(path) ? File.ReadAllBytes(path) : null;
@@ -1216,12 +1391,56 @@ namespace XRApartment.Tests
             }
         }
 
+        [UnityTest] public IEnumerator ArrivalIntroducesBothFridgeChoicesBeforeCooking()
+        {
+            yield return LoadKitchen();
+            menuKeyboard = new KitchenMenuKeyboard();
+            var menu = EnableKitchenMenu();
+            var guide = menu.GetComponentInChildren<KitchenActivityGuide>();
+            var guidePanel = guide.transform.Find("Guide");
+            yield return null;
+            KitchenSceneTestSetup.ChooseStartupLanguage(menu);
+            yield return FollowKitchenEntry(menu, guidePanel);
+
+            var hint = guide.transform.Find("GuideHint/Hint").GetComponent<TMP_Text>();
+            Assert.That(KitchenLocale.Source(hint), Does.Contain("full-size").And.Contain("compact").And.Contain("F9"));
+            yield return OpenGuide(menu);
+            var choose = guidePanel.Find("Continue");
+            Assert.That(KitchenLocale.Source(choose.GetComponentInChildren<TMP_Text>()), Is.EqualTo("Choose a fridge"));
+            yield return Click(menu, choose);
+
+            var layoutPanel = menu.GetComponentInChildren<KitchenLayoutMenu>().transform;
+            var lab = scene.GetRootGameObjects().Select(root => root.GetComponent<KitchenLayoutLab>()).Single(item => item != null);
+            Assert.IsTrue(layoutPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(lab.CompactSelected);
+            yield return Click(menu, layoutPanel.Find("CompactFridge"));
+            Assert.IsTrue(lab.CompactSelected);
+            yield return Click(menu, layoutPanel.Find("CloseLayoutLab"));
+            Assert.That(Time.timeScale, Is.GreaterThan(0f));
+            yield return Frames(6);
+
+            yield return menuKeyboard.Hold();
+            var layoutEntry = guide.transform.Find("PauseMenu/Navigation/LayoutLab");
+            Assert.That(KitchenLocale.Source(layoutEntry.GetComponentInChildren<TMP_Text>()), Is.EqualTo("Choose a fridge"));
+            yield return Click(menu, layoutEntry);
+            yield return Click(menu, layoutPanel.Find("StandardFridge"));
+            Assert.IsFalse(lab.CompactSelected);
+            Assert.That(KitchenLocale.Source(guidePanel.Find("Title").GetComponent<TMP_Text>()), Is.EqualTo("Practice controls"));
+            yield return Click(menu, layoutPanel.Find("CloseLayoutLab"));
+            menu.Close();
+        }
+
         [UnityTest] public IEnumerator FeedbackNotesFollowTheirObjectsAndAppendUnicodeTextToTheDocument()
         {
             yield return LoadKitchen();
             menuKeyboard = new KitchenMenuKeyboard();
             var menu = EnableKitchenMenu();
-            KitchenSceneTestSetup.DisableStartupGuide(menu);
+            var guide = menu.GetComponentInChildren<KitchenActivityGuide>();
+            var guidePanel = guide.transform.Find("Guide");
+            yield return null;
+            KitchenSceneTestSetup.ChooseStartupLanguage(menu);
+            yield return FollowKitchenEntry(menu, guidePanel);
+            Assert.IsTrue(guide.isActiveAndEnabled && !guide.IsFreePlay);
             var kitchen = station.GetComponent<KitchenCookingStation>();
             var lab = scene.GetRootGameObjects().Select(root => root.GetComponent<KitchenLayoutLab>()).Single(item => item != null);
             Assert.IsTrue(lab.TrySelectFridge(true, out var status), status);
@@ -1242,8 +1461,10 @@ namespace XRApartment.Tests
                 Drop(left, note.gameObject);
                 yield return null;
                 Assert.IsFalse(editor.gameObject.activeSelf, "Releasing in mid-air must not open a note editor.");
+                for (var i = 0; i < 100 && note != null; i++) yield return new WaitForFixedUpdate();
+                Assert.IsTrue(note == null, "An unpinned note that lands away from a target is removed.");
                 yield return SpawnFeedbackNote(menu);
-                Assert.AreSame(note, LooseNote(), "Reopening a loose draft should recall the same note.");
+                note = LooseNote();
 
                 var outside = fridge.transform.TransformPoint(new Vector3(0f, 1.25f, 1f));
                 var ray = new Ray(outside, -fridge.transform.forward);
@@ -1253,21 +1474,39 @@ namespace XRApartment.Tests
                     .Where(hit => hit.collider != null).OrderBy(hit => hit.distance).First();
                 yield return PinNote(note, outside, face);
                 Assert.IsTrue(editor.gameObject.activeSelf);
-                Assert.That(form.Find("Target").GetComponent<TMP_Text>().text, Is.EqualTo("Compact fridge door"));
+                Assert.That(form.Find("Target").GetComponent<TMP_Text>().text, Is.EqualTo(KitchenLocale.T("Compact fridge door")));
                 Assert.IsFalse(form.Find("SaveFeedback").GetComponent<Button>().interactable);
-                yield return Click(menu, form.Find("WriteInVR"));
                 var keyboard = editor.Find("FeedbackKeyboard");
+                Assert.IsTrue(keyboard.gameObject.activeSelf, "Attaching must automatically open input.");
+                var group = form.GetComponent<CanvasGroup>();
+                Assert.IsTrue(form.gameObject.activeInHierarchy && group.interactable && group.blocksRaycasts);
+                Assert.AreEqual(1f, group.alpha, "The keyboard must not mask the original form.");
+                var keyBounds = ((RectTransform)keyboard).rect.yMax + ((RectTransform)keyboard).anchoredPosition.y;
+                var formBounds = ((RectTransform)form).rect.yMin + ((RectTransform)form).anchoredPosition.y;
+                Assert.LessOrEqual(keyBounds, formBounds, "The keyboard belongs entirely below the original form.");
+                if (KitchenLocale.Chinese) yield return Click(menu, keyboard.Find("Language"));
                 yield return Click(menu, keyboard.Find("Key O"));
                 yield return Click(menu, keyboard.Find("Key K"));
-                yield return Click(menu, keyboard.Find("Done"));
                 Assert.AreEqual("ok", field.text);
+                yield return Click(menu, keyboard.Find("Language"));
+                foreach (var letter in "BINGXIANG") yield return Click(menu, keyboard.Find("Key " + letter));
+                var candidate = keyboard.Cast<Transform>().First(t => t.name.StartsWith("Candidate") && ButtonText(t) == "冰箱");
+                yield return Click(menu, candidate);
+                Assert.AreEqual("ok冰箱", field.text);
+                var nextWord = keyboard.Cast<Transform>().First(t => t.name.StartsWith("Candidate") && ButtonText(t) == "把手");
+                yield return Click(menu, nextWord);
+                Assert.AreEqual("ok冰箱把手", field.text);
+                yield return Click(menu, keyboard.Find("Done"));
+                Assert.IsFalse(keyboard.gameObject.activeSelf);
+                Assert.IsTrue(form.gameObject.activeInHierarchy && group.alpha == 1f);
                 field.text = text;
                 Capture("feedback-note-editor", sourceCamera.transform.position, editor.position);
                 yield return Click(menu, form.Find("CloseFeedback"));
                 yield return SpawnFeedbackNote(menu);
                 Assert.AreEqual(text, field.text, "Closing the editor must keep the note draft.");
+                yield return Click(menu, keyboard.Find("Done"));
                 yield return Click(menu, form.Find("SaveFeedback"));
-                Assert.That(form.Find("SaveStatus").GetComponent<TMP_Text>().text, Does.Contain("Saved"));
+                Assert.That(KitchenLocale.Source(form.Find("SaveStatus").GetComponent<TMP_Text>()), Is.EqualTo("Saved to KitchenFeedback/feedback.txt"));
                 yield return Click(menu, form.Find("CloseFeedback"));
                 var onDoor = note.transform.localPosition;
                 yield return ToggleDoor(fridge);
@@ -1282,7 +1521,16 @@ namespace XRApartment.Tests
                 yield return SpawnFeedbackNote(menu);
                 var second = LooseNote();
                 yield return PinNote(second, above, worktop);
-                Assert.AreEqual("Kitchen counter", form.Find("Target").GetComponent<TMP_Text>().text);
+                yield return Click(menu, keyboard.Find("CloseKeyboard"));
+                Assert.IsTrue(form.gameObject.activeInHierarchy && second != null, "Hiding the keyboard is not closing the note.");
+                yield return Click(menu, form.Find("CloseFeedback"));
+                yield return null;
+                Assert.IsTrue(second == null, "Closing an empty pinned note removes it.");
+                yield return SpawnFeedbackNote(menu);
+                second = LooseNote();
+                yield return PinNote(second, above, worktop);
+                Assert.AreEqual(KitchenLocale.T("Kitchen counter"), form.Find("Target").GetComponent<TMP_Text>().text);
+                yield return Click(menu, keyboard.Find("Done"));
                 field.text = "The work surface is easy to reach.";
                 yield return Click(menu, form.Find("SaveFeedback"));
                 var saved = File.ReadAllText(file).Substring(originalLength);
@@ -1296,12 +1544,135 @@ namespace XRApartment.Tests
                 yield return Frames(8);
                 Assert.IsTrue(note.transform.IsChildOf(fridge.Door.transform));
                 Assert.IsTrue(second.transform.IsChildOf(counter.transform));
+                yield return menuKeyboard.Hold();
+                yield return Click(menu, guide.transform.Find("PauseMenu/Context/SavedFeedback"));
+                var savedPanel = guide.transform.Find("SavedFeedback");
+                Assert.IsTrue(savedPanel.gameObject.activeInHierarchy);
+                var previousClipboard = GUIUtility.systemCopyBuffer;
+                try
+                {
+                    yield return Click(menu, savedPanel.Find("CopyPath"));
+                    Assert.AreEqual(file, GUIUtility.systemCopyBuffer);
+                }
+                finally { GUIUtility.systemCopyBuffer = previousClipboard; }
             }
             finally
             {
                 if (backup != null) File.WriteAllBytes(file, backup);
                 else if (File.Exists(file)) File.Delete(file);
             }
+        }
+
+        [UnityTest] public IEnumerator ThrownFeedbackPinsTheFirstTargetAndDeletesBlockedThrows()
+        {
+            yield return LoadKitchen();
+            menuKeyboard = new KitchenMenuKeyboard();
+            var menu = EnableKitchenMenu();
+            var guide = menu.GetComponentInChildren<KitchenActivityGuide>(true);
+            yield return null;
+            KitchenSceneTestSetup.ChooseStartupLanguage(menu);
+            yield return FollowKitchenEntry(menu, guide.transform.Find("Guide"));
+            var editor = guide.transform.Find("FeedbackEditor");
+            // Keep the throw lane away from the real rig capsule: the test hand is a
+            // separate interactor, so the kitchen's physical colliders still block it.
+            var point = new Vector3(-3.20f, 1.20f, .32f);
+            var target = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            target.transform.position = point;
+            target.transform.localScale = new Vector3(.42f, .12f, .42f);
+            target.AddComponent<KitchenFeedbackTarget>().Configure("throw-target", "Throw target");
+            GameObject obstacle = null;
+            try
+            {
+                yield return SpawnFeedbackNote(menu);
+                var note = LooseNote();
+                yield return ThrowDown(note, point + Vector3.up * .89f);
+                Assert.IsFalse(note.GetComponent<XRGrabInteractable>().enabled);
+                Assert.IsTrue(note.transform.IsChildOf(target.transform));
+                Assert.IsTrue(editor.Find("FeedbackKeyboard").gameObject.activeInHierarchy);
+                yield return Click(menu, editor.Find("Form/CloseFeedback"));
+                yield return null;
+
+                obstacle = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                obstacle.transform.position = point + Vector3.up * .22f;
+                obstacle.transform.localScale = new Vector3(.42f, .08f, .42f);
+                Physics.SyncTransforms();
+                yield return SpawnFeedbackNote(menu);
+                note = LooseNote();
+                yield return ThrowDown(note, point + Vector3.up * .89f);
+                Assert.IsTrue(note == null, "The untagged blocker absorbs the throw; it must not pin the target behind it.");
+                Assert.IsFalse(editor.gameObject.activeSelf);
+            }
+            finally
+            {
+                if (obstacle != null) Object.Destroy(obstacle);
+                Object.Destroy(target);
+            }
+        }
+
+        IEnumerator ThrowDown(KitchenFeedbackNote note, Vector3 start)
+        {
+            yield return Pick(left, note.gameObject);
+            yield return MoveHeld(left, note.gameObject, start, Quaternion.identity, 30);
+            Assert.That(Vector3.Distance(note.transform.position, start), Is.LessThan(.07f), "The throw starts clear of surrounding colliders.");
+            var originalDelta = Time.captureDeltaTime;
+            Time.captureDeltaTime = 1f / 90f;
+            try
+            {
+                for (var frame = 0; frame < 25; frame++) yield return null;
+                for (var frame = 0; frame < 11; frame++)
+                {
+                    left.transform.position -= Vector3.up * .032f;
+                    yield return null;
+                }
+                Drop(left, note.gameObject);
+                yield return null;
+                yield return null;
+                Assert.IsTrue(note != null && note.GetComponent<XRGrabInteractable>().enabled, "The release starts well outside the near-attach radius.");
+                Assert.That(note.GetComponent<Rigidbody>().velocity.y, Is.LessThan(-.55f), "XRI provides the tracked throw velocity.");
+                for (var frame = 0; frame < 80 && note != null && note.GetComponent<XRGrabInteractable>().enabled; frame++) yield return null;
+            }
+            finally { Time.captureDeltaTime = originalDelta; }
+        }
+
+        IEnumerator FollowKitchenEntry(LocomotionSettingsView menu, Transform guide)
+        {
+            var movement = menu.GetComponentInParent<KitchenLocomotionSettings>();
+            Assert.That(movement.transform.position, Is.EqualTo(new Vector3(-.43f, 0f, -7.37f)),
+                "The player starts inside the two hallway doors.");
+            Assert.That(Vector3.Dot(movement.transform.forward, Vector3.forward), Is.GreaterThan(.99f));
+            Assert.That(KitchenLocale.Source(guide.Find("Title").GetComponent<TMP_Text>()), Is.EqualTo("Find the kitchen"));
+            Assert.IsFalse(menu.IsOpen);
+            var hint = guide.parent.Find("GuideHint/Hint").GetComponent<TMP_Text>();
+            var arrow = scene.GetRootGameObjects().Single(root => root.name == "KitchenEntryArrow").GetComponent<LineRenderer>();
+            yield return new WaitForSecondsRealtime(.2f);
+            Assert.IsTrue(arrow.enabled);
+            Assert.That(KitchenLocale.Source(hint), Does.Contain("sofa"));
+            var projectedArrow = movement.Origin.Camera.WorldToViewportPoint(arrow.transform.position);
+            Assert.That(projectedArrow.y, Is.InRange(0f, 1f), "The first arrow must be visible while looking ahead.");
+
+            var stops = new[]
+            {
+                (position: new Vector3(-.43f, .004f, .08f), nextHint: "Turn left"),
+                (position: new Vector3(-3.15f, .004f, .08f), nextHint: "Turn right"),
+                (position: new Vector3(-3.15f, .004f, 1.12f), nextHint: "Grip")
+            };
+            foreach (var (position, nextHint) in stops)
+            {
+                Assert.IsTrue(movement.TeleportProvider.QueueTeleportRequest(new TeleportRequest
+                {
+                    destinationPosition = position,
+                    matchOrientation = MatchOrientation.None,
+                    requestTime = Time.time
+                }), $"The route must have a clear, supported landing at {position}.");
+                for (var frame = 0; frame < 40 && Vector3.Distance(movement.transform.position, position) > .03f; frame++)
+                    yield return null;
+                Assert.That(Vector3.Distance(movement.transform.position, position), Is.LessThan(.03f));
+                yield return new WaitForSecondsRealtime(.2f);
+                Assert.That(KitchenLocale.Source(hint), Does.Contain(nextHint));
+            }
+
+            Assert.That(KitchenLocale.Source(guide.Find("Title").GetComponent<TMP_Text>()), Is.EqualTo("Practice controls"));
+            Assert.IsFalse(arrow.enabled);
         }
 
         LocomotionSettingsView EnableKitchenMenu()
@@ -1339,9 +1710,7 @@ namespace XRApartment.Tests
             var rotation = Quaternion.LookRotation(-surface.normal, up);
             yield return MoveHeld(left, note.gameObject, approach, rotation, 45);
             yield return MoveHeld(left, note.gameObject, surface.point + surface.normal * .026f, rotation, 35);
-            Drop(left, note.gameObject);
-            yield return null;
-            yield return null;
+            yield return PlaceAndRelease(left, note.gameObject);
             Assert.IsFalse(note.GetComponent<XRGrabInteractable>().enabled, $"Note failed to attach at {note.transform.position} near {surface.point}.");
         }
 

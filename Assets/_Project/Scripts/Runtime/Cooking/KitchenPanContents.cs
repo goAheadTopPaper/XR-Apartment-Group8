@@ -28,10 +28,17 @@ namespace XRApartment.Runtime
         [SerializeField] KitchenCookingProfile profile;
         [SerializeField] Transform[] curds;
         [SerializeField] bool texturedEggCurds;
+        struct PlatedCurd
+        {
+            public Transform parent;
+            public Vector3 from, to;
+            public Quaternion fromRotation, toRotation;
+        }
         KitchenFoodVessel vessel;
         XRGrabInteractable panGrab;
         readonly Captured[] captured = new Captured[32];
         Vector3[] curdScales;
+        PlatedCurd[] platedCurds;
         MeshRenderer[][] curdRenderers;
         MaterialPropertyBlock curdTint;
         int count, servedCount;
@@ -43,7 +50,10 @@ namespace XRApartment.Runtime
         public float StirFryDistance { get; private set; }
         public float BeefOnionStirDistance { get; private set; }
         public int CapturedCount => count - servedCount;
-        public bool BeefOnionPlated => servedCount > 0;
+        public bool BeefOnionPlated => servedCount > 0 && PlatedEggMillilitres <= 0f;
+        public float PlatedEggMillilitres { get; private set; }
+        public float PlatedTomatoGrams { get; private set; }
+        public bool CanPlateEgg => vessel != null && vessel.Batch.Millilitres > .01f && vessel.Stage == CookingStage.Cooked;
         public float CoagulatedFraction => vessel == null || profile == null ? 0 : Mathf.InverseLerp(
             profile.cookedSeconds * profile.coagulationStartsAt, profile.cookedSeconds, vessel.Batch.Cooking.Dose);
         public bool TomatoCooked
@@ -52,7 +62,7 @@ namespace XRApartment.Runtime
             {
                 if (profile == null || TomatoGrams < profile.tomatoGrams * profile.requiredTomatoFraction) return false;
                 for (var i = 0; i < count; i++)
-                    if (captured[i].food.IngredientKind == KitchenIngredientKind.Tomato &&
+                    if (!captured[i].served && captured[i].food.IngredientKind == KitchenIngredientKind.Tomato &&
                         captured[i].food.Stage != CookingStage.Cooked) return false;
                 return true;
             }
@@ -93,8 +103,14 @@ namespace XRApartment.Runtime
             vessel = GetComponent<KitchenFoodVessel>();
             panGrab = GetComponent<XRGrabInteractable>();
             curdScales = new Vector3[curds.Length];
+            platedCurds = new PlatedCurd[curds.Length];
             curdRenderers = new MeshRenderer[curds.Length][]; curdTint = new MaterialPropertyBlock();
-            for (var i = 0; i < curds.Length; i++) { curdScales[i] = curds[i].localScale; curds[i].gameObject.SetActive(false); }
+            for (var i = 0; i < curds.Length; i++)
+            {
+                curdScales[i] = curds[i].localScale;
+                platedCurds[i].parent = curds[i].parent;
+                curds[i].gameObject.SetActive(false);
+            }
             for (var i = 0; i < curds.Length; i++) curdRenderers[i] = curds[i].GetComponentsInChildren<MeshRenderer>(true);
         }
         void OnTriggerEnter(Collider other) => Receive(other);
@@ -137,36 +153,108 @@ namespace XRApartment.Runtime
 
         internal bool TryPlateBeefOnion(Transform plate, float plateRadius)
         {
-            if (servedCount > 0 || plate == null || !plate.gameObject.activeInHierarchy ||
-                panGrab == null || !panGrab.isSelected || Vector3.Dot(plate.up, Vector3.up) < .85f ||
-                BeefStage != CookingStage.Cooked || OnionStage != CookingStage.Cooked) return false;
-            var tilt = Vector3.Dot(transform.up, Vector3.up);
-            if (tilt > .7071f || tilt < -.35f) return false;
-            var downhill = Vector3.ProjectOnPlane(Vector3.down, transform.up).normalized;
-            var lip = transform.position + downhill * vessel.InnerRadius +
-                transform.up * (vessel.InnerBottom + vessel.InnerHeight);
-            var target = plate.InverseTransformPoint(lip);
-            if (target.y < .018f || target.y > .22f || target.x * target.x + target.z * target.z > plateRadius * plateRadius)
-                return false;
-
+            if (BeefStage != CookingStage.Cooked || OnionStage != CookingStage.Cooked ||
+                !CanPlate(plate, plateRadius)) return false;
             serveTime = 0f;
             for (var index = 0; index < count; index++)
             {
                 var entry = captured[index];
-                if (entry.food.IngredientKind == KitchenIngredientKind.Tomato) continue;
-                entry.served = true;
-                entry.food.transform.SetParent(plate, true);
-                entry.serveFrom = entry.food.transform.localPosition;
-                entry.serveFromRotation = entry.food.transform.localRotation;
-                var angle = servedCount * 2.39996f;
-                var radius = plateRadius * (.26f + .14f * (servedCount % 3));
-                entry.serveToRotation = Quaternion.Euler(0, angle * Mathf.Rad2Deg + 35f, 0) * entry.rotation;
-                entry.serveTo = new Vector3(Mathf.Cos(angle) * radius, .026f + .008f * (servedCount % 2),
-                    Mathf.Sin(angle) * radius) - entry.serveToRotation * entry.centroid;
-                servedCount++;
+                if (entry.food.IngredientKind != KitchenIngredientKind.Tomato) Serve(entry, plate, plateRadius, servedCount);
             }
             BeefGrams = OnionGrams = 0f;
             return true;
+        }
+
+        internal bool TryPlateScrambledEgg(Transform plate, float plateRadius)
+        {
+            var plateEgg = PlatedEggMillilitres <= 0f && CanPlateEgg;
+            var hasUnservedTomato = false;
+            var allTomatoesCooked = true;
+            for (var index = 0; index < count; index++)
+            {
+                var entry = captured[index];
+                if (entry.served || entry.food.IngredientKind != KitchenIngredientKind.Tomato) continue;
+                hasUnservedTomato = true;
+                if (entry.food.Stage != CookingStage.Cooked) allTomatoesCooked = false;
+            }
+            if (!allTomatoesCooked) return false;
+            if (!plateEgg && !(PlatedEggMillilitres > 0f && hasUnservedTomato)) return false;
+            if (!CanPlateCommon(plate, plateRadius)) return false;
+
+            if (plateEgg)
+            {
+                UpdatePresentation();
+                PlatedEggMillilitres = vessel.Batch.Remove(vessel.Batch.Millilitres);
+                for (var i = 0; i < curds.Length; i++)
+                {
+                    var curd = curds[i];
+                    curd.gameObject.SetActive(true);
+                    curd.SetParent(plate, true);
+                    var angle = i * 2.39996f;
+                    ref var motion = ref platedCurds[i];
+                    motion.from = curd.localPosition;
+                    motion.fromRotation = curd.localRotation;
+                    motion.to = new Vector3(Mathf.Cos(angle) * plateRadius * (.22f + .10f * (i % 4)),
+                        .026f + .005f * (i % 3), Mathf.Sin(angle) * plateRadius * (.22f + .10f * (i % 4)));
+                    motion.toRotation = Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);
+                }
+            }
+            else if (serveTime >= 1f)
+            {
+                for (var i = 0; i < curds.Length; i++)
+                {
+                    var curd = curds[i];
+                    ref var motion = ref platedCurds[i];
+                    motion.from = curd.localPosition;
+                    motion.fromRotation = curd.localRotation;
+                    motion.to = curd.localPosition;
+                    motion.toRotation = curd.localRotation;
+                }
+            }
+
+            serveTime = 0f;
+            if (hasUnservedTomato)
+            {
+                PlatedTomatoGrams += TomatoGrams;
+                TomatoGrams = 0f;
+                for (var index = 0; index < count; index++)
+                {
+                    var entry = captured[index];
+                    if (!entry.served && entry.food.IngredientKind == KitchenIngredientKind.Tomato)
+                        Serve(entry, plate, plateRadius, curds.Length + servedCount);
+                }
+            }
+            return true;
+        }
+
+        bool CanPlateCommon(Transform plate, float plateRadius)
+        {
+            if (plate == null || !plate.gameObject.activeInHierarchy ||
+                panGrab == null || !panGrab.isSelected || Vector3.Dot(plate.up, Vector3.up) < .85f) return false;
+            var tilt = Vector3.Dot(transform.up, Vector3.up);
+            if (tilt > .7071f || tilt < -.75f) return false;
+            var downhill = Vector3.ProjectOnPlane(Vector3.down, transform.up).normalized;
+            var lip = transform.position + downhill * vessel.InnerRadius +
+                transform.up * (vessel.InnerBottom + vessel.InnerHeight);
+            var target = plate.InverseTransformPoint(lip);
+            return target.y >= .012f && target.y <= .28f && target.x * target.x + target.z * target.z <= plateRadius * plateRadius;
+        }
+
+        bool CanPlate(Transform plate, float plateRadius) =>
+            servedCount <= 0 && PlatedEggMillilitres <= 0f && CanPlateCommon(plate, plateRadius);
+
+        void Serve(Captured entry, Transform plate, float plateRadius, int index)
+        {
+            entry.served = true;
+            entry.food.transform.SetParent(plate, true);
+            entry.serveFrom = entry.food.transform.localPosition;
+            entry.serveFromRotation = entry.food.transform.localRotation;
+            var angle = index * 2.39996f;
+            var radius = plateRadius * (.26f + .14f * (index % 3));
+            entry.serveToRotation = Quaternion.Euler(0, angle * Mathf.Rad2Deg + 35f, 0) * entry.rotation;
+            entry.serveTo = new Vector3(Mathf.Cos(angle) * radius, .026f + .008f * (index % 2),
+                Mathf.Sin(angle) * radius) - entry.serveToRotation * entry.centroid;
+            servedCount++;
         }
         public void Heat(float intensity, float seconds)
         {
@@ -199,14 +287,23 @@ namespace XRApartment.Runtime
         void UpdatePresentation()
         {
             if (vessel == null || profile == null) return;
-            var animateServe = servedCount > 0 && serveTime < 1f;
+            var animateServe = (servedCount > 0 || PlatedEggMillilitres > 0f) && serveTime < 1f;
             if (animateServe) serveTime = Mathf.Min(1f, serveTime + Time.deltaTime / .24f);
+            var serveBlend = Mathf.SmoothStep(0f, 1f, serveTime);
             fold = Mathf.Max(0, fold - Time.deltaTime);
             var coagulated = CoagulatedFraction;
             var eggPresent = vessel.Batch.Millilitres > .01f;
             vessel.ShowSolidEgg(coagulated > .98f && eggPresent);
             for (var i = 0; i < curds.Length; i++)
             {
+                if (PlatedEggMillilitres > 0f)
+                {
+                    var motion = platedCurds[i];
+                    if (animateServe) curds[i].SetLocalPositionAndRotation(
+                        Vector3.Lerp(motion.from, motion.to, serveBlend),
+                        Quaternion.Slerp(motion.fromRotation, motion.toRotation, serveBlend));
+                    continue;
+                }
                 var visible = eggPresent && coagulated > (i % 4) * .035f + .025f;
                 curds[i].gameObject.SetActive(visible);
                 if (!visible) continue;
@@ -257,11 +354,17 @@ namespace XRApartment.Runtime
                 captured[i] = null;
             }
             count = servedCount = 0;
+            PlatedEggMillilitres = PlatedTomatoGrams = 0f;
             BeefGrams = OnionGrams = TomatoGrams = EggScrambleDistance = StirFryDistance =
                 BeefOnionStirDistance = fold = foldPhase = serveTime = 0;
             lastHeat = -10;
             if (vessel != null) vessel.ShowSolidEgg(false);
-            if (curds != null) foreach (var curd in curds) curd.gameObject.SetActive(false);
+            if (platedCurds != null) for (var i = 0; i < curds.Length; i++)
+            {
+                curds[i].SetParent(platedCurds[i].parent, false);
+                curds[i].localScale = curdScales[i];
+                curds[i].gameObject.SetActive(false);
+            }
         }
     }
 }

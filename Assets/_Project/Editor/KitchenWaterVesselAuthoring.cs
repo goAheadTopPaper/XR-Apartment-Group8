@@ -105,6 +105,8 @@ public static partial class KitchenWaterAuthoring
             data.FindProperty("drain").boolValue = drain;
             data.FindProperty("surface").objectReferenceValue = surface;
             data.FindProperty("stream").objectReferenceValue = stream;
+            var steam = vessel.Find("FX_Steam")?.GetComponent<ParticleSystem>();
+            if (steam != null) data.FindProperty("steam").objectReferenceValue = steam;
             data.FindProperty("fittedCavity").boolValue = true;
             data.FindProperty("spillWhenDisabled").boolValue = spillWhenDisabled;
             var profileData = data.FindProperty("sections");

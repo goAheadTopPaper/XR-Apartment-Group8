@@ -84,8 +84,13 @@ namespace XRApartment.Tests
                 Physics.SyncTransforms();
                 var before = vessel.Millilitres;
                 tap.SetRunning(true);
+                var waterSound = tap.GetComponentsInChildren<AudioSource>().Single(source => source.clip != null && source.clip.name == "SFX_Faucet");
+                Assert.IsTrue(waterSound.loop);
+                Assert.That(waterSound.spatialBlend, Is.EqualTo(1f));
+                Assert.That(waterSound.transform.position, Is.EqualTo(tap.OutletPosition));
                 yield return Frames(14);
                 tap.SetRunning(false);
+                Assert.IsFalse(waterSound.isPlaying);
                 yield return Frames(9);
                 Assert.That(vessel.Millilitres, Is.GreaterThan(before + 6f), path);
                 Assert.That(vessel.Millilitres, Is.LessThanOrEqualTo(vessel.CapacityMillilitres), path);
@@ -139,6 +144,38 @@ namespace XRApartment.Tests
         }
 
         [UnityTest]
+        public IEnumerator WaterSurfaceHeightFollowsFillAndRecoversAfterEmptying()
+        {
+            var root = Instantiate(Recipe + "MixingBowl");
+            root.GetComponent<Rigidbody>().interpolation = RigidbodyInterpolation.None;
+            root.transform.position = Origin + Vector3.right;
+            var vessel = Water(root);
+            var surface = root.transform.Find("LIQ_Surface");
+            var renderer = surface.GetComponent<MeshRenderer>();
+            var meshFilter = surface.GetComponent<MeshFilter>();
+
+            vessel.ResetWater();
+            Assert.That(vessel.Receive(50f), Is.EqualTo(50f));
+            yield return null;
+            Assert.That(renderer.enabled, Is.True);
+            var firstHeight = meshFilter.sharedMesh.vertices[0].y;
+
+            Assert.That(vessel.Receive(25f), Is.EqualTo(25f));
+            yield return null;
+            var filledHeight = meshFilter.sharedMesh.vertices[0].y;
+            Assert.That(filledHeight, Is.GreaterThan(firstHeight));
+
+            vessel.ResetWater();
+            yield return null;
+            Assert.That(renderer.enabled, Is.False);
+
+            Assert.That(vessel.Receive(75f), Is.EqualTo(75f));
+            yield return null;
+            Assert.That(renderer.enabled, Is.True);
+            Assert.That(meshFilter.sharedMesh.vertices[0].y, Is.EqualTo(filledHeight).Within(.0001f));
+        }
+
+        [UnityTest]
         public IEnumerator CupPoursIntoBowlAndBrokenPlateReleasesItsWater()
         {
             var bowl = Water(Instantiate(Cooking + "TomatoBowl"));
@@ -165,6 +202,88 @@ namespace XRApartment.Tests
             Assert.That(world.SpilledMillilitres - spillBefore, Is.EqualTo(40f).Within(.01f));
             prepared.ResetProp();
             Assert.That(plateWater.isActiveAndEnabled, Is.True);
+        }
+
+        [UnityTest]
+        public IEnumerator WaterPotAndPanHeatOnLitBurnerEmitSteamAndStaySafeWhenOffOrEmpty()
+        {
+            var workbench = Instantiate(Cooking + "Workbench");
+            var heat = workbench.GetComponentInChildren<KitchenHeatSource>();
+            var surface = workbench.transform.Find("LOC_BurnerSurface");
+            var burnerVapour = workbench.transform.Find("ACT_HeatZone/FX_FoodSteam").GetComponent<ParticleSystem>();
+
+            var pot = Instantiate(Cooking + "WaterPot");
+            var potWater = Water(pot);
+            var potSteam = pot.transform.Find("FX_Steam")?.GetComponent<ParticleSystem>();
+            Assert.IsNotNull(potSteam, "PREF_Cooking_WaterPot must include a rim FX_Steam particle system.");
+            potWater.ResetWater();
+            var initialPotMl = potWater.Millilitres;
+            Assert.Greater(initialPotMl, 50f);
+            pot.transform.position = surface.position + Vector3.up * .06f;
+            Physics.SyncTransforms();
+
+            heat.SetOn(false);
+            yield return Frames(4);
+            Assert.That(potWater.TemperatureCelsius, Is.EqualTo(20f).Within(.1f));
+            Assert.IsFalse(potWater.HasHotSteam);
+            Assert.IsFalse(potWater.IsBoiling);
+            Assert.IsFalse(potSteam.emission.enabled);
+            Assert.IsFalse(burnerVapour.emission.enabled);
+
+            heat.SetOn(true);
+            Time.timeScale = 5f;
+            for (var i = 0; i < 30 && !potWater.HasHotSteam; i++) yield return new WaitForSeconds(.4f);
+            Assert.IsTrue(heat.IsHeatingWater(potWater));
+            Assert.IsTrue(potWater.HasHotSteam);
+            Assert.That(potWater.TemperatureCelsius, Is.GreaterThanOrEqualTo(45f));
+            Assert.IsTrue(potSteam.emission.enabled, "Warming water pot should show visible steam.");
+            Assert.IsTrue(burnerVapour.emission.enabled, "Burner vapour should engage while heating water.");
+
+            for (var i = 0; i < 40 && !potWater.IsBoiling; i++) yield return new WaitForSeconds(.4f);
+            Time.timeScale = 1f;
+            Assert.IsTrue(potWater.IsBoiling);
+            Assert.That(potWater.TemperatureCelsius, Is.EqualTo(100f).Within(.2f));
+            Assert.That(potWater.Millilitres, Is.EqualTo(initialPotMl).Within(.01f), "Boiling must not consume water volume.");
+            Assert.IsTrue(potSteam.emission.enabled);
+            Assert.IsTrue(burnerVapour.emission.enabled);
+
+            heat.SetOn(false);
+            yield return null;
+            Assert.IsFalse(burnerVapour.emission.enabled);
+
+            heat.SetOn(true);
+            pot.transform.rotation = Quaternion.Euler(0f, 0f, 125f);
+            Time.timeScale = 4f;
+            for (var i = 0; i < 60 && potWater.Millilitres > .05f; i++) yield return new WaitForSeconds(.2f);
+            Time.timeScale = 1f;
+            pot.transform.rotation = Quaternion.identity;
+            Physics.SyncTransforms();
+            yield return Frames(4);
+            Assert.That(potWater.Millilitres, Is.LessThanOrEqualTo(.05f));
+            Assert.That(potWater.TemperatureCelsius, Is.EqualTo(20f).Within(.1f));
+            Assert.IsFalse(potWater.HasHotSteam);
+            Assert.IsFalse(potSteam.emission.enabled);
+            Assert.IsFalse(burnerVapour.emission.enabled);
+            Object.Destroy(pot);
+
+            var pan = Instantiate(Cooking + "FryingPan");
+            var panFood = pan.GetComponent<KitchenFoodVessel>();
+            var panWater = Water(pan);
+            var panSteam = pan.transform.Find("FX_Steam").GetComponent<ParticleSystem>();
+            panWater.ResetWater();
+            Assert.That(panWater.Receive(180f), Is.EqualTo(180f).Within(.01f));
+            pan.transform.position = surface.position + Vector3.up * .002f;
+            Physics.SyncTransforms();
+            Time.timeScale = 5f;
+            for (var i = 0; i < 30 && !panWater.HasHotSteam; i++) yield return new WaitForSeconds(.4f);
+            Time.timeScale = 1f;
+            Assert.IsTrue(heat.IsHeatingWater(panWater));
+            Assert.IsTrue(panSteam.emission.enabled, "Pan holding heated water must emit FX_Steam.");
+            Assert.That(panWater.Millilitres, Is.EqualTo(180f).Within(.01f));
+            Assert.Zero(panFood.Batch.Millilitres);
+            heat.SetOn(false);
+            yield return null;
+            Assert.IsFalse(burnerVapour.emission.enabled);
         }
     }
 }

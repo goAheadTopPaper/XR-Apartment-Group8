@@ -198,7 +198,11 @@ namespace XRApartment.EditorTools
                 {
                     RemoveRealVisual(root); HideOldVisual(root.transform.Find("BODY_" + name));
                     foreach (var t in root.transform.Cast<Transform>().Where(t => t.name.IndexOf("Handle",StringComparison.OrdinalIgnoreCase)>=0).ToArray()) HideOldVisual(t);
-                    if (name == "Pot") CookwareModel(root.transform, "stockpot");
+                    if (name == "Pot")
+                    {
+                        CookwareModel(root.transform, "stockpot");
+                        EnsurePotSteam(root);
+                    }
                     else
                     {
                         var source = KitchenAuthoring.LoadRequired<GameObject>(KitchenAuthoring.Prefabs + "Props/PREF_Prop_Mug.prefab");
@@ -252,6 +256,8 @@ namespace XRApartment.EditorTools
         {
             var model = CookwareModel(parent, "gas_hob"); model.transform.position = position;
             model.transform.localRotation = Quaternion.Euler(0,180,0);
+            var hobFilter = model.GetComponentInChildren<MeshFilter>(true);
+            if (hobFilter != null) hobFilter.sharedMesh = BuildAlignedGasHobMesh();
             var supports = Child(parent, "COL_GasHob"); supports.position = position;
             var slab = supports.gameObject.AddComponent<BoxCollider>(); slab.center = Vector3.up * .017f; slab.size = new Vector3(.32f, .034f, .36f);
             foreach (var side in new[] { -1f, 1f })
@@ -270,8 +276,131 @@ namespace XRApartment.EditorTools
             var zone = heat.gameObject.AddComponent<BoxCollider>(); zone.isTrigger = true; zone.size = new Vector3(.23f, .13f, .23f);
             var stove = heat.gameObject.AddComponent<KitchenHeatSource>(); stove.Configure(button, glow.GetComponent<Renderer>()); stove.SetHeatSurface(surface);
             stove.ConfigureFlame(BuildFlame(parent, position + Vector3.up * .035f));
+            stove.EnableWaterHeating();
             Parameter("cooking_burner_support_height", .055f); Parameter("cooking_gas_flame_radius", .073f); Parameter("cooking_gas_flame_height", .035f);
             return stove;
+        }
+
+        [MenuItem("XR Apartment/Cooking/Apply Cooking Fixes")]
+        public static void ApplyCookingFixes()
+        {
+            var hobMesh = BuildAlignedGasHobMesh();
+            KitchenAuthoring.EditPrefab(Prefabs + "PREF_Cooking_WaterPot.prefab", EnsurePotSteam);
+            KitchenAuthoring.EditPrefab(StationPath, root =>
+            {
+                var hob = root.transform.Find("VIS_Real_gas_hob");
+                var hobFilter = hob?.GetComponentInChildren<MeshFilter>(true);
+                if (hobFilter != null) hobFilter.sharedMesh = hobMesh;
+                var heat = root.transform.Find("ACT_HeatZone")?.GetComponent<KitchenHeatSource>();
+                if (heat != null)
+                {
+                    var so = new SerializedObject(heat);
+                    so.FindProperty("heatWater").boolValue = true;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+                var flow = root.GetComponent<KitchenRecipeController>();
+                if (flow != null)
+                {
+                    var so = new SerializedObject(flow);
+                    so.FindProperty("serveScrambledEgg").boolValue = true;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+            });
+            AssetDatabase.SaveAssets();
+        }
+
+        static void EnsurePotSteam(GameObject root)
+        {
+            var existing = root.transform.Find("FX_Steam");
+            if (existing != null) UnityEngine.Object.DestroyImmediate(existing.gameObject);
+            var steam = Particles(root.transform, "FX_Steam", 12, .75f, .04f);
+            steam.transform.localPosition = Vector3.up * .058f;
+            var emission = steam.emission;
+            emission.enabled = false;
+            var water = root.GetComponent<LiquidContainer>();
+            if (water != null)
+            {
+                var so = new SerializedObject(water);
+                so.FindProperty("steam").objectReferenceValue = steam;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        static Mesh BuildAlignedGasHobMesh()
+        {
+            const string sourcePath = "Assets/_Project/Art/Generated/kitchen_gas_hob_v001/kitchen_gas_hob_game.fbx";
+            var sourceRoot = KitchenAuthoring.LoadRequired<GameObject>(sourcePath);
+            var sourceFilter = sourceRoot.GetComponentsInChildren<MeshFilter>(true)
+                .FirstOrDefault(f => f.name == "VIS_Intact_00")
+                ?? sourceRoot.GetComponentsInChildren<MeshFilter>(true).OrderByDescending(f => f.sharedMesh.vertexCount).First();
+            var sourceMesh = sourceFilter.sharedMesh;
+            var sourceVertices = sourceMesh.vertices;
+            var sourceNormals = sourceMesh.normals;
+            var sourceTangents = sourceMesh.tangents;
+            var align = Quaternion.Euler(0f, 22.5f, 0f) * Quaternion.Euler(-90f, 0f, 0f);
+            var fromFilterToRoot = sourceRoot.transform.worldToLocalMatrix * sourceFilter.transform.localToWorldMatrix;
+
+            var vertices = new Vector3[sourceVertices.Length];
+            var min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            var max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+            for (var i = 0; i < sourceVertices.Length; i++)
+            {
+                var p = align * fromFilterToRoot.MultiplyPoint3x4(sourceVertices[i]);
+                vertices[i] = p;
+                min = Vector3.Min(min, p);
+                max = Vector3.Max(max, p);
+            }
+
+            var midX = (min.x + max.x) * .5f;
+            var midZ = (min.z + max.z) * .5f;
+            var sx = .32f / Mathf.Max(.001f, max.x - min.x);
+            var sy = .055f / Mathf.Max(.001f, max.y - min.y);
+            var sz = .36f / Mathf.Max(.001f, max.z - min.z);
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                var p = vertices[i];
+                vertices[i] = new Vector3((p.x - midX) * sx, (p.y - min.y) * sy, (p.z - midZ) * sz);
+            }
+
+            var mesh = UnityEngine.Object.Instantiate(sourceMesh);
+            mesh.name = "MESH_Cookware_GasHob";
+            mesh.vertices = vertices;
+            if (sourceNormals != null && sourceNormals.Length == vertices.Length)
+            {
+                var normals = new Vector3[sourceNormals.Length];
+                for (var i = 0; i < sourceNormals.Length; i++)
+                {
+                    var n = align * fromFilterToRoot.MultiplyVector(sourceNormals[i]);
+                    normals[i] = new Vector3(n.x / sx, n.y / sy, n.z / sz).normalized;
+                }
+                mesh.normals = normals;
+            }
+            else mesh.RecalculateNormals();
+            if (sourceTangents != null && sourceTangents.Length == vertices.Length)
+            {
+                var tangents = new Vector4[sourceTangents.Length];
+                for (var i = 0; i < sourceTangents.Length; i++)
+                {
+                    var t = sourceTangents[i];
+                    var v = align * fromFilterToRoot.MultiplyVector(new Vector3(t.x, t.y, t.z));
+                    v = new Vector3(v.x * sx, v.y * sy, v.z * sz).normalized;
+                    tangents[i] = new Vector4(v.x, v.y, v.z, t.w);
+                }
+                mesh.tangents = tangents;
+            }
+            mesh.RecalculateBounds();
+
+            var assetPath = CookwareArt + "MESH_Cookware_GasHob.asset";
+            var existing = AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
+            if (existing == null)
+            {
+                AssetDatabase.CreateAsset(mesh, assetPath);
+                return mesh;
+            }
+            EditorUtility.CopySerialized(mesh, existing);
+            EditorUtility.SetDirty(existing);
+            UnityEngine.Object.DestroyImmediate(mesh);
+            return existing;
         }
 
         static KitchenBurnerFlame BuildFlame(Transform parent, Vector3 position)

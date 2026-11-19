@@ -18,13 +18,26 @@ namespace XRApartment.Runtime
         [SerializeField] bool fittedCavity;
         [SerializeField] VesselLiquidGeometry.Section[] sections;
         [SerializeField] bool spillWhenDisabled;
+        [SerializeField] ParticleSystem steam;
 
         WaterVolume water;
         VesselLiquidGeometry geometry;
+        VesselLiquidGeometry previousSurfaceGeometry;
         KitchenFoodVessel foodVessel;
         Vector3 interiorOrigin;
         Vector3 lastPosition, lastVelocity;
+        Vector3 previousSurfaceNormal;
         Vector2 slosh, sloshVelocity;
+        float previousSurfaceFraction, previousSurfaceOffset;
+        const float AmbientCelsius = 20f;
+        const float SteamStartCelsius = 45f;
+        float lastHeat = -10f;
+        public float TemperatureCelsius { get; private set; } = AmbientCelsius;
+        public bool IsBoiling => Millilitres > VisibleMillilitres && TemperatureCelsius >= 99.9f;
+        public bool HasHotSteam => Millilitres > VisibleMillilitres && TemperatureCelsius >= SteamStartCelsius;
+        public void ConfigureSteam(ParticleSystem vapour) => steam = vapour;
+        internal bool CanBoilOnStove => !drain && (parameterPrefix == "water_cooking_stockpot" ||
+            (foodVessel != null && foodVessel.CanHeat));
         public float Millilitres => water == null ? 0 : water.Amount;
         public float CapacityMillilitres { get { Initialize(); return water == null ? 0f : water.Capacity; } }
         public bool IsDrain => drain;
@@ -49,6 +62,7 @@ namespace XRApartment.Runtime
         {
             Active.Remove(this);
             if (stream != null) stream.Stop();
+            StopSteam();
             if (spillWhenDisabled && water != null)
             {
                 var spilled = water.Remove(water.Amount);
@@ -78,16 +92,32 @@ namespace XRApartment.Runtime
         {
             Initialize();
             if (water == null || !isActiveAndEnabled || (foodVessel != null && foodVessel.HasEgg)) return 0f;
-            return water.Add(millilitres);
+            var before = water.Amount;
+            var accepted = water.Add(millilitres);
+            if (accepted > 0f) TemperatureCelsius = Mathf.Lerp(TemperatureCelsius, AmbientCelsius, accepted / (before + accepted));
+            return accepted;
+        }
+
+        internal void HeatWater(float seconds)
+        {
+            if (!CanBoilOnStove || Millilitres <= VisibleMillilitres) return;
+            lastHeat = Time.time;
+            // Responsive sandbox timing, with more water taking longer. No evaporation.
+            var degreesPerSecond = Mathf.Clamp(2400f / Millilitres, 5f, 16f);
+            TemperatureCelsius = Mathf.MoveTowards(TemperatureCelsius, 100f, degreesPerSecond * seconds);
         }
 
         public void ResetWater()
         {
             Initialize();
             if (stream != null) stream.Stop();
+            StopSteam();
             if (water == null) return;
             water.Remove(water.Amount);
             water.Add(water.Capacity * initialFill);
+            TemperatureCelsius = AmbientCelsius;
+            lastHeat = -10f;
+            previousSurfaceGeometry = null;
             slosh = sloshVelocity = Vector2.zero;
             lastPosition = transform.position;
             lastVelocity = Vector3.zero;
@@ -98,6 +128,9 @@ namespace XRApartment.Runtime
             Initialize();
             if (water == null) return;
             float dt = Time.fixedDeltaTime;
+            if (water.Amount <= VisibleMillilitres) TemperatureCelsius = AmbientCelsius;
+            else if (Time.time - lastHeat > .1f)
+                TemperatureCelsius = Mathf.MoveTowards(TemperatureCelsius, AmbientCelsius, .85f * dt);
             Vector3 velocity = (transform.position - lastPosition) / dt;
             var acceleration = Vector3.ClampMagnitude((velocity - lastVelocity) / dt, 15f);
             var localAcceleration = transform.InverseTransformDirection(acceleration);
@@ -132,6 +165,7 @@ namespace XRApartment.Runtime
 
         void LateUpdate()
         {
+            UpdateSteam();
             if (water == null || surface == null) return;
             if (water.Amount <= VisibleMillilitres)
             {
@@ -141,8 +175,37 @@ namespace XRApartment.Runtime
             var normal = LocalGravityNormal(transform);
             normal = (normal + new Vector3(slosh.x, 0, slosh.y)).normalized;
             float fraction = water.Amount / water.Capacity;
-            float offset = geometry.SurfaceOffset(normal.x, normal.y, normal.z, fraction);
-            surface.SetPlane(geometry, normal, offset, true);
+            // The mesh caches its plane, but finding the offset also iterates over the cavity.
+            if (geometry != previousSurfaceGeometry || !normal.Equals(previousSurfaceNormal) || fraction != previousSurfaceFraction)
+            {
+                previousSurfaceOffset = geometry.SurfaceOffset(normal.x, normal.y, normal.z, fraction);
+                previousSurfaceGeometry = geometry;
+                previousSurfaceNormal = normal;
+                previousSurfaceFraction = fraction;
+            }
+            surface.SetPlane(geometry, normal, previousSurfaceOffset, true);
+        }
+
+        void UpdateSteam()
+        {
+            if (steam == null) return;
+            var emitting = HasHotSteam;
+            var emission = steam.emission;
+            emission.enabled = emitting;
+            if (!emitting) return;
+            if (!steam.isPlaying) steam.Play();
+            var intensity = Mathf.InverseLerp(SteamStartCelsius, 100f, TemperatureCelsius);
+            emission.rateOverTime = Mathf.Lerp(6f, 18f, intensity);
+            var main = steam.main;
+            main.startColor = new Color(.94f, .96f, 1f, Mathf.Lerp(.16f, .34f, intensity));
+        }
+
+        void StopSteam()
+        {
+            if (steam == null) return;
+            var emission = steam.emission;
+            emission.enabled = false;
+            steam.Clear();
         }
 
         internal bool CrossesMouth(Vector3 from, Vector3 to, out float fraction)

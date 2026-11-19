@@ -28,6 +28,7 @@ namespace XRApartment.Runtime
         Vector3 previousPosition;
         KitchenPanContents panContents;
         bool solidEggVisible;
+        float defaultVapourRate = 8f;
         public EggBatch Batch { get { Initialize(); return batch; } }
         public CookingStage Stage => Batch == null ? CookingStage.Empty : Batch.Stage;
         public float SpilledMillilitres { get; private set; }
@@ -68,6 +69,7 @@ namespace XRApartment.Runtime
             if (surface != null) surfaceRenderer = surface.GetComponent<MeshRenderer>();
             previousPosition = transform.position;
             panContents = GetComponent<KitchenPanContents>();
+            if (vapour != null) defaultVapourRate = vapour.emission.rateOverTime.constant;
         }
 
         void OnEnable() { if (!Active.Contains(this)) Active.Add(this); }
@@ -217,10 +219,22 @@ namespace XRApartment.Runtime
                 }
             if (vapour != null)
             {
+                var waterHot = waterVessel != null && waterVessel.HasHotSteam && batch.Millilitres <= .01f;
                 var emission = vapour.emission;
-                emission.enabled = Time.time - lastHeat < .15f && batch.Millilitres > .01f;
+                emission.enabled = (Time.time - lastHeat < .15f && batch.Millilitres > .01f) || waterHot;
+                if (emission.enabled && !vapour.isPlaying) vapour.Play();
                 var main = vapour.main;
-                main.startColor = batch.Stage == CookingStage.Burnt ? profile.smoke : profile.steam;
+                if (waterHot)
+                {
+                    var boil = waterVessel.IsBoiling;
+                    emission.rateOverTime = boil ? 14f : 7f;
+                    main.startColor = new Color(.94f, .96f, 1f, boil ? .3f : .18f);
+                }
+                else
+                {
+                    emission.rateOverTime = defaultVapourRate;
+                    main.startColor = batch.Stage == CookingStage.Burnt ? profile.smoke : profile.steam;
+                }
             }
         }
 

@@ -44,6 +44,10 @@ namespace XRApartment.Runtime
         [SerializeField] CookableIngredient beef, onion;
         [SerializeField] Transform servingPlate;
         [SerializeField] float servingRadius;
+        [SerializeField] bool serveScrambledEgg = true;
+        public void EnableScrambledEggServing() => serveScrambledEgg = true;
+        bool EggServed => contents != null && contents.PlatedEggMillilitres > 0f;
+        bool TomatoEggServed => EggServed && Recipe.Ready;
         float nextHint, blockerVisibleUntil;
         Collider recentFridgeBlocker;
         Vector3 fridgeHintPosition;
@@ -100,8 +104,8 @@ namespace XRApartment.Runtime
         string TomatoInstructions => "TOMATO & EGG\n" +
             (Recipe.Step == TomatoEggStep.Ready || Recipe.Step == TomatoEggStep.Burnt ? "" :
                 "Step " + ((int)Recipe.Step + 1) + "/14: ") + Hints[(int)Recipe.Step] +
-            "\nEgg " + (pan == null ? 0 : pan.Batch.Millilitres).ToString("0") + " mL | Tomato " +
-            (contents == null ? 0 : contents.TomatoGrams).ToString("0") + " g | " +
+            "\nEgg " + ((pan == null ? 0 : pan.Batch.Millilitres) + (contents == null ? 0 : contents.PlatedEggMillilitres)).ToString("0") + " mL | Tomato " +
+            (contents == null ? 0 : contents.TomatoGrams + contents.PlatedTomatoGrams).ToString("0") + " g | " +
             (stove != null && stove.IsOn ? "STOVE ON" : "STOVE OFF") +
             (contents != null && contents.BeefGrams > 0f
                 ? $"\nBeef {contents.BeefGrams:0} g | {contents.BeefStage}" : "") +
@@ -193,7 +197,12 @@ namespace XRApartment.Runtime
         void Update()
         {
             if (profile == null || contents == null) return;
-            if (ActiveRecipe == KitchenRecipeChoice.TomatoEgg) ObserveTomatoRecipe();
+            if (ActiveRecipe == KitchenRecipeChoice.TomatoEgg)
+            {
+                ObserveTomatoRecipe();
+                if (serveScrambledEgg && !station.IsResetting)
+                    contents.TryPlateScrambledEgg(servingPlate, servingRadius);
+            }
             else if (BeefStep == BeefOnionStep.Plate) contents.TryPlateBeefOnion(servingPlate, servingRadius);
         }
 
@@ -226,7 +235,8 @@ namespace XRApartment.Runtime
             var burnt = beefRecipe ? beefStep == BeefOnionStep.Burnt : tomatoStep == TomatoEggStep.Burnt;
             var step = beefRecipe ? (int)beefStep : (int)tomatoStep;
             var total = beefRecipe ? (int)BeefOnionStep.Served : (int)TomatoEggStep.Ready;
-            var caption = done ? (beefRecipe ? "SERVED" : "READY") :
+            var tomatoServed = !beefRecipe && TomatoEggServed;
+            var caption = done ? (beefRecipe || tomatoServed ? "SERVED" : "READY") :
                 burnt ? "BURNT" : $"STEP {step + 1} / {total}";
             var ingredient = NeededIngredient(beefRecipe, tomatoStep, beefStep);
             var blocker = recentFridgeBlocker;
@@ -237,7 +247,7 @@ namespace XRApartment.Runtime
             const string blockedAction = "The fridge door is blocked.";
             var action = beefRecipe ? BeefHints[step] : Hints[step];
             if (beefRecipe && ingredient != null) action = "Take " + ingredient + " from the fridge opposite the sink.";
-            if (done && !beefRecipe && !stove.IsOn)
+            if (done && !beefRecipe && (!stove.IsOn || tomatoServed))
                 action = "Tomato and egg is ready. Select RESET ROOM to cook again.";
             var detail = blockedForRecipe ? recovery : beefRecipe ? BeefProgress(beefStep) : TomatoProgress(tomatoStep);
             var accent = burnt || blockedForRecipe ? Attention : done ? Complete : Guidance;
@@ -282,8 +292,9 @@ namespace XRApartment.Runtime
             }
             if (step == TomatoEggStep.CrackEgg || step == TomatoEggStep.BeatEgg)
                 return $"Mixing bowl  {bowl.Batch.Millilitres:0} mL egg  /  {bowl.Batch.MixedFraction:P0} mixed";
+            if (TomatoEggServed) return "Grip the plate to carry your dish.";
             if (step >= TomatoEggStep.TurnOnStove && step <= TomatoEggStep.Ready)
-                return $"Pan  {pan.Batch.Millilitres:0} mL egg  /  {contents.TomatoGrams:0} g tomato  /  {StoveStatus}";
+                return $"Pan  {pan.Batch.Millilitres + contents.PlatedEggMillilitres:0} mL egg  /  {contents.TomatoGrams + contents.PlatedTomatoGrams:0} g tomato  /  {StoveStatus}";
             return "Grip to hold  /  Trigger to use" + (recipeButton == null ? "" : "  /  RECIPE to switch");
         }
 
@@ -310,12 +321,19 @@ namespace XRApartment.Runtime
                 Recipe.Observe(TomatoEggAction.BeatEgg);
             if (stove.IsOn) Recipe.Observe(TomatoEggAction.TurnOnStove);
             if (stove.IsHeating(pan)) Recipe.Observe(TomatoEggAction.PlacePan);
-            if (pan.Batch.Millilitres >= profile.minimumEggMillilitres && pan.Batch.MixedFraction >= .99f)
-                Recipe.Observe(TomatoEggAction.PourEgg);
-            if (contents.EggScrambleDistance >= profile.scrambleMetres) Recipe.Observe(TomatoEggAction.ScrambleEgg);
-            if (contents.TomatoGrams >= profile.tomatoGrams * profile.requiredTomatoFraction) Recipe.Observe(TomatoEggAction.AddTomato);
-            if (contents.StirFryDistance >= profile.stirFryMetres) Recipe.Observe(TomatoEggAction.StirFry);
-            Recipe.ObserveCooking(pan.Stage == CookingStage.Cooked, contents.TomatoCooked, contents.TomatoEggBurnt);
+            var eggMillilitres = pan.Batch.Millilitres + contents.PlatedEggMillilitres;
+            var eggMixed = (pan.Batch.Millilitres >= profile.minimumEggMillilitres && pan.Batch.MixedFraction >= .99f) ||
+                contents.PlatedEggMillilitres >= profile.minimumEggMillilitres;
+            if (eggMillilitres >= profile.minimumEggMillilitres && eggMixed) Recipe.Observe(TomatoEggAction.PourEgg);
+            if (contents.EggScrambleDistance >= profile.scrambleMetres || contents.PlatedEggMillilitres > 0f)
+                Recipe.Observe(TomatoEggAction.ScrambleEgg);
+            var tomatoGrams = contents.TomatoGrams + contents.PlatedTomatoGrams;
+            if (tomatoGrams >= profile.tomatoGrams * profile.requiredTomatoFraction) Recipe.Observe(TomatoEggAction.AddTomato);
+            if (contents.StirFryDistance >= profile.stirFryMetres || contents.PlatedTomatoGrams > 0f)
+                Recipe.Observe(TomatoEggAction.StirFry);
+            var eggDone = pan.Stage == CookingStage.Cooked || contents.PlatedEggMillilitres > 0f;
+            var tomatoDone = contents.TomatoCooked || contents.PlatedTomatoGrams >= profile.tomatoGrams * profile.requiredTomatoFraction;
+            Recipe.ObserveCooking(eggDone, tomatoDone, contents.TomatoEggBurnt);
         }
         public void ResetRecipe() => Recipe.Reset();
     }

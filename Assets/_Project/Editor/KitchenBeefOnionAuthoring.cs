@@ -127,10 +127,12 @@ namespace XRApartment.EditorTools
                 : button.GetComponent<XRSimpleInteractable>();
             var plate = root.transform.Find("PREF_Prop_plate/Intact");
             if (plate == null) throw new InvalidOperationException("The serving plate is missing from the workbench.");
-            root.GetComponent<KitchenRecipeController>().ConfigureBeefOnion(control,
+            var flow = root.GetComponent<KitchenRecipeController>();
+            flow.ConfigureBeefOnion(control,
                 root.transform.Find("STOCK_Beef").GetComponent<CookableIngredient>(),
                 root.transform.Find("STOCK_Onion").GetComponent<CookableIngredient>(),
                 plate, ServingRadius);
+            flow.EnableScrambledEggServing();
             Parameter("cooking_serving_radius", ServingRadius);
         }
     }

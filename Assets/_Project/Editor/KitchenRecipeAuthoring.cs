@@ -17,6 +17,7 @@ namespace XRApartment.EditorTools
     {
         const string RecipeArt = Art + "RecipeModels/";
         const string RecipePrefabs = Prefabs + "Recipe/";
+        const string ChoppingBoardPath = RecipePrefabs + "PREF_Cooking_ChoppingBoard.prefab";
         const string RecipeProfilePath = KitchenAuthoring.Settings + "SET_TomatoEggCooking.asset";
         const string RecipeTomato = KitchenAuthoring.Prefabs + "Generated/tomato_v002/PREF_Prop_tomato.prefab";
         static readonly Dictionary<Material, Material> RecipeMaterials = new Dictionary<Material, Material>();
@@ -234,10 +235,25 @@ namespace XRApartment.EditorTools
                 RecipeModel(root.transform, "chopping_board", false);
                 var collider = root.AddComponent<BoxCollider>(); collider.center = Vector3.up * .011f; collider.size = new Vector3(.42f, .022f, .34f);
                 root.AddComponent<Rigidbody>().mass = .45f; root.AddComponent<XRGrabInteractable>(); KitchenGrabAuthoring.ConfigureProp(root);
+                ConfigureChoppingBoardGrab(root);
                 ConfigurePrepTray(root, true, .21f, .17f, .022f, .1f);
-                PrefabUtility.SaveAsPrefabAsset(root, RecipePrefabs + root.name + ".prefab");
+                PrefabUtility.SaveAsPrefabAsset(root, ChoppingBoardPath);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        static void ConfigureChoppingBoardGrab(GameObject board) =>
+            board.GetComponent<XRGrabInteractable>().distanceCalculationMode = XRBaseInteractable.DistanceCalculationMode.ColliderVolume;
+
+        static void ConfigureKnifeRest(GameObject workbench)
+        {
+            const float offset = .225f;
+            var knife = workbench.transform.Find("PREF_Prop_knife");
+            var board = workbench.transform.Find("PREF_Cooking_ChoppingBoard");
+            // Review V2 B inherits the original spawn height and overrides X/Z.
+            knife.localPosition = board.localPosition + new Vector3(0f, .03f, offset);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(knife);
+            Parameter("cooking_knife_rest_board_offset_z", offset);
         }
 
         static void ConfigurePrepTray(GameObject root, bool rectangle, float width, float depth, float bottom, float height)
@@ -263,8 +279,10 @@ namespace XRApartment.EditorTools
                 var spatula = Place(root.transform, RecipePrefabs + "PREF_Cooking_Spatula.prefab", new Vector3(-3.02f, table + .015f, 2.26f), targets).GetComponent<KitchenSpatula>();
                 spatula.transform.rotation = Quaternion.Euler(0, 90, 0);
                 spatula.SetPan(pan.GetComponent<KitchenPanContents>());
-                Place(root.transform, RecipePrefabs + "PREF_Cooking_ChoppingBoard.prefab", new Vector3(-3.68f, table, 1.92f), targets);
-                Place(root.transform, Generated("knife"), new Vector3(-3.68f, table + .03f, 1.92f), targets);
+                var boardPosition = new Vector3(-3.68f, table, 1.92f);
+                Place(root.transform, ChoppingBoardPath, boardPosition, targets);
+                Place(root.transform, Generated("knife"), boardPosition, targets);
+                ConfigureKnifeRest(root);
                 Place(root.transform, Generated("plate"), new Vector3(-4.22f, table, 2.23f), targets);
                 var ladle = Place(root.transform, Prefabs + "PREF_Cooking_Ladle.prefab", new Vector3(-3.28f, table + .025f, 2.31f), targets);
                 ladle.transform.rotation = Quaternion.Euler(0, -90, 0);
@@ -294,6 +312,7 @@ namespace XRApartment.EditorTools
                 var flow = root.AddComponent<KitchenRecipeController>();
                 var slices = tomato.transform.Find("DerivedPieces").Cast<Transform>().Select(t => t.GetComponent<PreparedKitchenProp>()).ToArray();
                 flow.Configure(profile, fridge, tomato, slices, eggs, bowl, pan, stove);
+                flow.EnableScrambledEggServing();
                 var station = root.AddComponent<KitchenCookingStation>(); station.Configure(targets.ToArray(), reset, bowl, pan, stove, null); station.ConfigureRecipe(flow, fridge);
                 EnsureCompactFridge(root);
                 ConfigureBeefOnionWorkbench(root);
