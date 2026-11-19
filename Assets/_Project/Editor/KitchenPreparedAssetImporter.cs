@@ -197,12 +197,12 @@ namespace XRApartment.EditorTools
             ConfigureTextures(folder);
         }
 
-        internal static void ConfigureModel(string path)
+        internal static void ConfigureModel(string path, bool readable = true)
         {
             var importer = (ModelImporter)AssetImporter.GetAtPath(path);
             importer.globalScale = 1f;
             importer.useFileScale = true;
-            importer.isReadable = true;
+            importer.isReadable = readable;
             importer.addCollider = false;
             importer.importAnimation = false;
             importer.materialImportMode = ModelImporterMaterialImportMode.ImportStandard;

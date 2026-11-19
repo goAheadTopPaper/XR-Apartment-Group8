@@ -113,7 +113,11 @@ namespace XRApartment.EditorTools
             var bounds = renderers[0].bounds; foreach (var r in renderers) bounds.Encapsulate(r.bounds); return bounds;
         }
 
-        static int Triangles(Renderer[] renderers) => renderers.Sum(r => r.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3);
+        static int Triangles(Renderer[] renderers) => renderers.Sum(r =>
+        {
+            var mesh = r.GetComponent<MeshFilter>().sharedMesh;
+            return Enumerable.Range(0, mesh.subMeshCount).Sum(i => (int)mesh.GetIndexCount(i) / 3);
+        });
 
         static void RenderStudio()
         {

@@ -54,7 +54,10 @@ namespace XRApartment.EditorTools
                 foreach (var suffix in new[] { "", "_lod1" })
                 {
                     var path = FurnitureArt + name + suffix + ".fbx";
-                    KitchenPreparedAssetImporter.ConfigureModel(path);
+                    // The table uses primitive colliders; chair and pendant use their LOD1 mesh for collision.
+                    bool readable = name.StartsWith("fridge", StringComparison.Ordinal) ||
+                        (name != "dining_table" && suffix == "_lod1");
+                    KitchenPreparedAssetImporter.ConfigureModel(path, readable);
                     var importer = (ModelImporter)AssetImporter.GetAtPath(path);
                     importer.generateSecondaryUV = !name.StartsWith("fridge", StringComparison.Ordinal);
                     importer.SaveAndReimport();

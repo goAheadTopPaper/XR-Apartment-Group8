@@ -38,6 +38,19 @@ namespace XRApartment.Tests
         T[] Components<T>() where T : Component => scene.GetRootGameObjects()
             .SelectMany(root => root.GetComponentsInChildren<T>(true)).ToArray();
 
+        [TestCase("dining_table", false)]
+        [TestCase("dining_table_lod1", false)]
+        [TestCase("dining_chair", false)]
+        [TestCase("pendant", false)]
+        [TestCase("dining_chair_lod1", true)]
+        [TestCase("pendant_lod1", true)]
+        public void CookingFurnitureRetainsCpuMeshesOnlyWhereRequired(string name, bool readable)
+        {
+            var importer = (ModelImporter)AssetImporter.GetAtPath("Assets/_Project/Art/Cooking/Furniture/" + name + ".fbx");
+            Assert.IsNotNull(importer);
+            Assert.AreEqual(readable, importer.isReadable);
+        }
+
         [Test]
         public void BuildStartsInTheCityKitchenAndIncludesTheFormalReview()
         {
