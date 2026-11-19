@@ -20,6 +20,9 @@ namespace XRApartment.Data.ReviewV2
         public string beforeEventId, afterEventId;
         public string explanation, importance;
         public FeedbackSaveStatus saveStatus;
+
+        // All fields are values or immutable strings.
+        public SpatialFeedbackRecord Copy() => (SpatialFeedbackRecord)MemberwiseClone();
     }
 
     [Serializable]

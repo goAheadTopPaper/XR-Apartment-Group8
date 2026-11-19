@@ -128,7 +128,7 @@ namespace XRApartment.Tests
             panel.review.onClick.Invoke(); Assert.AreEqual(SessionPhase.Review, panel.host.Snapshot.Phase);
             Assert.IsTrue(panel.back.gameObject.activeSelf); Assert.IsFalse(panel.reset.gameObject.activeSelf);
             panel.back.onClick.Invoke(); Assert.AreEqual(visit, panel.host.Snapshot.SchemeVisitId);
-            panel.SetOpen(true); panel.review.onClick.Invoke(); panel.finish.onClick.Invoke();
+            panel.SetOpen(true); panel.review.onClick.Invoke(); panel.finish.onClick.Invoke(); yield return ReviewOperationWait.Idle(panel.host);
             Assert.AreEqual(SessionPhase.Finished, panel.host.Snapshot.Phase);
             Assert.AreEqual(SaveStatus.Verified, panel.host.Snapshot.SaveStatus);
             StringAssert.Contains("保存已验证", panel.status.text);
@@ -336,7 +336,7 @@ namespace XRApartment.Tests
             StringAssert.Contains("暂无标记", panel.reviewBoard.listText.text);
             Assert.IsTrue(panel.reviewBoard.currentScheme.interactable); Assert.IsTrue(panel.reviewBoard.allSchemes.interactable);
             panel.back.onClick.Invoke(); Assert.AreEqual(visit, panel.host.Snapshot.SchemeVisitId);
-            panel.quickReview.onClick.Invoke(); panel.finish.onClick.Invoke();
+            panel.quickReview.onClick.Invoke(); panel.finish.onClick.Invoke(); yield return ReviewOperationWait.Idle(panel.host);
             Assert.AreEqual(SessionPhase.Finished, panel.host.Snapshot.Phase);
             Assert.AreEqual(SaveStatus.Verified, panel.host.Snapshot.SaveStatus);
             StringAssert.Contains("保存已验证", panel.status.text);
@@ -360,6 +360,7 @@ namespace XRApartment.Tests
             Assert.IsFalse(panel.host.Snapshot.IsBusy); Assert.AreNotEqual(visit, panel.host.Snapshot.SchemeVisitId);
             panel.OpenMark(); panel.markDraft.note.text = "scheme draft";
             panel.host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator);
+            yield return ReviewOperationWait.Idle(panel.host);
             Assert.AreEqual(SchemeIds.ExternalRefrigerator, panel.host.Snapshot.SchemeId);
             Assert.IsFalse(panel.markDraft.IsOpen); Assert.IsFalse(panel.markDraft.HasDraft);
             panel.OpenMark(); panel.markDraft.note.text = "disable draft";

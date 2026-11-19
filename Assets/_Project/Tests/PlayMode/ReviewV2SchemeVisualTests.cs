@@ -33,6 +33,7 @@ namespace XRApartment.Tests
                 foreach (var scheme in new[] { SchemeIds.IntegratedKitchen, SchemeIds.ExternalRefrigerator })
                 {
                     if (host.Snapshot.SchemeId != scheme) host.Execute(CommandType.ChangeScheme, scheme);
+                    yield return ReviewOperationWait.Idle(host);
                     Assert.AreEqual(scheme, host.Snapshot.SchemeId);
                     camera.transform.position = scheme == SchemeIds.IntegratedKitchen ? new Vector3(-3.5f, 1.65f, 1.15f) : new Vector3(-3.3f, 1.65f, .05f);
                     camera.transform.LookAt(host.Resolve("FRIDGE").position + Vector3.up * .95f);

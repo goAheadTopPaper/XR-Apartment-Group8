@@ -18,19 +18,20 @@ namespace XRApartment.Runtime.ReviewV2
             public GoalCheckpoint[] goals;
         }
         public static string CheckpointPath(string sessionId) => Path.Combine(LocalFeedbackStore.DefaultDirectory, "sessions", sessionId + ".json");
-        public void Save(string requestId, SessionSnapshot snapshot, Action<string, bool, string> completed)
+        public async void Save(string requestId, SessionSnapshot snapshot, Action<string, bool, string> completed)
         {
             bool success = false; string message;
             try
             {
                 if (snapshot.IsMock) throw new InvalidOperationException("Mock sessions cannot be verified");
-                if (recorder == null || !recorder.RetrySave()) throw new IOException(recorder == null ? "Feedback recorder is not configured" : recorder.Error ?? "Feedback is unavailable");
+                if (recorder == null || !await recorder.RetrySaveAsync()) throw new IOException(recorder == null ? "Feedback recorder is not configured" : recorder.Error ?? "Feedback is unavailable");
                 var checkpoint = new Checkpoint { requestId = requestId, sessionId = snapshot.SessionId, schemeId = snapshot.SchemeId,
                     schemeVisitId = snapshot.SchemeVisitId, modelVersion = snapshot.ModelVersion, phase = snapshot.Phase,
                     schemeHistory = snapshot.SchemeHistory.ToArray(), goals = snapshot.Goals.Select(g => new GoalCheckpoint { id = g.Id,
                     state = g.State, available = g.Available, evidenceId = g.EvidenceId, hasUpdatedAt = g.UpdatedAtMilliseconds.HasValue,
                     updatedAtMilliseconds = g.UpdatedAtMilliseconds ?? 0 }).ToArray() };
-                LocalFeedbackStore.WriteVerified(CheckpointPath(snapshot.SessionId), JsonUtility.ToJson(checkpoint, true), text => JsonUtility.ToJson(JsonUtility.FromJson<Checkpoint>(text), true));
+                var path = CheckpointPath(snapshot.SessionId);
+                await LocalFeedbackStore.WriteAsync(() => LocalFeedbackStore.WriteVerified(path, JsonUtility.ToJson(checkpoint, true)));
                 success = true; message = "反馈与会话快照已写盘并读回验证。";
             }
             catch (Exception ex) { message = "保存失败：" + ex.Message; }

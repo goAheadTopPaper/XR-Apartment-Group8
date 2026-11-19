@@ -17,7 +17,8 @@ namespace XRApartment.Runtime.ReviewV2
         public GameObject discardPrompt;
         public event Action Closed;
         string session, visit, scheme, model, objectId, markerId;
-        bool initialized, hasPosition, saved;
+        bool initialized, hasPosition, saved, submitting;
+        int draftVersion;
         Vector3 point;
         FeedbackType feedbackType = FeedbackType.Discuss;
         SpatialFeedbackRecorder Recorder => t3Source as SpatialFeedbackRecorder;
@@ -25,6 +26,12 @@ namespace XRApartment.Runtime.ReviewV2
         public bool HasDraft => !saved && (hasPosition || !string.IsNullOrWhiteSpace(note.text));
         public bool IsConfirmingDiscard => discardPrompt.activeSelf;
         void Awake() => Initialize();
+        void OnEnable() { if (Recorder != null) Recorder.RecordsChanged += OnRecordsChanged; }
+        void OnDisable() { if (Recorder != null) Recorder.RecordsChanged -= OnRecordsChanged; }
+        void OnRecordsChanged()
+        {
+            if (!hasPosition && !saved) Refresh("Select a type, then capture a location.\nNot submitted or saved.");
+        }
         void Initialize()
         {
             if (initialized) return; initialized = true;
@@ -69,6 +76,7 @@ namespace XRApartment.Runtime.ReviewV2
         }
         public void Open(SessionSnapshot context)
         {
+            draftVersion++; submitting = false;
             Initialize(); session = context.SessionId; visit = context.SchemeVisitId; scheme = context.SchemeId; model = context.ModelVersion;
             markerId = objectId = null; hasPosition = saved = false; feedbackType = FeedbackType.Discuss;
             note.SetTextWithoutNotify(""); note.readOnly = false; ConfirmDiscard(false); gameObject.SetActive(true);
@@ -87,32 +95,45 @@ namespace XRApartment.Runtime.ReviewV2
         {
             bool ready = Recorder != null && Recorder.IsReady;
             if (Recorder == null) message = t3Source == null ? "Marker service unavailable. Capture and submit disabled.\nDraft only; not submitted or saved." : "T3 configured; integration pending. Submit unavailable.\nDraft only; not submitted or saved.";
-            else if (!ready) message = "Read or save failed. Retry; data is not verified.\n" + Short(Recorder.Error);
+            else if (Recorder.IsLoading) message = "Loading feedback…";
+            else if (!ready && !submitting) message = "Read or save failed. Retry; data is not verified.\n" + Short(Recorder.Error);
             if (message != null) availability.text = message;
-            capture.interactable = ready && !saved && markerId == null && positionCapture != null;
-            submit.interactable = !saved && Recorder != null && ((ready && hasPosition) || markerId != null);
-            SetLabel(submit, markerId != null && !saved ? "Retry Save" : "Submit Marker");
+            capture.interactable = ready && !saved && !submitting && markerId == null && positionCapture != null;
+            submit.interactable = !saved && !submitting && Recorder != null && ((ready && hasPosition) || markerId != null);
+            SetLabel(submit, submitting ? "Saving…" : markerId != null && !saved ? "Retry Save" : "Submit Marker");
             foreach (var button in new[] { positive, concern, discuss })
                 if (button != null) { button.interactable = !saved && markerId == null; button.GetComponent<UnityEngine.UI.Image>().color =
                     (button == positive && feedbackType == FeedbackType.Positive) || (button == concern && feedbackType == FeedbackType.Concern) || (button == discuss && feedbackType == FeedbackType.Discuss)
                     ? new Color(.055f, .36f, .46f) : new Color(.10f, .20f, .28f); }
         }
-        void Submit()
+        async void Submit()
         {
-            if (Recorder == null || saved || positionCapture == null || !Matches(positionCapture.host.Snapshot) || !positionCapture.host.Snapshot.CanReview) return;
+            var recorder = Recorder;
+            if (recorder == null || saved || submitting || positionCapture == null) return;
+            var snapshot = positionCapture.host.Snapshot;
+            if (!Matches(snapshot) || !snapshot.CanReview || !hasPosition) return;
+            int version = draftVersion;
+            submitting = note.readOnly = true;
+            Refresh("Saving marker and verifying read-back…");
+            string message;
             try
             {
+                bool verified;
                 if (markerId == null)
                 {
-                    if (!hasPosition) return;
-                    var r = Recorder.AddMarker(feedbackType, point, note.text, "", objectId, null, null); markerId = r.markerId;
-                    saved = r.saveStatus == FeedbackSaveStatus.Verified;
+                    markerId = recorder.AddMarker(feedbackType, point, note.text, "", objectId, null, null).markerId;
+                    verified = await recorder.RetrySaveAsync();
                 }
-                else saved = Recorder.AddExplanation(markerId, note.text, "");
-                note.readOnly = saved;
-                Refresh(saved ? TypeName(feedbackType) + " · Submitted and verified\nLocation: " + (objectId ?? "World Position") : "Save failed. The same marker is retained; retry.");
+                else verified = await recorder.AddExplanationAsync(markerId, note.text, "");
+                if (this == null || version != draftVersion) return;
+                saved = verified;
+                message = saved ? TypeName(feedbackType) + " · Submitted and verified\nLocation: " + (objectId ?? "World Position") : "Save failed. The same marker is retained; retry.";
             }
-            catch (Exception ex) { Refresh("Submit failed: " + Short(ex.Message)); }
+            catch (Exception ex) { message = "Submit failed: " + Short(ex.Message); }
+            if (this == null || version != draftVersion) return;
+            submitting = false;
+            note.readOnly = saved;
+            Refresh(message);
         }
         static string Short(string s) => string.IsNullOrEmpty(s) ? "Check the storage path." : s.Length > 65 ? s.Substring(0, 65) + "…" : s;
         static void SetLabel(Button button, string text) => button.GetComponentInChildren<TMP_Text>(true).text = text;
@@ -127,6 +148,7 @@ namespace XRApartment.Runtime.ReviewV2
         void Close() { Invalidate(); Closed?.Invoke(); }
         public void Invalidate()
         {
+            draftVersion++; submitting = false;
             positionCapture?.Cancel(); note.DeactivateInputField(); note.SetTextWithoutNotify(""); ConfirmDiscard(false);
             gameObject.SetActive(false); session = visit = scheme = model = markerId = null; hasPosition = saved = false;
         }

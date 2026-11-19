@@ -117,9 +117,11 @@ namespace XRApartment.Tests
             PanIsOnColdHob();
             var before = pan.transform.position; host.Execute(CommandType.Review); host.Execute(CommandType.Continue); yield return null;
             Assert.That(Vector3.Distance(before, pan.transform.position), Is.LessThan(.003f));
-            host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator); yield return null;
+            host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator);
+            yield return ReviewOperationWait.Idle(host); yield return null;
             Assert.AreEqual(SchemeIds.ExternalRefrigerator, host.Snapshot.SchemeId);
-            host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen); yield return null;
+            host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen);
+            yield return ReviewOperationWait.Idle(host); yield return null;
             Assert.AreEqual(SchemeIds.IntegratedKitchen, host.Snapshot.SchemeId);
             for (var i = 0; i < 15; i++) yield return new WaitForFixedUpdate();
             PanIsOnColdHob();
@@ -203,10 +205,12 @@ namespace XRApartment.Tests
             for (var i = 0; i < 120 && host.Snapshot.IsBusy; i++) yield return null;
             Assert.IsFalse(host.Snapshot.IsBusy); Assert.IsTrue(Doors.All(Closed), "Reset doors: " + string.Join(", ", Doors.Select(d => d.name + "=" + Angle(d) + ", progress=" + d.Progress)));
             yield return Pull(Doors[0], 40);
-            Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted); yield return null;
+            Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
+            yield return ReviewOperationWait.Idle(host); yield return null;
             Assert.AreEqual(SchemeIds.ExternalRefrigerator, host.Snapshot.SchemeId); Assert.IsNull(host.Resolve("MICROWAVE_VISUAL"));
             var initialItemPosition = ((ReviewSchemePort)host.schemePort).layouts.Single(w => w.schemeId == SchemeIds.IntegratedKitchen).groceries.groceries[1].transform.position;
             Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen).Accepted);
+            yield return ReviewOperationWait.Idle(host);
             Assert.AreEqual(initialItemPosition, host.groceries.groceries[1].transform.position, "New A world starts with the authored item pose");
             yield return null;
             Assert.AreEqual("integrated-kitchen-m2-v5", host.Snapshot.ModelVersion);

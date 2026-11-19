@@ -53,6 +53,7 @@ namespace XRApartment.Tests
             host.Execute(CommandType.CompleteSetup); host.Execute(CommandType.CompleteOnboarding);
             if (host.Snapshot.SchemeId != SchemeIds.ExternalRefrigerator)
                 Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
+                yield return ReviewOperationWait.Idle(host);
             Assert.AreEqual(SchemeIds.ExternalRefrigerator, host.Snapshot.SchemeId);
             Door.GetComponent<XRSimpleInteractable>().interactionManager = manager;
             Directory.CreateDirectory(Folder); yield return Frames(8);
@@ -163,10 +164,12 @@ namespace XRApartment.Tests
             yield return Frames(8); Assert.Less(Mathf.Abs(Angle(Door)), .2f); Assert.AreEqual(0, Door.Progress);
             Assert.That(Vector3.Distance(food.transform.position, start), Is.LessThan(.01f)); Assert.IsFalse(host.station.GetComponentInChildren<KitchenHeatSource>().IsOn);
             yield return Pull(-105); FullOpen();
-            host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen); yield return Frames(8);
+            host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen);
+            yield return ReviewOperationWait.Idle(host); yield return Frames(8);
             Assert.AreEqual("integrated-kitchen-m2-v5", host.Snapshot.ModelVersion);
             Assert.IsTrue(host.station.GetComponentInChildren<ReviewPanStoveSnap>().IsDocked);
-            host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator); yield return Frames(8);
+            host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator);
+            yield return ReviewOperationWait.Idle(host); yield return Frames(8);
             Assert.AreEqual("external-fridge-m2-v8", host.Snapshot.ModelVersion); Assert.AreEqual(0, Door.Progress);
             Assert.That(Vector3.Distance(Fridge.transform.position, new Vector3(-4.65f, 0, -.1f)), Is.LessThan(.00001f));
             Assert.IsFalse(host.station.GetComponentInChildren<KitchenHeatSource>().IsOn);

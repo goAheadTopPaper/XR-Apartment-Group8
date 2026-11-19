@@ -26,7 +26,7 @@ namespace XRApartment.Runtime.ReviewV2
             if (initialized) return; initialized = true;
             currentScheme.onClick.AddListener(() => { all = false; selected = null; Refresh(); });
             allSchemes.onClick.AddListener(() => { all = true; selected = null; Refresh(); });
-            if (retry != null) retry.onClick.AddListener(() => { if (Recorder != null) { Recorder.Reload(); Refresh(); } });
+            if (retry != null) retry.onClick.AddListener(() => { if (Recorder != null) { _ = Recorder.ReloadAsync(); Refresh(); } });
         }
         void OnEnable() { all = false; selected = null; Initialize(); if (Recorder != null) Recorder.RecordsChanged += Refresh; Refresh(); }
         void OnDisable() { if (Recorder != null) Recorder.RecordsChanged -= Refresh; }
@@ -51,7 +51,8 @@ namespace XRApartment.Runtime.ReviewV2
             foreach (var row in rows) { row.gameObject.SetActive(false); Destroy(row.gameObject); } rows.Clear();
             if (Recorder == null || host == null || rowTemplate == null) { ShowUnavailable(); return; }
             currentScheme.interactable = allSchemes.interactable = true;
-            if (retry != null) retry.gameObject.SetActive(!Recorder.IsReady);
+            if (retry != null) retry.gameObject.SetActive(!Recorder.IsReady && !Recorder.IsLoading);
+            if (Recorder.IsLoading) { Present(ReviewBoardDisplayState.Loading); return; }
             if (!Recorder.IsReady) { Present(ReviewBoardDisplayState.Failed, "Marker read or save failed.\nRetry; existing data is retained.", Recorder.Error); EnableFilters(); return; }
             var s = host.Snapshot;
             var records = Recorder.Records.Where(r => r.sessionId == s.SessionId && (all || r.schemeId == s.SchemeId)).OrderByDescending(r => r.timestampUtcMilliseconds).ToArray();

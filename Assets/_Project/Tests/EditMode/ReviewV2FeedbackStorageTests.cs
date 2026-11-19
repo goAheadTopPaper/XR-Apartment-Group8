@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.IO;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 using XRApartment.Data.ReviewV2;
 using XRApartment.Runtime.ReviewV2;
 namespace XRApartment.Tests
@@ -19,27 +21,47 @@ namespace XRApartment.Tests
             doc.records[0].explanation = "same count, changed content"; store.Save(doc);
             Assert.AreEqual("same count, changed content", store.Load().records[0].explanation); Assert.IsFalse(File.Exists(store.FilePath + ".tmp"));
         }
-        [Test] public void CorruptLoadIsNotOverwrittenByRecorderOrSavePort()
+        [UnityTest] public IEnumerator CorruptLoadIsNotOverwrittenByRecorderOrSavePort()
         {
             var path = new LocalFeedbackStore().FilePath; File.WriteAllText(path, "{broken");
             var go = new GameObject("corrupt storage");
-            try { var r=go.AddComponent<SpatialFeedbackRecorder>(); r.Reload(); Assert.IsFalse(r.IsReady); Assert.IsFalse(r.RetrySave()); Assert.IsFalse(r.Reload()); Assert.AreEqual("{broken", File.ReadAllText(path)); }
+            try
+            {
+                var recorder = go.AddComponent<SpatialFeedbackRecorder>();
+                var load = recorder.ReloadAsync();
+                yield return new WaitUntil(() => load.IsCompleted);
+                Assert.IsFalse(load.GetAwaiter().GetResult());
+                Assert.IsFalse(recorder.RetrySaveAsync().GetAwaiter().GetResult());
+                var retry = recorder.ReloadAsync();
+                yield return new WaitUntil(() => retry.IsCompleted);
+                Assert.IsFalse(retry.GetAwaiter().GetResult());
+                Assert.AreEqual("{broken", File.ReadAllText(path));
+            }
             finally { UnityEngine.Object.DestroyImmediate(go); }
         }
         [Test] public void MissingSchemaIsRejected() { var p = new LocalFeedbackStore().FilePath; File.WriteAllText(p, "{}"); Assert.Throws<InvalidDataException>(()=>new LocalFeedbackStore().Load()); }
         [Test] public void UnsupportedSchemaIsRejected() { var p = new LocalFeedbackStore().FilePath; File.WriteAllText(p, "{\"schemaVersion\":\"other\",\"records\":[]}"); Assert.Throws<InvalidDataException>(()=>new LocalFeedbackStore().Load()); }
-        [Test] public void CheckpointContainsIdentityGoalsAndHistoryAndRejectsWriteFailure()
+        [UnityTest] public IEnumerator CheckpointContainsIdentityGoalsAndHistoryAndRejectsWriteFailure()
         {
             var go = new GameObject("save port");
             try
             {
-                var recorder=go.AddComponent<SpatialFeedbackRecorder>(); recorder.Reload(); var port=go.AddComponent<ReviewFeedbackSavePort>(); port.recorder=recorder;
+                var recorder=go.AddComponent<SpatialFeedbackRecorder>(); var load = recorder.ReloadAsync(); yield return new WaitUntil(() => load.IsCompleted); Assert.IsTrue(load.GetAwaiter().GetResult()); var port=go.AddComponent<ReviewFeedbackSavePort>(); port.recorder=recorder;
                 var s=new SessionSnapshot("session",SessionPhase.Review,"A","visit","model",new[]{new GoalSnapshot("G01",GoalState.InProgress,true,"fact",42)},false,false,false,SaveStatus.Pending,new[]{"A","B","A"});
-                bool done=false; port.Save("request",s,(id,ok,msg)=>{Assert.AreEqual("request",id);Assert.IsTrue(ok,msg);done=true;}); Assert.IsTrue(done);
+                string receipt = null, message = null; bool success = false;
+                port.Save("request", s, (id, ok, msg) => { receipt = id; success = ok; message = msg; });
+                Assert.IsNull(receipt, "Save must return before verified disk work completes");
+                yield return new WaitUntil(() => receipt != null);
+                Assert.AreEqual("request", receipt); Assert.IsTrue(success, message);
                 var check=JsonUtility.FromJson<ReviewFeedbackSavePort.Checkpoint>(File.ReadAllText(ReviewFeedbackSavePort.CheckpointPath("session")));
                 Assert.AreEqual("visit",check.schemeVisitId); CollectionAssert.AreEqual(new[]{"A","B","A"},check.schemeHistory); Assert.AreEqual(42,check.goals[0].updatedAtMilliseconds);
                 using(var locked=new FileStream(ReviewFeedbackSavePort.CheckpointPath("session")+".tmp",FileMode.Create,FileAccess.ReadWrite,FileShare.None))
-                    port.Save("failed",s,(id,ok,msg)=>{Assert.AreEqual("failed",id);Assert.IsFalse(ok);});
+                {
+                    receipt = null;
+                    port.Save("failed", s, (id, ok, _) => { receipt = id; success = ok; });
+                    yield return new WaitUntil(() => receipt != null);
+                    Assert.AreEqual("failed", receipt); Assert.IsFalse(success);
+                }
                 Assert.AreEqual("request",JsonUtility.FromJson<ReviewFeedbackSavePort.Checkpoint>(File.ReadAllText(ReviewFeedbackSavePort.CheckpointPath("session"))).requestId);
             }
             finally { UnityEngine.Object.DestroyImmediate(go); }

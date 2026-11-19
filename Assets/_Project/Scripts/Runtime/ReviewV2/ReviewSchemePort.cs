@@ -29,9 +29,13 @@ namespace XRApartment.Runtime.ReviewV2
         {
             if (prefab.gameObject.activeSelf) throw new InvalidOperationException("Scheme prefab must be saved inactive");
             var instance = Instantiate(prefab);
-            var scene = SceneManager.CreateScene("ReviewV2-" + prefab.schemeId + "-" + Guid.NewGuid().ToString("N"));
-            SceneManager.MoveGameObjectToScene(instance.gameObject, scene);
+            MoveToWorldScene(instance);
             return instance;
+        }
+        static void MoveToWorldScene(ReviewSchemeWorld instance)
+        {
+            var scene = SceneManager.CreateScene("ReviewV2-" + instance.schemeId + "-" + Guid.NewGuid().ToString("N"));
+            SceneManager.MoveGameObjectToScene(instance.gameObject, scene);
         }
         static void Release(ReviewSchemeWorld world)
         {
@@ -44,13 +48,39 @@ namespace XRApartment.Runtime.ReviewV2
             if (changing || !Supports(schemeId) || current == null)
             { completed(id, false, "SchemeUnavailable"); return; }
             changing = true;
+            var prefab = Find(schemeId);
+            try
+            {
+                if (prefab.gameObject.activeSelf) throw new InvalidOperationException("Scheme prefab must be saved inactive");
+                var load = InstantiateAsync(prefab.gameObject);
+                load.completed += _ => FinishChange(id, load.Result, completed);
+            }
+            catch (Exception ex)
+            {
+                changing = false;
+                completed(id, false, ex.Message);
+            }
+        }
+        void FinishChange(string id, GameObject[] instances, Action<string, bool, string> completed)
+        {
+            var root = instances != null && instances.Length == 1 ? instances[0] : null;
+            if (this == null || host == null || host.Snapshot.Phase == SessionPhase.Exited)
+            {
+                changing = false;
+                if (root != null) Destroy(root);
+                completed(id, false, "SchemeChangeCancelled");
+                return;
+            }
             ReviewSchemeWorld next = null;
             var previous = current;
+            var movedToWorld = false;
             string error = null;
             try
             {
-                next = Stage(Find(schemeId));
-                if (!next.IsConfigured) throw new InvalidOperationException("Authored world references are invalid");
+                next = root != null ? root.GetComponent<ReviewSchemeWorld>() : null;
+                if (next == null || !next.IsConfigured) throw new InvalidOperationException("Authored world references are invalid");
+                MoveToWorldScene(next);
+                movedToWorld = true;
                 // Inspect the staged geometry synchronously, without advancing physics or
                 // disabling the old world; rejection must also preserve existing held objects.
                 next.Bind(host); next.gameObject.SetActive(true); Physics.SyncTransforms();
@@ -63,7 +93,9 @@ namespace XRApartment.Runtime.ReviewV2
             catch (Exception ex)
             {
                 error = ex.Message;
-                Release(next); previous.Bind(host); previous.gameObject.SetActive(true); current = previous;
+                if (movedToWorld) Release(next);
+                else if (root != null) Destroy(root);
+                previous.Bind(host); previous.gameObject.SetActive(true); current = previous;
                 host.WorldRebound(false);
             }
             changing = false;

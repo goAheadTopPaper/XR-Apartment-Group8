@@ -43,6 +43,7 @@ namespace XRApartment.Tests
             driver = new GameObject("B storage tracked hand"); hand = driver.AddComponent<DrivenGrabInteractor>(); hand.interactionManager = manager; hand.keepSelectedTargetValid = true;
             host.Execute(CommandType.CompleteSetup); host.Execute(CommandType.CompleteOnboarding);
             if (host.Snapshot.SchemeId != SchemeIds.ExternalRefrigerator) Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
+            yield return ReviewOperationWait.Idle(host);
             Assert.AreEqual("external-fridge-m2-v8", host.Snapshot.ModelVersion);
             foreach (var door in Doors) door.GetComponent<XRSimpleInteractable>().interactionManager = manager;
             var world = host.station.GetComponentInParent<ReviewSchemeWorld>();
@@ -172,9 +173,11 @@ namespace XRApartment.Tests
             yield return Frames(15); foreach (var d in Doors) { Assert.AreEqual(0, d.Progress); Assert.Less(Mathf.Abs(Angle(d)), .2f); }
             Assert.Less(Vector3.Distance(cup.transform.position, cupStart), .025f);
             AssertCounterStart();
-            host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen); yield return Frames(8);
+            host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen);
+            yield return ReviewOperationWait.Idle(host); yield return Frames(8);
             Assert.AreEqual("integrated-kitchen-m2-v5", host.Snapshot.ModelVersion); Assert.IsNull(host.Resolve("WINDOW_STORAGE"));
-            host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator); yield return Frames(12);
+            host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator);
+            yield return ReviewOperationWait.Idle(host); yield return Frames(12);
             Assert.AreEqual("external-fridge-m2-v8", host.Snapshot.ModelVersion); Assert.AreEqual(2, Doors.Length); Assert.IsTrue(Doors.All(d => d.Progress == 0));
             AssertCounterStart();
         }

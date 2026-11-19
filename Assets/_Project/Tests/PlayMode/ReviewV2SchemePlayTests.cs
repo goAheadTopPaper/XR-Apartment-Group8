@@ -36,6 +36,7 @@ namespace XRApartment.Tests
             // Normalize only this runtime fixture, preserving the user's unsaved Editor start.
             if (host.Snapshot.SchemeId != SchemeIds.IntegratedKitchen)
                 Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen).Accepted);
+            yield return ReviewOperationWait.Idle(host);
             initialHistoryCount = host.Snapshot.SchemeHistory.Count;
             yield return null;
         }
@@ -66,6 +67,7 @@ namespace XRApartment.Tests
             Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
             OperationResult result = null; host.OperationCompleted += r => result = r;
             Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
+            yield return ReviewOperationWait.Idle(host);
             Assert.IsNotNull(result); Assert.IsTrue(result.Succeeded, result.Message);
             yield return null;
             Assert.AreEqual(SchemeIds.ExternalRefrigerator, host.Snapshot.SchemeId);
@@ -80,6 +82,7 @@ namespace XRApartment.Tests
             Assert.IsFalse(host.Snapshot.Goals.Any(g => g.State != GoalState.NotStarted));
             Assert.IsFalse(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
             Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.IntegratedKitchen).Accepted);
+            yield return ReviewOperationWait.Idle(host);
             Assert.IsTrue(result.Succeeded, result.Message); yield return null;
             Assert.AreEqual("integrated-kitchen-m2-v5", host.Snapshot.ModelVersion);
             Assert.AreEqual(aPosition, host.Resolve("FRIDGE").position);
@@ -109,6 +112,7 @@ namespace XRApartment.Tests
             var destination = camera.position;
             OperationResult result = null; host.OperationCompleted += r => result = r;
             Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
+            yield return ReviewOperationWait.Idle(host);
             Assert.IsNotNull(result); Assert.IsFalse(result.Succeeded,
                 $"head={camera.position:F3} intended={destination:F3} overlap=" +
                 string.Join(",", Physics.OverlapSphere(destination, .18f).Select(c => c.name)));
@@ -118,6 +122,7 @@ namespace XRApartment.Tests
             Assert.IsTrue(egg.isSelected, "A rejected switch must preserve the original held object");
             camera.position = before;
             Assert.IsTrue(host.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator).Accepted);
+            yield return ReviewOperationWait.Idle(host);
             Assert.IsTrue(result.Succeeded, result.Message); Object.Destroy(driver); yield return null;
         }
         [UnityTest] public IEnumerator ClosedFridgeEnvelopeHasNoFixedFurnitureOverlap()
@@ -125,6 +130,7 @@ namespace XRApartment.Tests
             foreach (var scheme in new[] { SchemeIds.IntegratedKitchen, SchemeIds.ExternalRefrigerator })
             {
                 if (host.Snapshot.SchemeId != scheme) host.Execute(CommandType.ChangeScheme, scheme);
+                yield return ReviewOperationWait.Idle(host);
                 Assert.AreEqual(scheme, host.Snapshot.SchemeId);
                 Physics.SyncTransforms();
                 var fridge = host.station.ActiveFridge.transform;
