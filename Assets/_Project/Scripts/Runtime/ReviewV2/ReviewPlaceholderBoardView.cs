@@ -58,8 +58,7 @@ namespace XRApartment.Runtime.ReviewV2
             if (recorder == null || host == null || rowTemplate == null) { ShowUnavailable(); return; }
             if (retry != null) retry.gameObject.SetActive(!recorder.IsReady && !recorder.IsLoading);
             if (recorder.IsLoading) { Present(ReviewBoardDisplayState.Loading); return; }
-            if (!recorder.IsReady) { Present(ReviewBoardDisplayState.Failed, "Marker read or save failed.
-Retry; existing data is retained.", recorder.Error); return; }
+            if (!recorder.IsReady) { Present(ReviewBoardDisplayState.Failed, "Marker read or save failed.\nRetry; existing data is retained.", recorder.Error); return; }
             var snapshot = host.Snapshot;
             var records = recorder.RecordsForSession(snapshot.SessionId, all ? null : snapshot.SchemeId)
                 .OrderByDescending(r => r.timestampUtcMilliseconds).ToArray();
@@ -68,9 +67,7 @@ Retry; existing data is retained.", recorder.Error); return; }
             if (records.Length == 0)
             {
                 listText.text = "No Markers Yet";
-                detailText.text = "Marker Details
-
-No matching records in this session.";
+                detailText.text = "Marker Details\n\nNo matching records in this session.";
                 selected = null;
             }
             else
@@ -85,8 +82,7 @@ No matching records in this session.";
                     if (row.Record == null || row.Record.markerId != record.markerId)
                     {
                         row.Button.name = "Marker " + record.markerId;
-                        row.Label.text = (record.schemeId == SchemeIds.IntegratedKitchen ? "A" : "B") + " · " + ReviewMarkDraftView.TypeName(record.type) + "
-" + LocationName(record);
+                        row.Label.text = (record.schemeId == SchemeIds.IntegratedKitchen ? "A" : "B") + " · " + ReviewMarkDraftView.TypeName(record.type) + "\n" + LocationName(record);
                     }
                     row.Record = record;
                     row.Button.gameObject.SetActive(true);
@@ -138,7 +134,7 @@ No matching records in this session.";
                 "\nScheme: " + r.schemeId + "\nVisit：" + r.schemeVisitId.Substring(0, Math.Min(8, r.schemeVisitId.Length)) +
                 "\nModel: " + r.modelVersion + "\nObject: " + LocationName(r) +
                 "\nLocation: " + new Vector3(r.worldX, r.worldY, r.worldZ).ToString("F2") + "\n\n" + (string.IsNullOrEmpty(r.explanation) ? "(No note)" : r.explanation);
-            detailScroll.verticalNormalizedPosition = 1;
+            if (resetScroll) detailScroll.verticalNormalizedPosition = 1;
         }
         public void Present(ReviewBoardDisplayState state, string list = null, string detail = null)
         {
