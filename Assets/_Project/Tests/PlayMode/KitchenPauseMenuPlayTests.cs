@@ -216,6 +216,18 @@ namespace XRApartment.Tests
             }
         }
 
+        [TestCase(true, -1, "", KitchenGraphicsMenu.Performance)]
+        [TestCase(false, -1, "", KitchenGraphicsMenu.Standard)]
+        [TestCase(true, KitchenGraphicsMenu.Standard, "invalid", KitchenGraphicsMenu.Standard)]
+        [TestCase(true, KitchenGraphicsMenu.RayTracing, "performance", KitchenGraphicsMenu.Performance)]
+        [TestCase(true, KitchenGraphicsMenu.Performance, "STANDARD", KitchenGraphicsMenu.Standard)]
+        [TestCase(true, -1, "high", KitchenGraphicsMenu.RayTracing)]
+        public void StartupGraphicsRespectsOverrideAndSavedChoice(bool windowsPlayer, int saved, string value, int expected)
+        {
+            var args = value.Length == 0 ? new[] { "Kitchen.exe" } : new[] { "Kitchen.exe", "-kitchen-quality", value };
+            Assert.AreEqual(expected, KitchenGraphicsMenu.StartupQuality(windowsPlayer, saved, args));
+        }
+
         [UnityTest]
         public IEnumerator GraphicsQualitySwitchesTheRenderPipelineWhilePaused()
         {

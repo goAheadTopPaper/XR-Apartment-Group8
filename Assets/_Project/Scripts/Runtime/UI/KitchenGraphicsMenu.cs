@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -20,8 +21,25 @@ namespace XRApartment.Runtime.UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Restore()
         {
-            var saved = PlayerPrefs.GetInt(Preference, Standard);
-            QualitySettings.SetQualityLevel(saved >= Performance && saved <= RayTracing ? saved : Standard, true);
+            var saved = PlayerPrefs.GetInt(Preference, -1);
+            QualitySettings.SetQualityLevel(StartupQuality(Application.platform == RuntimePlatform.WindowsPlayer,
+                saved, Environment.GetCommandLineArgs()), true);
+        }
+
+        // The override is per process and never changes the saved preference.
+        public static int StartupQuality(bool windowsPlayer, int saved, string[] arguments)
+        {
+            for (int i = 0; i + 1 < arguments.Length; i++)
+            {
+                if (!string.Equals(arguments[i], "-kitchen-quality", StringComparison.OrdinalIgnoreCase)) continue;
+                switch (arguments[i + 1].ToLowerInvariant())
+                {
+                    case "performance": return Performance;
+                    case "standard": return Standard;
+                    case "high": return RayTracing;
+                }
+            }
+            return saved >= Performance && saved <= RayTracing ? saved : windowsPlayer ? Performance : Standard;
         }
 
         internal void Bind(KitchenPauseMenu pause)
