@@ -84,10 +84,26 @@ namespace XRApartment.Tests
             save.Done(save.Id, false, "disk full"); Assert.AreEqual(a.SchemeVisitId, core.Snapshot.SchemeVisitId);
             Assert.AreEqual(SaveStatus.Failed, core.Snapshot.SaveStatus); Assert.IsNull(layout.Done);
             core.Execute(CommandType.ChangeScheme, SchemeIds.ExternalRefrigerator);
+            var saving = core.Snapshot;
+            Assert.AreSame(saving, save.Captured);
+            Assert.IsTrue(saving.IsBusy);
+            Assert.AreEqual(SaveStatus.Pending, saving.SaveStatus);
             save.Done("old", true, ""); Assert.IsNull(layout.Done);
+            Assert.AreSame(saving, core.Snapshot);
+
+            int changes = 0;
+            core.Changed += _ => changes++;
             save.Done(save.Id, true, "verified test receipt"); Assert.IsNotNull(layout.Done);
-            Assert.AreEqual(a.SchemeVisitId, core.Snapshot.SchemeVisitId);
+            var loading = core.Snapshot;
+            Assert.AreEqual(0, changes, "The verified state is readable without publishing another Changed event");
+            Assert.AreSame(loading, core.Snapshot);
+            Assert.IsTrue(loading.IsBusy);
+            Assert.AreEqual(SaveStatus.Verified, loading.SaveStatus);
+            Assert.AreEqual(SaveStatus.Pending, saving.SaveStatus);
+            Assert.AreEqual(a.SchemeVisitId, loading.SchemeVisitId);
             layout.Done(layout.Id, true, "loaded"); Assert.AreEqual(SchemeIds.ExternalRefrigerator, core.Snapshot.SchemeId);
+            Assert.AreEqual(1, changes);
+            Assert.IsFalse(core.Snapshot.IsBusy);
             var b = core.Snapshot.SchemeVisitId;
             save.Done(save.Id, true, "duplicate"); Assert.AreEqual(b, core.Snapshot.SchemeVisitId);
             Assert.AreEqual(a.SchemeId, save.Captured.SchemeId);
