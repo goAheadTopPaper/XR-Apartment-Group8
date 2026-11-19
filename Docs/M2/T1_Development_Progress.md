@@ -1,5 +1,7 @@
 # T1 / M2 Development Progress
 
+2026-11-19 本轮性能范围覆盖 V2 保存/切换/反馈界面、Windows XR 初始画质、持物/水流和视觉家具导入。Unity 定向 EditMode 48/48、PlayMode 26/26（分批）；较宽批次的原分支失败保留。未做 Quest Link 整帧、显存对照；证据与采样路线见 [Windows PCVR 性能验证](../XR_Performance_Validation.md)。
+
 2026-11-19 Review V2 快照分配优化：`SessionController` 复用最近读取的不可变快照，状态变化时再构造。相同 Mono 环境的独立采样中，预热后 100,000 次稳定读取由 25,600,000 B 降至 0 B；使用 Unity 2022.3.62f3 随附 Mono 和 NUnit 直接执行会话／方案两组纯逻辑测试，25/25 通过（未通过 Unity Editor Test Runner 执行）。这不是整帧或设备数据；场景 PlayMode 与 Quest Link 未跑。场景、画质、持久化、公共签名和既有本地修改均不在本轮改动范围。
 
 2026-11-17 T1+T3试用集成（用户批准，Editor联调已验证）：独立工作区与 `integration/t1-t3-preview`，引入 `feature/mzh@7175372` 的记录Schema/Recorder/Store及原metadata，原位适配现有Mark/Review，新增真实保存端口、右手Near-Far捕捉及独立Marker Prefab。既有公共契约/Core/A/B资源保持；正式T2未接入。实际输入已完成A记录→Review→B记录→两案筛选/详情→Finish/Verified，使用隔离磁盘目录。接线、范围、失败修正和使用步骤见 [T1+T3试用说明](../ReviewV2_T1_T3_Preview.md)。最终EditMode 29/29（job `818e277d434c4981b828ce76f16d743f`）与PlayMode 32/32（job `1a8222042daa4df9b534b5249faa5a53`）分批通过；16:9/4:3的Mark/Review截图检查无字溢出，作者重复配置3资源字节一致，既有UI 493对象与场景333对象ID全部保留；当前控制台0 error、历史警告保留；不据此宣称设备或正式全产品验收。
