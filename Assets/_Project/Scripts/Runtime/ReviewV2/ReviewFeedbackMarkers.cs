@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using XRApartment.Data.ReviewV2;
+
 namespace XRApartment.Runtime.ReviewV2
 {
     public sealed class ReviewFeedbackMarkers : MonoBehaviour
@@ -10,38 +10,62 @@ namespace XRApartment.Runtime.ReviewV2
         public ReviewSessionHost host;
         public SpatialFeedbackRecorder recorder;
         public GameObject markerPrefab;
-        IReadOnlyList<SpatialFeedbackRecord> visible = new SpatialFeedbackRecord[0];
-        readonly Dictionary<string, GameObject> markers = new Dictionary<string, GameObject>();
-        void OnEnable() { recorder.RecordsChanged += Rebuild; host.Changed += Changed; }
-        void Start() => Rebuild();
-        void OnDisable() { recorder.RecordsChanged -= Rebuild; host.Changed -= Changed; Clear(); }
-        void Changed(SessionSnapshot s) => Rebuild();
-        void Clear() { foreach (var m in markers.Values) if (m != null) { m.SetActive(false); Destroy(m); } markers.Clear(); }
-        void Rebuild()
+        sealed class Marker
         {
-            Clear(); if (!recorder.IsReady || markerPrefab == null) return;
-            var s = host.Snapshot;
-            if (s.Phase != SessionPhase.Experience && s.Phase != SessionPhase.Review) return;
-            visible = recorder.Records.Where(r => r.sessionId == s.SessionId && r.schemeVisitId == s.SchemeVisitId && r.modelVersion == s.ModelVersion).ToArray();
-            foreach (var r in visible)
+            public Transform View, Anchor;
+            public Vector3 LocalPoint, WorldPoint;
+        }
+        readonly Dictionary<string, Marker> markers = new Dictionary<string, Marker>();
+        SessionSnapshot context;
+
+        void OnEnable() { recorder.RecordsChanged += Refresh; host.Changed += Changed; }
+        void Start() => Refresh();
+        void OnDisable() { recorder.RecordsChanged -= Refresh; host.Changed -= Changed; Clear(); context = null; }
+        void Changed(SessionSnapshot snapshot)
+        {
+            if (context == null || IsVisible(context) != IsVisible(snapshot) || context.SchemeVisitId != snapshot.SchemeVisitId)
+                Refresh();
+        }
+        static bool IsVisible(SessionSnapshot s) => s.Phase == SessionPhase.Experience || s.Phase == SessionPhase.Review;
+        void Clear()
+        {
+            foreach (var marker in markers.Values)
+                if (marker.View != null) { marker.View.gameObject.SetActive(false); Destroy(marker.View.gameObject); }
+            markers.Clear();
+        }
+        void Refresh()
+        {
+            var snapshot = host.Snapshot;
+            if (!IsVisible(snapshot) || markerPrefab == null || context?.SchemeVisitId != snapshot.SchemeVisitId) Clear();
+            context = snapshot;
+            if (!IsVisible(snapshot) || markerPrefab == null) return;
+            // The recorder never deletes a marker within a visit. Changes to note/status do not change its pose or icon.
+            foreach (var record in recorder.RecordsForSession(snapshot.SessionId, snapshot.SchemeId, snapshot.SchemeVisitId, snapshot.ModelVersion))
             {
-                var marker = Instantiate(markerPrefab, transform); marker.name = "Feedback " + r.markerId;
-                marker.GetComponentInChildren<TMP_Text>().text = r.type == FeedbackType.Positive ? "+" : r.type == FeedbackType.Concern ? "!" : "?";
-                marker.GetComponentInChildren<TMP_Text>().color = r.type == FeedbackType.Positive ? new Color(.25f, 1, .55f) : r.type == FeedbackType.Concern ? new Color(1, .65f, .2f) : new Color(.3f, .8f, 1);
-                markers.Add(r.markerId, marker);
+                if (markers.ContainsKey(record.markerId)) continue;
+                var instance = Instantiate(markerPrefab, transform);
+                instance.name = "Feedback " + record.markerId;
+                var text = instance.GetComponentInChildren<TMP_Text>();
+                text.text = record.type == FeedbackType.Positive ? "+" : record.type == FeedbackType.Concern ? "!" : "?";
+                text.color = record.type == FeedbackType.Positive ? new Color(.25f, 1, .55f) : record.type == FeedbackType.Concern ? new Color(1, .65f, .2f) : new Color(.3f, .8f, 1);
+                markers.Add(record.markerId, new Marker { View = instance.transform,
+                    Anchor = record.hasObjectLocalPosition ? host.Resolve(record.objectId) ?? host.Resolve(record.anchorId) : null,
+                    LocalPoint = new Vector3(record.localX, record.localY, record.localZ),
+                    WorldPoint = new Vector3(record.worldX, record.worldY, record.worldZ) });
             }
             Update();
         }
         void Update()
         {
-            var camera = host.locomotion.Origin.Camera.transform;
-            foreach (var r in visible)
+            if (markers.Count == 0) return;
+            var cameraPosition = host.locomotion.Origin.Camera.transform.position;
+            foreach (var marker in markers.Values)
             {
-                if (!markers.TryGetValue(r.markerId, out var marker) || marker == null) continue;
-                var t = host.Resolve(r.objectId ?? r.anchorId);
-                var point = r.hasObjectLocalPosition && t != null ? t.TransformPoint(new Vector3(r.localX, r.localY, r.localZ)) : new Vector3(r.worldX, r.worldY, r.worldZ);
-                marker.transform.position = point + (camera.position - point).normalized * .025f;
-                marker.transform.rotation = Quaternion.LookRotation(marker.transform.position - camera.position, Vector3.up);
+                if (marker.View == null) continue;
+                var point = marker.Anchor != null ? marker.Anchor.TransformPoint(marker.LocalPoint) : marker.WorldPoint;
+                var delta = point - cameraPosition;
+                if (delta.sqrMagnitude < .000001f) continue;
+                marker.View.SetPositionAndRotation(point - delta.normalized * .025f, Quaternion.LookRotation(delta, Vector3.up));
             }
         }
     }

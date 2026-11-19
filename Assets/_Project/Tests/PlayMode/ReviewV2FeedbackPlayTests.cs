@@ -55,7 +55,13 @@ namespace XRApartment.Tests
         {
             Submit("A：柜门旁的中文意见");Assert.AreEqual(FeedbackSaveStatus.Pending,recorder.Records.Single().saveStatus);yield return MarkSaved();Assert.AreEqual(1,recorder.Records.Count);Assert.AreEqual(FeedbackSaveStatus.Verified,recorder.Records[0].saveStatus);
             Assert.AreEqual(FeedbackType.Concern,recorder.Records[0].type);
-            var first=recorder.Records[0];panel.markDraft.cancel.onClick.Invoke();panel.quickReview.onClick.Invoke();
+            var first=recorder.Records[0];
+            var marker = panel.host.transform.Find("Feedback " + first.markerId);
+            panel.markDraft.cancel.onClick.Invoke(); panel.quickReview.onClick.Invoke();
+            Assert.AreSame(marker, panel.host.transform.Find(marker.name));
+            var row = panel.reviewBoard.listScroll.content.Find("Marker " + first.markerId);
+            panel.reviewBoard.Refresh();
+            Assert.AreSame(row, panel.reviewBoard.listScroll.content.Find(row.name));
             Assert.AreEqual(ReviewBoardDisplayState.Ready,panel.reviewBoard.State);StringAssert.Contains("柜门旁",panel.reviewBoard.detailText.text);
             panel.back.onClick.Invoke();Assert.AreEqual(first.schemeVisitId,panel.host.Snapshot.SchemeVisitId);
             Assert.IsTrue(panel.host.Execute(CommandType.ChangeScheme,SchemeIds.ExternalRefrigerator).Accepted);yield return Idle();

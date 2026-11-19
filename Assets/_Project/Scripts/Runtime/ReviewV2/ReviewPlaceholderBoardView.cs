@@ -16,7 +16,13 @@ namespace XRApartment.Runtime.ReviewV2
         public TMP_Text listText, detailText;
         public ScrollRect listScroll, detailScroll;
         public ReviewBoardDisplayState State { get; private set; }
-        readonly List<Button> rows = new List<Button>();
+        sealed class Row
+        {
+            public Button Button;
+            public TMP_Text Label;
+            public SpatialFeedbackRecord Record;
+        }
+        readonly List<Row> rows = new List<Row>();
         SpatialFeedbackRecorder Recorder => t3Source as SpatialFeedbackRecorder;
         bool all, initialized;
         string selected;
@@ -24,11 +30,11 @@ namespace XRApartment.Runtime.ReviewV2
         void Initialize()
         {
             if (initialized) return; initialized = true;
-            currentScheme.onClick.AddListener(() => { all = false; selected = null; Refresh(); });
-            allSchemes.onClick.AddListener(() => { all = true; selected = null; Refresh(); });
+            currentScheme.onClick.AddListener(() => { all = false; selected = null; ResetScroll(); Refresh(); });
+            allSchemes.onClick.AddListener(() => { all = true; selected = null; ResetScroll(); Refresh(); });
             if (retry != null) retry.onClick.AddListener(() => { if (Recorder != null) { _ = Recorder.ReloadAsync(); Refresh(); } });
         }
-        void OnEnable() { all = false; selected = null; Initialize(); if (Recorder != null) Recorder.RecordsChanged += Refresh; Refresh(); }
+        void OnEnable() { all = false; selected = null; Initialize(); ResetScroll(); if (Recorder != null) Recorder.RecordsChanged += Refresh; Refresh(); }
         void OnDisable() { if (Recorder != null) Recorder.RecordsChanged -= Refresh; }
         public void ConfigurePresentation()
         {
@@ -48,33 +54,85 @@ namespace XRApartment.Runtime.ReviewV2
         public void Refresh()
         {
             if (!isActiveAndEnabled) return;
-            foreach (var row in rows) { row.gameObject.SetActive(false); Destroy(row.gameObject); } rows.Clear();
-            if (Recorder == null || host == null || rowTemplate == null) { ShowUnavailable(); return; }
-            currentScheme.interactable = allSchemes.interactable = true;
-            if (retry != null) retry.gameObject.SetActive(!Recorder.IsReady && !Recorder.IsLoading);
-            if (Recorder.IsLoading) { Present(ReviewBoardDisplayState.Loading); return; }
-            if (!Recorder.IsReady) { Present(ReviewBoardDisplayState.Failed, "Marker read or save failed.\nRetry; existing data is retained.", Recorder.Error); EnableFilters(); return; }
-            var s = host.Snapshot;
-            var records = Recorder.Records.Where(r => r.sessionId == s.SessionId && (all || r.schemeId == s.SchemeId)).OrderByDescending(r => r.timestampUtcMilliseconds).ToArray();
+            var recorder = Recorder;
+            if (recorder == null || host == null || rowTemplate == null) { ShowUnavailable(); return; }
+            if (retry != null) retry.gameObject.SetActive(!recorder.IsReady && !recorder.IsLoading);
+            if (recorder.IsLoading) { Present(ReviewBoardDisplayState.Loading); return; }
+            if (!recorder.IsReady) { Present(ReviewBoardDisplayState.Failed, "Marker read or save failed.
+Retry; existing data is retained.", recorder.Error); return; }
+            var snapshot = host.Snapshot;
+            var records = recorder.RecordsForSession(snapshot.SessionId, all ? null : snapshot.SchemeId)
+                .OrderByDescending(r => r.timestampUtcMilliseconds).ToArray();
             State = records.Length == 0 ? ReviewBoardDisplayState.Empty : ReviewBoardDisplayState.Ready;
-            listText.gameObject.SetActive(records.Length == 0); listText.text = "No Markers Yet";
-            if (records.Length == 0) { detailText.text = "Marker Details\n\nNo matching records in this session."; selected = null; }
+            listText.gameObject.SetActive(records.Length == 0);
+            if (records.Length == 0)
+            {
+                listText.text = "No Markers Yet";
+                detailText.text = "Marker Details
+
+No matching records in this session.";
+                selected = null;
+            }
             else
             {
-                if (!records.Any(r => r.markerId == selected)) selected = records[0].markerId;
-                foreach (var record in records)
+                var detail = records.FirstOrDefault(r => r.markerId == selected) ?? records[0];
+                bool changedSelection = selected != detail.markerId;
+                selected = detail.markerId;
+                for (int i = 0; i < records.Length; ++i)
                 {
-                    var row = Instantiate(rowTemplate, listScroll.content); row.name = "Marker " + record.markerId; row.gameObject.SetActive(true);
-                    row.GetComponentInChildren<TMP_Text>(true).text = (record.schemeId == SchemeIds.IntegratedKitchen ? "A" : "B") + " · " + ReviewMarkDraftView.TypeName(record.type) + "\n" + LocationName(record);
-                    row.onClick.AddListener(() => { selected = record.markerId; ShowDetail(record); }); rows.Add(row);
-                    if (record.markerId == selected) ShowDetail(record);
+                    var record = records[i];
+                    var row = i < rows.Count ? rows[i] : CreateRow();
+                    if (row.Record == null || row.Record.markerId != record.markerId)
+                    {
+                        row.Button.name = "Marker " + record.markerId;
+                        row.Label.text = (record.schemeId == SchemeIds.IntegratedKitchen ? "A" : "B") + " · " + ReviewMarkDraftView.TypeName(record.type) + "
+" + LocationName(record);
+                    }
+                    row.Record = record;
+                    row.Button.gameObject.SetActive(true);
                 }
+                ShowDetail(detail, changedSelection);
             }
-            EnableFilters(); Canvas.ForceUpdateCanvases(); listScroll.verticalNormalizedPosition = 1;
+            HideUnusedRows(records.Length);
+            EnableFilters();
+        }
+        Row CreateRow()
+        {
+            var button = Instantiate(rowTemplate, listScroll.content);
+            var row = new Row { Button = button, Label = button.GetComponentInChildren<TMP_Text>(true) };
+            button.onClick.AddListener(() =>
+            {
+                if (row.Record == null) return;
+                selected = row.Record.markerId;
+                ShowDetail(row.Record, true);
+            });
+            rows.Add(row);
+            return row;
+        }
+        void HideUnusedRows(int count)
+        {
+            for (int i = count; i < rows.Count; ++i)
+            {
+                rows[i].Record = null;
+                rows[i].Button.gameObject.SetActive(false);
+            }
+        }
+        void ResetScroll()
+        {
+            if (listScroll != null)
+            {
+                listScroll.StopMovement();
+                listScroll.verticalNormalizedPosition = 1;
+            }
+            if (detailScroll != null)
+            {
+                detailScroll.StopMovement();
+                detailScroll.verticalNormalizedPosition = 1;
+            }
         }
         void EnableFilters() { currentScheme.interactable = allSchemes.interactable = true; }
         static string LocationName(SpatialFeedbackRecord r) => !string.IsNullOrEmpty(r.objectId) ? r.objectId : !string.IsNullOrEmpty(r.anchorId) ? r.anchorId : "World Position";
-        void ShowDetail(SpatialFeedbackRecord r)
+        void ShowDetail(SpatialFeedbackRecord r, bool resetScroll)
         {
             detailText.text = ReviewMarkDraftView.TypeName(r.type) + " · " + (r.saveStatus == FeedbackSaveStatus.Verified ? "Save Verified" : "Save Not Verified") +
                 "\nScheme: " + r.schemeId + "\nVisit：" + r.schemeVisitId.Substring(0, Math.Min(8, r.schemeVisitId.Length)) +
@@ -87,7 +145,7 @@ namespace XRApartment.Runtime.ReviewV2
             State = state; listText.gameObject.SetActive(true);
             listText.text = list ?? (state == ReviewBoardDisplayState.Empty ? "No Markers Yet" : state == ReviewBoardDisplayState.Failed ? "Unable to load markers. Retry." : state == ReviewBoardDisplayState.Ready ? "Markers Loaded" : state == ReviewBoardDisplayState.Loading ? "Loading Markers..." : "T3 unavailable. Markers cannot be loaded.");
             detailText.text = detail ?? "Marker Details"; currentScheme.interactable = allSchemes.interactable = false;
-            Canvas.ForceUpdateCanvases(); listScroll.verticalNormalizedPosition = detailScroll.verticalNormalizedPosition = 1;
+            HideUnusedRows(0); ResetScroll();
         }
     }
 }

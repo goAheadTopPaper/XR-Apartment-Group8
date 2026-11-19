@@ -227,7 +227,7 @@ namespace XRApartment.Runtime.ReviewV2
             var recorder = host != null ? host.GetComponent<SpatialFeedbackRecorder>() : null;
             if (recorder == null || !recorder.IsReady)
             { reason = "Marker storage is unavailable. Check Review before proceeding."; return false; }
-            foreach (var record in recorder.Records)
+            foreach (var record in recorder.RecordsForSession(host.Snapshot.SessionId))
                 if (record.saveStatus != XRApartment.Data.ReviewV2.FeedbackSaveStatus.Verified)
                 { reason = "An unverified marker is retained in memory. Retry saving in Review before proceeding."; return false; }
             return true;
@@ -483,7 +483,6 @@ namespace XRApartment.Runtime.ReviewV2
             {
                 bool showBoard = s.Phase == SessionPhase.Review && ready && !DraftOpen;
                 reviewBoard.gameObject.SetActive(showBoard);
-                if (showBoard) reviewBoard.Refresh();
             }
             if (quickBar != null)
             {

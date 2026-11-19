@@ -22,7 +22,19 @@ namespace XRApartment.Runtime.ReviewV2
         public string Error { get; private set; }
         public bool IsLoading { get; private set; }
         public bool IsReady => document != null && Error == null;
-        public IReadOnlyList<SpatialFeedbackRecord> Records => CopyRecords();
+        public IReadOnlyList<SpatialFeedbackRecord> Records => RecordsForSession(null);
+
+        internal IReadOnlyList<SpatialFeedbackRecord> RecordsForSession(string session, string scheme = null,
+            string visit = null, string model = null)
+        {
+            if (document == null) return Array.Empty<SpatialFeedbackRecord>();
+            var result = new List<SpatialFeedbackRecord>();
+            foreach (var r in document.records)
+                if ((session == null || r.sessionId == session) && (scheme == null || r.schemeId == scheme) &&
+                    (visit == null || r.schemeVisitId == visit) && (model == null || r.modelVersion == model))
+                    result.Add(r.Copy());
+            return result;
+        }
         public event Action RecordsChanged;
         public string FilePath => store?.FilePath;
 
@@ -160,8 +172,6 @@ namespace XRApartment.Runtime.ReviewV2
             return true;
         }
         void NotifyRecordsChanged() { if (this != null) RecordsChanged?.Invoke(); }
-        IReadOnlyList<SpatialFeedbackRecord> CopyRecords() => document == null
-            ? Array.Empty<SpatialFeedbackRecord>() : document.records.Select(r => r.Copy()).ToArray();
         public string ExportJson() => store.ExportJson();
     }
 }
