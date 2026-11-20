@@ -220,8 +220,9 @@ namespace XRApartment.EditorTools
                 Wire(notes, ("notePrefab", KitchenAuthoring.LoadRequired<GameObject>(FeedbackNotePrefab)
                         .GetComponent<KitchenFeedbackNote>()), ("editor", editor), ("form", group), ("close", done),
                     ("discard", discard), ("save", save), ("writeInVr", write), ("input", field), ("target", target),
-                    ("context", context), ("status", saveStatus), ("keyboardSurfaceShader", JourneyPhaseFiveBuilder.ReviewPanelShader),
-                    ("keyboardTextShader", JourneyPhaseFiveBuilder.ReviewFontShader));
+                    ("context", context), ("status", saveStatus),
+                    ("keyboardSurfaceShader", KitchenAuthoring.LoadRequired<Shader>("Assets/_Project/Art/UI/SH_ReviewKeyboardSurface.shader")),
+                    ("keyboardTextShader", KitchenAuthoring.LoadRequired<Shader>("Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader")));
                 PrefabUtility.SaveAsPrefabAsset(root.gameObject, ActivitiesPrefab);
             }
             finally { Object.DestroyImmediate(root.gameObject); }

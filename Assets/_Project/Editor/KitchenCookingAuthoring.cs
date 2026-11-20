@@ -97,19 +97,7 @@ namespace XRApartment.EditorTools
             var required = new[] { "PREF_Water_KitchenStation", "PREF_Prop_Cup", "PREF_Prop_Pot" };
             var present = new HashSet<string>(scene.GetRootGameObjects().Select(root => root.name));
             if (required.All(present.Contains)) return;
-            var review = EditorSceneManager.OpenScene(KitchenAuthoring.ScenePath, OpenSceneMode.Additive);
-            try
-            {
-                foreach (var source in review.GetRootGameObjects().Where(root => required.Contains(root.name) && !present.Contains(root.name)))
-                {
-                    var prefab = PrefabUtility.GetCorrespondingObjectFromSource(source);
-                    var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
-                    instance.transform.SetPositionAndRotation(source.transform.position, source.transform.rotation);
-                    instance.transform.localScale = source.transform.localScale;
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(instance.transform);
-                }
-            }
-            finally { EditorSceneManager.CloseScene(review, true); UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene); }
+            throw new InvalidOperationException("Missing required water station or vessels in " + scene.path);
         }
 
         public static void BakeLightingBatch()
@@ -280,9 +268,6 @@ namespace XRApartment.EditorTools
 
         static void BuildScene()
         {
-            var review = EditorSceneManager.OpenScene(KitchenAuthoring.ScenePath);
-            // Save a copy before touching any object; formal review content and build settings stay intact.
-            EditorSceneManager.SaveScene(review, ScenePath, true);
             var scene = EditorSceneManager.OpenScene(ScenePath);
             var keep = new HashSet<string> { "EventSystem", "XR Interaction Manager", "PREF_XR_KitchenRig", "PREF_Lighting_KitchenDaylight", "PREF_Kitchen_Environment", "PREF_Kitchen_TeleportArea" };
             foreach (var root in scene.GetRootGameObjects()) if (!keep.Contains(root.name)) UnityEngine.Object.DestroyImmediate(root);

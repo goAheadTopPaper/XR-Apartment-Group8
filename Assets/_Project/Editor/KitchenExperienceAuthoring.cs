@@ -238,11 +238,6 @@ namespace XRApartment.EditorTools
         public static void BakeExperienceBatch()
         {
             BakeLightingBatch();
-            var review = EditorSceneManager.OpenScene("Assets/_Project/Scenes/SCN_Kitchen_Review.unity");
-            if (!Lightmapping.Bake()) throw new InvalidOperationException("Review probe bake failed.");
-            KitchenHdrpAuthoring.BakeReflections(review);
-            KitchenAuthoring.SaveScene(review);
-            AssetDatabase.SaveAssets();
             Debug.Log("KITCHEN_EXPERIENCE_BAKED probes=" + LightmapSettings.lightProbes.count);
         }
     }

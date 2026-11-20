@@ -70,8 +70,7 @@ namespace XRApartment.EditorTools
                 if (SceneManager.GetSceneAt(i).isDirty)
                     throw new InvalidOperationException("Save scene edits before configuring the main kitchen.");
 
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) }
-                .Concat(EditorBuildSettings.scenes.Where(scene => scene.path != ScenePath)).ToArray();
+            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             EditorSceneManager.playModeStartScene = asset;
             VerifyMainScene();
         }

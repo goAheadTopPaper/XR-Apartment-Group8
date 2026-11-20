@@ -35,8 +35,7 @@ namespace XRApartment.EditorTools
         internal static void ConfigureEnvironment(Scene scene, Cubemap cubemap, float rotation)
         {
             var lighting = LightingRoot(scene);
-            var profile = KitchenAuthoring.LoadRequired<VolumeProfile>(
-                Folder + (scene.path == KitchenAuthoring.ScenePath ? "VOL_KitchenReview.asset" : "VOL_KitchenCooking.asset"));
+            var profile = KitchenAuthoring.LoadRequired<VolumeProfile>(Folder + "VOL_KitchenCooking.asset");
             var sky = RequireSky(profile);
             sky.hdriSky.Override(cubemap);
             sky.rotation.Override(rotation);

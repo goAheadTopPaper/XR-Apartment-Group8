@@ -13,7 +13,7 @@ namespace XRApartment.Tests
         [UnityTest]
         public IEnumerator ExteriorDoorsStopWalkingAndTeleportingWhileThePassageStaysOpen()
         {
-            foreach (var scene in new[] { "SCN_Kitchen_Cooking", "SCN_Kitchen_Review" })
+            foreach (var scene in new[] { "SCN_Kitchen_Cooking" })
             {
                 SceneManager.LoadScene(scene);
                 yield return null;

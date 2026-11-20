@@ -204,10 +204,6 @@ namespace XRApartment.Tests
                 ClickWithTrackedRay(movement, menu.transform.Find("FinishSage"));
                 Assert.AreEqual(1, lab.ActiveFinishIndex);
                 movement.Close();
-                SceneManager.LoadScene("SCN_Kitchen_Review");
-                yield return null;
-                Assert.IsNull(Object.FindObjectOfType<KitchenLayoutLab>());
-                Assert.IsFalse(GameObject.Find("SM_KitchenTable").GetComponent<Renderer>().HasPropertyBlock());
             }
             finally
             {

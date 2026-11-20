@@ -65,7 +65,7 @@ namespace XRApartment.Tests
             for (var i = owned.Count - 1; i >= 0; i--) if (owned[i] != null) Object.DestroyImmediate(owned[i]);
             owned.Clear(); foreach (var root in hidden) if (root != null) root.SetActive(true); hidden.Clear();
         }
-        IEnumerator LoadKitchen(string path = ScenePath, string scheme = null)
+        IEnumerator LoadKitchen()
         {
             previous = SceneManager.GetActiveScene();
             for (var i = 0; i < SceneManager.sceneCount; i++)
@@ -74,28 +74,14 @@ namespace XRApartment.Tests
                         root.GetComponentInChildren<Collider>(true) != null ||
                         root.GetComponentInChildren<Light>(true) != null || root.GetComponentInChildren<UnityEngine.EventSystems.EventSystem>(true) != null))
                     { hidden.Add(root); root.SetActive(false); }
-            scene = EditorSceneManager.LoadSceneInPlayMode(path, new LoadSceneParameters(LoadSceneMode.Additive));
+            scene = EditorSceneManager.LoadSceneInPlayMode(ScenePath, new LoadSceneParameters(LoadSceneMode.Additive));
             for (var i = 0; i < 300 && !scene.isLoaded; i++) yield return null;
             Assert.IsTrue(scene.isLoaded); SceneManager.SetActiveScene(scene);
             var roots = scene.GetRootGameObjects(); var rig = roots.Single(go => go.name == "PREF_XR_KitchenRig");
             sourceCamera = rig.GetComponentInChildren<Camera>(true); rig.SetActive(false);
             if (!Object.FindObjectsOfType<AudioListener>().Any(listener => listener.isActiveAndEnabled))
                 manager.gameObject.AddComponent<AudioListener>();
-            if (scheme == null) station = roots.Single(go => go.name == "PREF_Cooking_Workbench");
-            else
-            {
-                var host = roots.SelectMany(r => r.GetComponentsInChildren<XRApartment.Runtime.ReviewV2.ReviewSessionHost>()).Single();
-                sourceCamera.transform.position = new Vector3(-3.15f, 1.65f, 1.12f);
-                host.Execute(XRApartment.Data.ReviewV2.CommandType.CompleteSetup);
-                host.Execute(XRApartment.Data.ReviewV2.CommandType.CompleteOnboarding);
-                if (host.Snapshot.SchemeId != scheme)
-                {
-                    XRApartment.Data.ReviewV2.OperationResult result = null; host.OperationCompleted += r => result = r;
-                    Assert.IsTrue(host.Execute(XRApartment.Data.ReviewV2.CommandType.ChangeScheme, scheme).Accepted);
-                    Assert.IsNotNull(result); Assert.IsTrue(result.Succeeded, result.Message);
-                }
-                station = host.station.gameObject;
-            }
+            station = roots.Single(go => go.name == "PREF_Cooking_Workbench");
             yield return Frames(40);
         }
         static IEnumerator Frames(int count) { for (var i = 0; i < count; i++) yield return new WaitForFixedUpdate(); }
@@ -913,120 +899,9 @@ namespace XRApartment.Tests
         }
 
         [UnityTest] public IEnumerator CompleteRecipeUsesFridgeKnifeEggPourAndSpatulaAndCanReset()
-            => CompleteRecipe(false);
-
-        [UnityTest] public IEnumerator ReviewV2RealRecipeKeepsWorldAndCompletesG02()
-            => CompleteRecipe(true);
-        [UnityTest] public IEnumerator ReviewV2StoredEggAndBagTomatoShareRecipeIdentity()
-            => CompleteRecipe(true, true);
-        [UnityTest] public IEnumerator M2SchemeARealRecipeCompletesG02()
-            => CompleteRecipe(true, false, XRApartment.Data.ReviewV2.SchemeIds.IntegratedKitchen);
-        [UnityTest] public IEnumerator M2SchemeBRealRecipeCompletesG02()
-            => CompleteRecipe(true, false, XRApartment.Data.ReviewV2.SchemeIds.ExternalRefrigerator);
-
-        [UnityTest] public IEnumerator ReviewV2GroceryCanBeCarriedFromTableToShelf()
-            => CarryGrocery();
-        [UnityTest] public IEnumerator M2SchemeAGroceryCanBeCarriedFromTableToShelf()
-            => CarryGrocery(XRApartment.Data.ReviewV2.SchemeIds.IntegratedKitchen);
-        [UnityTest] public IEnumerator M2SchemeBGroceryCanBeCarriedFromTableToShelf()
-            => CarryGrocery(XRApartment.Data.ReviewV2.SchemeIds.ExternalRefrigerator);
-        [UnityTest] public IEnumerator M2SchemeADoubleDoorsOpenByRealHandPull()
         {
-            yield return LoadKitchen("Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity", XRApartment.Data.ReviewV2.SchemeIds.IntegratedKitchen);
-            var fridge = station.GetComponentInChildren<KitchenFridge>();
-            yield return PullDoor(fridge.Door, 105);
-            Assert.That(fridge.Door.Progress, Is.GreaterThan(.8), DoorObstruction(fridge.Door)); Assert.IsFalse(fridge.Accessible);
-            Assert.That(Mathf.Abs(Mathf.DeltaAngle(0, fridge.Door.transform.localEulerAngles.y)), Is.GreaterThan(104), DoorObstruction(fridge.Door));
-            yield return PullDoor(fridge.SecondaryDoor, -105);
-            Assert.That(fridge.SecondaryDoor.Progress, Is.GreaterThan(.8), DoorObstruction(fridge.SecondaryDoor)); Assert.IsTrue(fridge.Accessible);
-        }
-        static string DoorObstruction(KinematicSwingDoor door)
-        {
-            var blocker = (Collider)typeof(KinematicSwingDoor).GetProperty("OpeningBlocker",
-                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(door);
-            return door.name + " angle=" + door.transform.localEulerAngles.y + " blocker=" + blocker?.transform.parent?.name + "/" + blocker?.name;
-        }
-        [UnityTest] public IEnumerator M2SchemeBFridgeOpensByRealHandPull()
-        {
-            yield return LoadKitchen("Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity", XRApartment.Data.ReviewV2.SchemeIds.ExternalRefrigerator);
-            var fridge = station.GetComponentInChildren<KitchenFridge>();
-            yield return ToggleDoor(fridge);
-            Assert.That(fridge.Door.Progress, Is.GreaterThan(.8)); Assert.IsTrue(fridge.Accessible);
-        }
-        IEnumerator CarryGrocery(string scheme = null)
-        {
-            yield return LoadKitchen(scheme == null ? "Assets/_Project/Scenes/SCN_Kitchen_ReviewV2_M1Regression.unity" :
-                "Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity", scheme);
-            var host = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<XRApartment.Runtime.ReviewV2.ReviewSessionHost>()).Single();
-            if (scheme == null)
-            {
-                host.Execute(XRApartment.Data.ReviewV2.CommandType.CompleteSetup);
-                host.Execute(XRApartment.Data.ReviewV2.CommandType.CompleteOnboarding);
-            }
-            var egg = station.GetComponentInChildren<KitchenEgg>().gameObject;
-            var fridge = station.GetComponentInChildren<KitchenFridge>();
-            var visit = host.Snapshot.SchemeVisitId;
-            var facts = new List<XRApartment.Data.ReviewV2.InteractionEvent>(); host.Observed += facts.Add;
-            fridge.Door.SetOpenImmediate(true);
-            if (fridge.SecondaryDoor != null) fridge.SecondaryDoor.SetOpenImmediate(true);
-            yield return Pick(left, egg);
-            yield return MoveHeld(left, egg, new Vector3(egg.transform.position.x, 1.52f, egg.transform.position.z), Quaternion.identity, 45);
-            var approach = scheme == null ? new Vector3(-2.50f, 1.52f, fridge.transform.position.z) :
-                fridge.transform.TransformPoint(new Vector3(0,1.52f,.95f));
-            yield return MoveHeld(left, egg, approach, Quaternion.identity, 90);
-            var aboveShelf = fridge.transform.TransformPoint(new Vector3(0,1.50f,0));
-            yield return MoveHeld(left, egg, aboveShelf, Quaternion.identity, 60);
-            var destination = fridge.transform.TransformPoint(new Vector3(0,1.334f,0));
-            yield return MoveHeld(left, egg, destination, Quaternion.identity, 45);
-            Assert.That(Vector3.Distance(destination, egg.transform.position), Is.LessThan(.04f),
-                "The collision-constrained held egg must actually reach the shelf");
-            yield return PlaceAndRelease(left, egg);
-            yield return new WaitForSeconds(1);
-            for (int i = 0; i < 30 && host.Snapshot.Goals.Single(g => g.Id == "G01").State == XRApartment.Data.ReviewV2.GoalState.NotStarted; i++)
-                yield return new WaitForSeconds(.1f);
-            var eggBody = egg.GetComponent<Rigidbody>();
-            Assert.AreEqual(XRApartment.Data.ReviewV2.GoalState.InProgress, host.Snapshot.Goals.Single(g => g.Id == "G01").State,
-                $"selected={egg.GetComponent<XRGrabInteractable>().isSelected} " +
-                $"inside={host.groceries.Contains(egg.GetComponent<XRGrabInteractable>())} split={egg.GetComponent<PreparedKitchenProp>().IsSplit} " +
-                $"local={fridge.transform.InverseTransformPoint(egg.transform.position)} speed={eggBody.velocity.magnitude} spin={eggBody.angularVelocity.magnitude} " +
-                $"canObserve={host.CanObserve} accessible={fridge.Accessible}");
-            Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
-            Assert.AreEqual(1, facts.Count(f => f.Kind == XRApartment.Data.ReviewV2.InteractionKind.IngredientStored));
-            if (scheme != null)
-            {
-                var second = host.groceries.groceries.First(g => g.gameObject != egg && g.GetComponent<KitchenEgg>() != null).gameObject;
-                yield return Pick(left, second);
-                yield return MoveHeld(left, second, second.transform.position + Vector3.up * .76f, Quaternion.identity, 45);
-                yield return MoveHeld(left, second, fridge.transform.TransformPoint(new Vector3(.15f,1.52f,.95f)), Quaternion.identity, 90);
-                yield return MoveHeld(left, second, fridge.transform.TransformPoint(new Vector3(.15f,1.50f,0)), Quaternion.identity, 60);
-                yield return MoveHeld(left, second, fridge.transform.TransformPoint(new Vector3(.15f,1.334f,0)), Quaternion.identity, 45);
-                yield return PlaceAndRelease(left, second);
-                for (int i = 0; i < 40 && host.Snapshot.Goals.Single(g => g.Id == "G01").State != XRApartment.Data.ReviewV2.GoalState.Completed; i++)
-                    yield return new WaitForSeconds(.1f);
-                Assert.AreEqual(XRApartment.Data.ReviewV2.GoalState.Completed, host.Snapshot.Goals.Single(g => g.Id == "G01").State);
-                Assert.AreEqual(2, facts.Where(f => f.Kind == XRApartment.Data.ReviewV2.InteractionKind.IngredientStored).Select(f => f.ObjectId).Distinct().Count());
-                Assert.AreEqual(XRApartment.Data.ReviewV2.SessionPhase.Experience, host.Snapshot.Phase);
-                Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
-            }
-            host.Observed -= facts.Add;
-        }
-
-        IEnumerator CompleteRecipe(bool reviewV2, bool storeFirst = false, string scheme = null)
-        {
-            yield return LoadKitchen(scheme != null ? "Assets/_Project/Scenes/SCN_Kitchen_ReviewV2.unity" :
-                reviewV2 ? "Assets/_Project/Scenes/SCN_Kitchen_ReviewV2_M1Regression.unity" : ScenePath, scheme);
-            var host = reviewV2 ? scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<XRApartment.Runtime.ReviewV2.ReviewSessionHost>()).Single() : null;
-            var facts = new List<XRApartment.Data.ReviewV2.InteractionEvent>();
-            if (host != null)
-            {
-                host.Observed += facts.Add;
-                if (scheme == null)
-                {
-                    Assert.IsTrue(host.Execute(XRApartment.Data.ReviewV2.CommandType.CompleteSetup).Accepted);
-                    Assert.IsTrue(host.Execute(XRApartment.Data.ReviewV2.CommandType.CompleteOnboarding).Accepted);
-                }
-            }
-            else yield return StartGuidedRecipe();
+            yield return LoadKitchen();
+            yield return StartGuidedRecipe();
             var fridge = station.GetComponentInChildren<KitchenFridge>();
             var flow = station.GetComponent<KitchenRecipeController>();
             var tomato = station.GetComponentsInChildren<CookableIngredient>().Single(f => f.IngredientKind == KitchenIngredientKind.Tomato).GetComponent<PreparedKitchenProp>();
@@ -1043,49 +918,13 @@ namespace XRApartment.Tests
             var whiskObject = station.GetComponentInChildren<KitchenStirTool>().gameObject;
             var whiskRest = new Pose(whiskObject.transform.position, whiskObject.transform.rotation);
             var cutPosition = board.transform.position + Vector3.up * .029f;
-            if (storeFirst)
-            {
-                var groceryEgg = station.GetComponentInChildren<KitchenEgg>();
-                var stableId = groceryEgg.GetComponent<XRApartment.Runtime.ReviewV2.ReviewSceneIdentity>().Id;
-                fridge.Door.SetOpenImmediate(true); yield return Pick(left, groceryEgg.gameObject);
-                var grab = groceryEgg.GetComponent<XRGrabInteractable>(); var body = groceryEgg.GetComponent<Rigidbody>();
-                var location = fridge.transform.TransformPoint(new Vector3(0,1.334f,0));
-                groceryEgg.transform.position = location; body.position = location;
-                grab.SetTargetPose(new Pose(location, groceryEgg.transform.rotation)); left.transform.position = body.worldCenterOfMass;
-                Physics.SyncTransforms(); manager.SelectExit((IXRSelectInteractor)left, grab);
-                body.velocity = body.angularVelocity = Vector3.zero; yield return new WaitForSeconds(1);
-                Assert.AreEqual(XRApartment.Data.ReviewV2.GoalState.InProgress, host.Snapshot.Goals.Single(g => g.Id == "G01").State);
-                Assert.AreEqual(stableId, facts.Single(f => f.Kind == XRApartment.Data.ReviewV2.InteractionKind.IngredientStored).ObjectId);
-                Assert.AreSame(groceryEgg.transform, host.Resolve(stableId));
-                fridge.Door.SetOpenImmediate(false);
-            }
-            if (host != null && !fridge.Contains(tomato.transform.position))
-            {
-                yield return Pick(left, tomato.gameObject);
-                yield return MoveHeld(left, tomato.gameObject, tomato.transform.position + Vector3.up * .35f, Quaternion.identity, 30);
-            }
-            else
-            {
-                yield return ToggleDoor(fridge); yield return Retrieve(left, tomato.gameObject, fridge);
-                yield return ToggleDoor(fridge);
-            }
+            yield return ToggleDoor(fridge); yield return Retrieve(left, tomato.gameObject, fridge);
+            yield return ToggleDoor(fridge);
             Assert.That(fridge.Door.Progress, Is.LessThan(.05), "Retrieved food must clear the closing leaf.");
             yield return MoveHeld(left, tomato.gameObject, cutPosition + Vector3.up * .25f, Quaternion.identity, 140);
             yield return MoveHeld(left, tomato.gameObject, cutPosition, Quaternion.identity, 35); yield return PlaceAndRelease(left, tomato.gameObject);
             Assert.That(Vector3.Distance(tomato.transform.position,cutPosition),Is.LessThan(.065f), "Tomato must reach the actual kitchen board.");
             yield return Frames(12); yield return Pick(right, knife); yield return CutWithKnife(knife, tomato);
-            if (host != null)
-            {
-                var goal = host.Snapshot.Goals.Single(g => g.Id == "G02");
-                Assert.AreEqual(XRApartment.Data.ReviewV2.GoalState.InProgress, goal.State);
-                Assert.AreEqual(facts.Single(f => f.Kind == XRApartment.Data.ReviewV2.InteractionKind.TomatoCut).EventId, goal.EvidenceId);
-                var visit = host.Snapshot.SchemeVisitId;
-                var pose = tomato.transform.position; var actions = flow.Recipe.Actions;
-                Assert.IsTrue(host.Execute(XRApartment.Data.ReviewV2.CommandType.Review).Accepted);
-                Assert.IsTrue(host.Execute(XRApartment.Data.ReviewV2.CommandType.Continue).Accepted);
-                Assert.AreEqual(pose, tomato.transform.position); Assert.AreEqual(actions, flow.Recipe.Actions);
-                Assert.AreEqual(visit, host.Snapshot.SchemeVisitId);
-            }
             var knifePark = board.transform.position + new Vector3(.32f, .4f, -.12f);
             var cuttingGrip = Quaternion.Euler(90, 0, 0);
             yield return MoveHeld(right, knife, knifePark, cuttingGrip, 22);
@@ -1137,21 +976,11 @@ namespace XRApartment.Tests
             var diced = slices.SelectMany(cut => cut.Pieces).ToArray(); Assert.AreEqual(16, diced.Length);
             Assert.That(diced.Sum(body => body.GetComponent<CookableIngredient>().Grams), Is.EqualTo(120).Within(.02f));
             yield return Frames(20);
-            if (storeFirst) Assert.AreNotEqual(TomatoEggAction.None, flow.Recipe.Actions & TomatoEggAction.TakeEgg,
-                "The earlier real grocery pickup must remain evidence; do not force the old instruction order");
-            else Assert.AreEqual(TomatoEggStep.TakeEgg, flow.Recipe.Step);
+            Assert.AreEqual(TomatoEggStep.TakeEgg, flow.Recipe.Step);
             Capture("tomato-diced", board.transform.position + new Vector3(.12f,.7f,-.6f), board.transform.position);
             var egg = station.GetComponentInChildren<KitchenEgg>();
-            if (host != null && !fridge.Contains(egg.transform.position))
-            {
-                yield return Pick(right, egg.gameObject);
-                yield return MoveHeld(right, egg.gameObject, egg.transform.position + Vector3.up * .35f, Quaternion.identity, 30);
-            }
-            else
-            {
-                yield return ToggleDoor(fridge); yield return Retrieve(right, egg.gameObject, fridge);
-                yield return ToggleDoor(fridge);
-            }
+            yield return ToggleDoor(fridge); yield return Retrieve(right, egg.gameObject, fridge);
+            yield return ToggleDoor(fridge);
             yield return MoveHeld(right, egg.gameObject, bowl.transform.position + Vector3.up * .25f, Quaternion.identity, 140);
             yield return Pick(left, bowl.gameObject); yield return Frames(2);
             var eggAbove = bowl.transform.position + new Vector3(.06f, .16f, 0);
@@ -1221,22 +1050,6 @@ namespace XRApartment.Tests
             for (var i = 0; i < 8 && !flow.Recipe.Ready; i++) yield return StirWithSpatula(spatula, pan, 100);
             Assert.IsTrue(flow.Recipe.Ready, "Recipe missing evidence: " + flow.Recipe.Actions + "; step=" + flow.Recipe.Step +
                 "; egg=" + pan.Stage + "; tomato cooked=" + contents.TomatoCooked + "; stir=" + contents.StirFryDistance);
-            if (host != null)
-            {
-                yield return null;
-                Assert.AreEqual(XRApartment.Data.ReviewV2.GoalState.Completed, host.Snapshot.Goals.Single(g => g.Id == "G02").State);
-                Assert.AreEqual(XRApartment.Data.ReviewV2.SessionPhase.Experience, host.Snapshot.Phase);
-                Assert.AreEqual(1, facts.Count(f => f.Kind == XRApartment.Data.ReviewV2.InteractionKind.DishCooked));
-                Assert.AreEqual(1, facts.Count(f => f.Kind == XRApartment.Data.ReviewV2.InteractionKind.TomatoCut || f.Kind == XRApartment.Data.ReviewV2.InteractionKind.EggReceivedInBowl));
-                var visit = host.Snapshot.SchemeVisitId;
-                Assert.IsTrue(host.Execute(XRApartment.Data.ReviewV2.CommandType.ResetWorld).Accepted);
-                for (int i = 0; i < 30 && host.Snapshot.IsBusy; i++) yield return null;
-                Assert.IsFalse(host.Snapshot.IsBusy); Assert.AreNotEqual(visit, host.Snapshot.SchemeVisitId);
-                Assert.AreEqual(XRApartment.Data.ReviewV2.GoalState.NotStarted, host.Snapshot.Goals.Single(g => g.Id == "G02").State);
-                Assert.AreEqual(TomatoEggAction.None, flow.Recipe.Actions);
-                host.Observed -= facts.Add;
-                yield break;
-            }
             heat.SetOn(false);
             yield return MoveHeld(right, spatula.gameObject, spatula.transform.position + Vector3.up * .25f, spatula.transform.rotation, 20);
             yield return MoveHeld(right, spatula.gameObject, spatulaRest.position + Vector3.up * .25f, spatulaRest.rotation, 24);

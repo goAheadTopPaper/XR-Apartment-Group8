@@ -11,7 +11,7 @@ namespace XRApartment.EditorTools
     internal static class KitchenAuthoring
     {
         public const string Root = "Assets/_Project/";
-        public const string ScenePath = Root + "Scenes/SCN_Kitchen_Review.unity";
+        public const string ScenePath = Root + "Scenes/SCN_Kitchen_Cooking.unity";
         public const string Settings = Root + "Settings/";
         public const string Prefabs = Root + "Prefabs/";
 
