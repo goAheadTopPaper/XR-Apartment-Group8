@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "asset_class": "character",
+  "quality": {
+    "draft": {"master_faces": 50000, "master_texture": 1024, "master_normal": 1024, "master_ao": 512, "game_triangles": 15000, "game_texture": 1024},
+    "standard": {"master_faces": 100000, "master_texture": 2048, "master_normal": 2048, "master_ao": 1024, "game_triangles": 30000, "game_texture": 2048},
+    "high": {"master_faces": 300000, "master_texture": 4096, "master_normal": 2048, "master_ao": 2048, "game_triangles": 50000, "game_texture": 2048}
+  },
+  "requirements": ["complete neutral A/T pose", "consistent proportions across views", "no hidden hands or feet", "retopology before production rig", "armature and skinning in Blender or a rigging tool"],
+  "acceptance": {"mesh": "pending", "body_rig": "pending: idle, walk, arm raise and knee bend in Unity", "facial_lip_sync": "separate pending gate: requires facial rig/blend shapes and audio"}
+}

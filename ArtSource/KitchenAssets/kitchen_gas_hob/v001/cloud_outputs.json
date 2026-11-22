@@ -1,0 +1,48 @@
+{
+  "job_id": "a5dcc0ad-f3e9-465f-b08f-df8d3c19164a",
+  "archive_sha256": "7c241168165bb8225327de3314a37ceb5d506cca3a060d8887fb05f203a913d2",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_gas_hob/v001/master_glb_00001.glb",
+      "bytes": 13802568,
+      "sha256": "0279344b5f994c0f60674b4ee1e106383debff211600f9b16067750dd7c2c894",
+      "file": "kitchen_gas_hob/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_gas_hob/v001/basecolor_00001.png",
+      "bytes": 3209945,
+      "sha256": "31c38c4d4cea0a687b056486421465f2e8d369b3cfeda447bda46148a349a39c",
+      "file": "kitchen_gas_hob/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_gas_hob/v001/metallic_00001.png",
+      "bytes": 1427116,
+      "sha256": "43790462db1a450d487f054535db6ac517878e633a765daee42e2adf6337ec20",
+      "file": "kitchen_gas_hob/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_gas_hob/v001/roughness_00001.png",
+      "bytes": 1174137,
+      "sha256": "63673b3c57af75f05469dff83c8272afc24c328d7c610b4da56ce8028e979a6a",
+      "file": "kitchen_gas_hob/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_gas_hob/v001/normal_00001.png",
+      "bytes": 2907006,
+      "sha256": "a42762864a5471313e5fd11dda3fbff770892ba0e2fd3c018c2a54539cbe6554",
+      "file": "kitchen_gas_hob/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_gas_hob/v001/ao_00001.png",
+      "bytes": 662749,
+      "sha256": "fd4ec20fed055cd2c6ac440ff80cc672e51149c3647a544a9e06bdbb9e2f90c6",
+      "file": "kitchen_gas_hob/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_gas_hob/v001/render_preview_00001.png",
+      "bytes": 514681,
+      "sha256": "acb15e4a376ed47bebc3b3c64384caa19269989a64842da894f3efc8b1c483ce",
+      "file": "kitchen_gas_hob/v001/download/cloud_render_preview.png"
+    }
+  }
+}

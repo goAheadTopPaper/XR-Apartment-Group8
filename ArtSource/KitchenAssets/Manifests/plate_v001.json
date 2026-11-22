@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "asset_name": "plate",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271028,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/plate_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 1,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 0.27,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "fracture",
+    "fragment_count": 8,
+    "interior": "unglazed ceramic",
+    "collider_mode": "derived_compound"
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "d12ebfac-cecf-4e1d-9e27-904549920cd5",
+    "elapsed_seconds": 36.9,
+    "credits_before": 6631,
+    "credits_after": 6631,
+    "credits_consumed": null,
+    "failure": null,
+    "submission_attempt_utc": "2026-10-28T01:06:53.069542+00:00",
+    "cloud_assets_verified": [
+      "3d/kitchen/plate/v001/master_glb_00001.glb",
+      "3d/kitchen/plate/v001/render_preview_00001.png"
+    ],
+    "observed_balance_delta": 0,
+    "billing_status": "visible balance unchanged; per-job charge not yet confirmed",
+    "workflow_sha256": "eeb7bcf127576461fe1d116d9f077b7f363f7fc62e4a895374fd7808b8c99cb5"
+  },
+  "outputs": {
+    "master_glb": "../plate/v001/download/master.glb",
+    "game_glb": "../plate/v001/prepared_game_v002/plate_game.glb",
+    "unity_fbx": "../plate/v001/prepared_game_v002/plate_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../plate/v001/TexturesSource/basecolor.png",
+      "metallic": "../plate/v001/TexturesSource/metallic.png",
+      "roughness": "../plate/v001/TexturesSource/roughness.png",
+      "normal": "../plate/v001/TexturesSource/normal.png",
+      "ao": "../plate/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../plate/v001/download/cloud_render_preview.png",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/plate_v001/PREF_Prop_plate.prefab",
+    "normalized_master_glb": "../plate/v001/prepared_game_v002/plate_master.glb",
+    "prepared_manifest": "../plate/v001/prepared_game_v002/unity_asset.json",
+    "game_pbr_folder": "../plate/v001/prepared_game_v002/Textures",
+    "game_preview_png": "../plate/v001/prepared_game_v002/plate_preview.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Automated Blender cleanup: weld coincident UV-seam vertices while retaining loop UVs, then align the plate plane to Z-up. Original downloaded GLB retained unchanged. No human retopology recorded.",
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "passed_real_XRI_physics_and_cooking_scenarios",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "visual_quality": "approved_for_kitchen_prototype",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "d7fc7ce2817c987ff957e7e2499c65a6c426e4e78473276d6dd9957ac81228e6"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true,
+    "orientation": "best_fit_plane_z"
+  },
+  "intact_review": {
+    "status": "approved_for_prefracture",
+    "reviewer": "Codex",
+    "evidence": "qa/intact-reviewed.png and qa/intact-inspection-stats.json; prior full intermediates archived under Logs/KitchenAssetPipeline/ArchivedIntermediates.",
+    "source_sha256": "32cd196bc872a079696cb8cd5980e6c6a79e6740340ca8faaffcd23d49eead84",
+    "reviewed_utc": "2026-10-28T01:17:46.117240+00:00",
+    "preview": "../plate/v001/qa/intact-reviewed.png"
+  },
+  "processing": {
+    "source_sha256": "32cd196bc872a079696cb8cd5980e6c6a79e6740340ca8faaffcd23d49eead84",
+    "game_triangles": 4000,
+    "triangle_budget": 4000,
+    "piece_count": 8,
+    "size_blender_xyz": [
+      0.25746577978134155,
+      0.27006033062934875,
+      0.03127405419945717
+    ],
+    "game_basecolor_size": [
+      1024,
+      1024
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 26.535,
+    "local_authoring_seconds": null,
+    "fragment_volume_relative_error": 1.9754016173773178e-09
+  }
+}

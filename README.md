@@ -1,5 +1,11 @@
 # XR Apartment — Kitchen Design Review
 
+T1 + T3 Editor preview (T2 UI pending): [试用操作与集成说明](Docs/ReviewV2_T1_T3_Preview.md).
+
+> **Phase 3 开发入口：** `SCN_Kitchen_ReviewV2` 是唯一的产品集成与验收主场景。T1–T5 的 M0 会话/目标状态、命令和事件接口以 [Review V2 M0 State Contract](Docs/ReviewV2_Contract_v0.4_M0.md) 及其链接的 [集成说明](Docs/ReviewV2_M0_Integration.md) 为准。使用 `XR Apartment / Review V2 / Open Phase 3 Review` 开发测试。`SCN_Kitchen_Cooking` 用于功能回归，`SCN_Kitchen_Review` 和下文 B1/B2 标准化 Challenge 流程属于 Phase 2 历史参考；[旧 Module Interface Contract](Docs/Module_Interface_Contract.md) 不适用于 V2。默认 Build Settings 暂未切换。
+
+**T2/T3 对接入口：** [T1 接口清单与产品逻辑接入手册](Docs/ReviewV2_T1_Interface_Reference.md) 汇总当前 A-v5/B-v8 的函数签名、输入输出、数据结构、命令/回调与保存约定，并说明如何实现引导、标记、回顾、切换、重置和保存结束。可编译签名仍以 ReviewContracts.cs 为准。
+
 ## 1. Introduction
 
 ### Group 8
@@ -29,12 +35,13 @@ The product scope and acceptance criteria are defined in the [Lean PRD v0.3 Fina
 | Item | Configuration |
 | --- | --- |
 | Unity | **2022.3.62f3**; do not upgrade the engine |
-| Rendering | Built-in Render Pipeline, Linear Color Space |
+| Rendering | HDRP 14.0.12, Linear Color Space, Direct3D 12 on Windows with Direct3D 11 fallback |
 | Input | New Input System only (`activeInputHandler: 1`) |
 | XR | OpenXR + XR Interaction Toolkit 3.5.0 |
 | Target experience | Windows PC build, used with **Quest 3 + Quest Link** |
-| Scene | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
-| Data | Local CSV on the host PC; no account, server, or network service required |
+| Main scene | `Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity` (city panorama and cooking) |
+| Review scene | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
+| Data | Local review CSV and kitchen feedback document on the host PC |
 
 ### Clone and Open
 
@@ -45,9 +52,25 @@ cd XR-Apartment-Group8
 git lfs pull
 ```
 
-Open the repository root in Unity Hub and select **2022.3.62f3**. After UPM finishes its first package resolution, select **XR Apartment → Open Kitchen Review Scene** from the Unity menu, or open the scene listed above directly. This scene is enabled in `ProjectSettings/EditorBuildSettings.asset`.
+Open the repository root in Unity Hub and select **2022.3.62f3**. After UPM finishes its first package resolution, select **XR Apartment → Open Main Kitchen**. The city-panorama cooking kitchen is the first enabled scene in `ProjectSettings/EditorBuildSettings.asset`, so a Player build starts there. **XR Apartment → Cooking → Use City Kitchen as Main Scene** also sets the local Editor's Play start scene.
+
+The city kitchen starts with the guide. Calibrate a standing or seated view, practice teleporting and releasing a tool, make tomato and egg, and compare both fridge sizes in the same layout. Place a feedback note on an object, save it, and select **Start free play**. Saved notes are added to `KitchenFeedback/feedback.txt` under the local Unity persistent data folder.
+
+Hold the Quest left controller's **Menu** button or keyboard **F8** for about half a second to open the floating pause menu. Use a controller ray to select **Resume**, **Kitchen Guide**, **Layout Lab**, **Feedback note**, **Options**, or **Graphics** as the guide advances. The kitchen freezes while the menu is open. Head and controller tracking continue.
+
+**Graphics** applies the base preset immediately and saves it on the PC. **Performance** reduces texture and shadow resolution and uses baked reflection probes; **Standard** adds screen-space reflections and ambient occlusion; **High** increases shadow quality. **Ray tracing** and **DLSS** are separate switches: change just one while keeping the same preset and view to compare. Ray tracing affects opaque reflections and requires Windows Direct3D 12 with DXR. DLSS uses the Quality mode on a detected NVIDIA DLSS device; it renders internally at a recommended scale and reconstructs the output. The menu reports unsupported options and falls back to raster reflections or native resolution without changing the other switch.
+
+Build the DXR-enabled Windows player from the Windows Unity Editor. The macOS Editor can run the raster presets and the High fallback.
+
+In free play, **Options → Start Design Review** opens the formal B1/B2 review at Setup. In the Editor, **XR Apartment → Open Kitchen Review Scene** opens that scene directly and clears the Play override.
 
 For headset-free testing in the Editor, use the included XR Interaction Simulator and follow its in-Play prompts (`Y`). The simulator is useful for checking interaction logic, but it does not replace spatial, comfort, or device acceptance testing with Quest Link.
+
+The project simulator routes default FPS keyboard walking through the rig's character collision, so solid cabinets and walls block movement. Independent controller/head pose editing remains available for tracking experiments. See [Keyboard locomotion](Docs/KeyboardLocomotion.md).
+
+Choose **Teleport** (the first-run default) or **Continuous** in **Options**. Continuous uses the left stick to walk. Both modes retain right-stick snap turning and teleport. The choice is saved locally. [Movement controls and limits](Docs/LocomotionModes.md)
+
+For headset Play testing, run the Editor on Windows, connect Quest Link (or Windows Virtual Desktop for development), and turn off **Use XR Interaction Simulator in scenes** in **Project Settings → XR Plug-in Management → XR Interaction Toolkit**. Virtual Desktop on Mac streams the desktop and does not supply this PCVR connection. Keep the Windows64 build target unchanged.
 
 ## 3. Current Implementation
 
@@ -82,12 +105,33 @@ The workflow also supports pause and resume, resuming from the current step, res
 
 - XRI controllers drive movement, teleportation, grabbing, and door/drawer interactions. Doors and drawers use kinematic logic rather than physics hinges.
 - `PREF_XR_KitchenRig` provides controller-driven hand models and grip animations. Spherical palm proxies can dock to static surfaces. There is **no** camera-based bare-hand tracking, per-finger collision, or adaptive grasping.
+- Held props use whole-object collision sweeps: obstacles stop the object, a translucent hand shows the tracked position, and blocked release suppresses artificial throwing velocity. The same configuration is used by both runtime designs and kitchen authoring tools.
 - The kitchen water station supports filling and pouring, with finite container volume, gravity-driven streams, constrained sloshing, and splashes. The implementation uses bounded water-flow segments; it is not SPH/FLIP fluid simulation and does not include buoyancy, weight feedback, or floor puddles.
 - The kitchen environment, props, daylight, sky, and baked lighting are stored in Prefabs and assets. Rebake lighting after changing static environment geometry, the sun, or emissive materials.
 - The scene menu includes demonstration controls for returning to the starting point, pausing, and changing locomotion. The water system can be reset from an Editor menu. These features do not change ownership of formal review workflow state.
 
+An additional cooking sandbox is available through **XR Apartment → Cooking → Open Cooking Kitchen**. Follow the prompts to open the fridge, retrieve tomato and eggs, slice then dice the tomato, crack and whisk an egg in a bowl, switch on the stove, place the pan, pour in the egg, let it set, scramble with the spatula, add the diced tomato and stir-fry the finished dish. Food can burn; RESET restores the ingredients, utensils and fridge. The sandbox also retains plate breaking, other prepared food cuts and the water station. [Recipe instructions, models and validation](Docs/TomatoEggRecipe.md) describe the interaction and its limits. The furniture batch passed EditMode 145/145 and PlayMode 50/50 on macOS; [subsequent cleanup checks and observed test instability](Docs/ProjectCleanup.md) record the latest reruns. Windows Player / Quest Link remain untested. This sandbox is separate from the formal review journey. [Pilot assets and measured results](ArtSource/KitchenAssets/Validation/PilotResults.md) include the character/body-rig and cabinet samples, their remaining art work, and the rejected multiview contrast.
+
+Open **Layout Lab** from the city kitchen with right **B** or **F9** in the Editor. Choose the original dock, forward dock, or pantry return, then choose a full-size or compact refrigerator independently. The menu compares the door angles you observed in that layout. A layout or size switch restocks the active refrigerator and resets the meal. Choose **Warm Ivory**, **Sage**, or **Graphite** at any point in the recipe to compare finishes. [Layout Lab controls, formal review and delivery plan](Docs/KitchenGameRoadmap.md)
+
+Before the formal B1/B2 review, use the [offline static pretest](Docs/Evaluation/StaticBaseline.html) to capture the initial judgement. The facilitator links the downloaded pretest to the completed anonymous session after the review. [Pretest and device acceptance steps](Docs/KitchenGameRoadmap.md#静态前测)
+
+Use the **RECIPE** button on the worktop to switch between Tomato & Egg and Beef & Onion. Cut both beef and onion, cook and stir them in the pan, turn off the stove, and tilt the held pan over the serving plate. [Recipe controls and device acceptance](Docs/KitchenGameRoadmap.md)
+
+The tomato cut surfaces and cooked egg now use two additional actual Comfy Cloud Pixal3D outputs, with visible seeds/flesh, folded egg geometry, PBR textures and egg LODs. [Current food models and before/after validation](Docs/FoodVisualUpgrade.md) document their provenance and integration; the original collision and recipe interactions are retained.
+
+Cooking now takes place inside the small kitchen, with washing by the window, preparation on the back counter and a gas hob on the right. Select its black front knob to light/extinguish the blue gas flames. Eight further Comfy Cloud jobs supplied the fridge door and main cookware; a locally refined fridge casing and vendor ceramic meshes complete the set. [Kitchen layout, cookware sources and current verification](Docs/KitchenRoomAndCookware.md) document the changes.
+
+The cooking sandbox also includes a matching oak dining table, four chairs, an ivory pendant and a refined single-door fridge. Four actual Pixal3D furniture jobs were reviewed; the generated wood furniture is retained, while the fridge's manufactured panels and the lamp's hollow shade were rebuilt locally for clean geometry. [Furniture sources, saved Prefabs and scene validation](Docs/KitchenFurniture.md) describe this batch and its limits.
+
+The counter's **RESET ROOM** button restores the cooking sandbox, including loose props, food, water and fire, while keeping the player in place. A CC0 urban rooftop panorama provides a city view through the windows. [Reset scope, city asset and verification](Docs/RoomResetAndCity.md) describe this extension.
+
 Related asset and maintenance notes:
 
+- [Code structure and maintenance entry points](Docs/CodeStructure.md)
+- [Unused imported assets and authoring-code cleanup](Docs/ProjectCleanup.md)
+- [Comfy Cloud kitchen asset pipeline and current acceptance status](Docs/KitchenAssetPipeline.md)
+- [Held-object collision constraints](Docs/HeldPropCollision.md)
 - [Kitchen migration and scene provenance](Docs/MzhKitchenMigration.md)
 - [Kitchen prop dressing](Docs/KitchenDressing.md)
 - [Sky and pouring interaction](Docs/KitchenWaterAndSky.md)
@@ -111,8 +155,9 @@ See the [Local CSV Storage guide](Docs/LocalCsvStorage.md) for the data structur
 ```text
 Assets/_Project/
   Art/                 Kitchen models, materials, and textures
+  Editor/              Shared kitchen authoring, journey UI builders, and XR setup
   Prefabs/             Environment, benchmarks, interactables, and UI Prefabs
-  Scenes/              SCN_Kitchen_Review (build entry point)
+  Scenes/              SCN_Kitchen_Cooking (build entry), SCN_Kitchen_Review
   Scripts/
     Data/               Benchmarks, parameters, feedback categories, and session records
     Simulation/         Workflow state machine, task tracking, contracts, and kinematics
@@ -137,16 +182,18 @@ Key entry points:
 
 ## 6. Tests and Acceptance
 
-Run EditMode and PlayMode tests separately in the Unity Test Runner. Most recent test results (2026-10-18):
+Run EditMode and PlayMode tests separately in the Unity Test Runner. Integration test results (2026-10-27, `feature/hzc` + `main@3a5c009`):
 
 | Test mode | Passed | Failed |
 | --- | ---: | ---: |
-| EditMode | 120 | 0 |
-| PlayMode | 18 | 0 |
+| EditMode | 133 | 0 |
+| PlayMode | 28 | 0 |
 
 PlayMode tests cover scene startup, the B1/B2 task journey, comparison input, XR ray and Editor mouse-ray targets, task-area sensors, and the recovery menu. EditMode tests cover workflow state, feedback validation, CSV, kinematics, water volume, and scene/Prefab integrity.
 
-These are Editor automation results. End-to-end acceptance has also been completed and passed with the target **Quest 3 + Quest Link** setup.
+PlayMode also checks two constrained held props, actual XRI task-item extraction and reset in both designs, and the editor menu respecting workflow state. The Layout Lab iteration produced a Windows64 build using Unity 2022.3.62f3. [Current validation and hardware checks](Docs/KitchenGameRoadmap.md)
+
+The upstream `main` README reports an earlier Quest 3 + Quest Link acceptance pass. The combined `feature/hzc` revision, including the held-object collision integration, still requires its own Windows and Quest Link check; Editor automation does not establish hardware comfort or performance.
 
 See the [Core Review Playbook](Docs/Core_Review_Playbook.md) and [Scene Wiring Guide](Docs/Core_Scene_Wiring.md) for workflow and joint acceptance steps. The detailed Phase 5 checklist is in [Phase 5 Manual Acceptance](Docs/UI/Phase5_Manual_Acceptance.md).
 
@@ -154,7 +201,7 @@ See the [Core Review Playbook](Docs/Core_Review_Playbook.md) and [Scene Wiring G
 
 - The build and experience target is **StandaloneWindows64 + Quest Link**. Running as an Android APK or standalone Quest app is not a current delivery target.
 - The runtime is configured for B1 and B2 only. Other designs in the registry or assets are not part of the current formal review journey. B3/F4, F3 Explore-only, and position markers are future scope under the PRD.
-- The current F2 proxy has two vertically stacked doors, while PRD Final §6.2 requires one large door. The F3/F4 proxies also do not fully match the PRD definitions and are future scope. Any correction and acceptance must verify door count, hinges, opening direction, collisions, and registered parameters individually. A Prefab's presence or passing automation tests does not constitute design acceptance.
+- B1 and B2 use one shared large single-door F2 with prototype dimensions recorded in the Assumption Register. See [F2 and window geometry](Docs/F2AndWindows.md). F3/F4 still need to be aligned with PRD Final §6.2 in P1. Design acceptance requires checking the model, dimensions and behavior in the approved Quest Link setup.
 - The workflow contract includes conflict and safety notification interfaces, but the current core Prefab does not bind `conflictSource` / `safetySource`, and the repository has no corresponding runtime detection implementation. Therefore, **objective geometric conflict prompts, Yellow-to-Amber feedback linkage, and independent Red safety prompts are not yet implemented**.
 - CSV read-back verification and automated tests do not provide a UI for restoring sessions across application launches.
 

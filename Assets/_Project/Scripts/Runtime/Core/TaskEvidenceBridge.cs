@@ -16,7 +16,7 @@ namespace XRApartment.Runtime.Core
         private readonly Dictionary<string, TaskEvidenceIdentity> identities =
             new Dictionary<string, TaskEvidenceIdentity>();
         private readonly Dictionary<string, bool> sourceWasInside = new Dictionary<string, bool>();
-        private readonly Dictionary<string, float> previousProgress = new Dictionary<string, float>();
+        private readonly Dictionary<string, float> accessMeasurements = new Dictionary<string, float>();
         private readonly Dictionary<string, float> dwell = new Dictionary<string, float>();
         private readonly HashSet<string> taken = new HashSet<string>();
         private readonly HashSet<string> placed = new HashSet<string>();
@@ -36,9 +36,22 @@ namespace XRApartment.Runtime.Core
         public event Action<TaskEvidence> EvidenceObserved;
         public event Action<string> InteractionBlocked;
         public string LastError { get; private set; }
+        internal float SessionSeconds => sessionStartedAt < 0f ? 0f : Time.realtimeSinceStartup - sessionStartedAt;
+
+        private void Awake() => sessionStartedAt = Time.realtimeSinceStartup;
 
         public bool HasEmitted(ChallengeStep step, string itemOrTargetId) =>
             emitted.Contains(step + ":" + itemOrTargetId);
+
+        internal TaskEvidenceIdentity FindNextAccess(ChallengeStep step)
+        {
+            if (task == null) return null;
+            foreach (var target in task.AccessTargets)
+                if (!TryMeasureReadyAccess(step, target.ObjectId, out _) &&
+                    identities.TryGetValue(target.ObjectId, out var identity))
+                    return identity;
+            return null;
+        }
 
         public bool Bind(SessionPlan plan, IJourneyCore journey, string benchmark, long run)
         {
@@ -63,12 +76,11 @@ namespace XRApartment.Runtime.Core
             {
                 TaskEvidenceIdentity identity;
                 if (!identities.TryGetValue(access.ObjectId, out identity) ||
-                    identity.Role != access.Role || !identity.TryGetAccessProgress(out var progress))
+                    identity.Role != access.Role || !identity.TryGetAccessProgress(out _))
                 {
                     LastError = "Missing moving access target: " + access.ObjectId;
                     return false;
                 }
-                previousProgress[access.ObjectId] = progress;
             }
             if (!HasZone(plan.Task.ApproachZoneId, ReviewRole.CirculationZone) ||
                 !HasZone(plan.Task.LeaveZoneId, ReviewRole.CirculationZone))
@@ -110,7 +122,6 @@ namespace XRApartment.Runtime.Core
                 identities[itemId].Grab.selectFilters.Add(guard);
                 grabGuards.Add(itemId, guard);
             }
-            if (sessionStartedAt < 0f) sessionStartedAt = Time.realtimeSinceStartup;
             LastError = null;
             return true;
         }
@@ -126,7 +137,7 @@ namespace XRApartment.Runtime.Core
             task = null;
             identities.Clear();
             sourceWasInside.Clear();
-            previousProgress.Clear();
+            accessMeasurements.Clear();
             dwell.Clear();
             taken.Clear();
             placed.Clear();
@@ -142,7 +153,7 @@ namespace XRApartment.Runtime.Core
                 snapshot.CurrentStep != ChallengeStep.Open) return true;
             InteractionBlocked?.Invoke(snapshot.IsBusy
                 ? "Wait for the current scene action before grabbing task items."
-                : "Open both fridge doors before grabbing task items (" + itemId + ").");
+                : "Open the fridge door before grabbing task items (" + itemId + ").");
             return false;
         }
 
@@ -156,10 +167,6 @@ namespace XRApartment.Runtime.Core
             foreach (var item in task.Items)
                 if (item.IsExistingItem && identities.TryGetValue(item.ItemId, out var identity))
                     sourceWasInside[item.ItemId] = Inside(item.SourceZoneId, SourcePosition(identity));
-            foreach (var access in task.AccessTargets)
-                if (identities.TryGetValue(access.ObjectId, out var identity) &&
-                    identity.TryGetAccessProgress(out var progress))
-                    previousProgress[access.ObjectId] = progress;
         }
 
         public void ItemReturnedToTray(string itemId)
@@ -184,7 +191,7 @@ namespace XRApartment.Runtime.Core
 
         private static Vector3 SourcePosition(TaskEvidenceIdentity identity)
         {
-            return identity.Body != null ? identity.Body.position : identity.transform.position;
+            return identity.Body != null ? identity.Body.worldCenterOfMass : identity.transform.position;
         }
 
         private void Update()
@@ -194,25 +201,6 @@ namespace XRApartment.Runtime.Core
             var active = snapshot.State == SessionState.ChallengeActive && !snapshot.IsBusy &&
                 snapshot.ActiveBenchmarkId == benchmarkId && snapshot.ActiveRunId == runId &&
                 snapshot.CurrentStep.HasValue;
-
-            foreach (var access in task.AccessTargets)
-            {
-                TaskEvidenceIdentity identity;
-                float progress;
-                if (!identities.TryGetValue(access.ObjectId, out identity) ||
-                    !identity.TryGetAccessProgress(out progress)) continue;
-                float previous;
-                previousProgress.TryGetValue(access.ObjectId, out previous);
-                if (active && snapshot.CurrentStep == ChallengeStep.Open &&
-                    previous < task.OpenProgressThreshold && progress >= task.OpenProgressThreshold)
-                    Emit(ChallengeStep.Open, access.ObjectId, access.Role,
-                        access.ObjectId, null, progress, false);
-                if (active && snapshot.CurrentStep == ChallengeStep.Close &&
-                    previous > task.ClosedProgressThreshold && progress <= task.ClosedProgressThreshold)
-                    Emit(ChallengeStep.Close, access.ObjectId, access.Role,
-                        access.ObjectId, null, progress, false);
-                previousProgress[access.ObjectId] = progress;
-            }
 
             foreach (var item in task.Items)
             {
@@ -238,6 +226,10 @@ namespace XRApartment.Runtime.Core
                     if (Inside(task.ApproachZoneId, rigHead.position))
                         Emit(ChallengeStep.Approach, task.ApproachZoneId,
                             ReviewRole.CirculationZone, null, null, 0f, false);
+                    break;
+                case ChallengeStep.Open:
+                case ChallengeStep.Close:
+                    ObserveAccessTargets(snapshot.CurrentStep.Value);
                     break;
                 case ChallengeStep.TemporaryPlacement:
                     foreach (var item in task.Items)
@@ -285,6 +277,28 @@ namespace XRApartment.Runtime.Core
             }
         }
 
+        private bool TryMeasureReadyAccess(ChallengeStep step, string objectId, out float progress)
+        {
+            progress = 0f;
+            if (task == null || !identities.TryGetValue(objectId, out var identity) || identity == null ||
+                !identity.TryGetAccessProgress(out progress)) return false;
+            return step == ChallengeStep.Open
+                ? progress >= task.OpenProgressThreshold : progress <= task.ClosedProgressThreshold;
+        }
+
+        private void ObserveAccessTargets(ChallengeStep step)
+        {
+            // Check the whole set before emitting. A door can move again after it reaches a threshold.
+            foreach (var access in task.AccessTargets)
+            {
+                if (!TryMeasureReadyAccess(step, access.ObjectId, out var progress)) return;
+                accessMeasurements[access.ObjectId] = progress;
+            }
+            foreach (var access in task.AccessTargets)
+                Emit(step, access.ObjectId, access.Role,
+                    access.ObjectId, null, accessMeasurements[access.ObjectId], false);
+        }
+
         private void ObserveStoragePlacement(TaskItemSpec item, TaskEvidenceIdentity identity,
             ChallengeStep step)
         {
@@ -320,7 +334,7 @@ namespace XRApartment.Runtime.Core
                 Step = step, Role = role, ObjectId = objectId,
                 ItemId = role == ReviewRole.CirculationZone || objectId != null ? null : key,
                 ZoneId = zoneId ?? (role == ReviewRole.CirculationZone ? key : null),
-                OccurredAtSessionSeconds = Time.realtimeSinceStartup - sessionStartedAt,
+                OccurredAtSessionSeconds = SessionSeconds,
                 Measurement = measurement, Released = released
             });
         }

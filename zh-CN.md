@@ -31,7 +31,8 @@ COMP5424 Scenario C 的厨房设计评审原型。参与者在同一个厨房里
 | 输入 | 仅新 Input System（`activeInputHandler: 1`） |
 | XR | OpenXR + XR Interaction Toolkit 3.5.0 |
 | 目标体验 | Windows PC 构建，通过 **Quest 3 + Quest Link** 使用 |
-| 场景 | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
+| 主场景 | `Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity` |
+| 评审场景 | `Assets/_Project/Scenes/SCN_Kitchen_Review.unity` |
 | 数据 | 写入运行电脑的本地 CSV，不需要账号、服务器或网络服务 |
 
 ### 克隆并打开
@@ -43,9 +44,11 @@ cd XR-Apartment-Group8
 git lfs pull
 ```
 
-用 Unity Hub 打开仓库根目录，并选择 **2022.3.62f3**。UPM 首次解析完成后，在 Unity 菜单选择 **XR Apartment → Open Kitchen Review Scene**；也可直接打开上表所列场景。`ProjectSettings/EditorBuildSettings.asset` 中已启用该场景。
+用 Unity Hub 打开仓库根目录，并选择 **2022.3.62f3**。构建启动后先进入城市烹饪厨房。按左手 **Y / Menu** 或键盘 **F8** 打开移动菜单，选择 **Start Design Review**，从 Setup 开始正式评审。在编辑器中，也可通过 **XR Apartment → Open Kitchen Review Scene** 直接打开评审场景并清除 Play 覆盖。
 
 编辑器无头显测试可使用项目随附的 XR Interaction Simulator；进入 Play 后查看模拟器提示（`Y`）。模拟器适合检查交互逻辑，不可代替 Quest Link 的空间、舒适度或设备验收。
+
+真机 Play 时，在 Windows 运行编辑器，先连接 Quest Link（Windows VD 仅作开发调试），再在 `Project Settings → XR Plug-in Management → XR Interaction Toolkit` 关闭 **Use XR Interaction Simulator in scenes**。Mac 的 VD 连接只串流桌面，不能提供这条 PCVR 链路；保持 Windows64 构建目标。
 
 ## 当前实现
 
@@ -135,14 +138,16 @@ Docs/                    接口、验收和功能维护文档
 
 ## 测试与验收
 
-在 Unity Test Runner 中分别运行 EditMode 与 PlayMode 测试。最近一次验证结果（2026-10-18）：
+在 Unity Test Runner 中分别运行 EditMode 与 PlayMode 测试。本次整合验证结果（2026-10-27，`feature/hzc` + `main@3a5c009`）：
 
 | 测试模式 | 通过 | 失败 |
 | --- | ---: | ---: |
-| EditMode | 120 | 0 |
-| PlayMode | 18 | 0 |
+| EditMode | 133 | 0 |
+| PlayMode | 28 | 0 |
 
 PlayMode 覆盖场景启动、B1/B2 任务流程、比较输入交互、XR 射线/编辑器鼠标射线目标、任务区传感器及恢复菜单。EditMode 覆盖流程状态、反馈校验、CSV、运动学、水量与场景/Prefab 完整性。
+
+本次还覆盖双手持物防穿透、实际 XRI 抓取任务物并在两方案中取出/重置，以及旧编辑器菜单遵守旅程状态。当前 Mac 安装缺少 Windows Build Support，本次没有执行 Windows Player 构建。
 
 以上是编辑器自动化测试结果，不等于 Windows Player 构建验证，也不等于 Quest 3 + Quest Link 端到端验收。正式设备验收仍须按 PRD 的目标环境执行。
 
@@ -152,7 +157,7 @@ PlayMode 覆盖场景启动、B1/B2 任务流程、比较输入交互、XR 射�
 
 - 构建与体验目标是 **StandaloneWindows64 + Quest Link**；本项目不以 Android APK/Quest 一体机运行作为当前交付目标。不要为方便测试切换 Android 平台。
 - 运行时配置只绑定 B1、B2。注册表或资源中存在其他方案，不代表它们已纳入当前正式评审旅程；B3/F4、F3 Explore-only 与位置 marker 按 PRD 属后续范围。
-- 当前 F2 代理为上下两扇门，而 PRD Final §6.2 要求大型单开门；F3/F4 代理形态也与 PRD 定义不完全一致，且属于后续范围。修正和验收须逐件核对门数、铰链、开启方向、碰撞与登记参数。Prefab 存在或自动化测试通过不代表模型已通过设计验收。
+- B1 和 B2 共用大型单开门 F2，原型尺寸已登记。详见 [F2 和窗户几何](Docs/F2AndWindows.md)。F3/F4 留到 P1 按 PRD Final §6.2 调整。设计验收还须在批准的 Quest Link 环境中核对模型、尺寸和交互。
 - 流程契约包含冲突与安全通知接口，但当前核心 Prefab 未绑定 `conflictSource` / `safetySource`，仓库中也没有相应运行时检测实现。因此，**客观几何冲突提示、Yellow→Amber 反馈联动和独立 Red 安全提示尚未完成**。
 - CSV 读回验证和自动化测试不提供跨启动的会话恢复 UI。
 

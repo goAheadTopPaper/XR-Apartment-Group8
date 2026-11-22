@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "asset_name": "tomato_slice",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271031,
+  "quality": "high",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/tomato_slice_single_v001.png"
+  },
+  "reference_sha256": {
+    "single": "56b5fdf4d5f2bb0bf3cac7b68959eb510cd2dcfcbd68820b5e10ea7648ae692c"
+  },
+  "design_review": {
+    "approved": true,
+    "approval_evidence": "User 2026-10-28: use model generation directly to replace simplistic tomato and cooked egg; agent selects matching realistic food design within authorized scope",
+    "style_board": "../References/Kitchen_StyleBoard_v001.png"
+  },
+  "scale": {
+    "reference_span_metres": 0.08,
+    "status": "prototype asset-production assumption, not client fact",
+    "orientation": "Blender Z-up / Unity Y-up",
+    "pivot": "bottom centre"
+  },
+  "parameters": {
+    "master_faces": 100000,
+    "master_texture": 2048,
+    "master_normal": 2048,
+    "master_ao": 1024,
+    "game_triangles": 8000,
+    "game_texture": 2048
+  },
+  "postprocess_recipe": {
+    "kind": "static",
+    "pieces": 0
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "reference_provider": "built-in Image Gen",
+    "reference_specification": "One thick tomato slice, photorealistic skin, flesh, membranes, gel and ivory seeds; no leaves or stem; pure white background."
+  },
+  "generation": {
+    "status": "generated_processed_imported_recipe_verified",
+    "job_id": "a85e7bdd-21ac-4286-a904-bbbd4cd317db",
+    "elapsed_seconds": 59.6,
+    "credits_consumed": null
+  },
+  "outputs": {
+    "master_glb": "../tomato_slice/v001/download/master.glb",
+    "preview_png": "../tomato_slice/v001/download/cloud_render_preview.png",
+    "pbr_textures": {
+      "basecolor": "../tomato_slice/v001/TexturesSource/basecolor.png",
+      "metallic": "../tomato_slice/v001/TexturesSource/metallic.png",
+      "roughness": "../tomato_slice/v001/TexturesSource/roughness.png",
+      "normal": "../tomato_slice/v001/TexturesSource/normal.png",
+      "ao": "../tomato_slice/v001/TexturesSource/ao.png"
+    },
+    "game_glb": "../tomato_slice/v001/prepared/tomato_slice_game.glb",
+    "unity_fbx": "../tomato_slice/v001/prepared/tomato_slice_game.fbx",
+    "prepared_manifest": "../tomato_slice/v001/prepared/unity_asset.json",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/tomato_slice_v001/PREF_Prop_tomato_slice.prefab",
+    "normalized_master_glb": "../tomato_slice/v001/prepared/tomato_slice_master.glb"
+  },
+  "acceptance": {
+    "cloud_generation": "passed_output_downloaded",
+    "unity_import": "passed_saved_FBX_Standard_PBR_reference_checks",
+    "visual_quality": "agent_reviewed_in_Unity_recipe_prototype",
+    "interaction": "passed_existing_XRI_cut_pour_scramble_recipe_regression",
+    "quest_link": "not_tested",
+    "ready_for_editor_prototype": true
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true,
+    "orientation": "best_fit_plane_z"
+  },
+  "processing": {
+    "source_sha256": "8440fdd6243e86429958f71d71ce67f3da3b6a0208e9029be1f4889ff8d62036",
+    "game_triangles": 8000,
+    "game_texture": 2048,
+    "size_blender_xyz": [
+      0.08001688122749329,
+      0.07551936060190201,
+      0.06591775268316269
+    ],
+    "cleanup": [
+      {
+        "mesh": "Mesh_0",
+        "operation": "weld_coincident_vertices_preserve_loop_uv",
+        "tolerance_source_units": 8.682132363319396e-08,
+        "vertices_before": 58713,
+        "vertices_after": 50000,
+        "boundaries_before": 17036,
+        "boundaries_after": 0
+      },
+      {
+        "operation": "best_fit_plane_z",
+        "source_axis": [
+          0.06907080858945847,
+          -0.5759630799293518,
+          0.8145524859428406
+        ]
+      }
+    ],
+    "postprocess_seconds": 5.321
+  },
+  "human_cleanup": {
+    "human_manual_minutes": 0,
+    "agent_authoring_minutes": null,
+    "notes": [
+      "Agent-authored mesh derivatives, LODs, collider-bound visual fitting and Unity material setup. Original cloud master retained."
+    ]
+  }
+}

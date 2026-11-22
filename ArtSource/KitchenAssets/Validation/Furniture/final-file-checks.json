@@ -1,0 +1,20 @@
+{
+  "protected_file_count": 63,
+  "protected_file_changes": [],
+  "manifest_output_references_verified": 65,
+  "unity_fbx_source_matches": {
+    "Assets/_Project/Art/Cooking/Furniture/pendant.fbx": "4620937475ea93a8bbdfd228655a23f9cabc995b3d398d9e6b93bfd66d293a50",
+    "Assets/_Project/Art/Cooking/Furniture/fridge_door.fbx": "55bda0b4b58674218b759eae8369ddb46ec5585ce1c6076d28ef5b5fcda3f149",
+    "Assets/_Project/Art/Cooking/Furniture/fridge_body_lod1.fbx": "660f3bd579c2901c973d86e29212dc7becfd5d3e3d761029901794169021f331",
+    "Assets/_Project/Art/Cooking/Furniture/dining_table.fbx": "0943279e242253b5c322449c68521105959fa04e2e98a6e90fb648274b890eec",
+    "Assets/_Project/Art/Cooking/Furniture/dining_chair_lod1.fbx": "4f0c79d20f15d4ffdab92a3a3d06bc49bce88d7709973731c404cfb6155c17da",
+    "Assets/_Project/Art/Cooking/Furniture/dining_table_lod1.fbx": "a6f08525e5477954fb14513b8dc564bded78872de6932693edc3171f60084087",
+    "Assets/_Project/Art/Cooking/Furniture/pendant_lod1.fbx": "0d93443e76153ecc9e03caa271b8c10b126442e3ce1335b8b0034d6c4b91b3d6",
+    "Assets/_Project/Art/Cooking/Furniture/fridge_body.fbx": "d1646259f6e567aae6c7b1637f29c6e8bf1eded4ae2195271afe3b91f6e9cca2",
+    "Assets/_Project/Art/Cooking/Furniture/fridge_door_lod1.fbx": "5a8409b8110ac7440920e1642a5ec02644e5e063f51e86dc3fb774a353eae00b",
+    "Assets/_Project/Art/Cooking/Furniture/dining_chair.fbx": "001bb391b0b5a9ce6429c27be080ff9c36ac79fd91fabea49a00c69a868eace5"
+  },
+  "missing_project_meta": [],
+  "duplicate_asset_guids": [],
+  "historical_source_changes": []
+}

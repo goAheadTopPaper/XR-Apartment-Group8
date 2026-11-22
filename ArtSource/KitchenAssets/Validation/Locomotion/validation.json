@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-31",
+  "branch": "feature/hzc",
+  "unity": "2022.3.62f3",
+  "host": "macOS Editor",
+  "build_target": "StandaloneWindows64",
+  "editmode": {
+    "total": 145,
+    "passed": 145,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 3.2160202,
+    "resultState": "Passed"
+  },
+  "playmode": {
+    "total": 61,
+    "passed": 61,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 162.1483676,
+    "resultState": "Passed"
+  },
+  "movement_checks_in_full_suite": {
+    "total": 5,
+    "passed": 5
+  },
+  "scene_wiring": [
+    "Assets/_Project/Scenes/SCN_Kitchen_Review.unity missingScripts=0 menuReferencesValid=True floorMask=-2147483648",
+    "Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity missingScripts=0 menuReferencesValid=True floorMask=-2147483648",
+    "Unity=2022.3.62f3 target=StandaloneWindows64"
+  ],
+  "authoring_idempotent": [
+    "PREF_XR_KitchenRig",
+    "PREF_Kitchen_Environment",
+    "PREF_Kitchen_TeleportArea",
+    "PREF_UI_LocomotionSettings"
+  ],
+  "performance_fixed_target_warm_cpu_probe": {
+    "samples": 256,
+    "accepted": 256,
+    "meanMilliseconds": 0.002370703125,
+    "maxMilliseconds": 0.0173,
+    "allocatedBytes": 0
+  },
+  "files": {
+    "baseline_files": 617,
+    "unchanged": 614,
+    "changed": [
+      "Assets/_Project/Prefabs/PREF_Kitchen_TeleportArea.prefab",
+      "Assets/_Project/Prefabs/PREF_XR_KitchenRig.prefab",
+      "Assets/_Project/Prefabs/PREF_Kitchen_Environment.prefab"
+    ],
+    "scenes_and_baked_lighting_unchanged": true,
+    "project_packages_xr_samples_unchanged": true
+  },
+  "limits": [
+    "Windows Player not built on this host",
+    "Quest Link not tested",
+    "CPU probe is not VR frame time",
+    "Past recipe physics-test variability is not claimed resolved"
+  ]
+}

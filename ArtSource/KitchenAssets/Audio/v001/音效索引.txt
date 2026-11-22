@@ -1,0 +1,165 @@
+XR Apartment Group 8 厨房音效 v001
+2026-11-11 香港时间
+
+Comfy Cloud 实际运行 17 个工作流，得到 106 条原始候选，选出 91 条 WAV。
+交付为 48 kHz、16 位、单声道 PCM WAV，含 78 条单次音和 13 条循环。
+manifest.json 记录每条文件的 Comfy 任务 ID、提示词、时长、音量、后期处理和文件校验。
+试听文件为 KitchenSFX_Preview.mp3，选段做了响度调整。
+当前已做文件、波形和循环接点检查。游戏内混音与 Quest Link 试听待验收。
+
+接入时的共用音效
+  UiConfirm 用于移动设置、语言切换、布局或配色应用成功、校准、练习、方案切换和已确认的任务步骤。
+  UiDenied 用于布局目标被占。TeleportDenied 用于玩家尝试无效落点。
+  UiNeutral 用于暂停、恢复、跳过和安全退出。FeedbackSubmitted 用于有效反馈和 Amber。
+  DesignConflict 用于正式评审的 Yellow。BoundaryWarning 用于真实活动区的 Red。
+  SaveVerified 在本地读回验证后播放。FormMissing 与 SaveFailed 各有一条反馈。
+  B1 和 B2 共用相同音色、音量和触发规则。
+  龙头出水、受水表面与倾倒口各有独立循环，按实际流动选择和停止。
+
+实体活动区边界（1）
+  红色实体活动区短警示  |  单次 2D 0.37s  |  WAV/Safety/SFX_BoundaryWarning.wav
+
+水槽和倒水（12）
+  龙头出水口气泡水流  |  循环 3D 4.91s  |  WAV/Water/SFX_TapStreamLoop.wav
+  龙头打开  |  单次 3D 0.36s  |  WAV/Water/SFX_TapOn.wav
+  龙头关闭  |  单次 3D 0.54s  |  WAV/Water/SFX_TapOff.wav
+  水流打在水槽  |  循环 3D 4.91s  |  WAV/Water/SFX_TapSinkLoop.wav
+  水流接入陶瓷杯  |  循环 3D 4.91s  |  WAV/Water/SFX_TapFillCupLoop.wav
+  水流接入金属锅  |  循环 3D 4.91s  |  WAV/Water/SFX_TapFillPotLoop.wav
+  从锅杯口倾倒清水  |  循环 3D 3.91s  |  WAV/Water/SFX_PourWaterLoop.wav
+  水流接入容器的水花  |  单次 3D 0.14s  |  WAV/Water/SFX_WaterCatch.wav
+  水洒到台面  |  单次 3D 0.56s  |  WAV/Water/SFX_CounterSpill.wav
+  半满杯锅晃水  |  单次 3D 0.15s  |  WAV/Water/SFX_VesselSlosh.wav
+  关水后的余滴  |  单次 3D 1.60s  |  WAV/Water/SFX_TapDrips.wav
+  水槽排水  |  循环 3D 3.91s  |  WAV/Water/SFX_SinkDrainLoop.wav
+
+冰箱门（5）
+  冰箱门磁封解开  |  单次 3D 0.40s  |  WAV/Fridge/SFX_FridgeUnseal.wav
+  冰箱门移动  |  循环 3D 2.91s  |  WAV/Fridge/SFX_FridgeHingeMove.wav
+  冰箱门收尾  |  单次 3D 0.24s  |  WAV/Fridge/SFX_FridgeHingeStop.wav
+  冰箱门闭合  |  单次 3D 0.22s  |  WAV/Fridge/SFX_FridgeClose.wav
+  冰箱门碰固定柜板  |  单次 3D 0.45s  |  WAV/Fridge/SFX_FridgeBlocked.wav
+
+抓取、放置和掉落（18）
+  抓取确认  |  单次 3D 0.08s  |  WAV/Props/SFX_Grip.wav
+  金属锅具较重落地  |  单次 3D 0.35s  |  WAV/Props/SFX_MetalDrop.wav
+  陶瓷碗盘较重落地  |  单次 3D 0.09s  |  WAV/Props/SFX_CeramicDrop.wav
+  软质食材落地  |  单次 3D 0.22s  |  WAV/Props/SFX_FoodDrop.wav
+  食品纸盒落地  |  单次 3D 0.46s  |  WAV/Props/SFX_CartonDrop.wav
+  陶瓷盘破碎  |  单次 3D 0.58s  |  WAV/Props/SFX_PlateBreak.wav
+  金属锅具轻放一  |  单次 3D 0.50s  |  WAV/Props/SFX_MetalPlace_01.wav
+  金属锅具轻放二  |  单次 3D 0.16s  |  WAV/Props/SFX_MetalPlace_02.wav
+  金属锅具轻放三  |  单次 3D 0.14s  |  WAV/Props/SFX_MetalPlace_03.wav
+  陶瓷碗盘轻放一  |  单次 3D 0.65s  |  WAV/Props/SFX_CeramicPlace_01.wav
+  陶瓷碗盘轻放二  |  单次 3D 0.35s  |  WAV/Props/SFX_CeramicPlace_02.wav
+  陶瓷碗盘轻放三  |  单次 3D 0.30s  |  WAV/Props/SFX_CeramicPlace_03.wav
+  软质食材轻放一  |  单次 3D 0.11s  |  WAV/Props/SFX_FoodPlace_01.wav
+  软质食材轻放二  |  单次 3D 0.32s  |  WAV/Props/SFX_FoodPlace_02.wav
+  软质食材轻放三  |  单次 3D 0.42s  |  WAV/Props/SFX_FoodPlace_03.wav
+  食品纸盒轻放一  |  单次 3D 0.25s  |  WAV/Props/SFX_CartonPlace_01.wav
+  食品纸盒轻放二  |  单次 3D 0.25s  |  WAV/Props/SFX_CartonPlace_02.wav
+  食品纸盒轻放三  |  单次 3D 0.36s  |  WAV/Props/SFX_CartonPlace_03.wav
+
+砧板和切配（13）
+  刀刃碰砧板  |  单次 3D 0.17s  |  WAV/Prep/SFX_KnifeBoard.wav
+  番茄切片一  |  单次 3D 0.51s  |  WAV/Prep/SFX_TomatoSlice_01.wav
+  番茄切片二  |  单次 3D 0.52s  |  WAV/Prep/SFX_TomatoSlice_02.wav
+  番茄切片三  |  单次 3D 0.36s  |  WAV/Prep/SFX_TomatoSlice_03.wav
+  番茄切丁一  |  单次 3D 0.36s  |  WAV/Prep/SFX_TomatoDice_01.wav
+  番茄切丁二  |  单次 3D 0.11s  |  WAV/Prep/SFX_TomatoDice_02.wav
+  番茄切丁三  |  单次 3D 0.14s  |  WAV/Prep/SFX_TomatoDice_03.wav
+  洋葱切块一  |  单次 3D 0.26s  |  WAV/Prep/SFX_OnionCut_01.wav
+  洋葱切块二  |  单次 3D 0.35s  |  WAV/Prep/SFX_OnionCut_02.wav
+  洋葱切块三  |  单次 3D 0.47s  |  WAV/Prep/SFX_OnionCut_03.wav
+  牛肉切条一  |  单次 3D 0.46s  |  WAV/Prep/SFX_BeefCut_01.wav
+  牛肉切条二  |  单次 3D 0.58s  |  WAV/Prep/SFX_BeefCut_02.wav
+  牛肉切条三  |  单次 3D 0.59s  |  WAV/Prep/SFX_BeefCut_03.wav
+
+磕蛋、打蛋和蛋液（5）
+  蛋壳磕裂  |  单次 3D 0.30s  |  WAV/Egg/SFX_EggCrack.wav
+  蛋液落入搅拌碗  |  单次 3D 0.16s  |  WAV/Egg/SFX_EggIntoBowl.wav
+  搅拌器搅动蛋液  |  循环 3D 3.91s  |  WAV/Egg/SFX_WhiskEggLoop.wav
+  打蛋器碰碗壁  |  单次 3D 0.56s  |  WAV/Egg/SFX_WhiskCeramicTap.wav
+  蛋液从碗口倒出  |  循环 3D 3.47s  |  WAV/Egg/SFX_EggPourLoop.wav
+
+燃气灶、下锅和翻炒（12）
+  食材触及热锅的爆滋  |  单次 3D 0.64s  |  WAV/Stove/SFX_HotFoodSizzleAttack.wav
+  灶台点火  |  单次 3D 0.42s  |  WAV/Stove/SFX_StoveIgnite.wav
+  灶台关火  |  单次 3D 0.16s  |  WAV/Stove/SFX_StoveOff.wav
+  平底锅落炉架  |  单次 3D 0.20s  |  WAV/Stove/SFX_PanOnGrate.wav
+  切配食材落入锅  |  单次 3D 0.16s  |  WAV/Stove/SFX_IngredientIntoPan.wav
+  食材受热煎炒循环  |  循环 3D 5.39s  |  WAV/Stove/SFX_PanSizzleLoop.wav
+  锅铲刮锅一  |  单次 3D 0.15s  |  WAV/Stove/SFX_SpatulaPan_01.wav
+  锅铲刮锅二  |  单次 3D 0.52s  |  WAV/Stove/SFX_SpatulaPan_02.wav
+  锅铲刮锅三  |  单次 3D 0.58s  |  WAV/Stove/SFX_SpatulaPan_03.wav
+  锅铲翻食物一  |  单次 3D 0.65s  |  WAV/Stove/SFX_SpatulaFold_01.wav
+  锅铲翻食物二  |  单次 3D 0.69s  |  WAV/Stove/SFX_SpatulaFold_02.wav
+  锅铲翻食物三  |  单次 3D 0.16s  |  WAV/Stove/SFX_SpatulaFold_03.wav
+
+菜谱和整屋重置（6）
+  西红柿炒蛋到达成菜状态  |  单次 2D 0.13s  |  WAV/Recipes/SFX_DishReady.wav
+  倾锅装盘食物落盘  |  单次 3D 0.53s  |  WAV/Recipes/SFX_FoodToPlate.wav
+  洋葱炒牛肉成功装盘  |  单次 2D 0.72s  |  WAV/Recipes/SFX_DishServed.wav
+  食材烧焦提示  |  单次 2D 0.36s  |  WAV/Recipes/SFX_FoodBurnt.wav
+  菜谱切换成功  |  单次 2D 0.08s  |  WAV/Recipes/SFX_RecipeSelect.wav
+  整屋复位完成  |  单次 2D 0.69s  |  WAV/Recipes/SFX_RoomReset.wav
+
+脚步和瞬移（5）
+  室内脚步一  |  单次 3D 0.26s  |  WAV/Movement/SFX_Step_01.wav
+  室内脚步二  |  单次 3D 0.51s  |  WAV/Movement/SFX_Step_02.wav
+  室内脚步三  |  单次 3D 0.41s  |  WAV/Movement/SFX_Step_03.wav
+  有效瞬移落点  |  单次 3D 0.60s  |  WAV/Movement/SFX_TeleportLand.wav
+  无效瞬移落点  |  单次 2D 0.46s  |  WAV/Movement/SFX_TeleportDenied.wav
+
+菜单、设置和布局实验（6）
+  通用界面点击  |  单次 2D 0.18s  |  WAV/UI/SFX_UiClick.wav
+  菜单打开  |  单次 2D 0.16s  |  WAV/UI/SFX_UiMenuOpen.wav
+  菜单关闭  |  单次 2D 0.44s  |  WAV/UI/SFX_UiMenuClose.wav
+  设置布局和任务确认  |  单次 2D 0.38s  |  WAV/UI/SFX_UiConfirm.wav
+  布局被占或设置拒绝  |  单次 2D 0.61s  |  WAV/UI/SFX_UiDenied.wav
+  暂停恢复跳过和退出确认  |  单次 2D 0.29s  |  WAV/UI/SFX_UiNeutral.wav
+
+正式评审和保存（5）
+  登记几何冲突黄色提示  |  单次 2D 0.50s  |  WAV/Review/SFX_DesignConflict.wav
+  有效反馈提交和琥珀状态  |  单次 2D 0.61s  |  WAV/Review/SFX_FeedbackSubmitted.wav
+  本地记录读回验证成功  |  单次 2D 0.16s  |  WAV/Review/SFX_SaveVerified.wav
+  表单有缺项  |  单次 2D 0.32s  |  WAV/Review/SFX_FormMissing.wav
+  本地记录保存失败  |  单次 2D 0.42s  |  WAV/Review/SFX_SaveFailed.wav
+
+室内、冰箱和城市底声（3）
+  冰箱压缩机底声  |  循环 3D 4.76s  |  WAV/Ambience/SFX_FridgeCompressorLoop.wav
+  厨房室内底声  |  循环 2D 11.82s  |  WAV/Ambience/SFX_KitchenRoomtoneLoop.wav
+  隔窗城市远景声  |  循环 3D 11.82s  |  WAV/Ambience/SFX_CityBehindGlassLoop.wav
+
+试听选段顺序
+
+  00:00.0  红色实体活动区短警示
+  00:00.6  龙头打开
+  00:01.2  水流打在水槽
+  00:02.9  水流接入陶瓷杯
+  00:04.5  从锅杯口倾倒清水
+  00:06.0  水洒到台面
+  00:06.8  冰箱门磁封解开
+  00:07.4  冰箱门碰固定柜板
+  00:08.1  冰箱门闭合
+  00:08.6  金属锅具轻放一
+  00:09.4  陶瓷碗盘轻放一
+  00:10.3  陶瓷盘破碎
+  00:11.1  番茄切片一
+  00:11.8  洋葱切块一
+  00:12.4  牛肉切条一
+  00:13.1  蛋壳磕裂
+  00:13.6  搅拌器搅动蛋液
+  00:15.3  灶台点火
+  00:15.9  食材触及热锅的爆滋
+  00:16.8  食材受热煎炒循环
+  00:18.6  锅铲翻食物一
+  00:19.5  倾锅装盘食物落盘
+  00:20.3  洋葱炒牛肉成功装盘
+  00:21.2  食材烧焦提示
+  00:21.8  室内脚步一
+  00:22.4  有效瞬移落点
+  00:23.2  登记几何冲突黄色提示
+  00:23.9  本地记录读回验证成功
+  00:24.4  本地记录保存失败
+  00:25.0  隔窗城市远景声

@@ -1,15 +1,35 @@
 # Module Interface Contract — 厨房评审核心流程
 
+> **LEGACY / Phase 2 历史合同。** 本文的 B1/B2 标准化 Challenge、八步证据链、强制流程及以下 Frozen v0.5 状态仅适用于 `SCN_Kitchen_Review` 和旧 Journey 模块。它不是 Group 8 Phase 3 `SCN_Kitchen_ReviewV2` 的接口依据。T1–T5 开发 V2 时，以 [Review V2 M0 State Contract](ReviewV2_Contract_v0.4_M0.md)、[集成说明](ReviewV2_M0_Integration.md) 和 [场景所有权](ReviewV2_Scene_Ownership.md) 为准；旧场景与接口保留供回归和历史追溯。
+
 **状态**：Frozen v0.5（2026-10-18）；公共接口基线，变更须先修订本文并审查
 **适用范围**：P0 B1=Proud+F2、B2=Flush-oriented+F2 的运行时评审旅程及 Core、Feedback、UI、Conflict Detection、Storage 的交接  
 **需求依据**：Lean PRD v0.3 Final §§8–12、FR-01/02/03/05/06/07/09/10/11/12、SAFE-01。本文约定模块交接，不代替 PRD 验收。现有模型与 PRD 的差异单独记录，由模型模块修复。
+
+独立烹饪场景的 `RESET ROOM` 不属于正式会话命令。`KitchenCookingStation.ResetStarting` 仅在原有烹饪重置开始时通知同场景的 `KitchenRoomReset`，先取消外部道具抓取、恢复姿态并清理水体，再由原工作台恢复食材、菜谱和冰箱。它不调用 Core，不改反馈 / CSV，也不重载或重置其他场景；正式评审仍必须经过 Core 的重置效果与回执。
+
+Rig 上的 `KitchenLocomotionSettings` 将瞬移与连续平移偏好保存在本机 PlayerPrefs。任一菜单打开时暂停摇杆走路、转向和瞬移，关闭后恢复当前偏好。正式评审的移动设置用左手 Y / Menu 或键盘 F8 打开，正式会话暂停由 Core 处理。地面瞬移的落点与直线路径碰撞检查用于玩家移动约束。
+
+独立烹饪场景的菜谱选择复用 `RESET ROOM` 的道具和食材复位流程。洋葱炒牛肉的进度来自本地取料、切配、锅内加热与翻炒。装盘需要实际抓住锅，并将倾斜的锅口对准完整盘子。菜谱及装盘结果保存在工作台的本次体验状态中。
+
+料理引导分别显示在台面和当前冰箱旁。台面读取菜谱步骤、容器和灶台状态，冰箱读取取料记录和门扇实测阻挡。两个面板随独立烹饪场景加载，通过现有交互结果刷新。
+
+Layout Lab 的配色应用到独立烹饪场景的指定渲染器。玩家可以在任意摆位、冰箱尺寸和菜谱步骤切换配色，并继续对照当前门角观测。
+
+城市厨房的活动引导从双门入口带玩家到操作台，复用瞬移和抓取事件、现有西红柿炒蛋菜谱及 Layout Lab 的实测开门结果。便利贴在实际贴到物品后记录物品标识、当时的布局和冰箱尺寸，并将玩家确认的文本保存至 `KitchenFeedback/feedback.txt`。城市厨房的活动进度及便利贴记录独立于正式 B1/B2 的 Core、反馈字段与会话 CSV。
+
+城市厨房每次进入先选择语言，首次以繁体中文显示。确认后以头显追踪的原始高度开始活动。按下左手摇杆会降低头部和手部的虚拟追踪高度，再按一次恢复。玩家沿箭头到达厨房后可练习抓取、料理、比较冰箱并保存反馈。Quest 左手 Menu 或键盘 F8 长按 0.55 秒打开浮空暂停菜单。暂停保留头显和手柄追踪与菜单射线，冻结世界时间和环境音，并取消玩家的物理选择。返回活动时恢复打开菜单前的时间与音频状态。
+
+正式评审的 Setup 和 Recovery Menu 共用本次会话的站姿、坐姿眼高校准（ACC-01、FR-12）。校准调整 XR Origin 下方的虚拟追踪偏移，保持头显和手柄的相对姿态、瞬移地面参考以及实体边界坐标。Recovery Menu 在评审及暂停时允许重新校准，操作沿用当前 run、进度与反馈草稿。姿态调整属于本地可访问性设置，使用现有会话和保存接口。
+
+FR-11 的恢复步骤先为本步骤的全部物品计算有效摆位，再一次应用。储物区可包含多个层板的感应体，恢复时依次分配不同层板和槽位，并用真实实体碰撞体确认下方有支撑。空间不足时保留当前状态并返回失败。恢复摆位沿用原物品、方案与 run，任务仍按真实门体和物品状态推进。
 
 ## 1. 使用顺序与共同规则
 
 1. **第一关仅交付契约**：流程负责人已审查本文、拟修改文件与分工；各工作包负责人已核对下述 C# 公共签名、状态与失败规则。本文现作为跨分支接口基线；共享接口变更先修本文并审查，再改代码。
 2. **第二关才实施 Core Skeleton**：B1/B2 运行时切换、完整状态流转、真实 XR 交互的八步证据、任务进度、暂停/跳过/重试/退出及模块协调。先以 Mock Feedback/Storage 和临时 Debug UI 贯通；正式模块可依本文并行开发。Mock 与临时 UI 不构成 P0 验收。
 3. 各包在独立功能分支验证并提交 PR。优先交付独立脚本和 Prefab；共享 Scene/核心 Prefab 只由指定场景集成人接入。必要的最小场景改动须逐项列清单，在独立功能分支提交，不直接改团队集成分支。每合入一包即进行联合检查。
-4. 最后执行完整 Unity 构建和 Quest 3 + Quest Link 试跑。EVAL-01 静态前测本轮暂缓，保持未完成，不能宣布完整 P0 验收通过。
+4. 最后执行完整 Unity 构建和 Quest 3 + Quest Link 试跑。EVAL-01 使用 `Evaluation/StaticBaseline.html` 在进入 XR 前采集初始判断，结束后关联实际会话。前测材料和采集工具就绪，参与者试跑是 P0 验收的一部分。
 
 本文定义**交接接口**，不是要求每个交接处都创建一个 C# `interface`。正式与 Mock 均需替换的场景、反馈和存储适配使用窄接口；固定数据和纯流程函数使用明确类型。跨模块类型、顺序约束和错误规则同属接口。
 
@@ -26,7 +46,7 @@
 | 场景集成人（已有人选） | 审查并合入唯一共享 Scene/核心 Prefab，联调各包 | 各包脚本、Prefab、接线清单 | 重定义模块规则 |
 | 模型模块 | 修正 F2 形态、参数和版本证据 | PRD Final §6.2、Assumption Register | 按旧代理形态定义 Core 任务 |
 
-程序集依赖维持 `Data ← Simulation ← Runtime` 的单向调用关系；`Simulation` 不引用 `UnityEngine`。共享纯类型放在 Data/Simulation，Runtime 各包使用独立目录和文件，避免并行修改同一实现。Core 是唯一会话状态所有者；其他模块只能提交输入或执行效果。`Assets/Editor/KitchenBenchmarkMenu.cs` 仅作制作/调试入口，正式构建通过运行时场景适配切换方案。
+程序集依赖维持 `Data ← Simulation ← Runtime` 的单向调用关系；`Simulation` 不引用 `UnityEngine`。共享纯类型放在 Data/Simulation，Runtime 各包使用独立目录和文件，避免并行修改同一实现。Core 是唯一会话状态所有者；其他模块只能提交输入或执行效果。`Assets/_Project/Editor/KitchenBenchmarkMenu.cs` 仅作制作/调试入口，正式构建通过运行时场景适配切换方案。
 
 公共接口及跨模块 DTO 由 Core 工作包统一维护在 `Simulation/JourneyContracts.cs`（引用现有 Data 类型、无 UnityEngine）。Core 也维护 `Data/SessionOutcome.cs` 及现有 `Data/SessionRecord.cs` 的公共字段；Feedback/Storage 可提出字段需求，但不在各自分支直接重定义共享 schema。Feedback、UI、Conflict、Storage 负责人审查签名，在各自 Runtime 子目录实现。若以后拆 Runtime 程序集，依赖只可从实现指向 Simulation/Data，不能让 Core 引用某个具体 Runtime 模块。
 
@@ -41,7 +61,7 @@
 | `benchmarkIds` | 按实际可用模型和本次评审目的明确给出有序、唯一 ID；首轮集成使用 B1/B2。B3 是否加入由后续会话计划决定，不因注册表中存在就自动进入。 |
 | `taskConfig` | 每个 Challenge **总共 3–5 件不同物品**，包含至少一件原有物品和一件新购物品；不是“先取出 3–5 件，再额外加入新购食品”。Take out 只统计原有物品，Put back 统计全部任务物品。B1/B2 复用同一组 ID、数量、角色与等价目标区；只变几何。 |
 
-所有跨模块 ID 均为非空稳定字符串，不含姓名或账号；时间明确为 UTC 或会话内单调秒数。只读快照及保存输入须复制集合，不能向 UI 暴露可变 `SessionRecord`。创建计划时验证每个 ID 能由 `BenchmarkRegistry.Find()` 找到、允许 Challenge，且 Prefab、语义目标及任务配置可用。失败返回 `PlanInvalid` 和缺失项，停留 Setup。现有 `BenchmarkRegistry.OrderFor()` 固定三项，不作为 P0 顺序来源。`BENCH_B1/B2/B3.asset` 的 `controlledQuestion` 当前为空；正式比较前由负责人填写 PRD Final §6.3 的实际受控问题，不从模型外观推断结论。
+所有跨模块 ID 均为非空稳定字符串，不含姓名或账号；时间明确为 UTC 或会话内单调秒数。只读快照及保存输入须复制集合，不能向 UI 暴露可变 `SessionRecord`。创建计划时验证每个 ID 能由 `BenchmarkRegistry.Find()` 找到、允许 Challenge，且 Prefab、语义目标及任务配置可用。失败返回 `PlanInvalid` 和缺失项，停留 Setup。P0 顺序来自会话计划。Explore 根据已经确认的方案 ID 从同一注册表读取 B1/B2 的柜体策略、冰箱类型和 PRD Final §6.3 受控问题。问题以观察任务表述，柜体实际表现由参与者体验并记录。
 
 | 共享类型 | 必须包含 | 生产者 → 消费者 |
 | --- | --- | --- |
@@ -318,6 +338,8 @@ namespace XRApartment.Simulation
 
 `TaskConfig.Items` 的 `Count` 必须为 3–5，`ItemId` 各异，至少各有一件 `IsExistingItem=true/false`。新购物品的 `SourceZoneId` 可为 `null`；原有物品必须有来源区。所有物品均须有放回目标区，原有物品须有临时放置区。`AccessTargets` 至少包含一个稳定对象 ID，角色只能为 `FridgeDoor`/`FridgeDrawer`；Open/Close 必须分别收齐全部目标。区域、阈值、访问目标和物品在创建计划时校验，不能在 B1/B2 中途变更。
 
+正式评审的 `ISafetySource` 只采纳活跃 XR 运行时在 Floor 跟踪模式下报告的物理边界，以及该运行时中有效的头显和控制器位置。接近边界产生独立的红色文字警示，离开后以不同距离阈值清除；没有有效边界或追踪时不把虚拟房间碰撞当成物理边界。安全通知不进入任务或 CSV 证据，暂停和退出沿用现有会话操作。
+
 ## 4. 唯一流程状态与推进接口
 
 ```
@@ -372,32 +394,40 @@ Core 在 Unity 主线程按序处理命令。可预期拒绝不抛异常、不�
 | 方向 | 消息 | 规则 |
 | --- | --- | --- |
 | Core → 场景 | `IReviewScenePort.Execute(action, completed)`，`action.Type=LoadBenchmark` | 以 `SceneActionResult.RequestId` 返回**实际**加载的方案 ID、成功/失败。切换时解除旧实例订阅、清理任务物/区域状态，只替换 benchmark 槽位，保留共同厨房/XR Rig/UI。失败恢复前一确认方案；不能恢复则报告失败并阻止 Challenge。 |
-| Core → 场景 | 同一 `Execute`，动作类型为 ResetTask/ReturnItem/ReplayBenchmark/Recenter | 返回同 `RequestId` 的结果；恢复物品、门/抽屉和任务状态；Recenter 只处理定位。重置或重新开始 Challenge 产生新的 `RunId`。 |
+| Core → 场景 | 同一 `Execute`，动作类型为 ResetTask/ReturnItem/ReplayBenchmark/Recenter | 返回同 `RequestId` 的结果；恢复物品、门/抽屉和任务状态；Recenter 恢复水平位置并保留当前眼高。重置或重新开始 Challenge 产生新的 `RunId`。 |
 | Core → 场景 | 同一 `Execute`，动作为 `RestoreCurrentStep`，`Step` 等于当前步骤 | 场景适配恢复该步骤入口的门和共享物品状态、重置当前步骤的证据采集；不移动 XR Rig。Core 仅在成功回执后清空当前步骤部分进度，保留此前步骤与同一 `RunId`。不得把恢复当成真实任务证据。 |
 | 场景 → Core | `EvidenceObserved(TaskEvidence)` | 当前 `RunId`、方案、步骤和物品/区域必须匹配；Core 按步骤及稳定 item ID 去重，无需通用 event ID。 |
 
 每个活动 Challenge 步骤都有可恢复的场景入口检查点。“恢复本步骤”只清零该步骤的部分计数，保留已完成步骤，不移动 XR Rig；恢复失败不改变 Core 进度，且要求用户先释放仍被抓取的任务物品。Approach/Open 阶段拒绝任务物品抓取并显示原因，Explore 自由抓取不受限；Take out 开始前来源物品不得因提前抓取丢失来源区边沿。若物理异常使其离开来源区，用户可恢复本步骤，不得伪造取出证据。
 
+来源区的进出使用任务物品的刚体世界质心。模型原点与实体外形存在偏移时，物品落稳到层板上的正常位移不得被记为取出。临时放置和归位继续使用已登记的实体碰撞体中心与区域重叠判断。
+
 | 八步任务 | 推进所需证据 |
 | --- | --- |
 | Approach | XR Rig 到达当前方案登记的操作区，记录区域 ID；按钮不能直接完成。 |
-| Open | 指定 `FridgeDoor`/`FridgeDrawer` 的**实际运动进度**达到 TaskConfig 开启阈值；不能以 `IsOpen` 目标值或 select 点击代替。 |
+| Open | 在该步骤内，所有指定 `FridgeDoor`/`FridgeDrawer` 的**实际运动进度**同时达到 TaskConfig 开启阈值，再逐件上报。 |
 | Take out | `TaskConfig.Items` 中标为原有的物品逐件离开来源 `StorageZone`；总任务物品数为 3–5，原有物品不必单独达到 3 件。 |
 | Temporary placement | 上述物品逐件进入登记的 `CounterSurface` 临时区且已释放抓取；瞬间经过碰撞体不计。 |
 | Reorganise | 登记储物区至少发生一次指定真实物品重定位，再由参与者确认；只记录动作及确认，不判断整理质量。 |
 | Put back | 原有物品与标为新购的物品（两类合计 3–5 件）逐件进入各自有效目标 `StorageZone` 且已释放；按 item ID 和目标区核对。 |
-| Close | 本次涉及的门/抽屉实际回到关闭阈值；不以点击代替。 |
+| Close | 在该步骤内，本次涉及的门/抽屉实际同时达到关闭阈值，再逐件上报。进入步骤时已达到阈值的门/抽屉仍可参与检查。 |
 | Leave | XR Rig 离开操作区并达到登记离开区/边界，记录空间事件；按钮不能直接完成。 |
 
-每步由 Core 核对当前方案、步骤及证据，切换/重置后用 `RunId` 排除迟到事件。Take out、Temporary placement、Put back 以各步骤的 item ID 集合计数，重复进入区域不能重复推进。现有 `KinematicSwingDoor`/`KinematicLinearDrawer`、XRI 抓取和移动继续使用；场景适配监听运动完成和区域变化，不重写底层交互。`ReviewElement` 的语义角色用于跨方案解析目标，不按 B1/B2 硬编码门数。任务可跳过：原因必填、保留证据，进入该方案 Feedback.Pending；四项评价可空，最终 outcome 为 Incomplete。两方案均跳过时不强迫偏好。现有 F2 两扇门与 PRD Final 单门要求的差异由模型模块修复，不以本轮旧模型完成 P0 验收。
+每步由 Core 核对当前方案、步骤及证据，切换/重置后用 `RunId` 排除迟到事件。Take out、Temporary placement、Put back 以各步骤的 item ID 集合计数，重复进入区域不能重复推进。现有 `KinematicSwingDoor`/`KinematicLinearDrawer`、XRI 抓取和移动继续使用；场景适配监听运动完成和区域变化，不重写底层交互。`ReviewElement` 的语义角色用于跨方案解析目标，不按 B1/B2 硬编码门数。任务可跳过：原因必填、保留证据，进入该方案 Feedback.Pending；四项评价可空，最终 outcome 为 Incomplete。两方案均跳过时不强迫偏好。B1/B2 共用同一个大型单门 F2（PRD Final §6.2）；此模型变更不等于 P0 验收。
 
-**当前 Core Play 验证场景的任务布局（不改变公共 DTO）**：两件原有物品从上方 Freezer 的 `ZONE_FreezerSource` 取出，临放台面后与一件新购物品一起放入下方 Fresh。`ZONE_FreshDestination` 是一个稳定的逻辑 `ReturnZoneId`，可由下方三格各自的触发体共同实现；任一格有效，但必须已释放并稳定停留，路过不计。Open/Close 对上、下两扇实际访问门逐一取证。此布局是现有 F2 双门代理的 Play 验证接线，不改变前述模型与 PRD Final §6.2 偏差的状态，也不要求其他模块按 Prefab 名称写死流程。
+**当前 Core Play 验证场景的任务布局（不改变公共 DTO）**：两件原有物品从上层取物区 `ZONE_FreezerSource` 取出，临放台面后与一件新购物品一起放入下层储物区。`ZONE_FreshDestination` 是一个稳定的逻辑 `ReturnZoneId`，可由下方三格各自的触发体共同实现；任一格有效，但必须已释放并稳定停留，路过不计。Open/Close 对同一个 `ACCESS_FridgeDoor` 取证；任务箭头由已绑定的 `TaskConfig.AccessTargets` 解析目标。保留内部储物区 ID 以兼容既有记录。
 
 ## 6. UI、反馈与冲突接口
+
+移动菜单可切换简体中文和 English。本机语言偏好只影响显示，已录入的自由文本、B1/B2 标识、比较选项的枚举值和 CSV 字段沿用现有契约。两套 F2 共用抓住把手并随手转动的操作，Core 继续读取门体实际到达的开合程度。
 
 2026-10-18 用户明确确认：当前 Feedback **只保存选择项，取消文字说明必填要求**。完成方案必填 Decision、Category、Importance；Experience、Everyday impact 等仍为可选。`ShortExplanation` / `shortExplanation` 字段为兼容既有记录而保留，但可空，不自动生成文字、不把口述伪装成文字或录音。本次按用户确认覆盖原 Short explanation 必填规则；这属于相对 PRD Final FR-07 四项必填的明确偏差，不代表原 FR-07 已完整验收。最终比较的 trade-off 与跳过原因规则保持原契约。
 
 UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反馈、比较、暂停及错误；只通过命令提交意图。按钮是否可用由快照决定，但 Core 仍验证每条命令。UI 不直接设置 `SessionState`、方案 ID 或保存成功标志。临时 Debug UI 只用于 Play 测试，采用同一命令和反馈接口，正式 UI 可替换它。
+
+整理步骤的快照物品进度为 0/1 或 1/1。Core 接受任一原有物品释放到登记的储物区后，完整版与紧凑版任务卡都允许提交整理确认。两种任务卡显示在前景，物品和目标区提示继续标在实际几何处。
+
+最终比较的必填取舍说明可以用手柄射线在同一世界空间面板内编辑，也可以用电脑键盘输入。两种操作编辑同一个草稿，由 `IComparisonInputView.Capture()` 交给 Core。暂停或关闭键盘保留已输入的文字，跳过组合的快捷说明仍由参与者主动选择。取舍内容、验证规则及本地记录格式沿用现有契约。
 
 | 输入/输出 | 合同 |
 | --- | --- |
@@ -410,6 +440,10 @@ UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反�
 
 `ConflictNotice.FeedbackRecorded` 由 Core 在发给 UI 的快照副本中设置：Conflict Detection 产生的原始 notice 始终不决定颜色。Core 将最小冲突关联复制为 `SessionRecord.conflicts`，包含 issue、方案、模型、对象、登记参数、测量及反馈已记录状态。`JourneySnapshot.CurrentSafety` 保留当前 Red 安全通知，安全来源以同一 `SafetyEventId` 的 `IsActive=false` 通知解除；它不改变设计冲突状态。
 
+边界提示出现后，等待有效的安全距离采样再解除。缺少有效采样时保持当前提示状态。Core 将每次新触发的 `boundary_warning` 写入现有 `SessionRecord.comfortOrAbort`，包括匿名会话内秒数和当时的方案（如有）。连续有效的同一警示只记一次，解除后再次触发可另记一次。使用同一组本地保存检查点，保留风险事件与设计冲突的独立性。时间从评审场景启动计起。
+
+F2 门扇与把手的扫掠检测复用实际限制门体运动的查询。仅把当前方案内显式登记的固定柜板作为设计障碍，物品、玩家、未登记的几何及查询饱和不产生设计证据。`door-sweep/<门 ID>/<柜板 ID>` 的 `Measurement` 记录受阻时实际已到达的角度（度），`AssumptionKey` 指向障碍的登记参数。切换、复位等程序定位不产生新证据。布局实验独立于正式评审会话。
+
 ## 7. 本地保存接口与终态
 
 本地 CSV 实现约定（2026-10-18，FR-10，不改变公共签名）：`Runtime/Storage/CsvSessionStore` 实现现有 `ISessionStore`，`LocalCsvStorageAdapter` 提供 Unity 组件接入。默认文件为 `Application.persistentDataPath/ReviewRecords/sessions.csv`。每位评审者每次新会话生成新的匿名 `sessionId`，增加一行；同一会话的逐方案反馈、暂停、最终确认及重试更新同一行，避免把检查点重复计为用户提交。CSV 包含可读摘要和完整 `SessionRecord` 的 JSON 单元格，后者用于无损恢复；没有独立 JSON 文件。UTF-8 BOM、标准 CSV 引号转义保留中文和多行文字。实现同步串行保存，在 Unity 主线程调用/回调；同目录临时文件落盘验证后原子替换，最终文件再次读回匹配才返回成功。文件锁定、格式损坏、写入或验证失败返回 `OperationFailed`，不覆盖坏文件、不自动另存绕过错误。按本次用户接线授权，`PREF_Core_PlayValidation` 的 Storage Adapter 改为 Local CSV，场景实例继承该配置；保留 Mock 脚本供测试使用。Feedback 表单使用同一 Host 保存流程；保存失败展示错误及 Retry save，已提交的选择保留，重试成功前不推进方案。
@@ -419,7 +453,7 @@ UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反�
 - 每次逐方案反馈、暂停/安全退出及最终确认后请求保存。对同一 session ID 临时写入、完成替换并读回验证，避免半写入冒充成功。同一时刻只有一个当前有效保存请求，旧 `RequestId` 回调无效。安全退出可使尚未返回的旧请求失效；Storage 必须按 `RequestId` 串行提交同一 session 的替换，保证较新的退出快照最终生效，不建立通用多版本框架。
 - 逐方案保存失败时保留内存反馈、保持 Feedback.Pending，显示失败和重试入口；安全退出始终可用。Amber 仍表示该反馈已提交，与保存状态分开。
 - 正常比较完成后，保存失败保持 Comparison.Summary + `SaveStatus.Failed`，不显示 Finished；验证成功才进入 Finished。成功保存的跳过会话 outcome 为 `Incomplete`。安全退出立即为 Exited + `Aborted`；尽力保存，失败或来不及回调时记录未验证，仍允许离开。
-- Mock Storage 可模拟成功、失败、迟到回执及重试，只用于 Core 骨架验收。外部静态前测目前没有实现；`sessionId` 保留未来关联入口。EVAL-01 在补齐前始终为未完成验收项。
+- Mock Storage 可模拟成功、失败、迟到回执及重试，只用于 Core 骨架验收。静态前测的答案先另存为本地 JSON。主持人在体验后用 `sessionId` 关联已完成的同模型版本 CSV 行。离线页面核对该行的 `record_json`，分开显示参与者判断和系统实测，单场关联文件保留原始前测及选中的会话详情。原始前测和评审 CSV 分别保留。会话计划和存储接口沿用本节约定。
 
 ## 8. 每包交付与联合测试
 
@@ -448,10 +482,10 @@ UI 使用 `JourneySnapshot` 呈现 Setup、Orientation、Explore、任务、反�
 | 工作包/所有者 | 拟新增文件 | 拟修改文件 |
 | --- | --- | --- |
 | 契约/集成负责人审查 | 无 | `Docs/Module_Interface_Contract.md`（本轮 Frozen v0.4） |
-| Core / 流程负责人 | `Assets/_Project/Scripts/Data/SessionOutcome.cs`、`Simulation/JourneyContracts.cs`, `JourneyCoordinator.cs`；`Assets/_Project/Scripts/Runtime/Core/JourneyRuntimeHost.cs`, `RuntimeBenchmarkAdapter.cs`, `TaskEvidenceBridge.cs`；`Assets/_Project/Tests/EditMode/JourneyCoordinatorTests.cs`, `TaskEvidenceContractTests.cs` | `Data/SessionRecord.cs`（最小公共字段）、`Simulation/SessionStateMachine.cs`, `SessionState.cs`（加入 Exited）, `ChallengeTaskTracker.cs`；必要时 `Runtime/BenchmarkSlotMarker.cs` |
+| Core / 流程负责人 | `Assets/_Project/Scripts/Data/SessionOutcome.cs`、`Simulation/JourneyContracts.cs`, `JourneyCoordinator.cs`；`Assets/_Project/Scripts/Runtime/Core/JourneyRuntimeHost.cs`, `RuntimeBenchmarkAdapter.cs`, `TaskEvidenceBridge.cs`；`Assets/_Project/Tests/EditMode/JourneyCoordinatorTests.cs`, `TaskEvidenceContractTests.cs` | `Data/SessionRecord.cs`（最小公共字段）、`Simulation/SessionStateMachine.cs`, `SessionState.cs`（加入 Exited）, `ChallengeTaskTracker.cs`；必要时 `Runtime/Review/BenchmarkSlotMarker.cs` |
 | Core Mock / 流程负责人 | `Runtime/Debug/MockFeedbackAdapter.cs`, `MockStorageAdapter.cs`, `JourneyDebugUI.cs` 或独立 Debug Prefab | 不修改正式 UI/Storage 文件 |
 | Feedback / 反馈负责人 | `Runtime/Feedback/FeedbackAdapter.cs`、正式表单 Prefab/脚本、字段校验测试 | 不直接修改公共 DTO；新增字段先提给 Core 维护 |
-| UI & Orientation / UI 负责人 | `Runtime/UI/JourneyPresenter.cs`、Orientation/正式流程 UI Prefab、UI 测试 | 现有 `Runtime/KitchenMenuController.cs` 如需接入 Core 命令；现有 UI Prefab 由该包维护 |
+| UI & Orientation / UI 负责人 | `Runtime/UI/JourneyPresenter.cs`、Orientation/正式流程 UI Prefab、UI 测试 | 现有 `Runtime/Review/KitchenMenuController.cs` 如需接入 Core 命令；现有 UI Prefab 由该包维护 |
 | Conflict Detection / 冲突负责人 | `Runtime/Conflict/ConflictDetector.cs`、冲突/安全通知适配与几何测试 | 登记参数/相关 Prefab 改动须与模型和场景集成人协调 |
 | Storage / 存储负责人 | `Runtime/Storage/LocalSessionStore.cs`, `SessionStoreTests.cs`、独立的序列化映射 | 不直接修改公共 DTO；新增字段先提给 Core 维护 |
 | 场景集成 / 指定集成人 | 按需新增任务物、操作/临时放置/储物/离开区 Prefab | 最小修改 `Scenes/SCN_Kitchen_Review.unity`, `Prefabs/PREF_Kitchen_Benchmark.prefab` 及相关任务物 Prefab，逐项列清单 |

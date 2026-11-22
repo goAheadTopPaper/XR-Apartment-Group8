@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "asset_name": "kitchen_character",
+  "asset_class": "character",
+  "version": 1,
+  "seed": 271728,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/kitchen_character_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 8,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 1.75,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "rig",
+    "body": "pending",
+    "lip_sync": "separate pending gate"
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "710d788b-8850-4efb-bffe-5c3e78738b1a",
+    "elapsed_seconds": 29.13,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "compute_hours_displayed": 0.008,
+    "workflow_sha256": "30b55d8cd75853f0fd82f2efb033c6e4f66846b376d3a3e04aaf21e12238d9cb"
+  },
+  "outputs": {
+    "master_glb": "../kitchen_character/v001/download/master.glb",
+    "game_glb": "../kitchen_character/v001/rigged_v008/kitchen_character_rig.glb",
+    "unity_fbx": "../kitchen_character/v001/rigged_v008/kitchen_character_rig.fbx",
+    "pbr_textures": {
+      "basecolor": "../kitchen_character/v001/TexturesSource/basecolor.png",
+      "metallic": "../kitchen_character/v001/TexturesSource/metallic.png",
+      "roughness": "../kitchen_character/v001/TexturesSource/roughness.png",
+      "normal": "../kitchen_character/v001/TexturesSource/normal.png",
+      "ao": "../kitchen_character/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../kitchen_character/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../kitchen_character/v001/inspection/kitchen_character_master.glb",
+    "prepared_manifest": "../kitchen_character/v001/rigged_v008/unity_asset.json",
+    "game_pbr_folder": "../kitchen_character/v001/rigged_v008/Textures",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/kitchen_character_v001/PREF_Character_kitchen_character.prefab",
+    "game_preview_png": "../kitchen_character/v001/rigged_v008/body_Stand.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "No human Blender editing recorded. Agent-authored local skinning needed several iterations; remaining production retopology/cloth cleanup and facial rigging are separate.",
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed.",
+      "20-bone Generic pilot; re-welded game GLB UV seams, anatomical weights and topology smoothing. Shoulder/apron appearance remains below production quality."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "pending",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "body_animation": "passed_4_Generic_clips_mesh_deformation_and_UV_seam_checks",
+    "facial_lipsync": "not_implemented_separate_acceptance",
+    "visual_quality": "requires_manual_shoulder_and_cloth_topology_cleanup",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "6a9b0997c6808c19938b5dae81e7347aba5850676c8b9cbb052c2f8236269043"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true
+  },
+  "processing": {
+    "source_sha256": "752dd41e9a81cd073caf509c6dee8bc39cca589338056646db4baff3b3841a49",
+    "game_triangles": 30000,
+    "triangle_budget": 30000,
+    "piece_count": 0,
+    "size_blender_xyz": [
+      0.8536722660064697,
+      0.3286006450653076,
+      1.7501490116119385
+    ],
+    "game_basecolor_size": [
+      2048,
+      2048
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 37.593,
+    "local_authoring_seconds": 70.132,
+    "fragment_volume_relative_error": null
+  }
+}

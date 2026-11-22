@@ -8,7 +8,9 @@
     "Unity.XR.CoreUtils",
     "UnityEngine.UI",
     "Unity.TextMeshPro",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.HighDefinition.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
@@ -17,6 +19,12 @@
   "precompiledReferences": [],
   "autoReferenced": true,
   "defineConstraints": [],
-  "versionDefines": [],
+  "versionDefines": [
+    {
+      "name": "com.unity.xr.openxr",
+      "expression": "[1.17.0,1.18.0)",
+      "define": "OPENXR_1_17"
+    }
+  ],
   "noEngineReferences": false
 }

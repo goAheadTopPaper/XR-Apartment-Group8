@@ -1,0 +1,48 @@
+{
+  "job_id": "07f52340-de05-4e55-8678-63994e707b41",
+  "archive_sha256": "aad6c2bc2daa6248dd7e5c690a060d09bfda555afd49e3a3455b5ebb9108870e",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_door/v001/master_glb_00001.glb",
+      "bytes": 8101008,
+      "sha256": "c7fcf55e416c3e9e39647e461008ff0c4c8241fb975b2e9588018808948ae3c2",
+      "file": "kitchen_fridge_door/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_door/v001/basecolor_00001.png",
+      "bytes": 1674732,
+      "sha256": "7a00b6676511a73e34afe2b4bff4ef95baf5991601411aef2a335eab7ff626ad",
+      "file": "kitchen_fridge_door/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_door/v001/metallic_00001.png",
+      "bytes": 277971,
+      "sha256": "0090cc4dfe8dc8c9a0bbad9be8323e2c55e71807937f174ebfdd7edfc7bc4b3d",
+      "file": "kitchen_fridge_door/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_door/v001/roughness_00001.png",
+      "bytes": 1037996,
+      "sha256": "5af46da112f6b40b8bc24471a450089476e16cd8ea9675f1307676d1e95465c0",
+      "file": "kitchen_fridge_door/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_door/v001/normal_00001.png",
+      "bytes": 1035741,
+      "sha256": "11d0b6a58e54456603681ccd832adad99e0dc93f066504d7959e2f0af17273a2",
+      "file": "kitchen_fridge_door/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_door/v001/ao_00001.png",
+      "bytes": 300940,
+      "sha256": "d54635ab001f18ea4680fa6ac6fe97958ea8231b24e5de28d57e0d9121ef43e3",
+      "file": "kitchen_fridge_door/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_fridge_door/v001/render_preview_00001.png",
+      "bytes": 263684,
+      "sha256": "49d81acded98ab724368181215e1bccb020139bc3527ce9ca38368f89bb6c2c2",
+      "file": "kitchen_fridge_door/v001/download/cloud_render_preview.png"
+    }
+  }
+}

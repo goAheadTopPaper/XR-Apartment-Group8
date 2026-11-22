@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "asset_name": "furniture_pendant_shade",
+  "asset_class": "prop",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "34a236e56b6c682c2b5eb5df1cf1a436197a2c5d86b1bfc61dff4e6bb41b14e5",
+  "source_input_relative": "../download/master.glb",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 0.4386316083117489,
+  "stage": "prepared",
+  "master_stats": [
+    {
+      "vertices": 49986,
+      "triangles": 99996,
+      "closed": true,
+      "volume_m3": 0.0009394771954706729
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 59766,
+      "triangles": 99996,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 9.119269847869873e-08,
+      "vertices_before": 59766,
+      "vertices_after": 49986,
+      "boundaries_before": 18948,
+      "boundaries_after": 0
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.3371473550796509,
+    0.40008214116096497,
+    0.2527073919773102
+  ],
+  "intact_fbx": "furniture_pendant_shade_game.fbx",
+  "pieces_fbx": "",
+  "recipe": "static",
+  "piece_count": 0,
+  "pieces": [],
+  "triangle_budget": 8000,
+  "game_triangles": 8000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": null,
+  "elapsed_seconds": 38.905,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  }
+}

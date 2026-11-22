@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "asset_name": "cabinet_module",
+  "asset_class": "building",
+  "version": 1,
+  "seed": 271828,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/cabinet_module_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 9,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 1.0,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "module",
+    "dimensions_metres": [
+      0.6,
+      0.6,
+      1.0
+    ],
+    "door": "separate mesh and hinge",
+    "enterable_building": false
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "22e7cd35-8a20-454f-9272-a3226beefec4",
+    "elapsed_seconds": 129.48,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "compute_hours_displayed": 0.036,
+    "workflow_sha256": "6958232e425c4611ba8e3c13887d1e75eb62257410c1e65e1d323ff2e0a46972"
+  },
+  "outputs": {
+    "master_glb": "../cabinet_module/v001/download/master.glb",
+    "game_glb": "../cabinet_module/v001/authored_v003/cabinet_module_game.glb",
+    "unity_fbx": "../cabinet_module/v001/authored_v003/cabinet_module_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../cabinet_module/v001/TexturesSource/basecolor.png",
+      "metallic": "../cabinet_module/v001/TexturesSource/metallic.png",
+      "roughness": "../cabinet_module/v001/TexturesSource/roughness.png",
+      "normal": "../cabinet_module/v001/TexturesSource/normal.png",
+      "ao": "../cabinet_module/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../cabinet_module/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../cabinet_module/v001/inspection_aligned/cabinet_module_master.glb",
+    "prepared_manifest": "../cabinet_module/v001/authored_v003/unity_asset.json",
+    "game_pbr_folder": "../cabinet_module/v001/authored_v003/Textures",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/cabinet_module_v001/PREF_Module_cabinet_module.prefab",
+    "game_preview_png": "../cabinet_module/v001/authored_v003/module_closed.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed.",
+      "Generated facade was wrinkled; authored dimensioned hollow carcass, flat rigid door, hardware and colliders locally; retained Cloud worktop UV appearance."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "passed_actual_110_degree_outward_hinge_and_fixed_carcass",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "visual_quality": "prototype_module_approved_after_local_rigid_geometry_authoring",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "4e6ccb4595249a5a5efdc3e2d8a92a67774b01dc614d18e42833caad35a21e2d"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true,
+    "orientation": "longest_axis_z_box"
+  },
+  "processing": {
+    "source_sha256": "a727ddddafa4bb1714616f6e50e1f6085b3c1278d0bcafab202d14268efbb8d0",
+    "game_triangles": 892,
+    "triangle_budget": 8000,
+    "piece_count": 0,
+    "size_blender_xyz": [
+      0.6000000238418579,
+      0.6000000238418579,
+      1.0
+    ],
+    "game_basecolor_size": [
+      2048,
+      2048
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 33.615,
+    "local_authoring_seconds": 44.353,
+    "fragment_volume_relative_error": null
+  },
+  "intact_review": {
+    "status": "approved_as_appearance_proxy_for_local_module_authoring",
+    "reviewer": "Codex",
+    "preview": "../cabinet_module/v001/inspection_aligned/cabinet_module_preview.png",
+    "notes": "Proxy is not spatial evidence; final cabinet uses explicit local module dimensions."
+  }
+}

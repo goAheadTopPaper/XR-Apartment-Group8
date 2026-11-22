@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-Hans">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>厨房评审 · 静态前测</title>
+<style>
+  :root { font: 17px/1.55 system-ui, sans-serif; color: #242925; background: #f4f4ee; }
+  body { max-width: 66rem; margin: auto; padding: 1.5rem 1rem 3rem; }
+  h1, h2 { line-height: 1.2; }
+  .views { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  figure { margin: 0; overflow: hidden; background: white; border: 1px solid #c6cbc1; border-radius: .5rem; }
+  img { display: block; width: 100%; height: auto; }
+  figcaption { padding: .4rem .8rem; font-weight: 650; }
+  form { display: grid; gap: 1rem; padding: 1rem; background: white; border-radius: .5rem; }
+  fieldset { display: grid; gap: 1rem; border: 0; margin: 0; padding: 0; }
+  label { display: grid; gap: .25rem; }
+  input, textarea, select, button { font: inherit; }
+  textarea { min-height: 3.5rem; resize: vertical; }
+  button { justify-self: start; padding: .45rem .85rem; color: white; background: #235845; border: 0; border-radius: .3rem; }
+  output:empty { display: none; }
+  .result { min-width: 0; padding: 1rem; background: white; border: 1px solid #c6cbc1; border-radius: .5rem; }
+  .result h3 { margin-top: 0; }
+  .result dt { font-weight: 650; }
+  .result dd { margin: 0 0 .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .result li { margin-bottom: .5rem; overflow-wrap: anywhere; }
+  #report { margin-top: .75rem; }
+  @media (max-width: 36rem) { .views { grid-template-columns: 1fr; } }
+</style>
+<main>
+  <h1>厨房评审 · 静态前测</h1>
+  <p>先看两张图，想象在厨房里从冰箱取食材、放上台面，再把食材放回去。请按自己的理解回答，填写后保存记录，再进入 XR。请勿填写姓名、联系方式或其他个人信息。</p>
+  <div class="views">
+    <figure><img src="B1.jpg" width="1200" height="900" alt="B1 的冰箱、台面和厨房入口"><figcaption>B1</figcaption></figure>
+    <figure><img src="B2.jpg" width="1200" height="900" alt="B2 的冰箱、台面和厨房入口"><figcaption>B2</figcaption></figure>
+  </div>
+  <h2>进入 XR 前填写</h2>
+  <form id="baseline">
+    <fieldset>
+      <label>你认为两种方案有何区别？<textarea name="understanding" required maxlength="600"></textarea></label>
+      <label>你预期使用 B1 会遇到什么问题？如果没有或无法判断，请写明。<textarea name="expectedB1" required maxlength="600"></textarea></label>
+      <label>你预期使用 B2 会遇到什么问题？如果没有或无法判断，请写明。<textarea name="expectedB2" required maxlength="600"></textarea></label>
+      <label>根据静态图片，你目前更偏好哪种方案？
+        <select name="preference" required>
+          <option value="">请选择</option><option value="B1">B1</option><option value="B2">B2</option><option value="undecided">暂无法判断</option>
+        </select>
+      </label>
+    </fieldset>
+    <button>下载前测 JSON</button>
+    <output id="baseline-status" role="status"></output>
+  </form>
+  <h2>完成 XR 后由主持人关联</h2>
+  <p>选择进入 XR 前下载的记录和本次保存后的 <code>sessions.csv</code>，输入本次新建的匿名 <code>session_id</code>。核对后可查看前后对照，并下载这一场的关联记录。</p>
+  <form id="link">
+    <label>前测记录 <input name="before" type="file" accept=".json,application/json" required></label>
+    <label>XR 本地记录 <input name="csv" type="file" accept=".csv,text/csv" required></label>
+    <label>本次匿名会话 ID <input name="session" type="text" minlength="32" maxlength="32" pattern="[a-f0-9]{32}" spellcheck="false" autocomplete="off" required></label>
+    <button>核对并查看对照</button>
+    <output id="link-status" role="status"></output>
+  </form>
+  <section id="comparison" aria-labelledby="comparison-title" hidden>
+    <h2 id="comparison-title">静态判断与 XR 结果</h2>
+    <dl id="comparison-summary" class="result"></dl>
+    <div id="comparison-plans" class="views"></div>
+    <form id="report">
+      <label>XR 新增、修正或可能误导了哪些判断？可选，请勿填写个人信息。
+        <textarea name="note" maxlength="600"></textarea>
+      </label>
+      <button>下载单场关联 JSON</button>
+      <output id="report-status" role="status"></output>
+    </form>
+  </section>
+</main>
+<script>
+  const modelVersion = 'mzh-1f501b3-kitchen-f2-hunyuan-v2';
+  const answers = ['understanding', 'expectedB1', 'expectedB2'];
+  const preferences = ['B1', 'B2', 'undecided'];
+  const baselineForm = document.getElementById('baseline');
+  const baselineStatus = document.getElementById('baseline-status');
+  const linkForm = document.getElementById('link');
+  const linkStatus = document.getElementById('link-status');
+  const comparison = document.getElementById('comparison');
+  const summary = document.getElementById('comparison-summary');
+  const plans = document.getElementById('comparison-plans');
+  const reportForm = document.getElementById('report');
+  const reportStatus = document.getElementById('report-status');
+  const decisions = ['', '可接受', '需要修改', '拒绝'];
+  const categories = ['', '开门净空', '通行', '储物可用性', '操作空间', '其他'];
+  const importance = ['', '低', '中', '高'];
+  let baseline;
+  let linked;
+  let linkRevision = 0;
+
+  function download(record, filename) {
+    const blob = new Blob([JSON.stringify(record, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  baselineForm.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!baseline) {
+      const data = new FormData(baselineForm);
+      const values = Object.fromEntries(answers.map(name => [name, data.get(name).trim()]));
+      if (answers.some(name => !values[name])) {
+        baselineStatus.textContent = '请填写每个问题。';
+        return;
+      }
+      baseline = {schemaVersion: 1, modelVersion, capturedAtUtc: new Date().toISOString(),
+        ...values, preference: data.get('preference')};
+      baselineForm.querySelector('fieldset').disabled = true;
+    }
+    download(baseline, 'kitchen-baseline.json');
+    baselineStatus.textContent = '请确认已保存前测文件，然后进入 XR。';
+  });
+
+  // The game quotes every CSV cell, including multiline feedback and escaped quotes.
+  function sessionRows(text) {
+    text = text.replace(/^\uFEFF/, '');
+    const cell = /"((?:[^"]|"")*)"(,|\r?\n|$)/gy;
+    const rows = [];
+    let row = [];
+    while (cell.lastIndex < text.length) {
+      const match = cell.exec(text);
+      if (!match) throw new Error('无法读取 CSV。请选择游戏直接保存的 sessions.csv。');
+      row.push(match[1].replace(/""/g, '"'));
+      if (match[2] !== ',') {
+        rows.push(row);
+        row = [];
+      }
+    }
+    const columns = rows.shift();
+    const required = ['schema_version', 'session_id', 'saved_at_utc', 'model_version', 'session_outcome',
+      'benchmark_order', 'final_preference_combination_id', 'record_json'];
+    if (row.length || !columns || required.some(name => !columns.includes(name)) ||
+        new Set(columns).size !== columns.length ||
+        rows.some(values => values.length !== columns.length)) {
+      throw new Error('CSV 格式与当前游戏记录不符。');
+    }
+    return rows.map(values => Object.fromEntries(columns.map((name, index) => [name, values[index]])));
+  }
+
+  function readSession(row) {
+    let session;
+    try { session = JSON.parse(row.record_json); }
+    catch { throw new Error('这场会话的记录 JSON 无法读取。'); }
+    if (!session || row.schema_version !== '1' || session.sessionId !== row.session_id ||
+        session.modelVersion !== row.model_version || session.sessionOutcome !== 1 ||
+        !Array.isArray(session.benchmarkOrder) || session.benchmarkOrder.join(' > ') !== row.benchmark_order ||
+        !['B1', 'B2'].includes(session.finalPreferenceCombinationId) ||
+        session.finalPreferenceCombinationId !== row.final_preference_combination_id ||
+        typeof session.finalTradeOffSummary !== 'string' || !session.finalTradeOffSummary.trim() ||
+        !Array.isArray(session.benchmarkFeedback) || session.benchmarkFeedback.length !== 2 ||
+        !session.benchmarkOrder.every(id => session.benchmarkFeedback.filter(
+          item => item?.combinationId === id && item.taskOutcome === 1 &&
+            [item.decision, item.category, item.importance].every(Number.isInteger) &&
+            decisions[item.decision] && categories[item.category] && importance[item.importance]).length === 1)) {
+      throw new Error('会话详情与 CSV 摘要不一致，或缺少完整的 B1/B2 反馈。');
+    }
+    const conflicts = session.conflicts ?? [];
+    if (!Array.isArray(conflicts) || conflicts.some(issue =>
+      !issue || !session.benchmarkOrder.includes(issue.combinationId) || issue.modelVersion !== session.modelVersion ||
+      !['issueId', 'objectId', 'assumptionKey'].every(key => typeof issue[key] === 'string' && issue[key].trim()) ||
+      !Number.isFinite(issue.measurement) || !Number.isFinite(issue.sessionSeconds) || issue.sessionSeconds < 0 ||
+      typeof issue.feedbackRecorded !== 'boolean')) {
+      throw new Error('这场会话的客观冲突证据不完整，无法核对。');
+    }
+    return session;
+  }
+
+  function element(tag, parent, text) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    parent.append(node);
+    return node;
+  }
+
+  function entry(list, label, value) {
+    element('dt', list, label);
+    element('dd', list, value);
+  }
+
+  function showComparison(before, session) {
+    entry(summary, '体验顺序', session.benchmarkOrder.join(' → '));
+    entry(summary, '前测对两种方案的理解', before.understanding);
+    entry(summary, '前测偏好与 XR 后偏好',
+      `${before.preference === 'undecided' ? '暂无法判断' : before.preference} → ${session.finalPreferenceCombinationId}`);
+    entry(summary, 'XR 最终取舍', session.finalTradeOffSummary);
+    const comfort = Array.isArray(session.comfortOrAbort) ? session.comfortOrAbort : [];
+    const boundary = comfort.filter(event => event?.type === 'boundary_warning' && Number.isFinite(event.sessionSeconds));
+    entry(summary, '实体边界警示', boundary.length ? boundary.map(event =>
+      `${session.benchmarkOrder.includes(event.combinationId) ? event.combinationId : '会话阶段'} · 第 ${event.sessionSeconds.toFixed(1)} 秒`).join('\n')
+      : '本次记录 0 次');
+    for (const id of ['B1', 'B2']) {
+      const feedback = session.benchmarkFeedback.find(item => item.combinationId === id);
+      const card = element('article', plans);
+      card.className = 'result';
+      element('h3', card, id);
+      const details = element('dl', card);
+      entry(details, '前测预期问题', before['expected' + id]);
+      entry(details, 'XR 组合反馈',
+        [decisions[feedback.decision], categories[feedback.category], `重要度 ${importance[feedback.importance]}`].join(' · '));
+      entry(details, '参与者说明', feedback.shortExplanation || '未填写');
+      const conflicts = (session.conflicts ?? []).filter(issue => issue.combinationId === id);
+      element('h4', card, `系统实测冲突 · ${conflicts.length} 条`);
+      if (!conflicts.length) continue;
+      const list = element('ul', card);
+      for (const issue of conflicts) {
+        const measurement = issue.issueId.startsWith('door-sweep/')
+          ? `门扇受阻于 ${issue.measurement.toFixed(1)}°`
+          : `记录值 ${issue.measurement}`;
+        const item = element('li', list,
+          `${measurement} · 会话第 ${issue.sessionSeconds.toFixed(1)} 秒 · ${issue.feedbackRecorded ? '已记录反馈' : '待记录反馈'}`);
+        item.append(document.createElement('br'));
+        element('code', item, `${issue.issueId} · ${issue.assumptionKey}`);
+      }
+    }
+    comparison.hidden = false;
+  }
+
+  function clearComparison() {
+    linked = null;
+    linkRevision++;
+    comparison.hidden = true;
+    summary.replaceChildren();
+    plans.replaceChildren();
+    reportForm.reset();
+    reportStatus.textContent = '';
+    linkStatus.textContent = '';
+  }
+
+  linkForm.addEventListener('input', clearComparison);
+  linkForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    clearComparison();
+    const revision = linkRevision;
+    const data = new FormData(linkForm);
+    try {
+      const before = JSON.parse(await data.get('before').text());
+      if (!before || before.schemaVersion !== 1 || before.modelVersion !== modelVersion ||
+          !Number.isFinite(Date.parse(before.capturedAtUtc)) || !preferences.includes(before.preference) ||
+          answers.some(name => typeof before[name] !== 'string' || !before[name].trim() || before[name].length > 600)) {
+        throw new Error('前测文件无效或版本不符。');
+      }
+      const rows = sessionRows(await data.get('csv').text());
+      const id = data.get('session');
+      const matches = rows.filter(row => row.session_id === id);
+      if (matches.length !== 1) throw new Error('CSV 中没有唯一的对应会话。');
+      const review = matches[0];
+      if (review.model_version !== modelVersion) throw new Error('静态图与 XR 模型版本不同。');
+      if (review.session_outcome !== 'Completed' || !['B1 > B2', 'B2 > B1'].includes(review.benchmark_order)) {
+        throw new Error('请选择已完整提交 B1 和 B2 的会话。');
+      }
+      if (!(Date.parse(review.saved_at_utc) > Date.parse(before.capturedAtUtc))) {
+        throw new Error('XR 保存时间须晚于前测时间。');
+      }
+      const session = readSession(review);
+      if (revision !== linkRevision) return;
+      const originalAnswers = Object.fromEntries(answers.map(name => [name, before[name]]));
+      linked = {schemaVersion: 1, modelVersion, capturedAtUtc: before.capturedAtUtc, ...originalAnswers,
+        preference: before.preference, sessionId: id, reviewSavedAtUtc: review.saved_at_utc, review: session};
+      showComparison(before, session);
+      linkStatus.textContent = '已核对，请在下方查看。';
+    } catch (error) {
+      if (revision !== linkRevision) return;
+      linkStatus.textContent = error instanceof SyntaxError ? '无法读取前测 JSON。' : error.message;
+    }
+  });
+
+  reportForm.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!linked) return;
+    const comparisonNote = new FormData(reportForm).get('note').trim();
+    download({...linked, comparisonNote}, `kitchen-baseline-${linked.sessionId}.json`);
+    reportStatus.textContent = '请一并归档原始前测、关联 JSON 和游戏 CSV。';
+  });
+</script>
+</html>

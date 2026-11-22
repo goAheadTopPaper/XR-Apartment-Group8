@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "asset_class": "prop",
+  "quality": {
+    "draft": {"master_faces": 50000, "master_texture": 1024, "master_normal": 1024, "master_ao": 512, "game_triangles": 1500, "game_texture": 512},
+    "standard": {"master_faces": 100000, "master_texture": 2048, "master_normal": 2048, "master_ao": 1024, "game_triangles": 4000, "game_texture": 1024},
+    "high": {"master_faces": 300000, "master_texture": 4096, "master_normal": 2048, "master_ao": 2048, "game_triangles": 8000, "game_texture": 2048}
+  },
+  "requirements": ["metre scale", "bottom-centred pivot unless a moving part has its own hinge", "separate moving parts", "simplified convex colliders", "closed solid before fracture", "original exterior materials retained on derivatives"],
+  "acceptance": {"static_mesh": "pending", "interaction": "pending", "fracture": "optional, pending"}
+}

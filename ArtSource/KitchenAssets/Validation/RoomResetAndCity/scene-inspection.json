@@ -1,0 +1,55 @@
+{
+    "scene": "Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity",
+    "sky": "Assets/_Project/Art/Cooking/MAT_Sky_CookingCity.mat",
+    "missingScripts": 0,
+    "windows": [
+        {
+            "path": "SM_KitchenWindow",
+            "material": "Assets/_Project/Art/Kitchen/Materials/MAT_Kitchen_White.mat",
+            "shader": "Standard",
+            "bounds": {
+                "m_Center": {
+                    "x": -5.172846794128418,
+                    "y": 1.9349076747894288,
+                    "z": 1.4482359886169434
+                },
+                "m_Extent": {
+                    "x": 0.10825943946838379,
+                    "y": 0.7452352046966553,
+                    "z": 0.5398775935173035
+                }
+            },
+            "colour": {
+                "r": 0.8199999928474426,
+                "g": 0.8199999928474426,
+                "b": 0.800000011920929,
+                "a": 1.0
+            },
+            "mode": 0.0
+        },
+        {
+            "path": "SM_WindowTable",
+            "material": "Assets/_Project/Art/Kitchen/Materials/M_WindowTable.mat",
+            "shader": "Standard",
+            "bounds": {
+                "m_Center": {
+                    "x": -4.857922554016113,
+                    "y": 1.399999976158142,
+                    "z": -0.8500000238418579
+                },
+                "m_Extent": {
+                    "x": 0.3016679286956787,
+                    "y": 1.600000023841858,
+                    "z": 1.2500001192092896
+                }
+            },
+            "colour": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "mode": 0.0
+        }
+    ]
+}

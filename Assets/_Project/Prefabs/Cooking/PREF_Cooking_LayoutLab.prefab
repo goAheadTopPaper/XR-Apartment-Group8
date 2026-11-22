@@ -1,0 +1,180 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5301694471317678149
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8404320335237771025}
+  m_Layer: 0
+  m_Name: LOC_Fridge_Original
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8404320335237771025
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5301694471317678149}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -1.81, y: 0, z: 1.055}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 341521298757126159}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7247483454078242847
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 341521298757126159}
+  - component: {fileID: 768154441988598535}
+  m_Layer: 0
+  m_Name: PREF_Cooking_LayoutLab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &341521298757126159
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7247483454078242847}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8404320335237771025}
+  - {fileID: 8521316258890267331}
+  - {fileID: 340644462676031523}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &768154441988598535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7247483454078242847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ec96a4d6b717484d87c95c535c27fb7, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  station: {fileID: 0}
+  fridge: {fileID: 0}
+  compactFridge: {fileID: 0}
+  player: {fileID: 0}
+  shortenedCounterMesh: {fileID: 4300000, guid: 8b13c835ea2434abc8452509c7d498b3, type: 2}
+  closedFridgeBounds:
+    m_Center: {x: 0.000000029802322, y: 0.905, z: 0.07099986}
+    m_Extent: {x: 0.3600001, y: 0.905, z: 0.40100008}
+  compactFridgeBounds:
+    m_Center: {x: 0.000000025331975, y: 0.76925, z: 0.06034988}
+    m_Extent: {x: 0.30600008, y: 0.76925, z: 0.34085009}
+  presets:
+  - label: A  |  Opposite the sink
+    description: The fridge is across from the sink. Try opening it and walking to
+      the worktop.
+    fridgeSocket: {fileID: 8404320335237771025}
+    shortenedCounter: 0
+  - label: B  |  Forward dock
+    description: The fridge sits closer to the sink. Try the opening and the route
+      to the worktop.
+    fridgeSocket: {fileID: 8521316258890267331}
+    shortenedCounter: 0
+  - label: C  |  Embedded fridge
+    description: The fridge sits in the slot at the end of the shortened worktop.
+    fridgeSocket: {fileID: 340644462676031523}
+    shortenedCounter: 1
+  finishes:
+  - label: Warm Ivory
+    furniture: {r: 0, g: 0, b: 0, a: 0}
+    enamel: {r: 0, g: 0, b: 0, a: 0}
+  - label: Sage
+    furniture: {r: 0.55, g: 0.67, b: 0.62, a: 1}
+    enamel: {r: 0.62, g: 0.73, b: 0.68, a: 1}
+  - label: Graphite
+    furniture: {r: 0.39, g: 0.43, b: 0.5, a: 1}
+    enamel: {r: 0.36, g: 0.43, b: 0.51, a: 1}
+  furnitureFinishTargets: []
+  enamelFinishTargets: []
+--- !u!1 &7523235867911783424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 340644462676031523}
+  m_Layer: 0
+  m_Name: LOC_Fridge_Embedded
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &340644462676031523
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7523235867911783424}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000004371139}
+  m_LocalPosition: {x: -1.87, y: 0, z: 1.98}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 341521298757126159}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8253381985798513124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8521316258890267331}
+  m_Layer: 0
+  m_Name: LOC_Fridge_Forward
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8521316258890267331
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8253381985798513124}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -1.9699999, y: 0, z: 1.055}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 341521298757126159}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

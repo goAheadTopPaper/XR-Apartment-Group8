@@ -18,7 +18,7 @@
 | `Runtime/Core/JourneyRuntimeHost.cs` | `viewAdapter` 按 `IJourneyView` 调用 `Render()`；UI 命令走 `Submit(JourneyCommand)`，反馈走 `SubmitFeedback(FeedbackDraft)`。Host 创建 Core、转发场景证据和通知，并处理场景/存储回调。 |
 | `Simulation/JourneyContracts.cs` | `JourneySnapshot` 是只读呈现来源；`JourneyCommandType` 定义操作；`IJourneyView.Render(snapshot, errorCode, message)` 是正式 UI 的接口。 |
 | `Runtime/Core/TaskTargetGuide.cs` | 已按 Snapshot 的当前步骤显示目标箭头和区域提示；正式 UI 可复用，不需重建对象追踪。 |
-| `Runtime/KitchenMenuController.cs` | 旧菜单的 `TogglePause()` 直接改 `Time.timeScale`，`ResetToStart()` 直接移动 XR Rig；正式菜单必须改走 Host 命令与状态。 |
+| `Runtime/Review/KitchenMenuController.cs` | 旧菜单的 `TogglePause()` 直接改 `Time.timeScale`，`ResetToStart()` 直接移动 XR Rig；正式菜单必须改走 Host 命令与状态。 |
 
 `PREF_Core_PlayValidation.prefab` 已给 Host 关联场景适配器、Mock Feedback、Mock Storage 和临时 View；`conflictSource`、`safetySource` 仍为空。正式接线由共享场景集成人协调。
 
@@ -32,7 +32,7 @@
 - 新增 `Assets/_Project/Scripts/Runtime/UI/JourneyUIActions.cs` 及 `.meta`：将 XR 按钮、菜单和输入映射到 Host 的 `Submit()` / `SubmitFeedback()`，不直接推进 Core。
 - 新增 `Assets/_Project/Prefabs/UI/PREF_UI_Journey.prefab` 及 `.meta`：独立世界空间 UI，包含 Setup/Orientation、Explore、Challenge、Comparison 与通用状态/错误区域；Feedback 表单组件由 E1 提供。
 - 修改 `Assets/_Project/Prefabs/Core/PREF_Core_PlayValidation.prefab`：集成时将 `viewAdapter` 指向正式 UI，临时 OnGUI 留作调试或移除；由场景集成人统一接线。
-- 修改 `Assets/_Project/Prefabs/PREF_UI_KitchenMenu.prefab` 与 `Assets/_Project/Scripts/Runtime/KitchenMenuController.cs`：将暂停、恢复、重置、回中心和退出入口与 Host 状态对齐；此处涉及共享菜单，实施前与集成人协调。
+- 修改 `Assets/_Project/Prefabs/PREF_UI_KitchenMenu.prefab` 与 `Assets/_Project/Scripts/Runtime/Review/KitchenMenuController.cs`：将暂停、恢复、重置、回中心和退出入口与 Host 状态对齐；此处涉及共享菜单，实施前与集成人协调。
 - 按实际 UI 行为新增 PlayMode 验证，覆盖可用命令、错误、暂停/恢复与输入保留；不复制 Core 的状态机测试。
 
 若需改 `JourneyContracts.cs` 或 `JourneyRuntimeHost.cs` 的共享接口，先更新 `Docs/Module_Interface_Contract.md` 并与 Core 负责人对齐。

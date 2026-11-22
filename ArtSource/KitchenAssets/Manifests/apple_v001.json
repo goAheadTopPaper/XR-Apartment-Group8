@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "asset_name": "apple",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271328,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/apple_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 4,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 0.085,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "slice",
+    "pieces": 4,
+    "interior": "apple flesh"
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "f47c156b-7995-47ca-b585-1c9f673074a1",
+    "elapsed_seconds": null,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "workflow_sha256": "2ce1c4ca2d1976a6f3a2c30b190694a87079ade7b5dd3578e99953479565d99e",
+    "measurement_note": "Job output and UUID verified. Exact per-job timing / usage detail not reconfirmed before Mac locked; left unconfirmed."
+  },
+  "outputs": {
+    "master_glb": "../apple/v001/download/master.glb",
+    "game_glb": "../apple/v001/prepared/apple_game.glb",
+    "unity_fbx": "../apple/v001/prepared/apple_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../apple/v001/TexturesSource/basecolor.png",
+      "metallic": "../apple/v001/TexturesSource/metallic.png",
+      "roughness": "../apple/v001/TexturesSource/roughness.png",
+      "normal": "../apple/v001/TexturesSource/normal.png",
+      "ao": "../apple/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../apple/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../apple/v001/prepared/apple_master.glb",
+    "prepared_manifest": "../apple/v001/prepared/unity_asset.json",
+    "game_pbr_folder": "../apple/v001/prepared/Textures",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/apple_v001/PREF_Prop_apple.prefab",
+    "game_preview_png": "../apple/v001/prepared/apple_preview.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed.",
+      "Prepared cut planes and simple independent interior material; seeds/core/segments not authored."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "passed_real_XRI_physics_and_cooking_scenarios",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "visual_quality": "approved_for_kitchen_prototype",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "78fa0936c59928823b0f1da2cc7dd23809ee1d540aaa475f5f4b9e1df4e4ca09"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true
+  },
+  "intact_review": {
+    "status": "approved_for_prefracture",
+    "reviewer": "Codex mesh and visual review",
+    "source_sha256": "a714d9a2a8e935071b48b7e7242d9d876c6a182e3e739d4eada736c2a17ebdd6",
+    "preview": "../apple/v001/qa/intact-reviewed.png",
+    "notes": "UV seams welded, closed solid and 8.5cm prototype scale verified; stem and silhouette inspected."
+  },
+  "processing": {
+    "source_sha256": "a714d9a2a8e935071b48b7e7242d9d876c6a182e3e739d4eada736c2a17ebdd6",
+    "game_triangles": 4000,
+    "triangle_budget": 4000,
+    "piece_count": 4,
+    "size_blender_xyz": [
+      0.08002351224422455,
+      0.08504801243543625,
+      0.08172835409641266
+    ],
+    "game_basecolor_size": [
+      1024,
+      1024
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 30.387,
+    "local_authoring_seconds": null,
+    "fragment_volume_relative_error": 7.285376264294151e-11
+  }
+}

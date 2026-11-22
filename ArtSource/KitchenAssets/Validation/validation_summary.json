@@ -1,0 +1,112 @@
+{
+  "date_local": "2026-10-29",
+  "unity": "2022.3.62f3",
+  "platform": "OSXEditor",
+  "build_target": "StandaloneWindows64",
+  "cloud_jobs_completed": 20,
+  "python_tests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "blender_tests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "editmode": {
+    "passed": 145,
+    "failed": 0,
+    "skipped": 0
+  },
+  "playmode": {
+    "passed": 49,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scenario_evidence": [
+    "actual plate fall and 8 derived fragments",
+    "actual held XRI knife contact activates cut; dropped knife does not",
+    "all 4 cut foods inherit cooking state and remain grabbable",
+    "cut pieces stay after debris timeout",
+    "active egg trigger feeds 50mL into a supported bowl",
+    "held whisk-tip motion beats egg; tilt stream transfers volume into pan",
+    "heat dose is not multiplied by compound contacts and stops off the stove",
+    "cooked/burnt state and reset",
+    "actual cooking scene support, input, liquid retention, reset",
+    "Generic character clips deform mesh; coincident UV seam vertices stay together",
+    "cabinet door opens outwards 110 degrees around an independent hinge; carcass stays fixed",
+    "actual multiview 8000-triangle FBX imports at metre scale / Y-up; visual candidate rejected and temporary import removed",
+    "open fridge and retrieve food through actual XRI selection; closed-door select filtering",
+    "tomato four slices then sixteen diced pieces through actual held-blade contact",
+    "50mL egg knocked into bowl, whisked, physically poured, set and scrambled with held spatula",
+    "released diced tomato physically drops through pan mouth, cooks and stir-fries to Ready; overheat and full reset",
+    "fixed-hinge fridge sweep stops at obstruction and resumes; all initial cookware remains supported"
+  ],
+  "visual_quality": {
+    "kitchen_props": "prototype_approved",
+    "character": "body_functional_visual_cloth_cleanup_required_facial_not_implemented",
+    "cabinet": "dimensioned_local_module_not_enterable_building",
+    "multiview_candidate": "rejected_wrinkled_facade_not_used",
+    "tomato_egg_recipe": "actual_generated_seeded_tomato_and_folded_egg_reviewed_in_Unity_recipe"
+  },
+  "billing": {
+    "credits_before": 6631,
+    "credits_after_first_nine_jobs": 6631,
+    "confirmed_per_job_credit_charge": null,
+    "note": "Visible balance unchanged is not evidence of zero billing; measured execution time and displayed compute hours are recorded separately.",
+    "remaining_usage_detail": "Apple / carrot exact timing and per-job credits remain unconfirmed; late UI inspection blocked by macOS lock. All model outputs had already been downloaded."
+  },
+  "windows_player_build": "not_tested_Mac_install_has_no_Windows_build_support",
+  "quest_link": "not_tested",
+  "mac_real_xr": "unavailable_expected_platform_limit",
+  "git": {
+    "branch": "feature/hzc",
+    "baseline_commit": "2975cd61969c72242bbd7b0c2b7c3a1c8bd0c793",
+    "current_changes_committed": false,
+    "current_changes_pushed": false
+  },
+  "results_source": {
+    "editmode": "Logs/FoodVisualUpgrade/editmode-final.xml",
+    "playmode": "Logs/FoodVisualUpgrade/playmode-final.xml",
+    "post_bake_scene": "Logs/KitchenAssetPipeline/playmode-cooking-baked-stable.xml",
+    "cooking_bake": "Logs/KitchenAssetPipeline/bake-cooking-gaussian.log"
+  },
+  "unity_prefab_types": 11,
+  "kitchen_prop_types": 7,
+  "post_bake_scene_check": {
+    "passed": 1,
+    "failed": 0,
+    "isolated_from_previously_loaded_kitchens": true,
+    "scenario": "AuthoredKitchenStaysSupportedAcceptsActivatedEggAndResets",
+    "egg_millilitres_received": 50,
+    "preview": "kitchen-play.png",
+    "preview_sha256": "7af6c7cabbb6336794014d19b7768027654cef72573533dc638c851505f97cec",
+    "fixture_note": "The egg is held stationary while the driven hand registers, then real XRI selection and activation are required. An earlier slow-frame free-fall failure is retained in ignored diagnostic logs."
+  },
+  "cooking_lighting": {
+    "bake": "passed",
+    "settings": "Assets/_Project/Art/Cooking/LGT_KitchenCooking.lighting",
+    "output_directory": "Assets/_Project/Scenes/SCN_Kitchen_Cooking",
+    "filtering": "Gaussian; same light samples; no OIDN pass on this Mac batch run",
+    "protected_review_assets_checked": 19,
+    "protected_review_assets_unchanged": true,
+    "build_target_reported_by_bake": "StandaloneWindows64"
+  },
+  "recipe_validation": "Recipe/validation.json",
+  "recipe_scenario": {
+    "actions": "OpenFridge, TakeTomato, SliceTomato, DiceTomato, TakeEgg, TakeBowl, CrackEgg, BeatEgg, TurnOnStove, PlacePan, PourEgg, ScrambleEgg, AddTomato, StirFry",
+    "completed": true,
+    "eggMl": 50.000003814697266,
+    "tomatoGrams": 120.0,
+    "scrambledMetres": 3.4663124084472656,
+    "stirFryMetres": 2.4586689472198486,
+    "capturedPieces": 16,
+    "presentationMeanMs": 0.01655657142857143,
+    "presentationMaxMs": 0.021417,
+    "presentationSamples": 70
+  },
+  "recipe_food_visual_sources": 2,
+  "current_recipe_validation": "FoodVisuals/validation.json",
+  "current_recipe_preview": "FoodVisuals/tomato-egg-finished.png",
+  "latest_kitchen_validation": "KitchenRoom/validation.json",
+  "latest_validation_notes": "Cooking room, gas flames, realistic cookware and real held-water fill verified. Existing Python 12 and Blender 7 results are historical baseline; new cookware processing executed and recorded separately."
+}

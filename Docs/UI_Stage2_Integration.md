@@ -20,7 +20,7 @@
 | `SCN_Kitchen_Review/PREF_UI_KitchenMenu` | 场景实例 inactive、旧 `KitchenMenuController` disabled；原 Prefab 和脚本保留。 |
 | EventSystem / 输入 / Rig | 复用场景唯一 EventSystem、XR UI Input Module、Rig 上现有控制器 UI interactor；未新建实例或输入模块。 |
 
-`Assets/Editor/JourneyUiPrefabBuilder.cs` 提供 Prefab 重建及场景接线菜单。首次导入时仅在 Prefab 缺少 Orientation 面板的情况下重建；场景接线由单独的 `Wire Setup Orientation In Review Scene` 菜单执行。本轮已执行并保存共享场景。
+`Assets/_Project/Editor/JourneyUiPrefabBuilder.cs` 提供 Prefab 重建及场景接线菜单。首次导入时仅在 Prefab 缺少 Orientation 面板的情况下重建；场景接线由单独的 `Wire Setup Orientation In Review Scene` 菜单执行。本轮已执行并保存共享场景。
 
 ## 尚未验证
 

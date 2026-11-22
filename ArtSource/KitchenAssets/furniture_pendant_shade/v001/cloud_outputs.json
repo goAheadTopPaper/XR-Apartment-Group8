@@ -1,0 +1,48 @@
+{
+  "job_id": "41ba5179-bf96-4ed3-ac6b-5167509ed44c",
+  "archive_sha256": "5772aba3324df49c3ac303839b2418c52389a22de7af281db8e7e13ea2997e77",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/furniture_pendant_shade/v001/master_glb_00001.glb",
+      "bytes": 13477312,
+      "sha256": "34a236e56b6c682c2b5eb5df1cf1a436197a2c5d86b1bfc61dff4e6bb41b14e5",
+      "file": "furniture_pendant_shade/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/furniture_pendant_shade/v001/basecolor_00001.png",
+      "bytes": 3471423,
+      "sha256": "51efbcb7bdc611ccd3ed11bbce52bae55e19b08460b64b4737230f0acaa89f94",
+      "file": "furniture_pendant_shade/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/furniture_pendant_shade/v001/metallic_00001.png",
+      "bytes": 1498927,
+      "sha256": "a3a0f238fa4dcc436295b1b8dc556597b4aede3bd4af978abef69ad0b1972e33",
+      "file": "furniture_pendant_shade/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/furniture_pendant_shade/v001/roughness_00001.png",
+      "bytes": 1662927,
+      "sha256": "9ef0f723fef31cea3f355d5c94aedfcd3c6b9298c90828db5923785321a3b031",
+      "file": "furniture_pendant_shade/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/furniture_pendant_shade/v001/normal_00001.png",
+      "bytes": 2263670,
+      "sha256": "b8b52844aa17047b6ffc0b4db4a895fcfd3bb6b7d6353262fbf293be8f310949",
+      "file": "furniture_pendant_shade/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/furniture_pendant_shade/v001/ao_00001.png",
+      "bytes": 689087,
+      "sha256": "a6719e9f4b235515ce987d888fe6d87652cd2d751f603734cea97fdba4a47f5a",
+      "file": "furniture_pendant_shade/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/furniture_pendant_shade/v001/render_preview_00001.png",
+      "bytes": 447147,
+      "sha256": "95c2bcf99237e17e89f17aa88b7d360d54c023c37f9f05cb59fefcebae3dab1f",
+      "file": "furniture_pendant_shade/v001/download/cloud_render_preview.png"
+    }
+  }
+}

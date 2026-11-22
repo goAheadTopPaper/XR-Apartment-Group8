@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "asset_class": "building",
+  "quality": {
+    "draft": {"master_faces": 50000, "master_texture": 1024, "master_normal": 1024, "master_ao": 512, "game_triangles": 3000, "game_texture": 1024},
+    "standard": {"master_faces": 100000, "master_texture": 2048, "master_normal": 2048, "master_ao": 1024, "game_triangles": 8000, "game_texture": 2048},
+    "high": {"master_faces": 300000, "master_texture": 4096, "master_normal": 2048, "master_ao": 2048, "game_triangles": 15000, "game_texture": 2048}
+  },
+  "requirements": ["explicit exterior versus enterable mode", "AI geometry is a visual starting point", "enterable geometry rebuilt as dimensioned modules in Blender", "separate walls, floor, roof, doors and windows", "independent hinges/pivots for moving parts", "fractures derive from the approved intact module"],
+  "acceptance": {"exterior": "pending", "enterable_modules": "pending: registered dimensions and Unity collision", "moving_parts": "pending", "fracture": "optional, pending"}
+}

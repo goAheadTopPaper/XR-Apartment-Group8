@@ -237,12 +237,12 @@ namespace XRApartment.Runtime.Debugging
             switch (step)
             {
                 case ChallengeStep.Approach: return "1/8 Approach: move your headset into the GREEN zone.";
-                case ChallengeStep.Open: return "2/8 Open: fully open BOTH upper Freezer and lower Fresh doors. Task items are locked until both doors are open.";
-                case ChallengeStep.TakeOut: return "3/8 Take out: remove TOMATO and ONION from the upper FREEZER.";
+                case ChallengeStep.Open: return "2/8 Open: fully open the fridge door. Task items are locked until the door is open.";
+                case ChallengeStep.TakeOut: return "3/8 Take out: remove TOMATO and ONION from the upper source shelf.";
                 case ChallengeStep.TemporaryPlacement: return "4/8 Temporary placement: release TOMATO and ONION on the PURPLE counter highlight.";
-                case ChallengeStep.Reorganise: return "5/8 Reorganise: move and release TOMATO or ONION from PURPLE onto ANY lower Fresh shelf; wait briefly, then confirm. CEREAL BOX counts in step 6.";
-                case ChallengeStep.PutBack: return "6/8 Put back: release all THREE items into ANY lower Fresh shelf. All three are valid.";
-                case ChallengeStep.Close: return "7/8 Close: fully close BOTH Fresh and Freezer doors.";
+                case ChallengeStep.Reorganise: return "5/8 Reorganise: move and release TOMATO or ONION from PURPLE onto ANY lower shelf; wait briefly, then confirm. CEREAL BOX counts in step 6.";
+                case ChallengeStep.PutBack: return "6/8 Put back: release all THREE items into ANY lower shelf. All three are valid.";
+                case ChallengeStep.Close: return "7/8 Close: fully close the fridge door.";
                 case ChallengeStep.Leave: return "8/8 Leave: exit GREEN, then move your headset into the BLUE zone.";
                 default: return "Wait for the current scene action to complete.";
             }

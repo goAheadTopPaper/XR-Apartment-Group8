@@ -1,0 +1,48 @@
+{
+  "job_id": "a85e7bdd-21ac-4286-a904-bbbd4cd317db",
+  "archive_sha256": "87e7d6a7f55d0733219d21424a94cade75d9304791084befada1b299e712e384",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/tomato_slice/v001/master_glb_00001.glb",
+      "bytes": 11509468,
+      "sha256": "8440fdd6243e86429958f71d71ce67f3da3b6a0208e9029be1f4889ff8d62036",
+      "file": "tomato_slice/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/tomato_slice/v001/basecolor_00001.png",
+      "bytes": 4101073,
+      "sha256": "ee142a15c00f231b41632d57bbdb086c747b046bc6f54806522b89c9da5426c1",
+      "file": "tomato_slice/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/tomato_slice/v001/metallic_00001.png",
+      "bytes": 133663,
+      "sha256": "447b048960b99dab171c97d4089f1f0bf7d55823350e03ae69cd6f8fbd97e13e",
+      "file": "tomato_slice/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/tomato_slice/v001/roughness_00001.png",
+      "bytes": 301165,
+      "sha256": "cef084d952ffca47f31ae835ce283fa74fc07c3c17b669feb3db4b48971f971a",
+      "file": "tomato_slice/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/tomato_slice/v001/normal_00001.png",
+      "bytes": 2489759,
+      "sha256": "a4d15f0e2355019d20bc5e1bedeb49e44c4bd27e8c499f7da04c437385fa6bdc",
+      "file": "tomato_slice/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/tomato_slice/v001/ao_00001.png",
+      "bytes": 364745,
+      "sha256": "108a4c237fc3ea640c5656310dd83281c42000281ae1b3ccad9c2b953df53fab",
+      "file": "tomato_slice/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/tomato_slice/v001/render_preview_00001.png",
+      "bytes": 1065935,
+      "sha256": "0ea54526ce446b362c47e29dddb3ecff7247517f172f7f6524327c77bb53220a",
+      "file": "tomato_slice/v001/download/cloud_render_preview.png"
+    }
+  }
+}

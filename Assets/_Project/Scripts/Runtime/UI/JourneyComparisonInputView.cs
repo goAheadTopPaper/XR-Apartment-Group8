@@ -15,18 +15,31 @@ namespace XRApartment.Runtime.UI
         private RectTransform tradeOffRect;
         private RectTransform viewportRect;
         private Button skipContextButton;
+        private Button openKeyboardButton;
+        private KitchenRayKeyboard keyboard;
+        private CanvasGroup comparisonGroup;
         private TMP_Text error;
+        private Shader keyboardSurfaceShader;
+        private Shader keyboardTextShader;
         private string preferred;
         private string skipped;
+
+        internal void ConfigureKeyboardShaders(Shader surface, Shader text)
+        {
+            keyboardSurfaceShader = surface;
+            keyboardTextShader = text;
+        }
 
         public void Open(JourneySnapshot snapshot, FinalComparison draft)
         {
             BuildIfNeeded();
+            CloseKeyboard();
             bool b1Completed = Completed(snapshot, "B1");
             bool b2Completed = Completed(snapshot, "B2");
             skipped = b1Completed && !b2Completed ? "B2" : b2Completed && !b1Completed ? "B1" : null;
             b1Button.interactable = b1Completed;
             b2Button.interactable = b2Completed;
+            openKeyboardButton.interactable = b1Completed || b2Completed;
             preferred = draft?.PreferredBenchmarkId;
             if (!Completed(snapshot, preferred))
                 preferred = b1Completed && !b2Completed ? "B1" : b2Completed && !b1Completed ? "B2" : null;
@@ -35,7 +48,7 @@ namespace XRApartment.Runtime.UI
             tradeOffRect.anchoredPosition = new Vector2(skipped == null ? 0f : -100f, -26f);
             tradeOffRect.sizeDelta = new Vector2(skipped == null ? 760f : 560f, 54f);
             viewportRect.sizeDelta = new Vector2(skipped == null ? 730f : 530f, 48f);
-            error.text = string.Empty;
+            KitchenLocale.Set(error, string.Empty);
             RefreshSelection();
         }
 
@@ -45,15 +58,19 @@ namespace XRApartment.Runtime.UI
             return new FinalComparison
             {
                 PreferredBenchmarkId = preferred,
-                TradeOffSummary = tradeOff.text?.Trim()
+                TradeOffSummary = tradeOff.text
             };
         }
 
         public void ShowError(string message)
         {
             BuildIfNeeded();
-            error.text = message ?? string.Empty;
+            KitchenLocale.Set(error, message ?? string.Empty);
         }
+
+        private void OnDisable() => CloseKeyboard();
+
+        private void OnDestroy() => keyboard?.ReleaseMaterials();
 
         private static bool Completed(JourneySnapshot snapshot, string id)
         {
@@ -74,8 +91,9 @@ namespace XRApartment.Runtime.UI
         {
             if (tradeOff != null) return;
             var font = TMP_Settings.defaultFontAsset;
-            b1Button = Choice("Prefer B1", -180f, font, () => { preferred = "B1"; RefreshSelection(); });
-            b2Button = Choice("Prefer B2", 180f, font, () => { preferred = "B2"; RefreshSelection(); });
+            b1Button = Choice("Prefer B1", -285f, font, () => { preferred = "B1"; RefreshSelection(); });
+            b2Button = Choice("Prefer B2", 285f, font, () => { preferred = "B2"; RefreshSelection(); });
+            openKeyboardButton = Choice("Write in VR", 0f, font, OpenKeyboard);
 
             var field = Rect("TradeOff", 0f, -26f, 760f, 54f);
             tradeOffRect = field;
@@ -93,12 +111,14 @@ namespace XRApartment.Runtime.UI
             tradeOff.placeholder = placeholder;
             tradeOff.characterLimit = 180;
             tradeOff.lineType = TMP_InputField.LineType.SingleLine;
+            tradeOff.richText = false;
+            value.richText = false;
             skipContextButton = Choice("Use skip context", 290f, font, () =>
             {
                 if (skipped == null || preferred == null) return;
                 tradeOff.text = preferred + " was assessed; " + skipped +
                     " was skipped, so a direct comparison is limited.";
-                error.text = string.Empty;
+                KitchenLocale.Set(error, string.Empty);
             });
             skipContextButton.GetComponentInChildren<TMP_Text>().fontSize = 17;
             skipContextButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(310f, -26f);
@@ -107,46 +127,39 @@ namespace XRApartment.Runtime.UI
             error.color = new Color(1f, .68f, .58f);
         }
 
+        private void OpenKeyboard()
+        {
+            if (keyboard == null)
+            {
+                var panel = (RectTransform)transform.parent;
+                comparisonGroup = panel.gameObject.AddComponent<CanvasGroup>();
+                keyboard = new KitchenRayKeyboard("TradeOffKeyboard", panel, panel.parent, tradeOff,
+                    "Write your main trade-off", "Use the controller ray and trigger. Done returns to the comparison.",
+                    CloseKeyboard, keyboardSurfaceShader, keyboardTextShader);
+            }
+            comparisonGroup.alpha = 0f;
+            comparisonGroup.interactable = false;
+            comparisonGroup.blocksRaycasts = false;
+            keyboard.Show();
+            KitchenLocale.Set(error, string.Empty);
+        }
+
+        internal void CloseKeyboard()
+        {
+            if (keyboard == null || !keyboard.IsOpen) return;
+            keyboard.Hide();
+            comparisonGroup.alpha = 1f;
+            comparisonGroup.interactable = true;
+            comparisonGroup.blocksRaycasts = true;
+        }
+
         private Button Choice(string title, float x, TMP_FontAsset font, UnityEngine.Events.UnityAction action)
-        {
-            var rect = Rect(title, x, 48f, 260f, 48f);
-            var image = rect.gameObject.AddComponent<Image>();
-            image.color = new Color(.14f, .42f, .77f);
-            var button = rect.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            Text("Label", rect, title, 22, font);
-            button.onClick.AddListener(action);
-            return button;
-        }
+            => KitchenRayKeyboard.Button(Rect(title, x, 48f, 225f, 48f), title, font, action);
 
-        private RectTransform Rect(string title, float x, float y, float width, float height,
-            Transform parent = null)
-        {
-            var rect = new GameObject(title, typeof(RectTransform)).GetComponent<RectTransform>();
-            rect.SetParent(parent == null ? transform : parent, false);
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(.5f, .5f);
-            rect.anchoredPosition = new Vector2(x, y);
-            rect.sizeDelta = new Vector2(width, height);
-            return rect;
-        }
+        private RectTransform Rect(string name, float x, float y, float width, float height, Transform parent = null)
+            => KitchenRayKeyboard.Rect(name, parent ?? transform, x, y, width, height);
 
-        private static TextMeshProUGUI Text(string title, RectTransform parent, string value,
-            int size, TMP_FontAsset font)
-        {
-            var label = new GameObject(title, typeof(RectTransform), typeof(TextMeshProUGUI))
-                .GetComponent<TextMeshProUGUI>();
-            label.transform.SetParent(parent, false);
-            label.rectTransform.anchorMin = Vector2.zero;
-            label.rectTransform.anchorMax = Vector2.one;
-            label.rectTransform.offsetMin = new Vector2(8f, 2f);
-            label.rectTransform.offsetMax = new Vector2(-8f, -2f);
-            label.font = font;
-            label.fontSize = size;
-            label.text = value;
-            label.color = Color.white;
-            label.alignment = TextAlignmentOptions.Center;
-            label.raycastTarget = false;
-            return label;
-        }
+        private static TextMeshProUGUI Text(string name, RectTransform parent, string value, int size, TMP_FontAsset font)
+            => KitchenRayKeyboard.Text(name, parent, value, size, font);
     }
 }

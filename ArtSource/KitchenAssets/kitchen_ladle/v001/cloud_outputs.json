@@ -1,0 +1,48 @@
+{
+  "job_id": "6101b476-1648-473c-a2f8-e4af0fda2764",
+  "archive_sha256": "a97290e30ab757fc110b95fadf0b137d9e01bead6b8b74fc29a8d9a7e2f15913",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_ladle/v001/master_glb_00001.glb",
+      "bytes": 9597728,
+      "sha256": "d94cfc02bc4e52e720ce7930e84ad4e34342e2373159a7c4a94878b38a8b9852",
+      "file": "kitchen_ladle/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_ladle/v001/basecolor_00001.png",
+      "bytes": 2632310,
+      "sha256": "4536723e407a8e4832144a2960f61bd21062308ce887c7c9d43e7a9b8625368e",
+      "file": "kitchen_ladle/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_ladle/v001/metallic_00001.png",
+      "bytes": 648367,
+      "sha256": "45b9bbb1087e2a4c09dcd21a0bbae52738afbe2ca66aa90e8bd2d11ea00c234d",
+      "file": "kitchen_ladle/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_ladle/v001/roughness_00001.png",
+      "bytes": 437501,
+      "sha256": "c21213448765170719922f14c6f9447b18f1ba8db5726752ad40c57659145a57",
+      "file": "kitchen_ladle/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_ladle/v001/normal_00001.png",
+      "bytes": 1290134,
+      "sha256": "d2a705b29609f9576094f12d8a5c06a519833e40cf8fc432c2414f1ff8f8d9f8",
+      "file": "kitchen_ladle/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_ladle/v001/ao_00001.png",
+      "bytes": 444315,
+      "sha256": "3062832d107b65b31eddcc8f3f06b7c0b0130b531e1cec11fd0cf792c277c4db",
+      "file": "kitchen_ladle/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_ladle/v001/render_preview_00001.png",
+      "bytes": 260649,
+      "sha256": "01704c3074ad3a561c8fd553eb31b6f8277a93fb3a0552e73a38a669560ad646",
+      "file": "kitchen_ladle/v001/download/cloud_render_preview.png"
+    }
+  }
+}

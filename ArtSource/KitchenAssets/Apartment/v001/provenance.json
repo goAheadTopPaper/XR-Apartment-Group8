@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "generation_date": "2026-11-12",
+  "notes": "Four accepted Cloud models. Unity meshes retain the generated triangles and UVs. Source transforms are baked into each OBJ and the maximum span normalized to one before fitting the prefab. Color and normal maps are resized to 1024 px and glTF metallic/roughness is packed as Unity Standard metallic/smoothness.",
+  "assets": [
+    {
+      "name": "exterior_oak_door",
+      "provider": "Comfy Cloud",
+      "node": "TencentImageToModelNode",
+      "model": "Hunyuan3D 3.1",
+      "target_faces": 9000,
+      "pbr": true,
+      "seed": 672951,
+      "reference_job": "cb47ec1f-bc94-40ee-821f-410ad07aa447",
+      "reference_model": "Z-Image-Turbo INT8",
+      "reference_seed": 672641,
+      "reference_prompt": "A single modern closed residential exterior door with its simple matching slim rectangular frame, natural light oak veneer slab with straight vertical grain, one narrow vertical matte frosted glass insert set into the upper half near the center, and one short graphite lever handle on the right. Precise rectangular architectural joinery, flush fitted slab, no opening. Realistic physically based materials, soft neutral studio product lighting. Isolated full object on a seamless plain light grey background, no room, no signage, no text, no other objects, no plinth. Slight three-quarter view, only fifteen degrees from straight front, level perspective. The entire door and all four corners are visible with generous margins. Typical door proportions, height 2.2 metres, width 0.9 metres.",
+      "reference_sha256": "fdff93b9a5f1f5397adb9c8a945705c7a6970c85e49d9d8a59056839a2d89c8c",
+      "prototype_reference_metres": 2.2,
+      "glb_sha256": "5848209032124daa4bdbd27900a533ccbf9207b986435e7f5dab220a5230c1cd",
+      "job_id": "add28e80-f760-4a6a-ba79-dc8d8cdc37f7",
+      "game_triangles": 9000,
+      "game_vertices": 6076,
+      "game_maps": {
+        "albedo": [
+          1024,
+          1024
+        ],
+        "normal": [
+          1024,
+          1024
+        ],
+        "metallic_smoothness": [
+          512,
+          512
+        ]
+      },
+      "orientation_matrix": [
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          -1
+        ]
+      ],
+      "unity_model": "Assets/_Project/Art/Cooking/Apartment/exterior_oak_door.obj",
+      "reference_png": "references/exterior_oak_door.png",
+      "unity_maps": "Assets/_Project/Art/Cooking/Apartment/exterior_oak_door_*.png"
+    },
+    {
+      "name": "corridor_ceiling_light",
+      "provider": "Comfy Cloud",
+      "node": "TencentImageToModelNode",
+      "model": "Hunyuan3D 3.1",
+      "target_faces": 6000,
+      "pbr": true,
+      "seed": 672952,
+      "reference_job": "239594fb-869f-4e18-9a73-fa983145d864",
+      "reference_model": "Z-Image-Turbo INT8",
+      "reference_seed": 672642,
+      "reference_prompt": "A single slim surface-mounted modern rectangular LED ceiling light, elongated horizontal shape, softly rounded corners, thin light oak trim around an uninterrupted flat white opal diffuser, minimal warm Scandinavian interior fixture. Compact real-world proportions approximately 55 cm long, 17 cm wide and 4 cm thick. Product photograph from a shallow three-quarter angle looking at the white diffuser side, crisp silhouette, realistic materials. Entire object isolated on plain light grey background with padding, no room, ceiling, wires, text or other objects. The light is off in this photo, white diffuser has no bloom or highlights blown out.",
+      "reference_sha256": "898e8cba401bdae4f64e385d49d6805ccd0d82ed4e3b988b7877a0cd8e04898c",
+      "prototype_reference_metres": 0.55,
+      "glb_sha256": "5d176f04cb7bd49835e2a5a8807b6d1abbba81217d7c832e1a395ccc73074a78",
+      "job_id": "badac31e-a874-48eb-a46d-2bd411755261",
+      "game_triangles": 6000,
+      "game_vertices": 3948,
+      "game_maps": {
+        "albedo": [
+          1024,
+          1024
+        ],
+        "normal": [
+          1024,
+          1024
+        ],
+        "metallic_smoothness": [
+          512,
+          512
+        ]
+      },
+      "orientation_matrix": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "unity_model": "Assets/_Project/Art/Cooking/Apartment/corridor_ceiling_light.obj",
+      "reference_png": "references/corridor_ceiling_light.png",
+      "unity_maps": "Assets/_Project/Art/Cooking/Apartment/corridor_ceiling_light_*.png"
+    },
+    {
+      "name": "herb_planter",
+      "provider": "Comfy Cloud",
+      "node": "TencentImageToModelNode",
+      "model": "Hunyuan3D 3.1",
+      "target_faces": 12000,
+      "pbr": true,
+      "seed": 672953,
+      "reference_job": "239594fb-869f-4e18-9a73-fa983145d864",
+      "reference_model": "Z-Image-Turbo INT8",
+      "reference_seed": 672643,
+      "reference_prompt": "A single small kitchen basil plant in one round warm ivory stoneware planter, realistic healthy broad sage-green basil leaves in a tidy compact crown, soft matte glazed cream pot with a small foot, contemporary Scandinavian kitchen decoration. Isolated studio product photo showing the entire object, level three-quarter view, soft diffuse light and a seamless light grey background. No saucer, no furniture, no text or other objects. Clear silhouette with generous padding.",
+      "reference_sha256": "e1649abeb4fb765c9b1e6a3f0a3d75221b728013ee40051a31944451c158ab87",
+      "prototype_reference_metres": 0.28,
+      "glb_sha256": "e5943346362d54eb5a0db0f55d5a9d27f08e9c49fcaf1ce03f6e4a1572033659",
+      "job_id": "d60573f2-91c1-45d9-be95-6b13b8686f63",
+      "game_triangles": 12010,
+      "game_vertices": 9380,
+      "game_maps": {
+        "albedo": [
+          1024,
+          1024
+        ],
+        "normal": [
+          1024,
+          1024
+        ],
+        "metallic_smoothness": [
+          512,
+          512
+        ]
+      },
+      "orientation_matrix": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "unity_model": "Assets/_Project/Art/Cooking/Apartment/herb_planter.obj",
+      "reference_png": "references/herb_planter.png",
+      "unity_maps": "Assets/_Project/Art/Cooking/Apartment/herb_planter_*.png"
+    },
+    {
+      "name": "oak_wall_relief",
+      "provider": "Comfy Cloud",
+      "node": "TencentImageToModelNode",
+      "model": "Hunyuan3D 3.1",
+      "target_faces": 6000,
+      "pbr": true,
+      "seed": 672954,
+      "reference_job": "239594fb-869f-4e18-9a73-fa983145d864",
+      "reference_model": "Z-Image-Turbo INT8",
+      "reference_seed": 672644,
+      "reference_prompt": "A single shallow wooden framed wall relief for a Scandinavian apartment, small landscape rectangle with light oak frame, an abstract composition of overlapping curved cream and muted sage shapes made of carved painted wood with slight depth. No glass, no words, no logo. Realistic studio product photograph looking at the front from a subtle twelve degree side angle, all corners visible. Standalone object on seamless light grey background, no wall, no furniture, no other objects, ample padding.",
+      "reference_sha256": "868c3a3f323b6284ed882f0f1b47606cdd3f6b97e1c579dedd2f402280dd8eef",
+      "prototype_reference_metres": 0.48,
+      "glb_sha256": "08ceaaa2df4afcc4621264925c2c30cba7cb09a55dc3af2b42e9a9c3cd9d49a2",
+      "job_id": "fa12866c-265c-48ae-96d1-6ddfa26b8b78",
+      "game_triangles": 6000,
+      "game_vertices": 4169,
+      "game_maps": {
+        "albedo": [
+          1024,
+          1024
+        ],
+        "normal": [
+          1024,
+          1024
+        ],
+        "metallic_smoothness": [
+          512,
+          512
+        ]
+      },
+      "orientation_matrix": [
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          -1
+        ]
+      ],
+      "unity_model": "Assets/_Project/Art/Cooking/Apartment/oak_wall_relief.obj",
+      "reference_png": "references/oak_wall_relief.png",
+      "unity_maps": "Assets/_Project/Art/Cooking/Apartment/oak_wall_relief_*.png"
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "dining_table": {
+    "near": {
+      "triangles": 12000,
+      "size": [
+        1.5,
+        0.8500000238418579,
+        0.7598156929016113
+      ],
+      "bottom": -2.8874344693008425e-08,
+      "materials": [
+        "MAT_Furniture_Cloud_dining_table"
+      ],
+      "foot_bottoms": [
+        2.812143407027179e-08,
+        -2.5448892770896236e-08,
+        2.703846746499039e-08,
+        -2.8874344693008425e-08
+      ]
+    },
+    "far": {
+      "triangles": 3000,
+      "size": [
+        1.4990508556365967,
+        0.8522099256515503,
+        0.765099287033081
+      ],
+      "bottom": -2.9412776214599035e-08,
+      "materials": [
+        "MAT_Furniture_Cloud_dining_table.001"
+      ],
+      "foot_bottoms": [
+        2.7683563885716467e-08,
+        -2.5448892770896236e-08,
+        2.7051868300986825e-08,
+        -2.9412776214599035e-08
+      ]
+    }
+  },
+  "dining_chair": {
+    "near": {
+      "triangles": 12000,
+      "size": [
+        0.49000000953674316,
+        0.5299999713897705,
+        0.8299999833106995
+      ],
+      "bottom": -1.897446644250067e-08,
+      "materials": [
+        "MAT_Furniture_Cloud_dining_chair"
+      ],
+      "foot_bottoms": [
+        1.6797629953657633e-08,
+        -1.4958274618948053e-08,
+        1.2871000265590737e-08,
+        -1.897446644250067e-08
+      ]
+    },
+    "far": {
+      "triangles": 3000,
+      "size": [
+        0.49239784479141235,
+        0.5311932563781738,
+        0.8314633369445801
+      ],
+      "bottom": -1.5029257838250487e-08,
+      "materials": [
+        "MAT_Furniture_Cloud_dining_chair.001"
+      ],
+      "foot_bottoms": [
+        0.0006255593034438789,
+        -1.5029257838250487e-08,
+        1.2753214484462205e-08,
+        1.6422873159172013e-05
+      ]
+    }
+  },
+  "pendant": {
+    "near": {
+      "triangles": 5887,
+      "size": [
+        0.4000000059604645,
+        0.4000000059604645,
+        0.9000000357627869
+      ],
+      "bottom": -1.4948584592389125e-08,
+      "materials": [
+        "MAT_Furniture_Brass",
+        "MAT_Furniture_Cable",
+        "MAT_Furniture_Cloud_pendant_shade",
+        "MAT_Furniture_IvoryEnamel"
+      ],
+      "hollow_underside_hit_height": 0.13908332586288452
+    },
+    "far": {
+      "triangles": 2397,
+      "size": [
+        0.4000000059604645,
+        0.4000000059604645,
+        0.8999758958816528
+      ],
+      "bottom": -2.9748902306891978e-05,
+      "materials": [
+        "MAT_Furniture_Brass.001",
+        "MAT_Furniture_Cable.001",
+        "MAT_Furniture_Cloud_pendant_shade.001",
+        "MAT_Furniture_IvoryEnamel.001"
+      ],
+      "hollow_underside_hit_height": 0.1389753222465515
+    }
+  },
+  "fridge_body": {
+    "near": {
+      "triangles": 9928,
+      "size": [
+        0.7200000286102295,
+        0.677000105381012,
+        1.809999942779541
+      ],
+      "bottom": -5.960464477539063e-08,
+      "materials": [
+        "MAT_Furniture_BrushedSteel",
+        "MAT_Furniture_Crisper",
+        "MAT_Furniture_DoorGasket",
+        "MAT_Furniture_FridgeEnamel",
+        "MAT_Furniture_FridgeLiner",
+        "MAT_Furniture_OpalLamp",
+        "MAT_Furniture_ShelfGlass"
+      ],
+      "open_cavity_back_hit_y": 0.24399995803833008
+    },
+    "far": {
+      "triangles": 3494,
+      "size": [
+        0.718761682510376,
+        0.6763582229614258,
+        1.8094608783721924
+      ],
+      "bottom": 3.260374069213867e-05,
+      "materials": [
+        "MAT_Furniture_BrushedSteel.001",
+        "MAT_Furniture_Crisper.001",
+        "MAT_Furniture_DoorGasket.001",
+        "MAT_Furniture_FridgeEnamel.001",
+        "MAT_Furniture_FridgeLiner.001",
+        "MAT_Furniture_OpalLamp.001",
+        "MAT_Furniture_ShelfGlass.001"
+      ],
+      "open_cavity_back_hit_y": 0.24459344148635864
+    }
+  },
+  "fridge_door": {
+    "near": {
+      "triangles": 6052,
+      "size": [
+        0.6904999613761902,
+        0.2455000877380371,
+        1.7360000610351562
+      ],
+      "bottom": 0.00950002670288086,
+      "materials": [
+        "MAT_Furniture_BrushedSteel.002",
+        "MAT_Furniture_Crisper.002",
+        "MAT_Furniture_DoorGasket.002",
+        "MAT_Furniture_FridgeEnamel.002",
+        "MAT_Furniture_FridgeLiner.002"
+      ]
+    },
+    "far": {
+      "triangles": 2196,
+      "size": [
+        0.6897746920585632,
+        0.24527928233146667,
+        1.7360000610351562
+      ],
+      "bottom": 0.00950002670288086,
+      "materials": [
+        "MAT_Furniture_BrushedSteel.003",
+        "MAT_Furniture_Crisper.003",
+        "MAT_Furniture_DoorGasket.003",
+        "MAT_Furniture_FridgeEnamel.003",
+        "MAT_Furniture_FridgeLiner.003"
+      ]
+    }
+  }
+}

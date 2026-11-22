@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "asset_name": "cabinet_multiview",
+  "asset_class": "building",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "1c08c9b69e1b3b62048f80690738173e6231520248bacc3a1740b88a8d4e923e",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 0.9965502235957389,
+  "stage": "intact_inspection",
+  "master_stats": [
+    {
+      "vertices": 49968,
+      "triangles": 99992,
+      "closed": true,
+      "volume_m3": 0.3176137442879742
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 56550,
+      "triangles": 99992,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 9.711827039718628e-08,
+      "vertices_before": 56550,
+      "vertices_after": 49968,
+      "boundaries_before": 12906,
+      "boundaries_after": 0
+    },
+    {
+      "operation": "longest_axis_z_box",
+      "source_axis": [
+        -0.0062759267166256905,
+        -0.056491199880838394,
+        0.9983833432197571
+      ]
+    },
+    {
+      "operation": "area_weighted_box_yaw_alignment",
+      "radians": 0.0017698475572159578
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.6099854707717896,
+    0.6468756198883057,
+    1.0003339052200317
+  ],
+  "intact_fbx": "cabinet_multiview_game.fbx",
+  "pieces_fbx": "",
+  "recipe": "module",
+  "piece_count": 0,
+  "pieces": [],
+  "triangle_budget": 8000,
+  "game_triangles": 8000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 2048,
+      "height": 2048,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": null,
+  "elapsed_seconds": 33.598,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  }
+}

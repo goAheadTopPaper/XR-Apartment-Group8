@@ -31,7 +31,8 @@ namespace XRApartment.Runtime.Core
             material = arrowMaterial;
             if (material == null)
             {
-                material = new Material(Shader.Find("Unlit/Color"));
+                material = new Material(Shader.Find("XR Apartment/Water Droplet"));
+                material.SetFloat("_ShapeMask", 0);
                 material.color = colour;
                 ownsMaterial = true;
             }
@@ -74,7 +75,8 @@ namespace XRApartment.Runtime.Core
             }
             var snapshot = host.Core.Snapshot;
             if (snapshot.State != SessionState.ChallengeActive || snapshot.IsBusy ||
-                !snapshot.CurrentStep.HasValue)
+                !snapshot.CurrentStep.HasValue ||
+                (snapshot.CurrentStep == ChallengeStep.Reorganise && snapshot.CompletedItemCount > 0))
             {
                 HideZoneHints();
                 ShowCount(0);
@@ -152,8 +154,6 @@ namespace XRApartment.Runtime.Core
                     ShowZoneHint("ZONE_Temporary");
                     break;
                 case ChallengeStep.Reorganise:
-                    if (evidenceBridge.HasEmitted(step, "ITEM_Tomato") ||
-                        evidenceBridge.HasEmitted(step, "ITEM_Onion")) break;
                     ShowZoneHint(AnyTargetItemHeld(step)
                         ? "ZONE_FreshDestination" : "ZONE_Temporary");
                     break;
@@ -193,21 +193,13 @@ namespace XRApartment.Runtime.Core
 
         private void AddNextAccess(ChallengeStep step, List<Vector3> positions)
         {
-            var ids = step == ChallengeStep.Open
-                ? new[] { "ACCESS_FridgeFreezerDoor", "ACCESS_FridgeFreshDoor" }
-                : new[] { "ACCESS_FridgeFreshDoor", "ACCESS_FridgeFreezerDoor" };
-            foreach (var id in ids)
-            {
-                if (evidenceBridge.HasEmitted(step, id) || !identities.TryGetValue(id, out var access))
-                    continue;
-                Transform handle = null;
-                foreach (var child in access.GetComponentsInChildren<Transform>())
-                    if (child.name == "Handle") { handle = child; break; }
-                positions.Add((handle != null ? handle.position : access.transform.position) +
-                    Vector3.up * 0.13f);
-                visibleTargets.Add(id);
-                return;
-            }
+            var access = evidenceBridge.FindNextAccess(step);
+            if (access == null) return;
+            Transform handle = null;
+            foreach (var child in access.GetComponentsInChildren<Transform>())
+                if (child.name == "Handle") { handle = child; break; }
+            positions.Add((handle != null ? handle.position : access.transform.position) + Vector3.up * 0.13f);
+            visibleTargets.Add(access.StableId);
         }
 
         private void AddNextItem(ChallengeStep step, List<Vector3> positions)
@@ -239,9 +231,6 @@ namespace XRApartment.Runtime.Core
             var ids = step == ChallengeStep.PutBack
                 ? new[] { "ITEM_Tomato", "ITEM_Onion", "ITEM_CerealBox" }
                 : new[] { "ITEM_Tomato", "ITEM_Onion" };
-            if (step == ChallengeStep.Reorganise &&
-                (evidenceBridge.HasEmitted(step, "ITEM_Tomato") ||
-                 evidenceBridge.HasEmitted(step, "ITEM_Onion"))) return;
             foreach (var id in ids)
                 if (!evidenceBridge.HasEmitted(step, id) &&
                     identities.TryGetValue(id, out var held) &&

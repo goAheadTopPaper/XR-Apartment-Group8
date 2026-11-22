@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "asset_name": "knife",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271628,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/knife_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 7,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 0.3,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "knife",
+    "cut_mode": "precut variants only"
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "9158c97f-7deb-4e5b-b096-c001ea973c01",
+    "elapsed_seconds": 22.89,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "workflow_sha256": "9be9c13bde7742b4e655821781e07cc033b13ea15698882c77bd951a14a59747",
+    "compute_hours_displayed": 0.006,
+    "measurement_source": "Cloud queue 22.89s and matching task detail UUID 9158c97f-7deb-4e5b-b096-c001ea973c01, displayed 0m22s / .006 hours."
+  },
+  "outputs": {
+    "master_glb": "../knife/v001/download/master.glb",
+    "game_glb": "../knife/v001/prepared/knife_game.glb",
+    "unity_fbx": "../knife/v001/prepared/knife_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../knife/v001/TexturesSource/basecolor.png",
+      "metallic": "../knife/v001/TexturesSource/metallic.png",
+      "roughness": "../knife/v001/TexturesSource/roughness.png",
+      "normal": "../knife/v001/TexturesSource/normal.png",
+      "ao": "../knife/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../knife/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../knife/v001/prepared/knife_master.glb",
+    "prepared_manifest": "../knife/v001/prepared/unity_asset.json",
+    "game_pbr_folder": "../knife/v001/prepared/Textures",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/knife_v001/PREF_Prop_knife.prefab",
+    "game_preview_png": "../knife/v001/prepared/knife_preview.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "passed_real_XRI_physics_and_cooking_scenarios",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "visual_quality": "approved_for_kitchen_prototype",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "2907810e639ffe93c5645ea356aedea43939eee70cf86e90fc7b1b68934d782f"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true,
+    "orientation": "longest_axis_x_flat_z"
+  },
+  "intact_review": {
+    "status": "approved_for_interactive_authoring",
+    "reviewer": "Codex visual review",
+    "preview": "../knife/v001/qa/intact-reviewed.png",
+    "source_sha256": "f1e1c4e1d806f81fad5542011658be4af3b748c7443e436caf02adc31d9242a5",
+    "notes": "30cm knife; black handle at +X, blade at -X. Final pass aligns blade plane parallel to tabletop; manually authored blade trigger and handle pivot."
+  },
+  "processing": {
+    "source_sha256": "f1e1c4e1d806f81fad5542011658be4af3b748c7443e436caf02adc31d9242a5",
+    "game_triangles": 4000,
+    "triangle_budget": 4000,
+    "piece_count": 0,
+    "size_blender_xyz": [
+      0.30002713203430176,
+      0.06727515161037445,
+      0.021621884778141975
+    ],
+    "game_basecolor_size": [
+      1024,
+      1024
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 16.353,
+    "local_authoring_seconds": null,
+    "fragment_volume_relative_error": null
+  }
+}

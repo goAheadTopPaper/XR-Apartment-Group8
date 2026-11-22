@@ -1,0 +1,83 @@
+{
+    "scene": "Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity",
+    "unity": "2022.3.62f3",
+    "platform": "OSXEditor",
+    "buildTarget": "StandaloneWindows64",
+    "lods": [
+        {
+            "name": "PREF_Cooking_Workbench/PREF_Cooking_Fridge/ACT_FridgeDoor/VIS_Furniture_fridge_door",
+            "nearTriangles": 6020,
+            "farTriangles": 2164,
+            "nearRenderers": 5,
+            "farRenderers": 5
+        },
+        {
+            "name": "PREF_Cooking_Workbench/PREF_Cooking_Fridge/VIS_Furniture_fridge_body",
+            "nearTriangles": 9800,
+            "farTriangles": 3366,
+            "nearRenderers": 7,
+            "farRenderers": 7
+        },
+        {
+            "name": "PREF_Furniture_DiningSet/PREF_Furniture_DiningTable/VIS_Furniture_dining_table",
+            "nearTriangles": 12000,
+            "farTriangles": 3000,
+            "nearRenderers": 1,
+            "farRenderers": 1
+        },
+        {
+            "name": "PREF_Furniture_DiningSet/PREF_Furniture_DiningChair/VIS_Furniture_dining_chair",
+            "nearTriangles": 12000,
+            "farTriangles": 3000,
+            "nearRenderers": 1,
+            "farRenderers": 1
+        },
+        {
+            "name": "PREF_Furniture_DiningSet/PREF_Furniture_DiningChair/VIS_Furniture_dining_chair",
+            "nearTriangles": 12000,
+            "farTriangles": 3000,
+            "nearRenderers": 1,
+            "farRenderers": 1
+        },
+        {
+            "name": "PREF_Furniture_DiningSet/PREF_Furniture_DiningChair/VIS_Furniture_dining_chair",
+            "nearTriangles": 12000,
+            "farTriangles": 3000,
+            "nearRenderers": 1,
+            "farRenderers": 1
+        },
+        {
+            "name": "PREF_Furniture_DiningSet/PREF_Furniture_DiningChair/VIS_Furniture_dining_chair",
+            "nearTriangles": 12000,
+            "farTriangles": 3000,
+            "nearRenderers": 1,
+            "farRenderers": 1
+        },
+        {
+            "name": "PREF_Furniture_DiningSet/PREF_Furniture_Pendant/VIS_Furniture_pendant",
+            "nearTriangles": 5887,
+            "farTriangles": 2397,
+            "nearRenderers": 4,
+            "farRenderers": 4
+        }
+    ],
+    "tableSize": {
+        "x": 1.5,
+        "y": 0.7598156929016113,
+        "z": 0.8499999642372131
+    },
+    "chairSize": {
+        "x": 0.49000024795532229,
+        "y": 0.8299999833106995,
+        "z": 0.5299999713897705
+    },
+    "tabletopHeight": 0.7580000162124634,
+    "ceilingHeight": 3.0,
+    "canopyTopHeight": 3.0,
+    "chairs": 4,
+    "missingScripts": 0,
+    "invalidMaterials": 0,
+    "tableUnderpassOpen": true,
+    "collisionRetainedAtLowDetail": true,
+    "originalDiningHidden": true
+}

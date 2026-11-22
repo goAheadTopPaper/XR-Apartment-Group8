@@ -1,0 +1,48 @@
+{
+  "job_id": "12187f5e-e184-4f0b-91a7-3d520a308282",
+  "archive_sha256": "8534683ac0c10cc978607c3f07332e480327c0b5c823f12750ced027e178db3d",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/furniture_refrigerator/v001/master_glb_00001.glb",
+      "bytes": 11590964,
+      "sha256": "ecab44c073b85c8e2160c8c3c3d1a27a0866a58500c988e6786372ed5a98d9ed",
+      "file": "furniture_refrigerator/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/furniture_refrigerator/v001/basecolor_00001.png",
+      "bytes": 2958354,
+      "sha256": "b303fe28410a1ac0bd5465fa88f38096dd6e9a751e371e9a752b275efff1d31a",
+      "file": "furniture_refrigerator/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/furniture_refrigerator/v001/metallic_00001.png",
+      "bytes": 371696,
+      "sha256": "64d89ed5aa0647d58eca2ca063653fff06b9964f5f5f62ec6abc0021ee50984f",
+      "file": "furniture_refrigerator/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/furniture_refrigerator/v001/roughness_00001.png",
+      "bytes": 1073706,
+      "sha256": "cdf872edc8af7d31d1eb1c4df76aa86256b4ae825f070513421672e91c93909b",
+      "file": "furniture_refrigerator/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/furniture_refrigerator/v001/normal_00001.png",
+      "bytes": 2549518,
+      "sha256": "ae583571e16f1832ef0812df63197e21c7b6e5b3bee52d5559765735a95717da",
+      "file": "furniture_refrigerator/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/furniture_refrigerator/v001/ao_00001.png",
+      "bytes": 356686,
+      "sha256": "916113ca6365a78653269d85e51d6971fb2306faac5d55d53d549b44b0489944",
+      "file": "furniture_refrigerator/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/furniture_refrigerator/v001/render_preview_00001.png",
+      "bytes": 443362,
+      "sha256": "53f61e43ea65b6db4b88e291900d04d99d0c1d04bbc6093f65641ba192fc6fb7",
+      "file": "furniture_refrigerator/v001/download/cloud_render_preview.png"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "asset_name": "apple",
+  "asset_class": "prop",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "a714d9a2a8e935071b48b7e7242d9d876c6a182e3e739d4eada736c2a17ebdd6",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 0.09261972808679525,
+  "stage": "intact_inspection",
+  "master_stats": [
+    {
+      "vertices": 49994,
+      "triangles": 99984,
+      "closed": true,
+      "volume_m3": 0.0002732083120793686
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 55173,
+      "triangles": 99984,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 9.177310466766357e-08,
+      "vertices_before": 55173,
+      "vertices_after": 49994,
+      "boundaries_before": 10134,
+      "boundaries_after": 0
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.08002351224422455,
+    0.08504801243543625,
+    0.08172835409641266
+  ],
+  "intact_fbx": "apple_game.fbx",
+  "pieces_fbx": "",
+  "recipe": "slice",
+  "piece_count": 0,
+  "pieces": [],
+  "triangle_budget": 4000,
+  "game_triangles": 4000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": null,
+  "elapsed_seconds": 11.811,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  }
+}

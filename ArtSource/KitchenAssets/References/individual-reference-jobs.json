@@ -1,0 +1,22 @@
+{
+  "method": "built-in ImageGen",
+  "style_board": "Kitchen_StyleBoard_v001.png",
+  "approved_style_evidence": "2026-10-28 user reply: 确认这套风格，厨房物品优先，人物和模块随后",
+  "entries": [
+    {
+      "name": "plate",
+      "prompt": "Create one isolated 3D asset reference image of the ceramic plate in cell 1 of the approved style-board reference. Preserve the same clean realistic kitchen style and warm ivory-white glazed ceramic design. One complete round shallow dinner plate with a restrained raised rim, a modest real wall thickness, flat stable underside and subtle foot ring; no decorations, no logos. Useful elevated three-quarter product view showing the whole interior and rim thickness, not edge-on. Centre one plate at about 80 percent canvas width with generous clear margins in a square composition. Soft uniform diffuse lighting and a perfectly plain off-white background, minimal contact shadow, no floor texture, no props, no text, no numbers, no grid. No cracks, no fragments, no cutaway, no food. This is a single intact object for image-to-3D reconstruction, not another contact sheet.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-c5b5c433-0f32-4b05-8c7f-d9eb528188e0.png"
+    },
+    {
+      "name": "tomato",
+      "prompt": "Create one isolated 3D asset reference image of the tomato in cell 2 of the approved style-board reference. Preserve its clean realistic kitchen game style: one fresh round red tomato, subtly lobed, five modest green sepals and a short sturdy green stem, realistic medium surface detail. Entire closed tomato silhouette fully visible. Three-quarter view slightly from above showing the stem and rounded body. One tomato only, centred at around 75 percent of a square canvas, generous margins. Plain off-white background and even soft diffuse lighting, no strong baked highlights, minimal shadow, no other props. No labels, numbers, grid, cut sections, cracks, pieces or food scenery. Match the approved object's appearance rather than adding new designs.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-2e4f9281-c534-4158-9ca9-12d9e55261d3.png"
+    },
+    {
+      "name": "egg",
+      "prompt": "Create one isolated 3D asset reference image of the intact hen egg in cell 6 of the approved style-board reference. Same restrained realistic kitchen game-asset style. One complete pale warm-brown chicken egg, natural tapered oval, narrow end up, extremely subtle natural speckling, smooth matte shell, no markings. Standing upright, three-quarter product reference with a full unobstructed closed silhouette, centred about 72 percent of a square canvas height with generous margins. Perfectly plain off-white background, even soft diffuse lighting, minimal contact shadow. No cracks, halves, yolk, extra eggs, plate, props, text, labels, numbers or grid. This is the approved intact shell design for later mesh-derived shell halves.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-24160f3c-5f47-4954-9bb5-39dbb2b1e3bd.png"
+    }
+  ]
+}

@@ -88,27 +88,27 @@ namespace XRApartment.Runtime.Feedback
                 page = 0;
             }
 
-            heading.text = "Kitchen design feedback · " + current.ActiveBenchmarkId;
+            KitchenLocale.Set(heading, "Kitchen design feedback · " + current.ActiveBenchmarkId);
             var pendingSkipReason = host == null
                 ? null : (host.Core as JourneyCoordinator)?.PendingSkipReason;
-            outcomeLabel.text = outcome == TaskOutcome.Completed
+            KitchenLocale.Set(outcomeLabel, outcome == TaskOutcome.Completed
                 ? "Task completed. Share your assessment of this design."
                 : outcome == TaskOutcome.Skipped
                     ? string.IsNullOrWhiteSpace(pendingSkipReason)
                         ? "Task skipped. The stored reason is unavailable; submission is blocked."
                         : "Task skipped · Reason recorded: " + pendingSkipReason
-                    : "Task outcome is not available.";
+                    : "Task outcome is not available.");
             submitButton.interactable = !current.IsBusy && (outcome == TaskOutcome.Completed ||
                 (outcome == TaskOutcome.Skipped && !string.IsNullOrWhiteSpace(pendingSkipReason)));
-            submitButton.GetComponentInChildren<TMP_Text>().text = current.Save == SaveStatus.Failed
-                ? "Retry save" : "Submit feedback";
+            KitchenLocale.Set(submitButton.GetComponentInChildren<TMP_Text>(), current.Save == SaveStatus.Failed
+                ? "Retry save" : "Submit feedback");
             RestoreControls();
             UpdatePageVisibility();
             if (current.Save == SaveStatus.Failed)
-                validationLabel.text = "CSV save failed. Close the CSV if it is open in Excel, then retry saving your submitted answers. " + message;
-            else if (current.Save == SaveStatus.Pending) validationLabel.text = "Saving feedback...";
+                KitchenLocale.Set(validationLabel, "CSV save failed. Close the CSV if it is open in Excel, then retry saving your submitted answers. " + message);
+            else if (current.Save == SaveStatus.Pending) KitchenLocale.Set(validationLabel, "Saving feedback...");
             else if (errorCode == JourneyErrorCode.InvalidFeedback) ShowContractErrors(message);
-            else validationLabel.text = string.Empty;
+            else KitchenLocale.Set(validationLabel, string.Empty);
         }
 
         private void BuildCanvas()
@@ -195,7 +195,7 @@ namespace XRApartment.Runtime.Feedback
                 toggle.onValueChanged.AddListener(_ =>
                 {
                     SetChoiceError(key, false);
-                    validationLabel.text = string.Empty;
+                    KitchenLocale.Set(validationLabel, string.Empty);
                     CaptureControls();
                 });
             }
@@ -256,12 +256,12 @@ namespace XRApartment.Runtime.Feedback
             if (snapshot.Save == SaveStatus.Failed)
             {
                 var retry = host.Submit(new JourneyCommand { Type = JourneyCommandType.Retry });
-                if (!retry.Accepted) validationLabel.text = retry.Message;
+                if (!retry.Accepted) KitchenLocale.Set(validationLabel, retry.Message);
                 return;
             }
             if (draftOutcome != TaskOutcome.Completed && draftOutcome != TaskOutcome.Skipped)
             {
-                validationLabel.text = "Feedback is unavailable because the task outcome is not Completed or Skipped.";
+                KitchenLocale.Set(validationLabel, "Feedback is unavailable because the task outcome is not Completed or Skipped.");
                 return;
             }
             CaptureControls();
@@ -279,19 +279,19 @@ namespace XRApartment.Runtime.Feedback
                 SetChoiceError("decision", draft.Decision == CombinationDecision.Unset);
                 SetChoiceError("category", draft.Category == FeedbackCategory.Unset);
                 SetChoiceError("importance", draft.Importance == Importance.Unset);
-                validationLabel.text = "Complete required fields: " + string.Join(", ", missing) + ".";
+                KitchenLocale.Set(validationLabel, "Complete required fields: " + string.Join(", ", missing) + ".");
                 return;
             }
             var result = host.SubmitFeedback(draft);
             if (result != null && !result.Accepted)
-                validationLabel.text = string.IsNullOrEmpty(result.Message) ? "Feedback was not accepted." : result.Message;
+                KitchenLocale.Set(validationLabel, string.IsNullOrEmpty(result.Message) ? "Feedback was not accepted." : result.Message);
         }
 
         private void ShowContractErrors(string message)
         {
             if (string.IsNullOrEmpty(message))
             {
-                validationLabel.text = "Feedback was not accepted. Review the required fields.";
+                KitchenLocale.Set(validationLabel, "Feedback was not accepted. Review the required fields.");
                 return;
             }
             var fields = new List<string>();
@@ -302,7 +302,7 @@ namespace XRApartment.Runtime.Feedback
             SetChoiceError("category", fields.Contains("Category"));
             SetChoiceError("importance", fields.Contains("Importance"));
             UpdatePageVisibility();
-            validationLabel.text = fields.Count == 0 ? message : "Please review: " + string.Join(", ", fields) + ".";
+            KitchenLocale.Set(validationLabel, fields.Count == 0 ? message : "Please review: " + string.Join(", ", fields) + ".");
         }
 
         private void Continue()
@@ -320,10 +320,10 @@ namespace XRApartment.Runtime.Feedback
                 SetChoiceError("decision", draft.Decision == CombinationDecision.Unset);
                 SetChoiceError("category", draft.Category == FeedbackCategory.Unset);
                 SetChoiceError("importance", draft.Importance == Importance.Unset);
-                validationLabel.text = "Choose: " + string.Join(", ", missing) + ".";
+                KitchenLocale.Set(validationLabel, "Choose: " + string.Join(", ", missing) + ".");
                 return;
             }
-            validationLabel.text = string.Empty;
+            KitchenLocale.Set(validationLabel, string.Empty);
             page = 1;
             UpdatePageVisibility();
         }
@@ -335,7 +335,7 @@ namespace XRApartment.Runtime.Feedback
             var two = canvas.transform.Find("WarmPanel/Content/PageTwo");
             if (one != null) one.gameObject.SetActive(page == 0);
             if (two != null) two.gameObject.SetActive(page == 1);
-            if (pageLabel != null) pageLabel.text = page == 0 ? "STEP 1 OF 2 · OVERALL JUDGEMENT" : "STEP 2 OF 2 · EXPERIENCE";
+            if (pageLabel != null) KitchenLocale.Set(pageLabel, page == 0 ? "STEP 1 OF 2 · OVERALL JUDGEMENT" : "STEP 2 OF 2 · EXPERIENCE");
             var nav = canvas.transform.Find("WarmPanel/Content/Navigation");
             if (nav != null)
             {
@@ -387,7 +387,7 @@ namespace XRApartment.Runtime.Feedback
             var obj = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI), typeof(LayoutElement));
             obj.transform.SetParent(parent, false);
             var text = obj.GetComponent<TextMeshProUGUI>();
-            text.text = value;
+            KitchenLocale.Set(text, value);
             if (uiFont == null)
                 uiFont = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
             if (uiFont == null) uiFont = TMP_Settings.defaultFontAsset;
@@ -442,6 +442,7 @@ namespace XRApartment.Runtime.Feedback
             Stretch(text.rectTransform, 4f, 2f, 4f, 2f);
             var button = obj.GetComponent<Button>();
             button.onClick.AddListener(action);
+            KitchenLocale.AddButtonSound(button);
             return button;
         }
 

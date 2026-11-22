@@ -1,0 +1,94 @@
+{
+  "date_local": "2026-10-29",
+  "generation_date_local": "2026-10-28",
+  "unity": "2022.3.62f3",
+  "platform": "OSXEditor",
+  "build_target": "StandaloneWindows64",
+  "baseline_commit": "2975cd61969c72242bbd7b0c2b7c3a1c8bd0c793",
+  "branch": "feature/hzc",
+  "committed": false,
+  "pushed": false,
+  "new_cloud_tasks": {
+    "tomato_slice": {
+      "job_id": "a85e7bdd-21ac-4286-a904-bbbd4cd317db",
+      "elapsed_seconds": 59.6,
+      "manifest": "ArtSource/KitchenAssets/Manifests/tomato_slice_v001.json",
+      "original_glb_sha256": "8440fdd6243e86429958f71d71ce67f3da3b6a0208e9029be1f4889ff8d62036",
+      "credits_consumed": null
+    },
+    "scrambled_egg": {
+      "job_id": "691f27f7-8e38-47e1-88d7-65d5fe2b828f",
+      "elapsed_seconds": 56.07,
+      "manifest": "ArtSource/KitchenAssets/Manifests/scrambled_egg_v001.json",
+      "original_glb_sha256": "e6402f8131cbb69464dc0a67157afff770c6d19ac8f6d997ac017e1d1d697192",
+      "credits_consumed": null
+    }
+  },
+  "actual_cloud_tasks_total": 12,
+  "reference_provider": "built-in Image Gen",
+  "food_visual_provenance": "ArtSource/KitchenAssets/Recipe/v002_food_visuals/visual_provenance.json",
+  "tests": {
+    "editmode": {
+      "passed": 145,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.3029756,
+      "completed_utc": "2026-10-28 16:09:01Z",
+      "source": "Logs/FoodVisualUpgrade/editmode-final.xml",
+      "xml_sha256": "edf41a9ae776fb51abd5a3e59b848a49ee71b072121811f91a0f7fb51cd5b490"
+    },
+    "playmode": {
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 143.233508,
+      "completed_utc": "2026-10-28 16:07:55Z",
+      "source": "Logs/FoodVisualUpgrade/playmode-final.xml",
+      "xml_sha256": "3b71b6f8bf237c036070889640a8572b4c68f0c6a7bf3489ee5afa3ad007ba9b"
+    }
+  },
+  "recipe_play_tests_passed": 5,
+  "scenario": {
+    "actions": "OpenFridge, TakeTomato, SliceTomato, DiceTomato, TakeEgg, TakeBowl, CrackEgg, BeatEgg, TurnOnStove, PlacePan, PourEgg, ScrambleEgg, AddTomato, StirFry",
+    "completed": true,
+    "eggMl": 50.000003814697266,
+    "tomatoGrams": 120.0,
+    "scrambledMetres": 3.4663124084472656,
+    "stirFryMetres": 2.4586689472198486,
+    "capturedPieces": 16,
+    "presentationMeanMs": 0.01655657142857143,
+    "presentationMaxMs": 0.021417,
+    "presentationSamples": 70
+  },
+  "visual_review": {
+    "reviewer": "Codex, actual Unity screenshots",
+    "tomato": "visible seed chambers, flesh and generated PBR; four slices / sixteen diced visual derivatives fitted to unchanged interaction proxies",
+    "cooked_egg": "actual Pixal3D folded curd, 12 pooled pieces, generated PBR and near/far meshes",
+    "egg_triangles_per_piece": {
+      "near": 4000,
+      "far": 1200
+    },
+    "all_diced_tomato_triangles": 39940,
+    "pan_food_max_near_triangles": 87940
+  },
+  "profiler_scope": "KitchenPanContents presentation CPU marker only, 70 rendered Editor frames; not whole-scene or headset performance",
+  "protected_review_assets_checked": 19,
+  "protected_review_assets_unchanged": true,
+  "previews": {
+    "cloud-generated-tomato.png": "5eb7ab57f8c1adde86a5900bde3576b48338a84c199596640f2d11f04f9147c7",
+    "tomato-egg-finished.png": "ea3fd7f3a728377c7e1ce9e0cf21f04ec402678b50a728f997297991f26f256e",
+    "before-kitchen-recipe-complete.png": "746a0b685daf67aafbad01b6f2d33691eb25d3fdd69dc29f521bc0f7016d77f6",
+    "before-tomato-egg-finished.png": "d116a4f0dddc1697ade0b4879670b7cc6a53c74c4f3b2e39dd0fc1d6533545e1",
+    "tomato-diced.png": "8a8a0d6f022d6b029cb84dac0081a08c3968f34f1950f09717e7abdac184fb49",
+    "kitchen-recipe-complete.png": "7d62df10f7d2d1d741c2a54f70576b90021f6a83eb7dedc9d6e56dff76cc2739",
+    "fridge-open.png": "4747a41edf9659e536064cc04b87028d2d033319cb1118ab3249337d3a796ba5"
+  },
+  "limits": [
+    "Prepared cut visuals; no arbitrary real-time slicing",
+    "Visible generated meshes fitted to existing colliders; food mass is the existing gameplay amount, not inferred visual volume",
+    "Folded egg mesh is for presentation, not watertight volume or fracture use",
+    "Windows Player, Quest Link feel and VR frame rate not tested",
+    "Per-task credit charges remain unconfirmed"
+  ],
+  "test_driver_note": "Initial visual regression exposed two timing-sensitive driven-hand tests. Inputs now wait for an XRI rendered update between physics samples, and whisking continues until the existing mixture threshold within a bounded stroke count. No gameplay threshold or collision constraint was relaxed. Additive fixtures disable duplicate EventSystem roots."
+}

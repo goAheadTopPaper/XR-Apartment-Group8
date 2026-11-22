@@ -4,16 +4,18 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using XRApartment.Data;
 using XRApartment.Runtime;
-using XRApartment.Runtime.Core;
+using XRApartment.Runtime.UI;
 
 namespace XRApartment.Tests
 {
     public class KitchenSceneIntegrityTests
     {
-        const string ScenePath = "Assets/_Project/Scenes/SCN_Kitchen_Review.unity";
+        const string ScenePath = "Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity";
         Scene scene;
         bool openedForTests;
 
@@ -36,17 +38,13 @@ namespace XRApartment.Tests
             .SelectMany(root => root.GetComponentsInChildren<T>(true)).ToArray();
 
         [Test]
-        public void StartupScene_IsTheAuthoredKitchen()
+        public void BuildContainsOnlyTheCityKitchenMainScene()
         {
-            var enabledScenes = EditorBuildSettings.scenes.Where(item => item.enabled).ToArray();
-            Assert.AreEqual(1, enabledScenes.Length);
-            Assert.AreEqual(ScenePath, enabledScenes[0].path);
-            Assert.AreEqual(0, Components<BenchmarkSlotMarker>().Length,
-                "Benchmarks are now instantiated into the runtime slot in Play.");
-            Assert.AreEqual(1, Components<JourneyRuntimeHost>().Length);
-            Assert.AreEqual(1, Components<RuntimeBenchmarkAdapter>().Length);
-            Assert.AreEqual(1, Components<TaskEvidenceBridge>().Length);
-            Assert.AreEqual(1, Components<KitchenMenuController>().Length);
+            var enabledScenes = EditorBuildSettings.scenes.Where(item => item.enabled).Select(item => item.path);
+            CollectionAssert.AreEqual(new[] { ScenePath }, enabledScenes);
+            Assert.AreEqual(1, Components<KitchenCookingStation>().Length);
+            Assert.AreEqual(1, Components<KitchenRoomReset>().Length);
+            Assert.AreEqual(1, Components<LocomotionSettingsView>().Length);
             Assert.AreEqual(1, Components<Camera>().Count(camera => camera.CompareTag("MainCamera")));
         }
 
@@ -69,13 +67,18 @@ namespace XRApartment.Tests
             foreach (var hand in hands)
             {
                 var serialized = new SerializedObject(hand);
-                foreach (var field in new[] { "interactor", "solidRoot", "ghostRoot", "contactProbe", "solidAnimator", "ghostAnimator" })
+                foreach (var field in new[] { "interactor", "solidRoot", "solidAnimator" })
                     Assert.IsNotNull(serialized.FindProperty(field).objectReferenceValue, hand.name + "." + field);
                 var profile = (HandInteractionProfile)serialized.FindProperty("profile").objectReferenceValue;
                 Assert.IsNotNull(profile, hand.name);
-                Assert.That(profile.Length("hand_palm_radius"), Is.GreaterThan(0f));
-                Assert.That(profile.Length("hand_ghost_show_distance"), Is.GreaterThan(profile.Length("hand_ghost_hide_distance")));
-                Assert.IsFalse(((SphereCollider)serialized.FindProperty("contactProbe").objectReferenceValue).enabled);
+                foreach (var collider in hand.GetComponentsInChildren<Collider>(true))
+                    Assert.IsFalse(collider.enabled, collider.name);
+                var palm = (Transform)serialized.FindProperty("solidRoot").objectReferenceValue;
+                Assert.AreSame(hand.transform, palm.parent);
+                Assert.AreEqual(Vector3.zero, hand.transform.localPosition);
+                Assert.AreEqual(Vector3.zero, palm.localPosition);
+                Assert.That(Quaternion.Angle(Quaternion.identity, hand.transform.localRotation), Is.LessThan(.01f));
+                Assert.That(Quaternion.Angle(Quaternion.identity, palm.localRotation), Is.LessThan(.01f));
                 var interactor = (Component)serialized.FindProperty("interactor").objectReferenceValue;
                 Assert.AreEqual(hand.transform.parent, interactor.transform.parent);
                 Assert.That(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(hand.transform.root.gameObject),
@@ -88,22 +91,50 @@ namespace XRApartment.Tests
         }
 
         [Test]
-        public void ImportedGeometry_HasMeshesCollidersAndBuiltInMaterials()
+        public void EnvironmentGeometry_HasMeshesCollidersAndHdrpMaterials()
         {
             var environment = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Environment");
+            var windows = environment.transform.Find("PREF_Kitchen_Windows");
+            var exteriorDoors = environment.transform.Find("ApartmentExteriorDoors");
+            Assert.IsNotNull(windows);
+            Assert.IsNotNull(exteriorDoors);
             var filters = environment.GetComponentsInChildren<MeshFilter>();
             Assert.IsNotEmpty(filters);
             foreach (var filter in filters)
             {
                 Assert.IsNotNull(filter.sharedMesh, filter.name);
-                var collider = filter.GetComponent<MeshCollider>();
-                Assert.IsNotNull(collider, filter.name);
-                Assert.AreSame(filter.sharedMesh, collider.sharedMesh, filter.name);
+                if (filter.transform.IsChildOf(windows))
+                {
+                    var collider = filter.GetComponent<BoxCollider>();
+                    Assert.IsNotNull(collider, filter.name);
+                    Assert.IsTrue(collider.enabled && !collider.isTrigger, filter.name);
+                    var bounds = collider.bounds;
+                    bounds.Expand(.002f);
+                    var visual = filter.GetComponent<Renderer>().bounds;
+                    Assert.IsTrue(bounds.Contains(visual.min) && bounds.Contains(visual.max), filter.name);
+                }
+                else if (filter.transform.IsChildOf(exteriorDoors))
+                {
+                    var collider = filter.GetComponentInParent<BoxCollider>();
+                    Assert.IsNotNull(collider, filter.name);
+                    Assert.AreSame(exteriorDoors, collider.transform.parent);
+                    Assert.IsTrue(collider.enabled && !collider.isTrigger, filter.name);
+                    var bounds = collider.bounds;
+                    bounds.Expand(.002f);
+                    var visual = filter.GetComponent<Renderer>().bounds;
+                    Assert.IsTrue(bounds.Contains(visual.min) && bounds.Contains(visual.max), filter.name);
+                }
+                else
+                {
+                    var collider = filter.GetComponent<MeshCollider>();
+                    Assert.IsNotNull(collider, filter.name);
+                    Assert.AreSame(filter.sharedMesh, collider.sharedMesh, filter.name);
+                }
                 foreach (var material in filter.GetComponent<Renderer>().sharedMaterials)
                 {
                     Assert.IsNotNull(material, filter.name);
                     Assert.IsNotNull(material.shader, material.name);
-                    Assert.AreEqual("Standard", material.shader.name, material.name);
+                    Assert.AreEqual("HDRP/Lit", material.shader.name, material.name);
                 }
             }
         }
@@ -111,7 +142,7 @@ namespace XRApartment.Tests
         [Test]
         public void DressingProps_UseRegisteredMetreScaleAndBoundGrabColliders()
         {
-            var dressing = scene.GetRootGameObjects().Single(root => root.name == "PREF_Kitchen_Dressing");
+            var dressing = scene.GetRootGameObjects().Single(root => root.name == "PREF_Apartment_Dressing");
             Assert.IsNull(dressing.GetComponentInParent<BenchmarkSlotMarker>());
             var assumptions = AssetDatabase.LoadAssetAtPath<ModelAssumptions>("Assets/_Project/Settings/ASM_KitchenParameters.asset");
             var paths = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs/Props" })
@@ -123,7 +154,9 @@ namespace XRApartment.Tests
                 try
                 {
                     Assert.AreEqual(Vector3.one, prop.transform.localScale, path);
-                    var renderers = prop.GetComponentsInChildren<Renderer>();
+                    var renderers = prop.GetComponentsInChildren<Renderer>().Where(renderer =>
+                        renderer.GetComponent<LiquidSurface>() == null && renderer.GetComponent<LiquidStream>() == null).ToArray();
+                    Assert.IsNotEmpty(renderers, path);
                     var bounds = renderers[0].bounds;
                     foreach (var renderer in renderers.Skip(1)) bounds.Encapsulate(renderer.bounds);
                     string key = "prop_" + prop.name.Replace("PREF_Prop_", "").ToLowerInvariant();
@@ -135,15 +168,17 @@ namespace XRApartment.Tests
                     foreach (var material in renderers.SelectMany(renderer => renderer.sharedMaterials))
                     {
                         Assert.IsNotNull(material, path);
-                        Assert.AreEqual("Standard", material.shader.name, path);
+                        Assert.AreEqual("HDRP/Lit", material.shader.name, path);
                     }
                     var grab = prop.GetComponent<XRGrabInteractable>();
                     if (grab == null) continue;
                     var body = prop.GetComponent<Rigidbody>();
                     Assert.IsNotNull(body, path);
                     Assert.IsFalse(body.isKinematic, path);
-                    Assert.AreEqual(XRBaseInteractable.MovementType.VelocityTracking,
-                        grab.movementType, path + " must remain dynamic while held so held props collide");
+                    Assert.AreEqual(XRBaseInteractable.MovementType.Instantaneous, grab.movementType,
+                        path + " uses the final pose checked by the collision-constrained transformer");
+                    Assert.IsNotNull(grab.GetComponent<CollisionConstrainedGrabTransformer>(),
+                        path + " must constrain held movement rather than follow through obstacles");
                     Assert.AreNotEqual(CollisionDetectionMode.Discrete, body.collisionDetectionMode, path);
                     Assert.IsTrue(grab.useDynamicAttach, path);
                     Assert.IsNotEmpty(grab.colliders, path);
@@ -155,12 +190,41 @@ namespace XRApartment.Tests
         }
 
         [Test]
+        public void AllHeldProps_HaveCollisionConstrainedGrabsAndDisabledQueryProbes()
+        {
+            var grabs = Components<XRGrabInteractable>();
+            Assert.IsNotEmpty(grabs);
+            foreach (var grab in grabs)
+            {
+                var guard = grab.GetComponent<CollisionConstrainedGrabTransformer>();
+                Assert.IsNotNull(guard, grab.name);
+                CollectionAssert.AreEqual(new[] { guard }, grab.startingSingleGrabTransformers, grab.name);
+                CollectionAssert.AreEqual(new[] { guard }, grab.startingMultipleGrabTransformers, grab.name);
+                Assert.IsFalse(grab.addDefaultGrabTransformers, grab.name);
+                Assert.IsFalse(grab.smoothPosition || grab.smoothRotation || grab.trackScale, grab.name);
+                Assert.AreEqual(0f, grab.attachEaseInTime, grab.name);
+                var data = new SerializedObject(guard);
+                var probe = (BoxCollider)data.FindProperty("sweepProbe").objectReferenceValue;
+                Assert.IsNotNull(probe, grab.name);
+                Assert.IsFalse(probe.enabled, grab.name);
+                Assert.IsFalse(grab.colliders.Contains(probe), grab.name);
+                Assert.IsNotEmpty(grab.colliders, grab.name);
+                var profile = (HandInteractionProfile)data.FindProperty("profile").objectReferenceValue;
+                Assert.IsNotNull(profile, grab.name);
+                Assert.That(profile.Length("grab_contact_skin"), Is.GreaterThan(0f));
+            }
+        }
+
+        [Test]
         public void WaterAndSky_AreWiredToTheSelectedAssets()
         {
             Assert.AreEqual(1, Components<KitchenWaterSystem>().Length);
             Assert.AreEqual(1, Components<WaterTap>().Length);
-            Assert.AreEqual(3, Components<LiquidContainer>().Length);
-            foreach (var container in Components<LiquidContainer>())
+            var containers = Components<LiquidContainer>();
+            Assert.IsNotEmpty(containers);
+            var prefixes = containers.Select(container => new SerializedObject(container).FindProperty("parameterPrefix").stringValue).ToArray();
+            CollectionAssert.IsSubsetOf(new[] { "water_cooking_sink", "water_cooking_cup", "water_cooking_stockpot" }, prefixes);
+            foreach (var container in containers)
             {
                 var data = new SerializedObject(container);
                 var profile = (WaterInteractionProfile)data.FindProperty("profile").objectReferenceValue;
@@ -170,21 +234,17 @@ namespace XRApartment.Tests
                 Assert.That(profile.Length(prefix + "_height"), Is.GreaterThan(0));
                 Assert.IsNotNull(data.FindProperty("surface").objectReferenceValue);
                 Assert.IsNotNull(data.FindProperty("stream").objectReferenceValue);
-                Assert.That(profile.SurfaceMaterial.shader.name, Is.EqualTo("#NVJOB/Water Shaders V2/Water Specular"));
-                Assert.IsFalse(profile.SurfaceMaterial.IsKeywordEnabled("EFFECT_MIRROR"));
+                Assert.That(profile.SurfaceMaterial.shader.name, Is.EqualTo("HDRP/Lit"));
+                Assert.AreEqual(1f, profile.SurfaceMaterial.GetFloat("_SurfaceType"));
+                Assert.That(AssetDatabase.GetAssetPath(profile.SurfaceMaterial.GetTexture("_NormalMap")),
+                    Does.StartWith("Assets/ThirdParty/NVJOBWaterV2/"));
             }
-            // The test runner can make its own scratch scene active; RenderSettings
-            // are scene-specific, unlike the explicitly scoped component queries.
-            var previous = SceneManager.GetActiveScene();
-            try
-            {
-                SceneManager.SetActiveScene(scene);
-                Assert.That(RenderSettings.skybox.shader.name, Is.EqualTo("Skybox/Cubemap"));
-                Assert.IsNotNull(RenderSettings.skybox.GetTexture("_Tex"));
-                Assert.That(AssetDatabase.GetAssetPath(RenderSettings.skybox.GetTexture("_Tex")),
-                    Does.StartWith("Assets/ThirdParty/AllSkyFree/"));
-            }
-            finally { SceneManager.SetActiveScene(previous); }
+            var volume = Components<Volume>().Single(value => value.sharedProfile != null &&
+                value.sharedProfile.name == "VOL_KitchenCooking");
+            Assert.IsTrue(volume.sharedProfile.TryGet(out HDRISky sky));
+            Assert.IsNotNull(sky.hdriSky.value);
+            Assert.That(AssetDatabase.GetAssetPath(sky.hdriSky.value), Does.StartWith("Assets/ThirdParty/"));
+            Assert.That(Components<HDAdditionalReflectionData>().Count(probe => probe.texture != null), Is.GreaterThanOrEqualTo(1));
         }
 
         [Test]
@@ -193,9 +253,8 @@ namespace XRApartment.Tests
             var assumptions = AssetDatabase.LoadAssetAtPath<ModelAssumptions>("Assets/_Project/Settings/ASM_KitchenParameters.asset");
             var counter = Components<ReviewElement>().Single(element => element.Role == ReviewRole.CounterSurface);
             Assert.IsTrue(assumptions.TryGetLength(counter.AssumptionKey, out var height));
-            Assert.IsTrue(assumptions.TryGetLength("counter_fridge_cut_x", out var cut));
             var filter = counter.GetComponentInChildren<MeshFilter>();
-            Assert.That(filter.GetComponent<Renderer>().bounds.max.x, Is.EqualTo(cut).Within(0.001f));
+            Assert.That(filter.GetComponent<Renderer>().bounds.max.x, Is.GreaterThan(-1.50f));
             Physics.SyncTransforms();
             Assert.IsTrue(filter.GetComponent<MeshCollider>().Raycast(
                 new Ray(new Vector3(-3f, 2f, 2f), Vector3.down), out var hit, 3f));

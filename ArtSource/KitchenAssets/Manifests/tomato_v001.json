@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "asset_name": "tomato",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271128,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/tomato_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 2,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 0.08,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "slice",
+    "pieces": 4,
+    "interior": "tomato flesh"
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "a6a7afdd-33f4-46b4-832b-00dd50d479ee",
+    "elapsed_seconds": 60.03,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "workflow_sha256": "8e66abd5a1928866b5ae35445a40e44cc734b061c8f64629a5cf01f63dcbf3bc"
+  },
+  "outputs": {
+    "master_glb": "../tomato/v001/download/master.glb",
+    "game_glb": "../tomato/v001/prepared/tomato_game.glb",
+    "unity_fbx": "../tomato/v001/prepared/tomato_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../tomato/v001/TexturesSource/basecolor.png",
+      "metallic": "../tomato/v001/TexturesSource/metallic.png",
+      "roughness": "../tomato/v001/TexturesSource/roughness.png",
+      "normal": "../tomato/v001/TexturesSource/normal.png",
+      "ao": "../tomato/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../tomato/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../tomato/v001/prepared/tomato_master.glb",
+    "prepared_manifest": "../tomato/v001/prepared/unity_asset.json",
+    "game_pbr_folder": "../tomato/v001/prepared/Textures",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/tomato_v001/PREF_Prop_tomato.prefab",
+    "game_preview_png": "../tomato/v001/prepared/tomato_preview.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed.",
+      "Prepared cut planes and simple independent interior material; seeds/core/segments not authored."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "passed_real_XRI_physics_and_cooking_scenarios",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "visual_quality": "approved_for_kitchen_prototype",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "d14a6b5b52b134ed7a3a21fcc26cd04d8bbd3f2e54c1a57de180ba9c95431f36"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true
+  },
+  "intact_review": {
+    "status": "approved_for_prefracture",
+    "reviewer": "Codex",
+    "evidence": "qa/intact-reviewed.png and qa/intact-inspection-stats.json; prior full intermediates archived under Logs/KitchenAssetPipeline/ArchivedIntermediates.",
+    "source_sha256": "148535a10920f221b0c3268ae7e27c9edf2a6af63924288ca77a898b4c9b1fe8",
+    "reviewed_utc": "2026-10-28T01:34:37.835297+00:00",
+    "preview": "../tomato/v001/qa/intact-reviewed.png"
+  },
+  "processing": {
+    "source_sha256": "148535a10920f221b0c3268ae7e27c9edf2a6af63924288ca77a898b4c9b1fe8",
+    "game_triangles": 4000,
+    "triangle_budget": 4000,
+    "piece_count": 4,
+    "size_blender_xyz": [
+      0.07287299633026123,
+      0.07993696630001068,
+      0.07476723939180374
+    ],
+    "game_basecolor_size": [
+      1024,
+      1024
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 10.861,
+    "local_authoring_seconds": null,
+    "fragment_volume_relative_error": 1.0626327326611685e-10
+  }
+}

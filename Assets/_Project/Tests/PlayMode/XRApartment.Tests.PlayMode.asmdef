@@ -1,9 +1,28 @@
 {
   "name": "XRApartment.Tests.PlayMode",
-  "references": ["XRApartment.Data", "XRApartment.Simulation", "XRApartment.Runtime", "Unity.XR.Interaction.Toolkit", "Unity.TextMeshPro"],
-  "optionalUnityReferences": ["TestAssemblies"],
+  "references": [
+    "XRApartment.Data",
+    "XRApartment.Simulation",
+    "XRApartment.Runtime",
+    "Unity.XR.Interaction.Toolkit",
+    "Unity.XR.CoreUtils",
+    "Unity.InputSystem",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.HighDefinition.Runtime"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
   "includePlatforms": [],
   "autoReferenced": false,
   "overrideReferences": true,
-  "precompiledReferences": ["nunit.framework.dll"]
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "rootNamespace": "XRApartment.Tests",
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ]
 }

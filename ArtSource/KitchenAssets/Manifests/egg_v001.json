@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "asset_name": "egg",
+  "asset_class": "prop",
+  "version": 1,
+  "seed": 271528,
+  "quality": "standard",
+  "input_mode": "single",
+  "reference_images": {
+    "single": "../References/egg_single_v001.png"
+  },
+  "design_review": {
+    "approved": true,
+    "style_board": "../References/Kitchen_StyleBoard_v001.png",
+    "board_cell": 6,
+    "approval_evidence": "User reply 2026-10-28 (Asia/Hong_Kong): 确认这套风格，厨房物品优先，人物和模块随后"
+  },
+  "scale": {
+    "reference_span_metres": 0.06,
+    "status": "prototype assumption for asset production, not a client fact",
+    "orientation": "Blender Z-up source, glTF/Unity Y-up export",
+    "pivot": "bottom-centre; explicit pivots for moving parts"
+  },
+  "postprocess_recipe": {
+    "kind": "egg",
+    "shell_halves": 2,
+    "states": [
+      "intact",
+      "cracked",
+      "beaten",
+      "cooked",
+      "burnt"
+    ]
+  },
+  "source": {
+    "provider": "Comfy Cloud",
+    "model_preference": "Pixal3D",
+    "workflow_version": "KitchenAssets_v1",
+    "template_repository_commit": "3c2199b9362457b12b9c60c6cc303501526ebd62"
+  },
+  "generation": {
+    "status": "generated_processed_import_verified",
+    "job_id": "76732879-5ef7-42ca-ba2d-f8fd497e17c7",
+    "elapsed_seconds": 43.88,
+    "credits_before": null,
+    "credits_after": null,
+    "credits_consumed": null,
+    "failure": null,
+    "workflow_sha256": "0af00eabc3054659f8e9316cae6345e285544918780d4846d82dd5fde87f61f5"
+  },
+  "outputs": {
+    "master_glb": "../egg/v001/download/master.glb",
+    "game_glb": "../egg/v001/prepared/egg_game.glb",
+    "unity_fbx": "../egg/v001/prepared/egg_game.fbx",
+    "pbr_textures": {
+      "basecolor": "../egg/v001/TexturesSource/basecolor.png",
+      "metallic": "../egg/v001/TexturesSource/metallic.png",
+      "roughness": "../egg/v001/TexturesSource/roughness.png",
+      "normal": "../egg/v001/TexturesSource/normal.png",
+      "ao": "../egg/v001/TexturesSource/ao.png"
+    },
+    "preview_png": "../egg/v001/download/cloud_render_preview.png",
+    "normalized_master_glb": "../egg/v001/prepared/egg_master.glb",
+    "prepared_manifest": "../egg/v001/prepared/unity_asset.json",
+    "game_pbr_folder": "../egg/v001/prepared/Textures",
+    "unity_prefab": "Assets/_Project/Prefabs/Generated/egg_v001/PREF_Prop_egg.prefab",
+    "game_preview_png": "../egg/v001/prepared/egg_preview.png"
+  },
+  "human_cleanup": {
+    "minutes": 0,
+    "notes": [
+      "Human manual Blender-editing minutes: 0. Agent-authored repairs/iterations were performed; total authoring labour was not separately timed."
+    ],
+    "agent_authoring_minutes": null
+  },
+  "acceptance": {
+    "cloud_generation": "passed_actual_output_downloaded",
+    "mesh_and_scale": "passed_metres_mesh_and_import_checks",
+    "unity_import": "passed_actual_FBX_Standard_import",
+    "interaction": "passed_real_XRI_physics_and_cooking_scenarios",
+    "quest_link": "not_tested",
+    "windows_player_build": "not_tested",
+    "visual_quality": "approved_for_kitchen_prototype",
+    "ready_for_editor_prototype": true
+  },
+  "reference_sha256": {
+    "single": "ffe8fd1e334e69d6e47a5b1b333db60289fd40bf7c70c0897066ee69ac948e3b"
+  },
+  "cleanup": {
+    "weld_coincident_vertices": true,
+    "orientation": "longest_axis_z"
+  },
+  "intact_review": {
+    "status": "approved_for_prefracture",
+    "reviewer": "Codex mesh and visual review",
+    "source_sha256": "e31586ad978a29d6d32c5716376dc4916f79543f139c6ff3aa56af6f08383d0d",
+    "preview": "../egg/v001/qa/intact-reviewed.png",
+    "notes": "Closed after UV-seam welding; game-scale silhouette inspected. Prototype quality, hand cleanup not performed."
+  },
+  "processing": {
+    "source_sha256": "e31586ad978a29d6d32c5716376dc4916f79543f139c6ff3aa56af6f08383d0d",
+    "game_triangles": 4000,
+    "triangle_budget": 4000,
+    "piece_count": 2,
+    "size_blender_xyz": [
+      0.0482376404106617,
+      0.052729640156030655,
+      0.060019031167030334
+    ],
+    "game_basecolor_size": [
+      1024,
+      1024
+    ],
+    "source_pbr_sizes": {
+      "basecolor": [
+        2048,
+        2048
+      ],
+      "metallic": [
+        2048,
+        2048
+      ],
+      "roughness": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ],
+      "ao": [
+        1024,
+        1024
+      ]
+    },
+    "postprocess_seconds": 23.695,
+    "local_authoring_seconds": null,
+    "fragment_volume_relative_error": 1.9599191440227426e-09
+  }
+}

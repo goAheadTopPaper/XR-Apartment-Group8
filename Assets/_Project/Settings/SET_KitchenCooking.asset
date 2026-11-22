@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 220160e8b9b1a44348ac9b2ce0a3f88c, type: 3}
+  m_Name: SET_KitchenCooking
+  m_EditorClassIdentifier: 
+  cookedSeconds: 12
+  burntSeconds: 32
+  eggMillilitres: 50
+  whiskMetres: 0.7
+  maxWhiskMetresPerStep: 0.05
+  eggKnockSpeed: 0.55
+  emptyingSeconds: 2
+  receiverHeight: 0.2
+  rawAlbumen: {r: 0.94, g: 0.9, b: 0.68, a: 0.42}
+  beatenEgg: {r: 1, g: 0.66, b: 0.08, a: 1}
+  cookedEgg: {r: 1, g: 0.85, b: 0.43, a: 1}
+  cookedFoodTint: {r: 0.72, g: 0.46, b: 0.22, a: 1}
+  burntTint: {r: 0.12, g: 0.075, b: 0.035, a: 1}
+  steam: {r: 0.85, g: 0.85, b: 0.85, a: 0.16}
+  smoke: {r: 0.16, g: 0.14, b: 0.12, a: 0.25}

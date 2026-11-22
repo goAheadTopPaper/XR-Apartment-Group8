@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "asset_name": "egg",
+  "asset_class": "prop",
+  "version": 1,
+  "diagnostic_fixture": false,
+  "source_provider": "Comfy Cloud",
+  "source_sha256": "e31586ad978a29d6d32c5716376dc4916f79543f139c6ff3aa56af6f08383d0d",
+  "design_approved": true,
+  "blender_version": "5.2.2 LTS",
+  "scale_factor": 0.06990977586684659,
+  "stage": "prepared",
+  "master_stats": [
+    {
+      "vertices": 49994,
+      "triangles": 99984,
+      "closed": true,
+      "volume_m3": 7.984884382179739e-05
+    }
+  ],
+  "raw_master_stats": [
+    {
+      "vertices": 53491,
+      "triangles": 99984,
+      "closed": false,
+      "volume_m3": null
+    }
+  ],
+  "cleanup": [
+    {
+      "mesh": "Mesh_0",
+      "operation": "weld_coincident_vertices_preserve_loop_uv",
+      "tolerance_source_units": 8.669618368148803e-08,
+      "vertices_before": 53491,
+      "vertices_after": 49994,
+      "boundaries_before": 6954,
+      "boundaries_after": 0
+    },
+    {
+      "operation": "longest_axis_z",
+      "source_axis": [
+        0.022518454119563103,
+        -0.28513389825820923,
+        0.9582231640815735
+      ]
+    }
+  ],
+  "unity_units": "metres",
+  "unity_up": "Y",
+  "shared_pivot": "bottom centre",
+  "size_blender_xyz": [
+    0.0482376404106617,
+    0.052729640156030655,
+    0.060019031167030334
+  ],
+  "intact_fbx": "egg_game.fbx",
+  "pieces_fbx": "egg_pieces.fbx",
+  "recipe": "egg",
+  "piece_count": 2,
+  "pieces": [
+    {
+      "visual": "VIS_Piece_00",
+      "collider": "COL_Piece_00",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 2616,
+      "triangles": 5228,
+      "closed": true,
+      "volume_m3": 3.7726924897074623e-06
+    },
+    {
+      "visual": "VIS_Piece_01",
+      "collider": "COL_Piece_01",
+      "collider_method": "simplified_convex_hull",
+      "vertices": 2144,
+      "triangles": 4284,
+      "closed": true,
+      "volume_m3": 3.280390202574502e-06
+    }
+  ],
+  "triangle_budget": 4000,
+  "game_triangles": 4000,
+  "pbr_textures": {
+    "basecolor": "basecolor.png",
+    "metallic": "metallic.png",
+    "roughness": "roughness.png",
+    "normal": "normal.png",
+    "ao": "ao.png",
+    "metallic_smoothness": "metallic_smoothness.png"
+  },
+  "embedded_images": [
+    {
+      "file": "embedded_00.png",
+      "original_name": "Image_0",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "sRGB"
+    },
+    {
+      "file": "embedded_01.png",
+      "original_name": "Image_1",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "Non-Color"
+    },
+    {
+      "file": "embedded_02.png",
+      "original_name": "Image_2",
+      "width": 1024,
+      "height": 1024,
+      "color_space": "Non-Color"
+    }
+  ],
+  "fragment_volume_relative_error": 1.9599191440227426e-09,
+  "elapsed_seconds": 23.695,
+  "acceptance": {
+    "unity_import": "pending",
+    "normal_direction": "pending",
+    "body_rig": "not_applicable",
+    "facial_lipsync": "not_applicable",
+    "movable_part_pivots": "manual_check_required"
+  }
+}

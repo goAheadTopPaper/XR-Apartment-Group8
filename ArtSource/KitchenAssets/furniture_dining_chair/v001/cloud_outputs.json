@@ -1,0 +1,48 @@
+{
+  "job_id": "b896a67e-5393-492b-aacf-16ee35124d71",
+  "archive_sha256": "f532648182a94ab183d41281930c66b6658ae3513ca77414e12606eb8ad9088f",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/furniture_dining_chair/v001/master_glb_00001.glb",
+      "bytes": 12350112,
+      "sha256": "c494a0ae36a6569d3fc74c53973c5535c8b290edb6133f046af9b35c4f3e996e",
+      "file": "furniture_dining_chair/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/furniture_dining_chair/v001/basecolor_00001.png",
+      "bytes": 3442052,
+      "sha256": "063a3a60c3e9c1f7bd4d24d9cad4afe80589feebd480a818ff364fcbb224032a",
+      "file": "furniture_dining_chair/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/furniture_dining_chair/v001/metallic_00001.png",
+      "bytes": 133739,
+      "sha256": "b09be6d3f85333fb6796eefa570009a63f84f3bdb5576a501c5705f72e7ff9cf",
+      "file": "furniture_dining_chair/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/furniture_dining_chair/v001/roughness_00001.png",
+      "bytes": 1623939,
+      "sha256": "10c7c0d018147308a051901b8d66a57ab19df5463b9870e75d100f98c150e4fb",
+      "file": "furniture_dining_chair/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/furniture_dining_chair/v001/normal_00001.png",
+      "bytes": 1716256,
+      "sha256": "5275d1501cc769afcfea3677f0e9761b37f3855998f6e101d3188b2a14391902",
+      "file": "furniture_dining_chair/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/furniture_dining_chair/v001/ao_00001.png",
+      "bytes": 724900,
+      "sha256": "31e1ae8750cd98a8526c41757d760a26defe7d24182207a5bd52e35a0c59f49b",
+      "file": "furniture_dining_chair/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/furniture_dining_chair/v001/render_preview_00001.png",
+      "bytes": 376624,
+      "sha256": "4969f868bf4e9a02772c007e477f5cf6fc6f3ed6602898363722527aafd79abf",
+      "file": "furniture_dining_chair/v001/download/cloud_render_preview.png"
+    }
+  }
+}

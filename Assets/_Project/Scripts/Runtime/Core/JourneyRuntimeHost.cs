@@ -65,8 +65,10 @@ namespace XRApartment.Runtime.Core
         private float lastBlockedNoticeAt = -10f;
 
         public IJourneyCore Core { get; private set; }
+        internal event Action<JourneySnapshot> SnapshotUpdated;
         public string StartupError { get; private set; }
         public FeedbackValidationResult LastFeedbackValidation { get; private set; }
+        internal BenchmarkDefinition FindBenchmark(string id) => registry == null ? null : registry.Find(id);
         public FeedbackRequest CurrentFeedbackRequest
         {
             get
@@ -130,7 +132,7 @@ namespace XRApartment.Runtime.Core
             sceneAdapter.InteractionBlocked += OnInteractionBlocked;
             if (conflicts != null) conflicts.ConflictObserved += OnConflict;
             if (safety != null) safety.SafetyObserved += OnSafety;
-            view?.Render(Core.Snapshot, JourneyErrorCode.None, string.Empty);
+            Render(Core.Snapshot, JourneyErrorCode.None, string.Empty);
         }
 
         private void OnDestroy()
@@ -232,9 +234,15 @@ namespace XRApartment.Runtime.Core
         {
             var result = Core.Submit(command);
             sceneAdapter?.SyncExplorePlacement(result.Snapshot);
-            view?.Render(result.Snapshot, result.ErrorCode, result.Message);
+            Render(result.Snapshot, result.ErrorCode, result.Message);
             if (result.Action != null) Dispatch(result.Action);
             return result;
+        }
+
+        private void Render(JourneySnapshot snapshot, JourneyErrorCode code, string message)
+        {
+            view?.Render(snapshot, code, message);
+            SnapshotUpdated?.Invoke(snapshot);
         }
 
         private void Dispatch(JourneyAction action)
@@ -380,7 +388,7 @@ namespace XRApartment.Runtime.Core
             if (sessionPlan.BenchmarkIds == null) return "Benchmark order is missing.";
             foreach (var id in sessionPlan.BenchmarkIds)
             {
-                var definition = registry.Find(id);
+                var definition = FindBenchmark(id);
                 if (definition == null || !definition.Allows(SessionMode.Challenge))
                     return "Registry has no Challenge benchmark: " + id;
                 if (!sceneAdapter.HasBinding(id)) return "Runtime prefab binding is missing: " + id;

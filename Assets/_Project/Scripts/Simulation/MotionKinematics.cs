@@ -22,6 +22,20 @@ namespace XRApartment.Simulation
             return t01 * t01 * (3.0 - 2.0 * t01);
         }
 
+        /// Recover timeline progress from an accepted eased pose after a sweep stops motion.
+        public static double InverseSmoothStep(double value01)
+        {
+            var value = Clamp01(value01);
+            if (value == 0.0 || value == 1.0) return value;
+            var lo = 0.0; var hi = 1.0;
+            for (var i = 0; i < 24; i++)
+            {
+                var middle = (lo + hi) * .5;
+                if (SmoothStep(middle) < value) lo = middle; else hi = middle;
+            }
+            return (lo + hi) * .5;
+        }
+
         /// Moves a 0..1 progress value toward the target by at most delta01 per call.
         public static double StepToward(double current, double target, double delta01)
         {

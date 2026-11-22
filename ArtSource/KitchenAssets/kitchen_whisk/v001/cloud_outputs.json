@@ -1,0 +1,48 @@
+{
+  "job_id": "6d20ad20-4532-4741-b38b-f741472cf454",
+  "archive_sha256": "71c99d9f9349ecae14fe79f05255e3b256d454298485bec6a3358a4117280a0a",
+  "files": {
+    "master_glb": {
+      "cloud_file": "3d/kitchen/kitchen_whisk/v001/master_glb_00001.glb",
+      "bytes": 12336620,
+      "sha256": "51ba4a0bb4c7401a006999daa4c22ebdf7cfcf40454d3a2d61b508b6dd42bbb6",
+      "file": "kitchen_whisk/v001/download/master.glb"
+    },
+    "basecolor": {
+      "cloud_file": "3d/kitchen/kitchen_whisk/v001/basecolor_00001.png",
+      "bytes": 2334787,
+      "sha256": "c9ff72f7358bbb17bd5ae79bf6fd1922a360cd014e584884a700b1c8847bd9f2",
+      "file": "kitchen_whisk/v001/TexturesSource/basecolor.png"
+    },
+    "metallic": {
+      "cloud_file": "3d/kitchen/kitchen_whisk/v001/metallic_00001.png",
+      "bytes": 768008,
+      "sha256": "c86ea1e383e01df90416933e9b79c6477882c3c6bc3cea5119465cf9b080b314",
+      "file": "kitchen_whisk/v001/TexturesSource/metallic.png"
+    },
+    "roughness": {
+      "cloud_file": "3d/kitchen/kitchen_whisk/v001/roughness_00001.png",
+      "bytes": 1141850,
+      "sha256": "7837f93d1d6b4bf8cf18f5664d4a886764eab65979e29a7214e2f29a15d823b2",
+      "file": "kitchen_whisk/v001/TexturesSource/roughness.png"
+    },
+    "normal": {
+      "cloud_file": "3d/kitchen/kitchen_whisk/v001/normal_00001.png",
+      "bytes": 2666030,
+      "sha256": "dad941f6fc0800f2d23e113b4cb2ebb0380e7042aca57509c174176895a6c9ca",
+      "file": "kitchen_whisk/v001/TexturesSource/normal.png"
+    },
+    "ao": {
+      "cloud_file": "3d/kitchen/kitchen_whisk/v001/ao_00001.png",
+      "bytes": 469449,
+      "sha256": "46d9a51e1b3a2fa939177d16dc299a14d853df9e6cad003faa00fa75ecdce9a7",
+      "file": "kitchen_whisk/v001/TexturesSource/ao.png"
+    },
+    "render_preview": {
+      "cloud_file": "3d/kitchen/kitchen_whisk/v001/render_preview_00001.png",
+      "bytes": 221113,
+      "sha256": "39068440c5de5ec1a75926e4c5b8d0e8667d32e4b8ace04cc05862385e69c0e7",
+      "file": "kitchen_whisk/v001/download/cloud_render_preview.png"
+    }
+  }
+}

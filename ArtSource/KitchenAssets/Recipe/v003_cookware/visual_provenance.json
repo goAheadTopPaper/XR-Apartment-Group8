@@ -1,0 +1,572 @@
+{
+  "schema_version": 1,
+  "assets": {
+    "fridge_body": {
+      "meshes": [
+        {
+          "name": "VIS_EnamelLeft",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.046112701010881746
+        },
+        {
+          "name": "VIS_EnamelRight",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.046112701010881746
+        },
+        {
+          "name": "VIS_EnamelTop",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.017756222081350276
+        },
+        {
+          "name": "VIS_EnamelBase",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.04467558453324616
+        },
+        {
+          "name": "VIS_EnamelBack",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.04481369934385635
+        },
+        {
+          "name": "VIS_LinerBack",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.02153866499361103
+        },
+        {
+          "name": "VIS_LinerLeft",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.015505400211362905
+        },
+        {
+          "name": "VIS_LinerRight",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.015505400211362905
+        },
+        {
+          "name": "VIS_LinerBase",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00612185531478257
+        },
+        {
+          "name": "VIS_FrameGasket",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00017744795013675067
+        },
+        {
+          "name": "VIS_FrameGasket.001",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00017744795013675067
+        },
+        {
+          "name": "VIS_FrameGasket.002",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 6.86679573249691e-05
+        },
+        {
+          "name": "VIS_FrameGasket.003",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 6.86679573249691e-05
+        },
+        {
+          "name": "VIS_VentSlat",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 3.298561356531616e-05
+        },
+        {
+          "name": "VIS_VentSlat.001",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 3.298561356531616e-05
+        },
+        {
+          "name": "VIS_VentSlat.002",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 3.298561356531616e-05
+        },
+        {
+          "name": "VIS_VentSlat.003",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 3.298561356531616e-05
+        },
+        {
+          "name": "VIS_VentSlat.004",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 3.298561356531616e-05
+        },
+        {
+          "name": "VIS_VentSlat.005",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 3.298561356531616e-05
+        },
+        {
+          "name": "VIS_AdjustableFoot",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00013003771218302206
+        },
+        {
+          "name": "VIS_AdjustableFoot.001",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00013003771218302206
+        },
+        {
+          "name": "VIS_AdjustableFoot.002",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00013003771218302206
+        },
+        {
+          "name": "VIS_AdjustableFoot.003",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00013003771218302206
+        },
+        {
+          "name": "VIS_InteriorLamp",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 8.31649503712978e-05
+        },
+        {
+          "name": "VIS_Shelf_0",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.006176808785725388
+        },
+        {
+          "name": "VIS_ShelfLip_0",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00018907896074124139
+        },
+        {
+          "name": "VIS_Shelf_1",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.006176808785725388
+        },
+        {
+          "name": "VIS_ShelfLip_1",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00018907896074124139
+        },
+        {
+          "name": "VIS_Shelf_2",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.006176808785725388
+        },
+        {
+          "name": "VIS_ShelfLip_2",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00018907896074124139
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.36000001430511475,
+          -0.34300002455711365,
+          0.0
+        ],
+        [
+          0.36000001430511475,
+          0.33000001311302185,
+          1.809999942779541
+        ]
+      ],
+      "cleanup": [
+        {
+          "removed_floating_vertices": 0
+        },
+        "Generated broad casing faces failed straightness review; rebuilt hard-surface retopology from approved generated design, open liner and three registered shelves. Cloud master retained; runtime casing is locally authored, door is generated mesh."
+      ],
+      "job_id": "1c97cc8d-8fa6-4bea-8cbc-ace58f965264",
+      "master_sha256": "4db376d874b55c1257bc483a02131f8ae7e200f0f668b22888500e4f03c45575"
+    },
+    "fridge_door": {
+      "meshes": [
+        {
+          "name": "VIS_fridge_door",
+          "vertices": 4623,
+          "triangles": 9280,
+          "closed": true,
+          "volume_m3": 0.056274046165811505
+        },
+        {
+          "name": "VIS_DoorInnerPanel",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.014760797225012497
+        },
+        {
+          "name": "VIS_DoorSeal",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00013433493533447207
+        },
+        {
+          "name": "VIS_DoorSeal.001",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 0.00013433493533447207
+        },
+        {
+          "name": "VIS_DoorSeal.002",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 5.171495470638587e-05
+        },
+        {
+          "name": "VIS_DoorSeal.003",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 5.171495470638587e-05
+        }
+      ],
+      "bounds_blender": [
+        [
+          -5.960464477539063e-08,
+          -0.11500000953674316,
+          0.014999999664723873
+        ],
+        [
+          0.6899999976158142,
+          0.03949999809265137,
+          1.7450001239776611
+        ]
+      ],
+      "cleanup": [
+        {
+          "removed_floating_vertices": 362
+        },
+        "Generated front/handle retained; clean local rear liner and gasket cover unreconstructable backside texture."
+      ],
+      "job_id": "07f52340-de05-4e55-8678-63994e707b41",
+      "master_sha256": "c7fcf55e416c3e9e39647e461008ff0c4c8241fb975b2e9588018808948ae3c2"
+    },
+    "frying_pan": {
+      "meshes": [
+        {
+          "name": "VIS_frying_pan",
+          "vertices": 6302,
+          "triangles": 8000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.2725927233695984,
+          -0.10899999737739563,
+          0.004000000189989805
+        ],
+        [
+          0.10900000482797623,
+          0.10900000482797623,
+          0.04000000283122063
+        ]
+      ],
+      "cleanup": [],
+      "job_id": "250c7fd4-3027-45cf-82a9-36e127847ec3",
+      "master_sha256": "f2f34089eae907a1892cb6240a3bb9f4a5ef35847d89848e926303552475ba52"
+    },
+    "stockpot": {
+      "meshes": [
+        {
+          "name": "VIS_stockpot",
+          "vertices": 6430,
+          "triangles": 8000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.11703547835350037,
+          -0.09000000357627869,
+          -0.05999999865889549
+        ],
+        [
+          0.11703548580408096,
+          0.09000000357627869,
+          0.06799999624490738
+        ]
+      ],
+      "cleanup": [],
+      "job_id": "27e42d88-e8a4-46ee-b243-2b1c80031274",
+      "master_sha256": "beba7e03505e4d9c71235d182c3dff4439e0495231b336a1c4947ef729a46289"
+    },
+    "spatula": {
+      "meshes": [
+        {
+          "name": "VIS_spatula",
+          "vertices": 7538,
+          "triangles": 8000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.032999999821186066,
+          -0.28200000524520874,
+          0.0
+        ],
+        [
+          0.032999999821186066,
+          0.04150000214576721,
+          0.032999999821186066
+        ]
+      ],
+      "cleanup": [],
+      "job_id": "53cef90d-5321-4038-9c0b-2e367514f4d1",
+      "master_sha256": "da343c86205cbcc798b3e1de1095bbeccc4546b15fa6f65d47d1f8501f4752ba"
+    },
+    "ladle": {
+      "meshes": [
+        {
+          "name": "VIS_ladle",
+          "vertices": 6041,
+          "triangles": 8000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.04666093364357948,
+          -0.26496195793151855,
+          0.0
+        ],
+        [
+          0.046660929918289185,
+          0.034999996423721313,
+          0.07268796861171722
+        ]
+      ],
+      "cleanup": [],
+      "job_id": "6101b476-1648-473c-a2f8-e4af0fda2764",
+      "master_sha256": "d94cfc02bc4e52e720ce7930e84ad4e34342e2373159a7c4a94878b38a8b9852"
+    },
+    "gas_hob": {
+      "meshes": [
+        {
+          "name": "VIS_gas_hob",
+          "vertices": 9576,
+          "triangles": 8000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.1599999964237213,
+          -0.18000000715255737,
+          0.0
+        ],
+        [
+          0.1599999964237213,
+          0.18000000715255737,
+          0.054999999701976776
+        ]
+      ],
+      "cleanup": [],
+      "job_id": "a5dcc0ad-f3e9-465f-b08f-df8d3c19164a",
+      "master_sha256": "0279344b5f994c0f60674b4ee1e106383debff211600f9b16067750dd7c2c894"
+    },
+    "whisk": {
+      "meshes": [
+        {
+          "name": "VIS_whisk",
+          "vertices": 10910,
+          "triangles": 8000,
+          "closed": false,
+          "volume_m3": null
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.014000000432133675,
+          -0.014000000432133675,
+          0.013999998569488525
+        ],
+        [
+          0.01400000136345625,
+          0.0139999995008111,
+          0.28999999165534973
+        ]
+      ],
+      "cleanup": [],
+      "job_id": "6d20ad20-4532-4741-b38b-f741472cf454",
+      "master_sha256": "51ba4a0bb4c7401a006999daa4c22ebdf7cfcf40454d3a2d61b508b6dd42bbb6"
+    }
+  },
+  "locally_authored_plumbing": {
+    "sink_basin": {
+      "meshes": [
+        {
+          "name": "VIS_RolledSink",
+          "vertices": 800,
+          "triangles": 1440,
+          "closed": false,
+          "volume_m3": null
+        },
+        {
+          "name": "VIS_DrainStrainer",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 1.810659627610169e-06
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.19200000166893005,
+          -0.19200000166893005,
+          0.0
+        ],
+        [
+          0.19200000166893005,
+          0.19200000166893005,
+          0.08699999749660492
+        ]
+      ]
+    },
+    "sink_tap": {
+      "meshes": [
+        {
+          "name": "VIS_GooseneckTap",
+          "vertices": 972,
+          "triangles": 1920,
+          "closed": false,
+          "volume_m3": null
+        },
+        {
+          "name": "VIS_TapBase",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 1.9058912440772084e-05
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.026000000536441803,
+          -0.035659246146678925,
+          0.0
+        ],
+        [
+          0.026000000536441803,
+          0.18599998950958252,
+          0.3042031228542328
+        ]
+      ]
+    },
+    "tap_lever": {
+      "meshes": [
+        {
+          "name": "VIS_TapLever",
+          "vertices": 96,
+          "triangles": 188,
+          "closed": true,
+          "volume_m3": 6.545258717787973e-05
+        }
+      ],
+      "bounds_blender": [
+        [
+          -0.04500000178813934,
+          -0.017500000074505806,
+          -0.012500000186264515
+        ],
+        [
+          0.04500000178813934,
+          0.017500000074505806,
+          0.012500000186264515
+        ]
+      ]
+    }
+  },
+  "files": {
+    "sink_basin.fbx": "775c230ffecce9a5c4465272ab6c3b5388b9099c569e97f20c646ddf0798cc41",
+    "sink_tap.glb": "e2c227f889577550063b0a5d0b4c69592c75132164840891471a0cff9a5fb3e5",
+    "gas_hob.fbx": "57ced2af982e4cbe77db91322a4d3e0b33e20a0df9520fc9354d70c92d9fdfff",
+    "fridge_door.fbx": "70aa805126d4da43bfc70fdc1a5655aad5a47836257fea0b8c292842d4b06387",
+    "ladle.fbx": "6c1e3aabab070ac560b9a2e725c0756747bf4d135f6777ed1ba999cbed8cdf75",
+    "tap_lever.glb": "6a89060ac9c593156ae40e98b69935dc3f23cb88dd6112e47615b53e37057692",
+    "whisk.fbx": "20cc9950db263e2af3a5f39c802c85de9c6f7cd587c60a237ea9b95e3c4deb6b",
+    "frying_pan.fbx": "e139117f7f51d7de9163b79c84a5ac8117b4127fd7200c6b53aedab6b14f8e7b",
+    "fridge_body.glb": "e97ca1b5b0867e72b976b89470ed626a26cb8ed7d1b13a2d8f9737813c6b0ec8",
+    "spatula.fbx": "f929add27d77b3674bf34b680c71f774778266fd453700adae955583a06b98cd",
+    "stockpot.glb": "3e9baf471d19edb8725c22cc7d21466d88006a03edca60392528ca20fca8b33a",
+    "gas_hob.glb": "5b1fc6c21bd639fb4d72a9779f57912b523a028dbd3460dcd6397a7359094968",
+    "fridge_door.glb": "2b3cfbd61e54ffb54e5c42d01750cb06d0c6f4d1605848f430b2189e3667e0e5",
+    "gas_hob_review.png": "dfc7d2a0c8c2bd490d22e0b7d4799dbdb2baf983dcc1fbbf7b78685a4907e038",
+    "ladle.glb": "7a8c6d3b6c2e7e618fed5356417bcdba1e9aa8ff8cb2a04bc3f6d79f10606095",
+    "tap_lever.fbx": "89081446cbf9f8f322e9d0c7a0cabebc838393d2acecf8f717beb567e35b91d9",
+    "sink_basin.glb": "d8eabda5997118c1c7a54767348cebd907e3e815c9b356df55381c30585e19a8",
+    "sink_tap.fbx": "3b1527d3c3e6070a37d406550c469fe7578fecb4eb9fde6b42019b01bf8ec942",
+    "frying_pan_review.png": "b9c86c7d2ee04faa5627f186068722e7a682ae747fc468a00b15344b05d14489",
+    "fridge_body.fbx": "f91d1ffb8b712d9805bd0ff8f966f5defbdd9677a9043689d984d7f0d332879d",
+    "spatula.glb": "9c7092a6cd4cfc9cbbd505fe822825d2d92d3a3d58702d22f9a001ff6633db5c",
+    "stockpot.fbx": "c49756da47de9e5edaeaee751e47a701c6c25fe985ea6fdb0c49a3fbd0bc3e6a",
+    "whisk.glb": "b6f68b25ba159311cec5433d0f4808a864b0f75c9af52bd15a98129cf447a1df",
+    "frying_pan.glb": "bad5404d3f8279e9bdbe08d6c3cebf1793e17da3a65a59be93e6ca8e9ac15bda"
+  }
+}

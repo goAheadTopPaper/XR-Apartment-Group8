@@ -1,0 +1,26 @@
+{
+  "method": "built-in ImageGen",
+  "style_board": "Kitchen_StyleBoard_v001.png",
+  "entries": [
+    {
+      "name": "carrot",
+      "prompt": "Create one isolated image-to-3D asset reference matching the approved style-board reference: the single orange carrot in cell 3, one whole tapered carrot with a short trimmed sturdy green stalk cluster, orange natural shallow root striations, slightly rounded tip; full carrot lying horizontally left tip/right stalk in a slightly elevated three-quarter view. Preserve the same clean restrained realistic kitchen game-asset style and material colours. One object only, fully visible with generous margins in a square composition, about 78 percent canvas span. Plain off-white background, soft even diffuse light, minimal contact shadow, no strong highlights baked into the material, no floor texture, no depth of field. No text, labels, numbering, grid, logos, other objects, sliced parts or fragments. This is a single intact object reference, not a contact sheet.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-07baccc9-416b-400e-9e2f-e0a52ea43362.png"
+    },
+    {
+      "name": "apple",
+      "prompt": "Create one isolated image-to-3D asset reference matching the approved style-board reference: the single red-green apple in cell 4, one whole rounded red apple with restrained yellow-green streaks, a short woody stem, natural lobes near its crown, no leaf; upright three-quarter view slightly from above, showing full closed silhouette. Preserve the same clean restrained realistic kitchen game-asset style and material colours. One object only, fully visible with generous margins in a square composition, about 78 percent canvas span. Plain off-white background, soft even diffuse light, minimal contact shadow, no strong highlights baked into the material, no floor texture, no depth of field. No text, labels, numbering, grid, logos, other objects, sliced parts or fragments. This is a single intact object reference, not a contact sheet.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-1057bc5e-ea53-4bae-a2b4-ce3d9751728f.png"
+    },
+    {
+      "name": "lemon",
+      "prompt": "Create one isolated image-to-3D asset reference matching the approved style-board reference: the single yellow lemon in cell 5, one whole yellow lemon with modest pointed ends and fine natural rind, lying horizontally in a useful three-quarter view, entire closed silhouette visible. Preserve the same clean restrained realistic kitchen game-asset style and material colours. One object only, fully visible with generous margins in a square composition, about 78 percent canvas span. Plain off-white background, soft even diffuse light, minimal contact shadow, no strong highlights baked into the material, no floor texture, no depth of field. No text, labels, numbering, grid, logos, other objects, sliced parts or fragments. This is a single intact object reference, not a contact sheet.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-e9a64d83-294a-4e37-aa24-6ea6ac9df83f.png"
+    },
+    {
+      "name": "knife",
+      "prompt": "Create one isolated image-to-3D asset reference matching the approved style-board reference: the single chef knife in cell 7, one stainless-steel chef knife with a straight strong spine and curved cutting edge, charcoal dark handle with three modest metal rivets; knife lying horizontally, blade tip on the left and handle on the right, viewed slightly from above so the full broad blade side, real blade/spine thickness and handle volume are clear; complete knife fully in frame. Preserve the same clean restrained realistic kitchen game-asset style and material colours. One object only, fully visible with generous margins in a square composition, about 78 percent canvas span. Plain off-white background, soft even diffuse light, minimal contact shadow, no strong highlights baked into the material, no floor texture, no depth of field. No text, labels, numbering, grid, logos, other objects, sliced parts or fragments. This is a single intact object reference, not a contact sheet.",
+      "source": "/Users/happys/.codex/generated_images/01a13fbb-ebcd-7c60-92a5-d9a6714ec7ad/exec-036a280c-43b7-4cb9-af67-f25dd67f1162.png"
+    }
+  ]
+}

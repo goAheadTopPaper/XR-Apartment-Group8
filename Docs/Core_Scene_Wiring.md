@@ -7,15 +7,15 @@
 ## 当前 Play 验证接线
 
 - `PREF_Core_PlayValidation` 挂载 `JourneyRuntimeHost`、`RuntimeBenchmarkAdapter`、`TaskEvidenceBridge`、Mock Feedback/Storage 和临时 `JourneyDebugUI`。原场景里的静态 B1 benchmark 实例已由运行时空槽位取代；`Show B1/B2` 会实例化对应 Prefab，切换时保持厨房、XR Rig 和 UI 不变。
-- 运行时 `SLOT_Benchmark_Runtime` 保留原静态 benchmark 的 180° Y 朝向，Fresh 门面向室内；B1/B2 同用此槽位，朝向由 PlayMode 测试覆盖。
-- 两个方案都读取 `REG_Benchmarks`，分别标为 `B1=Proud+F2` 和 `B2=FlushOriented+F2`。B2 围板启用，B1 围板关闭；两者暂用现有 F2 交互代理。任务访问对象是 Freezer 与 Fresh 两扇门的运动学枢轴 `ACCESS_FridgeFreezerDoor`、`ACCESS_FridgeFreshDoor`，打开/关闭逐扇按实际 `Progress` 记录。
-- 三件共享、可抓取任务物：`ITEM_Tomato`、`ITEM_Onion` 是原有物，Setup/Orientation/Explore 时摆在 `SET_Preparation` 的台面盘子上；Start B1/B2 时重置到上方 Freezer 的 `ZONE_FreezerSource`，Reset/Replay 也回到 Freezer。反馈保存成功回到 Explore 后再恢复盘子摆放。`ITEM_CerealBox` 是新购物，初始在早餐区。两件原有物从 Freezer 取出并在台面紫色 `ZONE_Temporary` 临放；第 5 步只能用其中一件原有物确认重整；第 6 步三件才都参与放回。三个分格的触发 Collider 属于同一个逻辑 `ZONE_FreshDestination`，没有指定唯一正确层板；其有效宽度和深度与可见 Fresh 层板对齐，层板侧边可放置区也有效。上方 Freezer 和下方 Fresh 两扇门均须真实开到位、关到位。F2 Fresh 门后有可见内胆、背板、层板及点光源；旧 `OPENING_FridgeDoor_Fresh/Freezer` 黑色遮挡薄片已移除。绿色 `ZONE_Approach` 和蓝色 `ZONE_Leave` 分别用于接近、离开。彩色区域采用不碰撞的半透明表面高亮，证据仍取自独立触发 Collider。临时 `TaskTargetGuide` 以绿色浮空倒三角指向当前门把手、物品或目标区，不推进状态。
+- 运行时 `SLOT_Benchmark_Runtime` 保留原静态 benchmark 的 180° Y 朝向，F2 门面向室内；B1/B2 同用此槽位，朝向由 PlayMode 测试覆盖。
+- 两个方案都读取 `REG_Benchmarks`，分别标为 `B1=Proud+F2` 和 `B2=FlushOriented+F2`。B2 围板启用，B1 围板关闭；两者共用 `PREF_Fridge_F2`。任务通过大型单门的运动学枢轴 `ACCESS_FridgeDoor` 读取实际开关进度。
+- 三件共享、可抓取任务物：`ITEM_Tomato`、`ITEM_Onion` 是原有物，Setup/Orientation/Explore 时摆在 `SET_Preparation` 的台面盘子上；Start B1/B2 时重置到上方 Freezer 的 `ZONE_FreezerSource`，Reset/Replay 也回到 Freezer。反馈保存成功回到 Explore 后再恢复盘子摆放。`ITEM_CerealBox` 是新购物，初始在早餐区。两件原有物从 Freezer 取出并在台面紫色 `ZONE_Temporary` 临放；第 5 步只能用其中一件原有物确认重整；第 6 步三件才都参与放回。三个分格的触发 Collider 属于同一个逻辑 `ZONE_FreshDestination`，没有指定唯一正确层板；其有效宽度和深度与可见 Fresh 层板对齐，层板侧边可放置区也有效。同一扇 F2 门须真实开到位、关到位。门后有可见内胆、背板、层板及点光源。绿色 `ZONE_Approach` 和蓝色 `ZONE_Leave` 分别用于接近、离开。彩色区域采用不碰撞的半透明表面高亮，证据仍取自独立触发 Collider。临时 `TaskTargetGuide` 以绿色浮空倒三角指向当前门把手、物品或目标区，不推进状态。
 - `TaskTargetGuide` 还依据 `JourneySnapshot` 控制区域 Renderer：非 Challenge 状态全部隐藏；Challenge 中仅显示当前步骤需要的区域，Reorganise 在抓住目标物后突出 Fresh 目标，PutBack 持续显示 Fresh 目标。它不禁用 Collider，不改变 Core 判定；正式 UI 可替换此视觉呈现。
 - PutBack 的 Fresh 金色目标区现在持续显示到 `Items: 3/3`；松手后目标区不再消失，避免把提示隐藏误认作完成。储物证据以任务物非 Trigger 碰撞体中心为位置基准（而非可能位于模型底部的根节点），仍须松手并稳定停留。三件物品逐件计数，计满才进入 Close。
-- 进入 Play 后，Game 视图左上角应出现临时 Debug UI。依次 Complete setup、Acknowledge orientation、Show B1、Start B1。八步实操：进入绿色区域 → 打开 Freezer 与 Fresh 两扇门 → 从上方 Freezer 取出番茄和洋葱 → 两件都释放在台面紫色区 → 至少一件移入下方 Fresh 任意一格并点击 Confirm physical reorganisation → 将三件物品都释放在 Fresh 任意格 → 关两扇门 → 离开绿色区并进入蓝色区。提交反馈并确认 Mock 保存后，再对 B2 重复。Reset、Skip、Pause/Resume、Safe exit、Mock 保存失败与 Retry 可用同一面板检查。
-- `Assets/_Project/Tests/PlayMode/CorePlayWiringSmokeTests.cs` 是无头显启动/方案切换烟测，并通过移动真实场景对象、门体进度和区域判定验证 B1/B2 八步；门外可见性测试还会以真实图形设备分别渲染 Freezer 和 Fresh 门洞，检查内部亮度。批处理运行该视觉测试时不要带 `-nographics`，否则它会明确跳过；它不直接向 Core 注入任务证据，但也不等于 XRI 手柄抓取实测。完整动作仍须在 Play 中由人用模拟器或 Quest Link 操作。
+- 进入 Play 后，Game 视图左上角应出现临时 Debug UI。依次 Complete setup、Acknowledge orientation、Show B1、Start B1。八步实操：进入绿色区域 → 打开 F2 单门 → 从上方 Freezer 取出番茄和洋葱 → 两件都释放在台面紫色区 → 至少一件移入下方 Fresh 任意一格并点击 Confirm physical reorganisation → 将三件物品都释放在 Fresh 任意格 → 关上 F2 门 → 离开绿色区并进入蓝色区。提交反馈并确认 Mock 保存后，再对 B2 重复。Reset、Skip、Pause/Resume、Safe exit、Mock 保存失败与 Retry 可用同一面板检查。
+- `Assets/_Project/Tests/PlayMode/CorePlayWiringSmokeTests.cs` 是无头显启动/方案切换烟测，并通过移动真实场景对象、门体进度和区域判定验证 B1/B2 八步；门外可见性测试还会以真实图形设备分别渲染开门后可见的上下储物区，检查内部亮度。批处理运行该视觉测试时不要带 `-nographics`，否则它会明确跳过；它不直接向 Core 注入任务证据，但也不等于 XRI 手柄抓取实测。完整动作仍须在 Play 中由人用模拟器或 Quest Link 操作。
 
-**验收边界**：现有 F2 仍是两扇门代理，与 PRD Final §6.2 的大型单门不符；冰箱内部储物和金色判定区现已一致，但其几何/层高仍是 Play 验证代理，尚未经过模型与登记参数负责人确认。临时反馈、内存存储及 OnGUI 不是正式模块；Conflict Detection / Safety 来源尚未接入，因此 Yellow→Amber/Red 不能靠本场景完成端到端验收。上述限制不妨碍验证 Core 的运行时切换、状态和真实交互证据，但不得宣称完整 P0 通过。
+**验收边界**：F2 已按 PRD Final §6.2 改为大型单门，冰箱几何和层高仍是待确认的原型假设。临时反馈、内存存储及 OnGUI 不是正式模块；Conflict Detection / Safety 来源尚未接入，因此 Yellow→Amber/Red 不能靠本场景完成端到端验收。上述限制不妨碍验证 Core 的运行时切换、状态和真实交互证据，但不得宣称完整 P0 通过。
 
 ## 最小接入
 
@@ -29,7 +29,7 @@
 ## 正式验收前仍须确定
 
 - 与模型/产品负责人确认正式使用的 3–5 件实物和空间位置；当前番茄、洋葱、麦片盒及冰箱中层测试区只是 Core Play 验证配置。Take out 只涉及原有物品，Put back 涉及全部物品。
-- 由模型/参数负责人确认 F2 形态、两方案几何和阈值的登记依据。当前旧 F2 代理与 PRD Final §6.2 不符，不能用它宣布模型验收。
+- 由模型/参数负责人确认 F2 形态、两方案几何和阈值的登记依据。F2 与窗户尺寸的登记见 [F2 和窗户几何](F2AndWindows.md)。
 - B1/B2 的 `controlledQuestion` 当前仍为空；正式比较前由对应负责人填写，不从现有代理外观推断结论。
 
 Host 启动时校验注册表、方案 Prefab、门体与任务物/区域 ID；缺一项会给出错误并停止旅程。接线完成后应在 Play 模式用真实 XR 动作逐步验证 B1、B2，并观察重置、暂停、跳过、保存失败、旧回调和安全退出。EditMode 通过只证明纯流程与公共接口，不代替该 Play 验证或 Quest Link 验收。

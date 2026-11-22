@@ -14,6 +14,15 @@ namespace XRApartment.Data
         [SerializeField] LayerMask contactLayers = Physics.DefaultRaycastLayers;
         [SerializeField] Color hoverEmission = new Color(0.04f, 0.10f, 0.12f);
         [SerializeField] Color holdingEmission = new Color(0.06f, 0.16f, 0.18f);
+        [SerializeField, Range(1f, 10f)] float grabRotationStepDegrees = 3f;
+        [SerializeField, Range(1, 64)] int grabRotationIterations = 32;
+        [SerializeField, Min(0f)] float maxReleaseSpeed = 3f;
+        [SerializeField, Min(0f)] float maxReleaseAngularSpeed = 12f;
+        [SerializeField, Range(0f, 1f)] float blockedHapticAmplitude = 0.18f;
+        [SerializeField, Min(0.01f)] float blockedHapticDuration = 0.035f;
+        [SerializeField, Min(0.05f)] float blockedHapticInterval = 0.15f;
+        [SerializeField, Range(1f, 90f)] float ghostShowAngle = 25f;
+        [SerializeField, Range(0f, 90f)] float ghostHideAngle = 15f;
 
         public ModelAssumptions Assumptions => assumptions;
         public float FingerResponse => fingerResponse;
@@ -22,6 +31,15 @@ namespace XRApartment.Data
         public int ContactLayers => contactLayers;
         public Color HoverEmission => hoverEmission;
         public Color HoldingEmission => holdingEmission;
+        public float GrabRotationStepDegrees => grabRotationStepDegrees;
+        public int GrabRotationIterations => grabRotationIterations;
+        public float MaxReleaseSpeed => maxReleaseSpeed;
+        public float MaxReleaseAngularSpeed => maxReleaseAngularSpeed;
+        public float BlockedHapticAmplitude => blockedHapticAmplitude;
+        public float BlockedHapticDuration => blockedHapticDuration;
+        public float BlockedHapticInterval => blockedHapticInterval;
+        public float GhostShowAngle => ghostShowAngle;
+        public float GhostHideAngle => ghostHideAngle;
 
         public float Length(string key)
         {
