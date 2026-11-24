@@ -238,10 +238,22 @@ namespace XRApartment.Tests
                 Assert.That(position.y, Is.GreaterThan(.9f), "Unsupported initial placement: " + target.name + " at " + position);
                 return;
             }
-            var supportRay = new Ray(position + Vector3.up * .04f, Vector3.down);
-            Assert.IsTrue(fridge.Contains(position) && fridge.GetComponentsInChildren<BoxCollider>()
+            Physics.SyncTransforms();
+            var hasCollider = false;
+            var bounds = default(Bounds);
+            foreach (var col in target.GetComponentsInChildren<Collider>(false))
+            {
+                if (!col.enabled || col.isTrigger) continue;
+                if (!hasCollider) { bounds = col.bounds; hasCollider = true; }
+                else bounds.Encapsulate(col.bounds);
+            }
+            var sample = hasCollider ? bounds.center : position;
+            var distance = hasCollider ? bounds.extents.y + .05f : .09f;
+            var origin = hasCollider ? sample : position + Vector3.up * .04f;
+            var supportRay = new Ray(origin, Vector3.down);
+            Assert.IsTrue(fridge.Contains(sample) && fridge.GetComponentsInChildren<BoxCollider>()
                 .Any(part => part.name.StartsWith("VIS_Shelf_", System.StringComparison.Ordinal) &&
-                    part.Raycast(supportRay, out _, .09f)),
+                    part.Raycast(supportRay, out _, distance)),
                 "Fridge stock must rest above an actual shelf: " + target.name + " at " + position);
         }
 

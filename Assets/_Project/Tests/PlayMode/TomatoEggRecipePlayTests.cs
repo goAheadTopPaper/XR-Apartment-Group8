@@ -761,7 +761,7 @@ namespace XRApartment.Tests
             yield return ReleaseIntoPan(strips, pan, contents);
             Assert.AreEqual(BeefOnionStep.TakeIngredients, flow.BeefStep, "Beef alone cannot satisfy the recipe.");
             yield return new WaitForSecondsRealtime(.22f);
-            Assert.AreEqual("For this recipe: an onion.", fridgeDetail.text);
+            Assert.AreEqual("For this recipe: an onion.", KitchenLocale.Source(fridgeDetail));
 
             yield return TakeAndCut(fridge, onion, knife, knifeRest, cut, -.059f);
             var quarters = onion.Prepared.Pieces.ToArray();
@@ -824,7 +824,7 @@ namespace XRApartment.Tests
             yield return new WaitForSeconds(.35f);
             Assert.AreEqual(BeefOnionStep.Served, flow.BeefStep,
                 "Pan " + pan.transform.position + " up " + pan.transform.up + " plate " + plate.position);
-            Assert.That(heading.text, Does.Contain("SERVED"));
+            Assert.That(KitchenLocale.Source(heading), Does.Contain("SERVED"));
             Assert.AreEqual(0, contents.CapturedCount);
             Assert.IsTrue(strips.Concat(quarters).All(piece => piece.transform.parent == plate));
             yield return MoveHeld(left, pan.gameObject, pan.transform.position + new Vector3(-.24f, .28f, 0f),
@@ -1072,8 +1072,8 @@ namespace XRApartment.Tests
             yield return new WaitForSecondsRealtime(.22f);
             var heading = station.transform.Find("UI_CookingInstructions/Heading").GetComponent<TMP_Text>();
             var detail = station.transform.Find("UI_CookingInstructions/Detail").GetComponent<TMP_Text>();
-            Assert.That(heading.text, Does.Contain("READY"));
-            Assert.That(detail.text, Does.Contain("50 mL egg").And.Contain($"{contents.TomatoGrams:0} g tomato"));
+            Assert.That(KitchenLocale.Source(heading), Does.Contain("READY"));
+            Assert.That(KitchenLocale.Source(detail), Does.Contain("50 mL egg").And.Contain($"{contents.TomatoGrams:0} g tomato"));
             var menu = EnableKitchenMenu();
             var guide = menu.transform.Find("PREF_UI_KitchenActivities/Guide");
             yield return null;
@@ -1081,7 +1081,7 @@ namespace XRApartment.Tests
             Assert.IsTrue(guide.gameObject.activeInHierarchy, "A finished meal with the stove off should open the next guide step.");
             Assert.AreEqual("Preview fridges", ButtonText(guide.Find("Continue")));
             yield return Click(menu, guide.Find("Continue"));
-            Assert.AreEqual("Compare the fridges", guide.Find("Title").GetComponent<TMP_Text>().text);
+            Assert.AreEqual("Compare the fridges", KitchenLocale.Source(guide.Find("Title").GetComponent<TMP_Text>()));
             menu.Close();
             SetKitchenRigActive(false);
             File.WriteAllText("Logs/TomatoEggRecipe/recipe-scenario.json", JsonUtility.ToJson(new RecipeReport {
@@ -1091,7 +1091,7 @@ namespace XRApartment.Tests
                 presentationMeanMs = meanPresentationMs, presentationMaxMs = maxPresentationMs, presentationSamples = presentationSamples }, true));
             pan.Heat(1, 100); yield return null; Assert.AreEqual(TomatoEggStep.Burnt, flow.Recipe.Step);
             yield return new WaitForSecondsRealtime(.22f);
-            Assert.That(heading.text, Does.Contain("BURNT"));
+            Assert.That(KitchenLocale.Source(heading), Does.Contain("BURNT"));
             station.GetComponent<KitchenCookingStation>().ResetStation(); yield return Frames(4);
             Assert.AreEqual(TomatoEggStep.OpenFridge, flow.Recipe.Step); Assert.IsFalse(fridge.Accessible);
             Assert.AreEqual(0, contents.CapturedCount); Assert.AreEqual(0, pan.Batch.Millilitres);
@@ -1123,7 +1123,7 @@ namespace XRApartment.Tests
             yield return PlaceAndRelease(left, cup);
             Assert.IsTrue(guide.gameObject.activeInHierarchy);
             yield return Click(menu, guide.Find("Continue"));
-            Assert.AreEqual("Cook tomato and egg", guide.Find("Title").GetComponent<TMP_Text>().text);
+            Assert.AreEqual("Cook tomato and egg", KitchenLocale.Source(guide.Find("Title").GetComponent<TMP_Text>()));
             Assert.IsFalse(guide.Find("Continue").GetComponent<Button>().interactable);
             Assert.AreEqual(startScene, SceneManager.GetActiveScene());
             station.GetComponent<KitchenCookingStation>().ResetStation();
@@ -1144,7 +1144,7 @@ namespace XRApartment.Tests
             var kitchen = station.GetComponent<KitchenCookingStation>();
             yield return ToggleDoor(kitchen.ActiveFridge);
             yield return OpenGuide(menu);
-            Assert.That(guide.Find("Instruction").GetComponent<TMP_Text>().text, Does.Contain("Choose Compact"));
+            Assert.That(KitchenLocale.Source(guide.Find("Instruction").GetComponent<TMP_Text>()), Does.Contain("Choose Compact"));
             yield return Click(menu, guide.Find("Continue"));
             yield return Click(menu, labMenu.Find("CompactFridge"));
             yield return Click(menu, labMenu.Find("CloseLayoutLab"));
@@ -1152,7 +1152,7 @@ namespace XRApartment.Tests
             yield return ToggleDoor(kitchen.ActiveFridge, mayPause: true);
             Assert.IsTrue(guide.gameObject.activeInHierarchy);
             Assert.AreEqual("Leave feedback", ButtonText(guide.Find("Continue")));
-            Assert.That(guide.Find("Detail").GetComponent<TMP_Text>().text, Does.Contain("°").And.Not.Contain("try opening"));
+            Assert.That(KitchenLocale.Source(guide.Find("Detail").GetComponent<TMP_Text>()), Does.Contain("°").And.Not.Contain("try opening"));
             yield return Click(menu, guide.Find("Continue"));
             Assert.AreEqual("Feedback note", ButtonText(guide.Find("Continue")));
         }
@@ -1527,7 +1527,7 @@ namespace XRApartment.Tests
             Assert.IsFalse(note.GetComponent<XRGrabInteractable>().enabled, $"Note failed to attach at {note.transform.position} near {surface.point}.");
         }
 
-        static string ButtonText(Transform button) => button.GetComponentInChildren<TMP_Text>().text;
+        static string ButtonText(Transform button) => KitchenLocale.Source(button.GetComponentInChildren<TMP_Text>());
 
         IEnumerator Click(LocomotionSettingsView menu, Transform button)
         {
