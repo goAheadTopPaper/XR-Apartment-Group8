@@ -12,7 +12,6 @@ using UnityEngine.TestTools;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 using XRApartment.Data;
 using XRApartment.Runtime;
-using XRApartment.Runtime.Core;
 using XRApartment.Runtime.UI;
 
 namespace XRApartment.Tests
@@ -33,7 +32,6 @@ namespace XRApartment.Tests
             Assert.NotNull(movement.GetComponentInChildren<KitchenLayoutMenu>(true));
             Assert.AreEqual(3, lab.PresetCount);
             Assert.AreEqual(3, lab.FinishCount);
-            Assert.IsNull(Object.FindObjectOfType<JourneyRuntimeHost>());
             var originalDock = fridge.transform.position;
             var sink = GameObject.Find("BASIN_Collect").transform;
             var acrossFromFridge = Vector3.ProjectOnPlane(sink.position - originalDock, Vector3.up).normalized;

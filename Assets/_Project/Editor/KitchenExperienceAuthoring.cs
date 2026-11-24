@@ -47,8 +47,6 @@ namespace XRApartment.EditorTools
             });
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Kitchen_Environment.prefab", ConfigureRoomEnvelope);
             KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Lighting_KitchenDaylight.prefab", ConfigureDaylightLighting);
-            KitchenAuthoring.EditPrefab(KitchenAuthoring.Prefabs + "PREF_Fridge_F2.prefab",
-                root => ConfigurePull(root, "Handle"));
             KitchenAuthoring.EditPrefab(RecipePrefabs + "PREF_Cooking_Fridge.prefab",
                 root => ConfigurePull(root, "VIS_FridgeHandle"));
             KitchenAuthoring.EditPrefab(RecipeTomato, ConfigureProgressiveTomato);

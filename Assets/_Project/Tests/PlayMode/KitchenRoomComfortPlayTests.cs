@@ -23,6 +23,7 @@ namespace XRApartment.Tests
         [UnitySetUp]
         public IEnumerator LoadRoom()
         {
+            yield return UnloadKitchenIfLoaded("ComfortSetupScratch");
             SceneManager.LoadScene("SCN_Kitchen_Cooking");
             yield return null;
             yield return null;
@@ -30,11 +31,24 @@ namespace XRApartment.Tests
             movement = menu.GetComponentInParent<KitchenLocomotionSettings>();
         }
 
-        [TearDown]
-        public void CloseMenu()
+        [UnityTearDown]
+        public IEnumerator CloseMenu()
         {
             LanguageSelectionView.Hide();
             if (menu != null) menu.Close();
+            Time.timeScale = 1f;
+            yield return UnloadKitchenIfLoaded("ComfortTeardownScratch");
+        }
+
+        static IEnumerator UnloadKitchenIfLoaded(string placeholderName)
+        {
+            const string scenePath = "Assets/_Project/Scenes/SCN_Kitchen_Cooking.unity";
+            var kitchen = SceneManager.GetSceneByPath(scenePath);
+            if (!kitchen.IsValid() || !kitchen.isLoaded) yield break;
+            var placeholder = SceneManager.GetSceneByName(placeholderName);
+            if (!placeholder.IsValid()) placeholder = SceneManager.CreateScene(placeholderName);
+            SceneManager.SetActiveScene(placeholder);
+            yield return SceneManager.UnloadSceneAsync(kitchen);
         }
 
         [UnityTest]
@@ -66,6 +80,9 @@ namespace XRApartment.Tests
                 Assert.IsFalse(lab.CompactSelected);
                 KitchenSceneTestSetup.Click(menu, panel.Find("CompactFridge"));
                 Assert.IsTrue(lab.CompactSelected);
+                var station = Object.FindObjectOfType<KitchenCookingStation>();
+                for (var frame = 0; frame < 5 && station != null && station.IsResetting; frame++) yield return null;
+                menu.Close();
             }
             finally { Object.Destroy(obstacle); }
         }

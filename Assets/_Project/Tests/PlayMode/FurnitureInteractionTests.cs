@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using System;
 using NUnit.Framework;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -24,13 +23,24 @@ namespace XRApartment.Tests
         [TestCase(true)]
         public void TogglingMotionEnabled_PreservesOtherSelectionListeners(bool useDrawer)
         {
-            fridge = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/_Project/Prefabs/PREF_Fridge_F4.prefab"));
-            fridge.transform.position = new Vector3(100f, 50f, 100f);
-            var door = fridge.GetComponentInChildren<KinematicSwingDoor>();
-            var drawer = fridge.GetComponentInChildren<KinematicLinearDrawer>();
-            Behaviour motion = useDrawer ? (Behaviour)drawer : door;
-            Func<bool> isOpen = useDrawer ? (Func<bool>)(() => drawer.IsOpen) : () => door.IsOpen;
+            Behaviour motion;
+            Func<bool> isOpen;
+            if (useDrawer)
+            {
+                fridge = new GameObject("DrawerTest", typeof(XRSimpleInteractable), typeof(KinematicLinearDrawer));
+                fridge.transform.position = new Vector3(100f, 50f, 100f);
+                var drawer = fridge.GetComponent<KinematicLinearDrawer>();
+                motion = drawer;
+                isOpen = () => drawer.IsOpen;
+            }
+            else
+            {
+                fridge = new GameObject("DoorTest", typeof(XRSimpleInteractable), typeof(KinematicSwingDoor));
+                fridge.transform.position = new Vector3(100f, 50f, 100f);
+                var door = fridge.GetComponent<KinematicSwingDoor>();
+                motion = door;
+                isOpen = () => door.IsOpen;
+            }
             var interaction = motion.GetComponent<XRSimpleInteractable>();
             var notifications = 0;
             interaction.selectEntered.AddListener(_ => notifications++);

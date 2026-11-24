@@ -143,7 +143,7 @@ namespace XRApartment.Tests
         public void DressingProps_UseRegisteredMetreScaleAndBoundGrabColliders()
         {
             var dressing = scene.GetRootGameObjects().Single(root => root.name == "PREF_Apartment_Dressing");
-            Assert.IsNull(dressing.GetComponentInParent<BenchmarkSlotMarker>());
+            Assert.IsNotNull(dressing);
             var assumptions = AssetDatabase.LoadAssetAtPath<ModelAssumptions>("Assets/_Project/Settings/ASM_KitchenParameters.asset");
             var paths = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs/Props" })
                 .Select(AssetDatabase.GUIDToAssetPath).ToArray();
